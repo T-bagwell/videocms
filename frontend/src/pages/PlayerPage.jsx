@@ -10,6 +10,9 @@ export default function PlayerPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  // activeId lets us switch episodes without unmounting the <video> element,
+  // so fullscreen survives auto-advance. It follows the route id.
+  const [activeId, setActiveId] = useState(id);
   const videoRef = useRef(null);
   const savedRef = useRef(null);
   const hlsRef = useRef(null);
@@ -23,23 +26,27 @@ export default function PlayerPage() {
   const [hlsErr, setHlsErr] = useState('');
   const [err, setErr] = useState('');
 
+  useEffect(() => {
+    setActiveId(id);
+  }, [id]);
+
   const saveProgress = useCallback(() => {
     const el = videoRef.current;
-    if (!el || !el.duration || !id) return;
+    if (!el || !el.duration || !activeId) return;
     const position = Math.max(0, offsetRef.current + (el.currentTime || 0));
     const duration = offsetRef.current + el.duration;
     api('/users/me/progress', {
       method: 'PUT',
       body: {
-        video_id: id,
+        video_id: activeId,
         position_sec: position,
         duration_sec: duration,
       },
     }).catch(() => {});
-  }, [id]);
+  }, [activeId]);
 
   useEffect(() => {
-    api(`/videos/${id}`).then(setVideo).catch((e) => setErr(e.message));
+    api(`/videos/${activeId}`).then(setVideo).catch((e) => setErr(e.message));
 
     const playlistId = searchParams.get('playlist');
     const seriesId = searchParams.get('series');
@@ -60,7 +67,7 @@ export default function PlayerPage() {
         })
         .catch(() => {});
     }
-  }, [id, searchParams, t]);
+  }, [activeId, searchParams, t]);
 
   const startTranscode = useCallback(async () => {
     if (!video) return;
@@ -74,7 +81,7 @@ export default function PlayerPage() {
     hlsRef.current = hls;
     setTranscoding(true);
     setHlsErr('');
-    const url = mediaUrl(`/videos/${id}/hls/playlist.m3u8`) + `&start=${start}`;
+    const url = mediaUrl(`/videos/${activeId}/hls/playlist.m3u8`) + `&start=${start}`;
 
     hls.on(Hls.Events.MANIFEST_PARSED, () => setTranscoding(false));
     hls.on(Hls.Events.ERROR, (_event, data) => {
@@ -88,7 +95,7 @@ export default function PlayerPage() {
     });
     hls.attachMedia(videoRef.current);
     hls.loadSource(url);
-  }, [id, video, t]);
+  }, [activeId, video, t]);
 
   useEffect(() => {
     if (!video) return;
@@ -109,16 +116,27 @@ export default function PlayerPage() {
 
   useEffect(() => {
     savedRef.current = null;
-  }, [id]);
+  }, [activeId]);
+
+  function switchEpisode(nextId) {
+    if (nextId === activeId) return;
+    saveProgress();
+    if (hlsRef.current) {
+      hlsRef.current.destroy();
+      hlsRef.current = null;
+    }
+    setActiveId(nextId);
+    setHlsErr('');
+    setTranscoding(false);
+    const qp = queueParam();
+    navigate(qp ? `/player/${nextId}?${qp}` : `/player/${nextId}`);
+  }
 
   function playNext() {
     if (!queue.length) return;
-    const idx = queue.findIndex((v) => v.id === id);
+    const idx = queue.findIndex((v) => v.id === activeId);
     const next = queue[idx + 1];
-    if (next) {
-      const qp = queueParam();
-      navigate(qp ? `/player/${next.id}?${qp}` : `/player/${next.id}`);
-    }
+    if (next) switchEpisode(next.id);
   }
 
   function queueParam() {
@@ -129,12 +147,24 @@ export default function PlayerPage() {
     return '';
   }
 
-  function onLoadedMetadata() {
+  // resume native playback from saved progress once the new episode's metadata
+  // is available (guard against stale video data during episode switching)
+  useEffect(() => {
+    if (!video || video.id !== activeId || useTranscode) return;
     const el = videoRef.current;
-    if (!useTranscode && el && video?.progress_sec > 5 && video.progress_sec < video.duration_sec * 0.95) {
-      el.currentTime = video.progress_sec;
+    if (!el) return;
+    const p = video.progress_sec;
+    if (!(p > 5 && p < video.duration_sec * 0.95)) return;
+    const apply = () => {
+      if (el.readyState >= 1) el.currentTime = p;
+    };
+    if (el.readyState >= 1) {
+      apply();
+    } else {
+      el.addEventListener('loadedmetadata', apply, { once: true });
+      return () => el.removeEventListener('loadedmetadata', apply);
     }
-  }
+  }, [video, activeId, useTranscode]);
 
   function restartTranscode(newStart) {
     if (hlsRef.current) {
@@ -172,8 +202,8 @@ export default function PlayerPage() {
   if (err) return <div className="container"><div className="form-error">{err}</div></div>;
   if (!video) return <div className="container"><div className="loading">{t('common.loading')}</div></div>;
 
-  const queueIdx = queue.findIndex((v) => v.id === id);
-  const streamUrl = useTranscode ? undefined : mediaUrl(`/videos/${id}/stream`);
+  const queueIdx = queue.findIndex((v) => v.id === activeId);
+  const streamUrl = useTranscode ? undefined : mediaUrl(`/videos/${activeId}/stream`);
 
   return (
     <div className="container player-page">
@@ -186,14 +216,12 @@ export default function PlayerPage() {
       </div>
 
       <video
-        key={id}
         ref={videoRef}
         className="player"
         controls
         autoPlay
         src={streamUrl}
-        poster={video.has_poster ? mediaUrl(`/videos/${id}/poster`) : undefined}
-        onLoadedMetadata={onLoadedMetadata}
+        poster={video.has_poster ? mediaUrl(`/videos/${activeId}/poster`) : undefined}
         onSeeking={onSeeking}
         onTimeUpdate={() => {
           const el = videoRef.current;
@@ -219,7 +247,7 @@ export default function PlayerPage() {
         <div className="banner warn">
           {hlsErr}{' '}
           {!useTranscode && (
-            <button className="btn small" onClick={() => navigate(`/player/${id}?transcode=1`)}>
+            <button className="btn small" onClick={() => navigate(`/player/${activeId}?transcode=1`)}>
               {t('player.transcodePlay')}
             </button>
           )}
@@ -235,14 +263,8 @@ export default function PlayerPage() {
           {queue.map((v, i) => (
             <button
               key={v.id}
-              className={`queue-item ${v.id === id ? 'current' : ''}`}
-              onClick={() =>
-                v.id !== id &&
-                (() => {
-                  const qp = queueParam();
-                  navigate(qp ? `/player/${v.id}?${qp}` : `/player/${v.id}`);
-                })()
-              }
+              className={`queue-item ${v.id === activeId ? 'current' : ''}`}
+              onClick={() => v.id !== activeId && switchEpisode(v.id)}
             >
               <span className="queue-idx">{i + 1}</span>
               <span className="queue-title">{v.title}</span>
