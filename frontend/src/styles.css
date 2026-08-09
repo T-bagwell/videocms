@@ -287,6 +287,8 @@ label input, label textarea { margin-top: 6px; }
 }
 .picker-dir:last-child { border-bottom: none; }
 .picker-dir:hover { background: #262b37; }
+.hidden-path-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.hidden-path-row:hover { background: #262b37; }
 .picker-dir-icon { flex: none; }
 .picker-empty { padding: 22px; text-align: center; color: var(--muted); font-size: 13px; }
 .picker-error { padding: 10px 12px; margin: 0; }

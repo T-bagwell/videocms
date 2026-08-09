@@ -89,12 +89,12 @@ func (m *HLSManager) Playlist(ctx context.Context, videoID uuid.UUID, input stri
 		"-map", "0:v:0", "-map", "0:a:0?",
 		"-c:v", "libx264", "-preset", "veryfast", "-crf", "23",
 		"-vf", "scale=" + fmt.Sprint(hlsMaxWidth) + ":-2",
+		"-force_key_frames", "expr:gte(t,n_forced*6)",
 		"-c:a", "aac", "-b:a", "128k",
 		"-f", "hls",
 		"-hls_time", fmt.Sprint(hlsSegmentDur),
-		"-hls_playlist_type", "vod",
 		"-hls_list_size", "0",
-		"-hls_flags", "independent_segments+temp_file",
+		"-hls_flags", "independent_segments",
 		"-hls_segment_filename", segPattern,
 		manifestPath,
 	}
@@ -122,6 +122,14 @@ func (m *HLSManager) Playlist(ctx context.Context, videoID uuid.UUID, input stri
 	go func() {
 		if err := cmd.Wait(); err != nil && sctx.Err() == nil {
 			log.Printf("[hls:%s] ffmpeg exited: %v", videoID.String()[:8], err)
+		}
+		// the manifest grows while transcoding; signal completion only when the
+		// transcode actually finished (not when the session was cancelled)
+		if sctx.Err() == nil {
+			if f, ferr := os.OpenFile(manifestPath, os.O_APPEND|os.O_WRONLY, 0o644); ferr == nil {
+				f.WriteString("#EXT-X-ENDLIST\n")
+				f.Close()
+			}
 		}
 	}()
 

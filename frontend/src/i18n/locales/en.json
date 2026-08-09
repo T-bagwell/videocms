@@ -125,7 +125,13 @@
     "favorite": "☆ Favorite series",
     "unfavorite": "Unfavorite series",
     "favorited": "★ Favorited",
-    "playAll": "▶ Play all episodes"
+    "playAll": "▶ Play all episodes",
+    "pathFilter": "Hide paths",
+    "pathFilterHint": "Videos under these server paths are hidden for you.",
+    "addPath": "Add",
+    "pathPlaceholder": "/Volumes/…/folder",
+    "noHiddenPaths": "No hidden paths yet.",
+    "removePath": "Remove"
   },
   "admin": {
     "title": "Admin",

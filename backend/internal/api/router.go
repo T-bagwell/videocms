@@ -92,6 +92,9 @@ func (a *App) Routes() http.Handler {
 	mux.HandleFunc("POST /api/users/me/favorites", authUser(a.addFavorite))
 	mux.HandleFunc("DELETE /api/users/me/favorites/{videoId}", authUser(a.removeFavorite))
 	mux.HandleFunc("GET /api/users/me/favorites", authUser(a.listFavorites))
+	mux.HandleFunc("GET /api/users/me/hidden-paths", authUser(a.listHiddenPaths))
+	mux.HandleFunc("POST /api/users/me/hidden-paths", authUser(a.addHiddenPath))
+	mux.HandleFunc("DELETE /api/users/me/hidden-paths/{id}", authUser(a.removeHiddenPath))
 
 	mux.HandleFunc("GET /api/playlists", authUser(a.listPlaylists))
 	mux.HandleFunc("POST /api/playlists", authUser(a.createPlaylist))

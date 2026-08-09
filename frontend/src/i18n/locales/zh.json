@@ -125,7 +125,13 @@
     "favorite": "☆ 收藏剧集",
     "unfavorite": "取消收藏剧集",
     "favorited": "★ 已收藏",
-    "playAll": "▶ 列表播放"
+    "playAll": "▶ 列表播放",
+    "pathFilter": "路径过滤",
+    "pathFilterHint": "以下服务器路径下的视频对你隐藏，不会显示。",
+    "addPath": "添加",
+    "pathPlaceholder": "/Volumes/…/文件夹",
+    "noHiddenPaths": "还没有隐藏路径。",
+    "removePath": "移除"
   },
   "admin": {
     "title": "管理后台",

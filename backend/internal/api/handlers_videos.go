@@ -38,6 +38,17 @@ const videoColumns = `
 	COALESCE((SELECT wp.position_sec FROM watch_progress wp WHERE wp.user_id=$1 AND wp.video_id=v.id), 0),
 	COALESCE((SELECT wp.duration_sec FROM watch_progress wp WHERE wp.user_id=$1 AND wp.video_id=v.id), 0)`
 
+// visibleEpisodes returns a SQL condition matching videos that are available
+// and not located under any of the current user's hidden paths. userParam is
+// the $N placeholder holding the user id.
+func visibleEpisodes(userParam int) string {
+	return fmt.Sprintf(`v.available AND NOT EXISTS (
+		SELECT 1 FROM hidden_paths hp
+		WHERE hp.user_id=$%d
+		  AND (v.file_path = hp.path OR starts_with(v.file_path, hp.path || '/'))
+	)`, userParam)
+}
+
 func scanVideo(row pgx.Row) (models.Video, error) {
 	var v models.Video
 	err := row.Scan(&v.ID, &v.LibraryID, &v.LibraryName, &v.Title, &v.Filename, &v.FilePath,
@@ -69,6 +80,7 @@ func (a *App) listVideos(w http.ResponseWriter, r *http.Request) {
 	args := []any{user.ID}
 	// $1 is always present so count and list queries share the same arg layout
 	where := []string{"v.available = true AND $1::uuid IS NOT NULL"}
+	where = append(where, visibleEpisodes(1))
 	argIdx := 2
 
 	if libID := q.Get("library_id"); libID != "" {
@@ -163,8 +175,8 @@ func (a *App) getVideo(w http.ResponseWriter, r *http.Request) {
 	v, err := scanVideo(a.pool.QueryRow(r.Context(), fmt.Sprintf(`
 		SELECT %s FROM videos v JOIN libraries l ON l.id=v.library_id
 		LEFT JOIN series s ON s.id = v.series_id
-		WHERE v.id=$2`,
-		videoColumns), auth.UserFrom(r).ID, id))
+		WHERE v.id=$2 AND %s`,
+		videoColumns, visibleEpisodes(1)), auth.UserFrom(r).ID, id))
 	if errors.Is(err, pgx.ErrNoRows) {
 		writeErr(w, http.StatusNotFound, "video not found")
 		return

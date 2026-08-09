@@ -125,7 +125,13 @@
     "favorite": "☆ Série favorite",
     "unfavorite": "Retirer des favoris",
     "favorited": "★ Favori",
-    "playAll": "▶ Tout lire"
+    "playAll": "▶ Tout lire",
+    "pathFilter": "Filtres de chemins",
+    "pathFilterHint": "Les vidéos situées sous ces chemins serveur vous sont masquées.",
+    "addPath": "Ajouter",
+    "pathPlaceholder": "/Volumes/…/dossier",
+    "noHiddenPaths": "Aucun chemin masqué pour le moment.",
+    "removePath": "Retirer"
   },
   "admin": {
     "title": "Administration",

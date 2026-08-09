@@ -125,7 +125,13 @@
     "favorite": "☆ Serie als Favorit",
     "unfavorite": "Favorit entfernen",
     "favorited": "★ Favorit",
-    "playAll": "▶ Alle Folgen abspielen"
+    "playAll": "▶ Alle Folgen abspielen",
+    "pathFilter": "Pfadfilter",
+    "pathFilterHint": "Videos unter diesen Serverpfaden werden für Sie ausgeblendet.",
+    "addPath": "Hinzufügen",
+    "pathPlaceholder": "/Volumes/…/Ordner",
+    "noHiddenPaths": "Noch keine ausgeblendeten Pfade.",
+    "removePath": "Entfernen"
   },
   "admin": {
     "title": "Verwaltung",

@@ -125,7 +125,13 @@
     "favorite": "☆ お気に入りに追加",
     "unfavorite": "お気に入り解除",
     "favorited": "★ お気に入り",
-    "playAll": "▶ リスト再生"
+    "playAll": "▶ リスト再生",
+    "pathFilter": "パスフィルター",
+    "pathFilterHint": "これらのサーバーパス以下の動画は非表示になります。",
+    "addPath": "追加",
+    "pathPlaceholder": "/Volumes/…/フォルダ",
+    "noHiddenPaths": "非表示パスはまだありません。",
+    "removePath": "削除"
   },
   "admin": {
     "title": "管理画面",

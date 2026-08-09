@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { api } from '../api.js';
 import VideoCard from '../components/VideoCard.jsx';
 import SeriesCard from '../components/SeriesCard.jsx';
+import PathFilterModal from '../components/PathFilterModal.jsx';
 import { useAuth } from '../auth.jsx';
 import { useTranslation } from 'react-i18next';
 
@@ -22,6 +23,7 @@ export default function BrowsePage() {
   const [sort, setSort] = useState('title');
   const [vtype, setVtype] = useState('');
   const [series, setSeries] = useState([]);
+  const [showFilter, setShowFilter] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const loadedRef = useRef(false);
@@ -29,8 +31,13 @@ export default function BrowsePage() {
   useEffect(() => {
     api('/libraries').then((d) => setLibraries(d.items)).catch(() => {});
     api('/users/me/continue').then((d) => setContinueWatching(d.items)).catch(() => {});
-    api('/series').then((d) => setSeries(d.items)).catch(() => {});
   }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (libraryId) params.set('library_id', libraryId);
+    api(`/series?${params}`).then((d) => setSeries(d.items)).catch(() => {});
+  }, [libraryId]);
 
   useEffect(() => {
     let cancelled = false;
@@ -70,6 +77,13 @@ export default function BrowsePage() {
     loadedRef.current = false;
     setPage(1);
     setSearch(q.trim());
+  }
+
+  function reloadAll() {
+    api('/videos?page_size=1').then(() => {
+      setPage(1);
+      setSearch(search);
+    }).catch(() => {});
   }
 
   const showMore = videos.length < total;
@@ -132,6 +146,9 @@ export default function BrowsePage() {
             <option value="movie">{t('browse.typeMovie')}</option>
             <option value="tv">{t('browse.typeTv')}</option>
           </select>
+          <button className="btn" onClick={() => setShowFilter(true)}>
+            {t('series.pathFilter')}
+          </button>
         </div>
 
         {error && <div className="form-error">{error}</div>}
@@ -154,6 +171,9 @@ export default function BrowsePage() {
           </div>
         )}
       </section>
+      {showFilter && (
+        <PathFilterModal onClose={() => setShowFilter(false)} onChanged={reloadAll} />
+      )}
       <div className="footer-note">
         {t('browse.footerUser', {
           name: user?.display_name || user?.username,

@@ -37,4 +37,3 @@ func readJSON(w http.ResponseWriter, r *http.Request, dst any) error {
 	}
 	return nil
 }
-
