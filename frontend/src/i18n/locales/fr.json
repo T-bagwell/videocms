@@ -110,7 +110,9 @@
   },
   "favorites": {
     "title": "Mes favoris",
-    "empty": "Aucun favori pour le moment. Touchez ☆ Favori pendant la navigation."
+    "empty": "Aucun favori pour le moment. Touchez ☆ Favori pendant la navigation.",
+    "videosTitle": "Vidéos favorites",
+    "seriesTitle": "Séries TV favorites"
   },
   "series": {
     "title": "Séries TV",

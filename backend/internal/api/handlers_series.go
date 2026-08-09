@@ -130,6 +130,39 @@ func (a *App) removeSeriesFavorite(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]any{"message": "removed"})
 }
 
+func (a *App) mySeriesFavorites(w http.ResponseWriter, r *http.Request) {
+	user := auth.UserFrom(r)
+	rows, err := a.pool.Query(r.Context(), `
+		SELECT s.id, s.library_id, l.name, s.name, s.season, s.episode_count, s.updated_at,
+		       (SELECT v.poster_path FROM videos v
+		        WHERE v.series_id = s.id AND v.available
+		        ORDER BY v.season, v.episode LIMIT 1),
+		       true AS is_fav
+		FROM series_favorites sf
+		JOIN series s ON s.id = sf.series_id
+		JOIN libraries l ON l.id = s.library_id
+		WHERE sf.user_id=$1
+		ORDER BY sf.created_at DESC`, user.ID)
+	if err != nil {
+		writeErr(w, http.StatusInternalServerError, "query series favorites failed")
+		return
+	}
+	defer rows.Close()
+
+	items := []models.Series{}
+	for rows.Next() {
+		var s models.Series
+		if err := rows.Scan(&s.ID, &s.LibraryID, &s.LibraryName, &s.Name, &s.Season,
+			&s.EpisodeCount, &s.UpdatedAt, &s.PosterPath, &s.IsFavorite); err != nil {
+			writeErr(w, http.StatusInternalServerError, "scan series favorite failed")
+			return
+		}
+		s.HasPoster = s.PosterPath != ""
+		items = append(items, s)
+	}
+	writeJSON(w, http.StatusOK, map[string]any{"items": items})
+}
+
 func (a *App) seriesPoster(w http.ResponseWriter, r *http.Request) {
 	id, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {

@@ -110,7 +110,9 @@
   },
   "favorites": {
     "title": "My Favorites",
-    "empty": "No favorites yet. Tap ☆ Favorite while browsing."
+    "empty": "No favorites yet. Tap ☆ Favorite while browsing.",
+    "videosTitle": "Favorited videos",
+    "seriesTitle": "Favorited TV shows"
   },
   "series": {
     "title": "TV Shows",

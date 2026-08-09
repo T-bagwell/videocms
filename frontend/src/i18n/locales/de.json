@@ -110,7 +110,9 @@
   },
   "favorites": {
     "title": "Meine Favoriten",
-    "empty": "Noch keine Favoriten. Tippen Sie beim Stöbern auf ☆ Favorit."
+    "empty": "Noch keine Favoriten. Tippen Sie beim Stöbern auf ☆ Favorit.",
+    "videosTitle": "Favorisierte Videos",
+    "seriesTitle": "Favorisierte Serien"
   },
   "series": {
     "title": "Serien",

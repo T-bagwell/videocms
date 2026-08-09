@@ -110,7 +110,9 @@
   },
   "favorites": {
     "title": "我的收藏",
-    "empty": "还没有收藏视频，浏览时点「☆ 收藏」即可加入。"
+    "empty": "还没有收藏内容，浏览时点「☆ 收藏」即可加入。",
+    "videosTitle": "收藏的视频",
+    "seriesTitle": "收藏的剧集"
   },
   "series": {
     "title": "剧集",

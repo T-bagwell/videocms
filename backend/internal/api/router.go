@@ -80,6 +80,7 @@ func (a *App) Routes() http.Handler {
 	mux.HandleFunc("GET /api/series/{id}/poster", authUser(a.seriesPoster))
 	mux.HandleFunc("POST /api/series/{id}/favorite", authUser(a.addSeriesFavorite))
 	mux.HandleFunc("DELETE /api/series/{id}/favorite", authUser(a.removeSeriesFavorite))
+	mux.HandleFunc("GET /api/users/me/series-favorites", authUser(a.mySeriesFavorites))
 
 	mux.HandleFunc("GET /api/admin/users", authAdmin(a.listUsers))
 	mux.HandleFunc("PATCH /api/admin/users/{id}", authAdmin(a.updateUser))
