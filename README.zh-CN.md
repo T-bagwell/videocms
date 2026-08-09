@@ -62,3 +62,7 @@ make serve                                  # 访问 http://<局域网IP>:8080
   伪装格式可在播放器点「转码播放」
 - TMDB 刮削需要能访问 api.themoviedb.org
 - 扫描为增量全量重扫，可扩展为文件系统监听
+
+## 文档
+
+- [系统架构设计](docs/architecture.zh-CN.md)（[English](docs/architecture.md) | [日本語](docs/architecture.ja.md)）

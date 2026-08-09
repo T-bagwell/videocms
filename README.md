@@ -152,3 +152,7 @@ Media URLs (`<video>`/`<img>` cannot set headers) accept `?token=JWT`.
 ## License
 
 [Apache License 2.0](LICENSE)
+
+## Documentation
+
+- [System architecture design](docs/architecture.md) (English | [中文](docs/architecture.zh-CN.md) | [日本語](docs/architecture.ja.md))

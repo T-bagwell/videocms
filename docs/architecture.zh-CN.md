@@ -1,0 +1,272 @@
+# VideoCMS — 系统架构设计
+
+> **语言:** [English](architecture.md) | 中文 | [日本語](architecture.ja.md)
+
+## 1. 概述
+
+VideoCMS 是一个自托管的视频资源管理系统。用户把服务器上的文件夹指给系统，系统将其扫描进
+媒体库、提取元数据，并通过 Web 播放器提供浏览与播放。目标是做一个轻量、可扩展、完全由
+所有者掌控的 Emby/Jellyfin 替代品。
+
+### 1.1 目标
+
+- 把服务器上任意文件夹扫描成可搜索的视频媒体库
+- 提取技术元数据（编码、分辨率、时长），并补充海报、简介、类型
+  （文件名解析、ffmpeg 抽帧、可选 TMDB 刮削）
+- 浏览器内播放：格式兼容时原生播放，否则实时 HLS 转码
+- 每用户状态：观看进度、收藏、播放列表
+- 管理能力：媒体库管理、元数据编辑、用户管理
+- 多语言界面（en/zh/fr/ja/de），默认英文
+
+### 1.2 当前范围外的目标
+
+- 不接入在线流媒体服务、不做 P2P
+- 暂无自适应码率（ABR）多档位（当前单码率 HLS）
+- 暂无文件系统监听增量入库（扫描为全量差异重扫）
+
+## 2. 系统总览
+
+```
+┌────────────────────┐        HTTP/JSON + Range 流媒体        ┌─────────────────────────┐
+│  React SPA (Vite)   │ ──────────────────────────────────────▶ │  Go 后端 (:8080)        │
+│  i18n en/zh/fr/ja/de│                                         │  net/http + pgx         │
+└─────────┬──────────┘                                         └────────────┬────────────┘
+          │  /api 代理（开发）/ 静态托管（生产）                              │ ffprobe / ffmpeg
+          │                                                                    ▼
+          └────────────────────────────────────────────────── 媒体库磁盘文件夹（视频文件）
+                                                              │
+                     PostgreSQL 14 ── 元数据 / 用户 / 进度 / 收藏 / 播放列表
+```
+
+三个运行时部分：
+
+| 部分 | 技术 | 职责 |
+| --- | --- | --- |
+| Web 界面 | React 18、Vite、react-router、i18next、hls.js | 浏览/搜索/播放、管理后台、语言切换 |
+| 后端 | Go（net/http 标准库、pgx/v5） | 认证、媒体库管理、扫描、流媒体、HLS、刮削 |
+| 存储 | PostgreSQL 14 + 服务器磁盘 | 元数据数据库；视频文件与生成的海报/HLS 分片在磁盘上 |
+
+## 3. 后端设计
+
+### 3.1 分层结构
+
+```
+backend/
+  cmd/server/main.go          入口：配置 → 数据库 → 迁移 → HTTP 服务
+  internal/
+    config/                   基于环境变量的配置
+    db/                       pgx 连接池、内嵌 SQL 迁移、管理员种子
+    models/                   共享领域类型
+    auth/                     JWT 签发/校验、认证中间件（Bearer 或 ?token=）
+    media/
+      scanner.go              媒体库扫描（并行遍历 + 探测 + 写入）
+      scraper.go              TMDB 元数据增强
+      hls.go                  HLS 转码会话管理
+      stream.go               HTTP Range 流媒体
+      segment.go              HLS 分片文件名校验
+    api/
+      router.go               路由表、CORS/日志/恢复中间件
+      json.go                 JSON 工具
+      handlers_*.go           按领域分组的 HTTP 处理器
+```
+
+### 3.2 HTTP 层
+
+- 路由使用 Go 1.22+ `net/http.ServeMux` 模式
+  （`"GET /api/videos/{id}"`、`"GET /api/videos/{id}/hls/{file...}"`）
+- 中间件链包裹路由：panic 恢复 → 请求日志 → CORS
+- 请求体限制大小（`http.MaxBytesReader`）
+- 所有 API 响应为 JSON；错误格式 `{"error": "..."}`；列表返回
+  `{"items": [...], "total", "page", "page_size"}`
+
+### 3.3 认证与授权
+
+- 密码使用 **bcrypt** 哈希；登录签发 **HS256 JWT**（7 天有效）
+- 默认 `Authorization: Bearer <token>`；媒体端点（`<video>`/`<img>` 无法设置请求头）
+  额外支持 `?token=<jwt>`
+- 两个角色：`user` 与 `admin`
+  - `RequireAuth` 每次请求从数据库重新加载用户，角色变更立即生效
+  - `RequireAdmin` 保护媒体库变更、元数据编辑、刮削、统计、目录浏览与用户管理
+- 用户管理守卫：不能删除自己、不能删除/降级最后一个管理员
+
+### 3.4 数据库结构
+
+由内嵌 SQL 迁移管理（`schema_migrations` 表记录版本）。
+
+```sql
+users           -- id, username(唯一), password_hash, display_name, role, created_at
+libraries       -- id, name, path(唯一), scan_status(idle|scanning|error|cancelled),
+                --   scan_error, scan_started_at, scan_finished_at, video_count
+videos          -- id, library_id(外键), title, filename, file_path(唯一), size_bytes,
+                --   duration_sec, width, height, video_codec, container, year, synopsis,
+                --   genres(text[]), poster_path, subtitle_path, tmdb_id, scraped_at,
+                --   available, created_at, updated_at, last_scanned_at
+watch_progress  -- 主键(user_id, video_id), position_sec, duration_sec, updated_at
+favorites       -- 主键(user_id, video_id), created_at
+playlists       -- id, user_id(外键), name, description, 时间戳
+playlist_items  -- 主键(playlist_id, video_id), position, added_at
+```
+
+关键索引：`videos(lower(title))`、`videos(library_id)`、部分索引
+`videos(available) WHERE available`、`watch_progress(user_id, updated_at DESC)`、
+`playlist_items(playlist_id, position)`。
+
+### 3.5 流媒体（HTTP Range）
+
+`GET /api/videos/{id}/stream` 直接打开磁盘文件，以 `Accept-Ranges: bytes` 提供，
+支持单 Range 请求（`206 Partial Content`）。Content-Type 按扩展名推断
+（`video/mp4`、`video/x-matroska` 等）。浏览器兼容的文件零 CPU 开销。
+
+### 3.6 HLS 转码
+
+浏览器无法播放的格式（如 MKV/HEVC），播放器回退到
+`GET /api/videos/{id}/hls/playlist.m3u8?start=<秒>`。
+
+`HLSManager`：
+
+- 每个视频会话启动一个 ffmpeg 进程：
+  `-ss <start> -i <input> -c:v libx264 -preset veryfast -crf 23 -vf scale=1280:-2
+  -c:a aac -b:a 128k -f hls -hls_time 6 -hls_playlist_type vod -hls_list_size 0
+  -hls_flags independent_segments+temp_file`
+- 分片写入 `data/hls/<video-id>/`，由增长的 VOD 播放列表引用；`temp_file` 防止
+  未写完的分片进入清单
+- 请求的 `start` 与当前会话相差超过一个分片（6 秒）时，杀掉旧会话并从新位置重启（跳转）
+- 清单在响应时重写，使每个分片 URL 都携带 `?token=`
+- 空闲会话 **15 分钟**后回收，同时删除会话目录
+- 服务端不阻塞转码：播放从第一个完成的分片开始
+
+### 3.7 媒体扫描器
+
+每个媒体库在后台 goroutine 中执行 `Scanner.scan`：
+
+1. 设置 `scan_status=scanning`，记录 `scan_started_at`
+2. `filepath.WalkDir` 发现视频文件；跳过隐藏文件/目录、`.m3u8` HLS 流文件夹
+   （以及 macOS `._` 资源分叉文件）
+3. 工作池（默认 **4**，`SCAN_WORKERS` 可设 1-16）用 ffprobe 探测每个文件（30 秒超时）
+   并写入视频记录
+4. 新记录用 ffmpeg 抽取海报帧（60 秒超时，`scale=480:-2`，取 15% 处画面）；
+   同目录字幕（`.srt/.vtt/.ass`）自动关联
+5. 每收录 20 个更新 `video_count`，UI 显示实时进度
+6. 完成后，本次未扫描到的文件标记 `available=false`
+   （依据 `last_scanned_at < scan_start`），取消扫描不会误标
+7. 取消（`POST /api/libraries/{id}/scan/cancel`）通过取消 context 实现；
+   状态变为 `cancelled`，已收录记录保留
+8. panic 会被恢复并显示为 `scan_status=error`；服务重启会把残留的 `scanning`
+   状态重置为 `error`
+
+探测失败的文件仍会以空技术元数据入库，让所有者能看到并决定如何处理。
+
+### 3.8 元数据刮削（TMDB）
+
+可选（`TMDB_API_KEY`）。`Scraper`：
+
+- 先搜索 TMDB（语言可配置，默认 `zh-CN`），再取影片详情获取本地化类型名
+- 下载 `w500` 海报到 `data/posters/<video-id>.<ext>`
+- 更新 `title, year, synopsis, genres, poster_path, tmdb_id, scraped_at`
+- 限速：每 400ms 一次请求
+- 扫描时只补充「无简介且从未刮削」的视频；手动
+  `POST /api/videos/{id}/scrape` 总是覆盖
+
+### 3.9 管理端点
+
+- `GET /api/admin/stats` — 聚合统计与总字节数
+- `GET /api/admin/paths?path=…` — 服务器目录浏览器（子目录、上级、主目录快捷方式、
+  通过 `statfs` 获取磁盘可用空间），供目录选择器使用
+- 用户管理：列表 / 改角色 / 重置密码 / 删除（带守卫）
+
+## 4. 前端设计
+
+### 4.1 结构
+
+```
+frontend/src/
+  api.js           fetch 封装（token、JSON、401 跳转）
+  auth.jsx         认证上下文（用户、登录/注册/退出）
+  i18n/            i18next 配置 + en/zh/fr/ja/de 语言 JSON
+  components/      Navbar、Poster、VideoCard、PathPicker、Toast
+  pages/           Login、Browse、VideoDetail、Player、Playlists、
+                   PlaylistDetail、Favorites、Admin
+```
+
+### 4.2 路由与状态
+
+- `react-router-dom` v6；未登录用户重定向到 `/login`
+- 认证状态在 React context，JWT 存 `localStorage`
+- i18n：`i18next` + `react-i18next`，默认 **英文**，选择存 `localStorage`，
+  支持 en/zh/fr/ja/de
+
+### 4.3 播放
+
+- H.264 MP4 / WebM / MOV → 原生 `<video>` + Range 流媒体
+- 其他格式 → 动态 `import('hls.js')`，带 `start` 偏移的 HLS 播放列表；
+  缓冲范围外跳转会重启转码会话
+- 每播放 5 秒及暂停/结束时保存进度（绝对位置 = 会话偏移 + 媒体时间）
+- 原生播放失败时提供「转码播放」兜底
+
+### 4.4 管理界面
+
+标签页：概览（统计）、媒体库（服务端目录选择器添加、扫描/停止、删除）、
+视频（搜索、编辑元数据、刮削、上传海报）、用户（角色、重置密码、删除）。
+
+## 5. 关键流程
+
+### 5.1 媒体库扫描
+
+```
+管理界面 ──POST /api/libraries/{id}/scan──▶ scanner.Start（goroutine）
+   │                                          │
+   │  轮询 GET /api/libraries（3 秒）          ├─ WalkDir（跳过隐藏/.m3u8）
+   │                                          ├─ 工作池：ffprobe → 入库 → 海报
+   │                                          ├─ 每 20 个更新 video_count
+   │                                          └─ 标记缺失 → idle/error/cancelled
+   ◀── 扫描状态 + 实时数量 ──────────────────┘
+```
+
+### 5.2 播放（不兼容格式）
+
+```
+播放器 ──GET /hls/playlist.m3u8?start=进度──▶ HLSManager
+   │                                            ├─ 启动/杀掉 ffmpeg 会话
+   │  分片（带 ?token=）◀──────────────────────┴─ 写入 data/hls/<id>/
+   └─ hls.js → <video> ──每 5 秒 PUT /users/me/progress
+```
+
+## 6. 配置
+
+| 变量 | 默认值 | 用途 |
+| --- | --- | --- |
+| `PORT` | `8080` | 监听地址 |
+| `DATABASE_URL` | `postgres://localhost:5432/videocms` | PostgreSQL 连接串 |
+| `JWT_SECRET` | 开发用常量 | 令牌签名密钥（生产必须设置） |
+| `DATA_DIR` | `data` | 海报 + HLS 分片 |
+| `ADMIN_USERNAME` / `ADMIN_PASSWORD` | admin / admin123 | 初始管理员 |
+| `FFPROBE_BIN` / `FFMPEG_BIN` | 自动探测 | 工具路径（含 Homebrew 回退） |
+| `TMDB_API_KEY` / `TMDB_LANGUAGE` | 空 / zh-CN | 刮削 |
+| `SCAN_WORKERS` | `4` | 并行探测工作数 |
+| `WEB_ROOT` | 自动（`frontend/dist`） | 生产模式下内置的前端目录 |
+
+## 7. 安全考虑
+
+- 所有变更/浏览端点仅限管理员
+- 媒体 URL 需要用户 JWT（请求头或查询参数）
+- HLS 分片名严格校验（`seg_\d+\.ts`）并限制在会话目录内
+- SQL 全程通过 pgx 参数化
+- 默认 `JWT_SECRET` 仅用于开发；明文 HTTP 只建议在可信局域网使用，
+  公网访问需前置 HTTPS 反向代理
+
+## 8. 性能说明
+
+- 直接播放的文件流媒体为磁盘 I/O 瓶颈（零转码）
+- 并行扫描（4 工作池）在外部 USB 硬盘上约 80 秒索引 1,600 个文件
+- 跳过 `._` 资源分叉和 `.m3u8` 分片目录，避免数千次无效探测
+- 数据库查询有索引，列表查询分页（默认每页 24 条）
+- HLS 转码为单码率、CPU 密集；空闲会话自动回收
+
+## 9. 扩展点
+
+- **文件系统监听**（fsnotify）实现增量入库
+- **ABR 多码率**（多档 HLS），可复用现有会话管理器
+- **更多在线元数据源**（JAV 数据库、剧集刮削等）
+- **字幕增强**：内嵌轨道提取、上传、多语言选择
+- **元数据与用户数据导出/备份**
+- **公开分享**：使用签名的短时 URL 而非账号 JWT

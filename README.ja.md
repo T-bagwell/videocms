@@ -46,3 +46,7 @@ make serve                                  # http://<LAN IP>:8080
   HLS トランスコード（15 分アイドルで回収）を利用
 - TMDB スクレイピングには api.themoviedb.org へのアクセスが必要
 - スキャンは差分更新方式の全量再スキャン。ファイル監視モードは将来の拡張候補
+
+## ドキュメント
+
+- [システムアーキテクチャ設計](docs/architecture.ja.md)（[English](docs/architecture.md) | [中文](docs/architecture.zh-CN.md)）
