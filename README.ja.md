@@ -1,55 +1,178 @@
-# VideoCMS — ビデオリソース管理システム
+# 🎬 VideoCMS
 
-> **言語:** [English](README.md) | [中文](README.zh-CN.md) | 日本語
+> **セルフホスト型ビデオリソース管理システム** — Go · React · PostgreSQL
 
-**Go + PostgreSQL + React** によるセルフホスト型ビデオライブラリです。
-ディスク上のフォルダをスキャンしてメタデータ（タイトル・年・解像度・コーデック・再生時間）と
-ポスターを自動抽出し、Web 上で閲覧・再生できます。視聴履歴・お気に入り・プレイリストに対応。
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
+![Go](https://img.shields.io/badge/Go-1.22+-00ADD8?logo=go&logoColor=white)
+![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14-4169E1?logo=postgresql&logoColor=white)
+![i18n](https://img.shields.io/badge/i18n-5%20languages-8A2BE2)
 
-## 主な機能
+**言語:** [English](README.md) | [中文](README.zh-CN.md) | 日本語
 
-- ライブラリ管理：サーバー上のフォルダを追加/削除、バックグラウンドスキャン
-- スキャン性能：並列プローブ（デフォルト 4 worker、`SCAN_WORKERS` で調整）、
-  リアルタイム進捗、いつでもキャンセル可能。macOS の `._` ファイルと `.m3u8` HLS フォルダは自動スキップ
-- メタデータ：ffprobe で抽出、ファイル名からタイトル/年を解析、ffmpeg でポスター生成、
-  **TMDB スクレイピング**も可能（`TMDB_API_KEY`）
-- **ドラマ自動グループ化**：連番ファイル（S01E01、EP1、第1集…）をエピソード順に
-  ドラマとして自動グループ化し、「ドラマ」カテゴリで個別表示
-- 再生：H.264 MP4/WebM は Range ストリーミング、MKV/HEVC は **HLS トランスコード**（シーク・再開対応）
-- ユーザー：登録/ログイン、JWT、管理者/一般ユーザー、管理者によるユーザー管理
-- お気に入り・プレイリスト（連続再生）・「続きを見る」
-- 管理画面：統計、ライブラリ管理（サーバー上のフォルダ選択機能付き）、メタデータ編集、ポスターアップロード
-- **多言語 UI**：デフォルト英語、中文 / English / Français / 日本語 / Deutsch に切替可能
+サーバーのディスク上のフォルダを、閲覧・検索可能なビデオライブラリに変えるシステムです。
+一度スキャンすれば、すべての動画にポスター・メタデータ・視聴履歴・お気に入り・プレイリストが付き、
+連番ファイルは自動でドラマとしてグループ化されます。
+
+---
+
+## 目次
+
+- [機能](#機能)
+- [スクリーンショット](#スクリーンショット)
+- [ドキュメント](#ドキュメント)
+- [クイックスタート](#クイックスタート)
+- [LAN / スマホアクセス](#lan--スマホアクセス)
+- [設定](#設定)
+- [プロジェクト構成](#プロジェクト構成)
+- [技術スタック](#技術スタック)
+- [セキュリティ](#セキュリティ)
+- [ロードマップ](#ロードマップ)
+- [コントリビュート](#コントリビュート)
+- [ライセンス](#ライセンス)
+
+## 機能
+
+| 分野 | ハイライト |
+| --- | --- |
+| 📂 メディアライブラリ | サーバー上の任意フォルダ。パス入力または内蔵**フォルダ選択 UI** |
+| 🔍 スキャン | mp4/mkv/webm/avi/mov/ts… を再帰検出。並列プローブ（4 worker、`SCAN_WORKERS`）、リアルタイム進捗、**いつでもキャンセル**。macOS の `._` ファイルと `.m3u8` フォルダは自動スキップ |
+| 🏷️ メタデータ | ffprobe でコーデック/解像度/再生時間、動画からポスター自動生成、タイトル/年/あらすじ/ジャンル編集可、任意の **TMDB スクレイピング** |
+| 📺 ドラマ | 連番ファイル（`S01E01`、`EP1`、`第1集`、`タイトル01話名`…）を自動グループ化、シーズン対応、リスト連続再生 |
+| ▶️ 再生 | H.264/WebM はネイティブ再生（HTTP Range）、**MKV/HEVC はリアルタイム HLS トランスコード**、字幕自動検出（SRT→WebVTT）、ダウンロード対応 |
+| 👤 パーソナル | 続きを見る、お気に入り（動画・ドラマ）、連続再生できるプレイリスト |
+| 🔐 ユーザー | JWT で登録/ログイン、管理者/一般ユーザー、ガード付きユーザー管理 |
+| 🚫 パスフィルター | サーバーパスをユーザーごとに非表示化 — ホーム・ドラマ・お気に入り・続きを見る・プレイリストすべてに反映 |
+| 🌐 インターフェース | i18n：**English（デフォルト）、中文、Français、日本語、Deutsch** |
+
+## スクリーンショット
+
+> *近日公開 — `make serve` 後、`http://<サーバーIP>:8080` で UI を確認できます。*
+
+## ドキュメント
+
+すべてのドキュメントは多言語です。**[ドキュメント索引](docs/README.md)** から始めてください：
+
+| ドキュメント | 言語 | 対象 |
+| --- | --- | --- |
+| [製品ドキュメント](docs/product.ja.md) | EN · 中文 · FR · JA · DE | エンドユーザー |
+| [システムアーキテクチャ](docs/architecture.ja.md) | EN · 中文 · JA | 開発者 |
+| [README](README.md) / [中文](README.zh-CN.md) | English · 中文 | すべて |
 
 ## クイックスタート
 
+### 必要な環境
+
+- Go 1.22+（ビルド用、またはビルド済みバイナリ）
+- PostgreSQL 14+
+- ffmpeg + ffprobe（メタデータ、ポスター、トランスコード）
+- Node.js 18+（フロントエンド開発のみ。本番 UI はバックエンドが配信）
+
+### インストール
+
 ```bash
 # 1. データベース
-createdb videocms                       # または docker compose up -d db
+createdb videocms                          # または: docker compose up -d db
 
 # 2.（任意）デモ動画を生成
 ./scripts/make-demo-media.sh
 
-# 3. バックエンド（初回起動でテーブル作成 + admin/admin123 作成）
+# 3. バックエンド — 初回起動でテーブル作成 + admin/admin123
 cd backend && go run ./cmd/server
 
-# 4. フロントエンド
-cd frontend && npm install && npm run dev   # http://localhost:5173
-
-# 5. スマホ / LAN アクセス（フロントを Go サーバーが配信）
-make serve                                  # http://<LAN IP>:8080
+# 4. フロントエンド（開発モード、ホットリロード）
+cd frontend && npm install && npm run dev  # http://localhost:5173
 ```
 
-環境変数と API 一覧は [README.md](README.md) を参照してください。
+本番相当のシングルポート配信：
 
-## 既知の制限
+```bash
+make serve                                 # UI をビルドし :8080 で一括配信
+```
 
-- ブラウザで直接再生できるのは H.264 MP4 / WebM のみ。MKV / HEVC は単一ビットレートの
-  HLS トランスコード（15 分アイドルで回収）を利用
-- TMDB スクレイピングには api.themoviedb.org へのアクセスが必要
-- スキャンは差分更新方式の全量再スキャン。ファイル監視モードは将来の拡張候補
+初期管理者 **admin / admin123** でログインし、すぐにパスワードを変更してください
+（管理 → ユーザー管理 → パスワード再設定）。その後、管理 → ライブラリ → スキャン で
+最初のライブラリを追加します。
 
-## ドキュメント
+## LAN / スマホアクセス
 
-- [製品ドキュメント](docs/product.ja.md)（[English](docs/product.md) | [中文](docs/product.zh-CN.md) | [Français](docs/product.fr.md) | [Deutsch](docs/product.de.md)）
-- [システムアーキテクチャ設計](docs/architecture.ja.md)（[English](docs/architecture.md) | [中文](docs/architecture.zh-CN.md)）
+1. サーバーの IP を確認：`ipconfig getifaddr en0`（例 `192.168.3.19`）
+2. スマホを**同じネットワーク**に接続 → `http://192.168.3.19:8080` を開く
+3. 初回は macOS のファイアウォール許可が必要な場合があります
+
+> 平文 HTTP + 開発用 JWT は信頼できる LAN のみ推奨。公開アクセスは[セキュリティ](#セキュリティ)を参照。
+
+## 設定
+
+すべて環境変数で設定します：
+
+| 変数 | デフォルト | 用途 |
+| --- | --- | --- |
+| `PORT` | `8080` | リッスンアドレス |
+| `DATABASE_URL` | `postgres://localhost:5432/videocms` | PostgreSQL DSN |
+| `JWT_SECRET` | 開発用定数 | トークン署名鍵 — **本番では強力な値に** |
+| `DATA_DIR` | `data` | ポスター + HLS セグメント |
+| `ADMIN_USERNAME` / `ADMIN_PASSWORD` | admin / admin123 | 初期管理者 |
+| `FFPROBE_BIN` / `FFMPEG_BIN` | 自動検出 | ツールパス（Homebrew フォールバック） |
+| `TMDB_API_KEY` / `TMDB_LANGUAGE` | 空 / zh-CN | メタデータスクレイピング |
+| `SCAN_WORKERS` | `4` | 並列スキャンワーカー数（1-16） |
+| `WEB_ROOT` | 自動（`frontend/dist`） | 本番モードのフロントエンドディレクトリ |
+
+## プロジェクト構成
+
+```
+backend/                 Go サーバー（net/http + pgx）
+  cmd/server/            エントリポイント
+  internal/api/          HTTP ハンドラ、ルーティング、ミドルウェア
+  internal/auth/         JWT + ロールミドルウェア
+  internal/media/        スキャナー、TMDB スクレイパー、HLS 管理、ストリーミング
+  internal/db/           プール + 埋め込み SQL マイグレーション
+  internal/models/       ドメイン型
+frontend/                React 18 SPA（Vite）
+  src/i18n/locales/      en / zh / fr / ja / de
+  src/pages/             ブラウズ、プレイヤー、ドラマ、プレイリスト、管理…
+docs/                    製品 + アーキテクチャ（多言語）
+scripts/                 デモ素材ジェネレーター
+```
+
+## 技術スタック
+
+| 層 | 技術 |
+| --- | --- |
+| バックエンド | Go（net/http、pgx/v5）、JWT（HS256）、bcrypt |
+| フロントエンド | React 18、Vite、react-router、i18next、hls.js |
+| データベース | PostgreSQL 14（埋め込み SQL マイグレーション） |
+| メディア | ffprobe（メタデータ）、ffmpeg（ポスター、HLS トランスコード） |
+| ドキュメント | Markdown + Mermaid（GitHub レンダリング） |
+
+## セキュリティ
+
+- 変更系操作はすべて管理者限定。メディア URL はユーザー JWT 必須（ヘッダーまたは `?token=`）
+- パスワードは bcrypt、ロールは毎リクエスト DB から再取得
+- HLS セグメント名は検証されセッションディレクトリ内に制限
+- SQL はすべてパラメータ化
+- **本番**：強力な `JWT_SECRET`、HTTPS リバースプロキシ、
+  `ADMIN_USERNAME/ADMIN_PASSWORD` で初期アカウントを指定
+
+[SECURITY.md](SECURITY.md) も参照してください。
+
+## ロードマップ
+
+- [x] ライブラリスキャン（並列、キャンセル可能、リアルタイム進捗）
+- [x] メタデータ + ポスター + TMDB スクレイピング
+- [x] ネイティブ再生 + HLS トランスコード
+- [x] ドラマ自動グループ化（複数の命名規則）
+- [x] お気に入り（動画・ドラマ）、プレイリスト、続きを見る
+- [x] i18n（en/zh/fr/ja/de）
+- [ ] ファイル監視による増分取り込み
+- [ ] アダプティブビットレート（多段階 HLS）
+- [ ] 内蔵字幕の抽出 / アップロード
+- [ ] 署名付き短時間 URL による公開共有
+
+## コントリビュート
+
+[CONTRIBUTING.md](CONTRIBUTING.md) を参照してください。
+
+## ライセンス
+
+[Apache License 2.0](LICENSE)

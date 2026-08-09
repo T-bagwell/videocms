@@ -26,6 +26,12 @@ hardware. Your videos never leave your network unless you choose to share them.
 | Users | Register/login, admin roles, admin user management |
 | Interface | 5 languages: English (default), 中文, Français, 日本語, Deutsch |
 
+## Screenshots
+
+> *Coming soon — run `make serve` and open `http://<server-ip>:8080` to see the UI
+> in action. The web player, series pages and admin console are all covered in
+> the [product tour](product.md).*
+
 ## 3. Quick Start
 
 ### Requirements
@@ -95,6 +101,17 @@ as `1 (4)` or `-535`. A group needs at least 2 episodes to become a series.
 - A series page shows episodes sorted by season → episode
 - Series re-group on every scan; a series with fewer than 2 available episodes
   is cleaned up automatically
+
+### 4.5 Playback tips
+
+- The player uses the browser's native video controls — **Space** to play/pause,
+  **F** for fullscreen, **←/→** to seek, **↑/↓** for volume, **M** to mute
+- Watch progress resumes automatically; "Continue Watching" on the home page
+  picks up where you left off
+- MKV/HEVC files are transcoded to HLS — the first playback takes a few seconds,
+  then seeking and next-episode autoplay work as usual
+- On a phone, rotate to landscape for the best playback experience; use the
+  queue below the player to jump between episodes
 
 ## 5. Admin Guide
 

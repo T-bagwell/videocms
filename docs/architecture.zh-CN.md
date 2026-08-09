@@ -26,6 +26,33 @@ VideoCMS 是一个自托管的视频资源管理系统。用户把服务器上�
 
 ## 2. 系统总览
 
+```mermaid
+flowchart LR
+    subgraph Browser["浏览器（React SPA）"]
+        UI["Vite UI · i18n en/zh/fr/ja/de"]
+        HLS["hls.js 播放器"]
+    end
+    subgraph Server["服务器（Go :8080）"]
+        API["net/http + 中间件"]
+        SCAN["扫描器（并行）"]
+        HLSM["HLS 管理器"]
+        SCR["TMDB 刮削器"]
+    end
+    DB[("PostgreSQL 14")]
+    DISK["磁盘上的媒体文件夹"]
+    TMDB[("TMDB API")]
+
+    UI -->|"/api"| API
+    HLS -->|"Range / HLS"| API
+    API --> DB
+    API --> SCAN
+    API --> HLSM
+    API --> SCR
+    SCAN -->|"ffprobe / ffmpeg"| DISK
+    HLSM -->|"ffmpeg 转码"| DISK
+    SCR -->|"搜索/详情/海报"| TMDB
+```
+
 ```
 ┌────────────────────┐        HTTP/JSON + Range 流媒体        ┌─────────────────────────┐
 │  React SPA (Vite)   │ ──────────────────────────────────────▶ │  Go 后端 (:8080)        │
@@ -113,6 +140,22 @@ videos          -- + series_id(外键→series, ON DELETE SET NULL), season, epi
 `videos(available) WHERE available`、`watch_progress(user_id, updated_at DESC)`、
 `playlist_items(playlist_id, position)`。
 
+```mermaid
+erDiagram
+    users ||--o{ watch_progress : 观看
+    users ||--o{ favorites : 收藏
+    users ||--o{ playlists : 拥有
+    users ||--o{ hidden_paths : 隐藏
+    users ||--o{ series_favorites : 收藏剧集
+    libraries ||--o{ videos : 包含
+    libraries ||--o{ series : 归组
+    series ||--o{ videos : "剧集 (series_id)"
+    playlists ||--o{ playlist_items : 包含
+    videos ||--o{ playlist_items : 被包含
+    videos ||--o{ watch_progress : 有
+    videos ||--o{ favorites : 有
+```
+
 ### 3.5 流媒体（HTTP Range）
 
 `GET /api/videos/{id}/stream` 直接打开磁盘文件，以 `Accept-Ranges: bytes` 提供，
@@ -182,6 +225,17 @@ videos          -- + series_id(外键→series, ON DELETE SET NULL), season, epi
   通过 `statfs` 获取磁盘可用空间），供目录选择器使用
 - 用户管理：列表 / 改角色 / 重置密码 / 删除（带守卫）
 
+### 3.10 关键设计决策
+
+- **只用标准库** — 后端直接使用 Go 的 `net/http` 路由模式与 `pgx`，无框架锁定，易于审计
+- **后台扫描 + 工作池** — 探测在外部磁盘上是 I/O 密集；4 个 worker（可配置）平衡吞吐与 CPU。
+  进度写入数据库，UI 通过轮询简单的媒体库状态而非长连接
+- **同元素播放切换** — 播放器在常驻的 `<video>` 元素上换源而非重建，浏览器全屏在剧集连播间保持
+- **HLS 实时增长清单** — ffmpeg 原地写清单（不做 VOD 缓冲），完成时补写 `#EXT-X-ENDLIST`；
+  分片完成后才进入清单，数小时的长片也能约 1 秒起播
+- **按用户隐私过滤** — 隐藏路径在 SQL 中求值（`starts_with`），对所有列表一致生效
+- **媒体 URL 携带用户 JWT**（`?token=`），因为 `<video>`/`<img>` 标签无法设置请求头
+
 ## 4. 前端设计
 
 ### 4.1 结构
@@ -220,6 +274,27 @@ frontend/src/
 
 ### 5.1 媒体库扫描
 
+```mermaid
+sequenceDiagram
+    actor Admin
+    participant API as Go API
+    participant Scan as 扫描 goroutine
+    participant DB as PostgreSQL
+    participant FF as ffprobe/ffmpeg
+    Admin->>API: POST /libraries/{id}/scan
+    API->>Scan: 启动（后台 context）
+    Scan->>DB: status=scanning, scan_started_at=now
+    loop 每个视频文件
+        Scan->>FF: probe(path)
+        FF-->>Scan: 时长/编码/分辨率
+        Scan->>DB: 写入视频（available=true）
+        Scan->>FF: 新视频生成海报
+    end
+    Scan->>DB: 标记缺失（last_scanned_at < scan_start）
+    Scan->>DB: 重建剧集分组（≥2 集）
+    Scan->>DB: status=idle + video_count
+```
+
 ```
 管理界面 ──POST /api/libraries/{id}/scan──▶ scanner.Start（goroutine）
    │                                          │
@@ -232,6 +307,26 @@ frontend/src/
 
 ### 5.2 播放（不兼容格式）
 
+```mermaid
+sequenceDiagram
+    participant UI as 浏览器（hls.js）
+    participant API as Go API
+    participant HLS as HLSManager
+    participant FF as ffmpeg
+    participant DB as PostgreSQL
+    UI->>API: GET /hls/playlist.m3u8?start=进度
+    API->>HLS: 确保会话（从偏移开始）
+    HLS->>FF: 启动转码器
+    FF-->>HLS: 分片（seg_%05d.ts）
+    HLS-->>API: 增长的播放列表（带 token 的 URL）
+    API-->>UI: 清单
+    loop 播放
+        UI->>API: GET seg_00000.ts?token=…
+        UI->>API: PUT /users/me/progress（每 5 秒）
+    end
+    UI->>API: 下一集（同一 <video> 元素，全屏保持）
+```
+
 ```
 播放器 ──GET /hls/playlist.m3u8?start=进度──▶ HLSManager
    │                                            ├─ 启动/杀掉 ffmpeg 会话
@@ -240,6 +335,17 @@ frontend/src/
 ```
 
 ## 6. 配置
+
+### 6.1 部署形态
+
+| 模式 | 方式 | 说明 |
+| --- | --- | --- |
+| 开发 | `go run ./cmd/server` + `npm run dev` | Vite 代理 `/api` 到 :8080；热更新 |
+| 单端口生产 | `make serve` | 后端托管构建好的 `frontend/dist`；UI 与 API 同一端口 |
+| Docker 数据库 | `docker compose up -d db` | PostgreSQL 14 容器；后端仍原生运行 |
+| 反向代理 | Nginx/Caddy → :8080 并启用 TLS | 公网访问推荐；需设置 `JWT_SECRET` |
+
+后端绑定所有网卡（`:8080`），局域网客户端可直接访问 UI。
 
 | 变量 | 默认值 | 用途 |
 | --- | --- | --- |

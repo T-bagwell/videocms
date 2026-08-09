@@ -26,6 +26,11 @@ matériel. Vos vidéos ne quittent jamais votre réseau, sauf si vous choisissez
 | Utilisateurs | Inscription/connexion, rôles administrateur, gestion des utilisateurs |
 | Interface | 5 langues : anglais (défaut), 中文, Français, 日本語, Deutsch |
 
+## Captures d’écran
+
+> *À venir — lancez `make serve` et ouvrez `http://<ip-serveur>:8080` pour voir
+> l’interface en action.*
+
 ## 3. Démarrage rapide
 
 ### Prérequis
@@ -96,6 +101,18 @@ en fin de nom (`1 (4)`, `-535`). Un groupe doit contenir au moins 2 épisodes.
 - Une page de série affiche les épisodes triés saison → épisode
 - Les séries sont reconstruites à chaque analyse ; celles avec moins de 2 épisodes
   disponibles sont nettoyées automatiquement
+
+### 4.5 Astuces de lecture
+
+- Le lecteur utilise les contrôles natifs du navigateur — **Espace** lecture/pause,
+  **F** plein écran, **←/→** avance/retour, **↑/↓** volume, **M** muet
+- La progression reprend automatiquement ; « Reprendre la lecture » vous ramène
+  à la position précédente
+- Les MKV/HEVC sont transcodés en HLS — la première lecture prend quelques
+  secondes, puis le défilement et la lecture automatique de l’épisode suivant
+  fonctionnent normalement
+- Sur mobile, passez en paysage pour une meilleure expérience ; utilisez la file
+  sous le lecteur pour changer d’épisode
 
 ## 5. Guide administrateur
 

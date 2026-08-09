@@ -28,6 +28,33 @@ alternative to Emby/Jellyfin that is fully under the owner's control.
 
 ## 2. System Overview
 
+```mermaid
+flowchart LR
+    subgraph Browser["Browser (React SPA)"]
+        UI["Vite UI · i18n en/zh/fr/ja/de"]
+        HLS["hls.js player"]
+    end
+    subgraph Server["Server (Go :8080)"]
+        API["net/http + middleware"]
+        SCAN["Scanner (parallel)"]
+        HLSM["HLS manager"]
+        SCR["TMDB scraper"]
+    end
+    DB[("PostgreSQL 14")]
+    DISK["Media folders on disk"]
+    TMDB[("TMDB API")]
+
+    UI -->|"/api"| API
+    HLS -->|"Range / HLS"| API
+    API --> DB
+    API --> SCAN
+    API --> HLSM
+    API --> SCR
+    SCAN -->|"ffprobe / ffmpeg"| DISK
+    HLSM -->|"ffmpeg transcode"| DISK
+    SCR -->|"search/details/poster"| TMDB
+```
+
 ```
 ┌────────────────────┐        HTTP/JSON + Range streaming        ┌─────────────────────────┐
 │  React SPA (Vite)   │ ────────────────────────────────────────▶ │  Go backend (:8080)     │
@@ -118,6 +145,22 @@ Key indexes: `videos(lower(title))`, `videos(library_id)`, partial
 `videos(available) WHERE available`, `watch_progress(user_id, updated_at DESC)`,
 `playlist_items(playlist_id, position)`.
 
+```mermaid
+erDiagram
+    users ||--o{ watch_progress : watches
+    users ||--o{ favorites : keeps
+    users ||--o{ playlists : owns
+    users ||--o{ hidden_paths : hides
+    users ||--o{ series_favorites : saves
+    libraries ||--o{ videos : contains
+    libraries ||--o{ series : groups
+    series ||--o{ videos : "episodes (series_id)"
+    playlists ||--o{ playlist_items : contains
+    videos ||--o{ playlist_items : included_in
+    videos ||--o{ watch_progress : has
+    videos ||--o{ favorites : has
+```
+
 ### 3.5 Streaming (HTTP Range)
 
 `GET /api/videos/{id}/stream` opens the file on disk and serves it with
@@ -193,6 +236,24 @@ Optional (`TMDB_API_KEY`). `Scraper`:
   home shortcut, free disk space via `statfs`) used by the folder picker
 - User management: list / change role / reset password / delete (with guards)
 
+### 3.10 Key design decisions
+
+- **Standard library only** — the backend uses Go's `net/http` router patterns
+  and `pgx` directly; no framework lock-in, trivially auditable
+- **Background scan with worker pool** — probing is I/O-bound on external disks;
+  4 workers (configurable) balance throughput and CPU. Progress is written to the
+  DB so the UI polls a simple library status instead of long-lived connections
+- **Same-element playback switching** — the player swaps media sources on a
+  persistent `<video>` element instead of remounting, so browser fullscreen
+  survives auto-advance between episodes
+- **HLS as a live-growing playlist** — ffmpeg writes the manifest in place
+  (no VOD buffering), `#EXT-X-ENDLIST` is appended on completion; segments are
+  referenced only after they finish, so playback starts in ~1s even for hours-long files
+- **Per-user privacy filters** — hidden paths are evaluated in SQL
+  (`starts_with`) so exclusions apply consistently across every listing
+- **Media URLs carry the user JWT** (`?token=`) because `<video>`/`<img>` tags
+  cannot set HTTP headers
+
 ## 4. Frontend Design
 
 ### 4.1 Structure
@@ -233,6 +294,27 @@ reset password, delete).
 
 ### 5.1 Library scan
 
+```mermaid
+sequenceDiagram
+    actor Admin
+    participant API as Go API
+    participant Scan as Scanner goroutine
+    participant DB as PostgreSQL
+    participant FF as ffprobe/ffmpeg
+    Admin->>API: POST /libraries/{id}/scan
+    API->>Scan: start (background context)
+    Scan->>DB: status=scanning, scan_started_at=now
+    loop every video file
+        Scan->>FF: probe(path)
+        FF-->>Scan: duration/codec/resolution
+        Scan->>DB: upsert video (available=true)
+        Scan->>FF: extract poster (new videos)
+    end
+    Scan->>DB: mark missing (last_scanned_at < scan_start)
+    Scan->>DB: rebuild series groups (>=2 episodes)
+    Scan->>DB: status=idle + video_count
+```
+
 ```
 Admin UI ──POST /api/libraries/{id}/scan──▶ scanner.Start (goroutine)
    │                                          │
@@ -245,6 +327,26 @@ Admin UI ──POST /api/libraries/{id}/scan──▶ scanner.Start (goroutine)
 
 ### 5.2 Playback (unsupported format)
 
+```mermaid
+sequenceDiagram
+    participant UI as Browser (hls.js)
+    participant API as Go API
+    participant HLS as HLSManager
+    participant FF as ffmpeg
+    participant DB as PostgreSQL
+    UI->>API: GET /hls/playlist.m3u8?start=progress
+    API->>HLS: ensure session (start at offset)
+    HLS->>FF: spawn transcoder
+    FF-->>HLS: segments (seg_%05d.ts)
+    HLS-->>API: growing playlist (tokenized URLs)
+    API-->>UI: manifest
+    loop playback
+        UI->>API: GET seg_00000.ts?token=…
+        UI->>API: PUT /users/me/progress (every 5s)
+    end
+    UI->>API: next episode (same <video> element, fullscreen kept)
+```
+
 ```
 Player ──GET /hls/playlist.m3u8?start=progress──▶ HLSManager
    │                                                ├─ start/kill ffmpeg session
@@ -253,6 +355,17 @@ Player ──GET /hls/playlist.m3u8?start=progress──▶ HLSManager
 ```
 
 ## 6. Configuration
+
+### 6.1 Deployment topologies
+
+| Mode | How | Notes |
+| --- | --- | --- |
+| Development | `go run ./cmd/server` + `npm run dev` | Vite proxies `/api` to :8080; hot reload |
+| Single-port production | `make serve` | Backend serves the built `frontend/dist`; one port for UI + API |
+| Docker database | `docker compose up -d db` | PostgreSQL 14 container; backend still runs natively |
+| Reverse proxy | Nginx/Caddy → :8080 with TLS | Recommended for public access; set `JWT_SECRET` |
+
+The backend binds all interfaces (`:8080`), so LAN clients reach the UI directly.
 
 | Variable | Default | Purpose |
 | --- | --- | --- |

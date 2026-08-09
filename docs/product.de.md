@@ -26,6 +26,11 @@ Hardware. Ihre Videos verlassen Ihr Netzwerk nie, außer Sie teilen sie bewusst.
 | Benutzer | Registrierung/Login, Admin-Rollen, Benutzerverwaltung |
 | Oberfläche | 5 Sprachen: Englisch (Standard), 中文, Français, 日本語, Deutsch |
 
+## Screenshots
+
+> *In Kürze — starten Sie `make serve` und öffnen Sie `http://<Server-IP>:8080`,
+> um die Oberfläche zu sehen.*
+
 ## 3. Schnellstart
 
 ### Voraussetzungen
@@ -96,6 +101,16 @@ Eine Gruppe braucht mindestens 2 Folgen, um eine Serie zu werden.
 - Eine Serienseite zeigt die Folgen sortiert nach Staffel → Folge
 - Serien werden bei jedem Scan neu aufgebaut; Serien mit weniger als 2 verfügbaren
   Folgen werden automatisch bereinigt
+
+### 4.5 Tipps zur Wiedergabe
+
+- Der Player nutzt die nativen Browser-Steuerungen — **Leertaste** zum Abspielen/Pausieren,
+  **F** für Vollbild, **←/→** zum Suchen, **↑/↓** für Lautstärke, **M** für Stummschaltung
+- Der Fortschritt wird automatisch fortgesetzt; „Weiterschauen“ bringt Sie an die letzte Position
+- MKV/HEVC werden live nach HLS transkodiert — die erste Wiedergabe dauert einige
+  Sekunden, danach funktionieren Suchen und automatisches Abspielen der nächsten Folge normal
+- Auf dem Handy lohnt sich das Querformat; nutzen Sie die Warteschlange unter dem
+  Player zum Wechseln zwischen Folgen
 
 ## 5. Administrationshandbuch
 

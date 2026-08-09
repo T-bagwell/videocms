@@ -26,6 +26,33 @@ Emby / Jellyfin に代わる、軽量で拡張性が高く、所有者が完全�
 
 ## 2. システム全体像
 
+```mermaid
+flowchart LR
+    subgraph Browser["ブラウザ（React SPA）"]
+        UI["Vite UI · i18n en/zh/fr/ja/de"]
+        HLS["hls.js プレイヤー"]
+    end
+    subgraph Server["サーバー（Go :8080）"]
+        API["net/http + ミドルウェア"]
+        SCAN["スキャナー（並列）"]
+        HLSM["HLS マネージャ"]
+        SCR["TMDB スクレイパー"]
+    end
+    DB[("PostgreSQL 14")]
+    DISK["ディスク上のメディアフォルダ"]
+    TMDB[("TMDB API")]
+
+    UI -->|"/api"| API
+    HLS -->|"Range / HLS"| API
+    API --> DB
+    API --> SCAN
+    API --> HLSM
+    API --> SCR
+    SCAN -->|"ffprobe / ffmpeg"| DISK
+    HLSM -->|"ffmpeg トランスコード"| DISK
+    SCR -->|"検索/詳細/ポスター"| TMDB
+```
+
 ```
 ┌────────────────────┐      HTTP/JSON + Range ストリーミング      ┌─────────────────────────┐
 │  React SPA (Vite)   │ ────────────────────────────────────────▶ │  Go バックエンド (:8080) │
@@ -114,6 +141,22 @@ videos          -- + series_id(FK→series, ON DELETE SET NULL), season, episode
 `videos(available) WHERE available`、`watch_progress(user_id, updated_at DESC)`、
 `playlist_items(playlist_id, position)`。
 
+```mermaid
+erDiagram
+    users ||--o{ watch_progress : 視聴
+    users ||--o{ favorites : お気に入り
+    users ||--o{ playlists : 所有
+    users ||--o{ hidden_paths : 非表示
+    users ||--o{ series_favorites : ドラマお気に入り
+    libraries ||--o{ videos : 包含
+    libraries ||--o{ series : グループ化
+    series ||--o{ videos : "エピソード (series_id)"
+    playlists ||--o{ playlist_items : 包含
+    videos ||--o{ playlist_items : 含まれる
+    videos ||--o{ watch_progress : 持つ
+    videos ||--o{ favorites : 持つ
+```
+
 ### 3.5 ストリーミング（HTTP Range）
 
 `GET /api/videos/{id}/stream` はディスク上のファイルを開き、`Accept-Ranges: bytes` で
@@ -186,6 +229,22 @@ videos          -- + series_id(FK→series, ON DELETE SET NULL), season, episode
   親、ホームショートカット、`statfs` による空き容量）。フォルダ選択 UI で使用
 - ユーザー管理：一覧 / ロール変更 / パスワード再設定 / 削除（ガード付き）
 
+### 3.10 主要な設計判断
+
+- **標準ライブラリのみ** — Go の `net/http` ルーティングと `pgx` を直接使用。
+  フレームワーク非依存で監査が容易
+- **バックグラウンドスキャン + ワーカープール** — プローブは外部ディスクで I/O 負荷が高い。
+  4 ワーカー（設定可能）でスループットと CPU を調整。進捗は DB に書き込み、
+  UI は長接続ではなくシンプルなステータスをポーリング
+- **同一要素での再生切替** — プレイヤーは `<video>` 要素を破棄せずソースを差し替えるため、
+  エピソード連続再生でもブラウザの全画面が維持される
+- **HLS はライブ成長型プレイリスト** — ffmpeg がその場でマニフェストを書き、
+  完了時に `#EXT-X-ENDLIST` を追記。セグメントは完成後にのみ参照されるため、
+  数時間のファイルでも約 1 秒で再生開始
+- **ユーザー単位のプライバシーフィルター** — 非表示パスは SQL（`starts_with`）で評価し、
+  すべての一覧に一貫して適用
+- **メディア URL はユーザー JWT を保持**（`?token=`）— `<video>`/`<img>` はヘッダーを設定できないため
+
 ## 4. フロントエンド設計
 
 ### 4.1 構成
@@ -225,6 +284,27 @@ frontend/src/
 
 ### 5.1 ライブラリスキャン
 
+```mermaid
+sequenceDiagram
+    actor Admin
+    participant API as Go API
+    participant Scan as スキャン goroutine
+    participant DB as PostgreSQL
+    participant FF as ffprobe/ffmpeg
+    Admin->>API: POST /libraries/{id}/scan
+    API->>Scan: 開始（バックグラウンド context）
+    Scan->>DB: status=scanning, scan_started_at=now
+    loop 各動画ファイル
+        Scan->>FF: probe(path)
+        FF-->>Scan: 再生時間/コーデック/解像度
+        Scan->>DB: 動画を登録（available=true）
+        Scan->>FF: 新規動画のポスター生成
+    end
+    Scan->>DB: 欠落判定（last_scanned_at < scan_start）
+    Scan->>DB: ドラマグループ再構築（2話以上）
+    Scan->>DB: status=idle + video_count
+```
+
 ```
 管理 UI ──POST /api/libraries/{id}/scan──▶ scanner.Start（goroutine）
    │                                          │
@@ -237,6 +317,26 @@ frontend/src/
 
 ### 5.2 再生（非対応形式）
 
+```mermaid
+sequenceDiagram
+    participant UI as ブラウザ（hls.js）
+    participant API as Go API
+    participant HLS as HLSManager
+    participant FF as ffmpeg
+    participant DB as PostgreSQL
+    UI->>API: GET /hls/playlist.m3u8?start=進捗
+    API->>HLS: セッション確保（オフセットから開始）
+    HLS->>FF: トランスコーダー起動
+    FF-->>HLS: セグメント（seg_%05d.ts）
+    HLS-->>API: 成長するプレイリスト（token 付き URL）
+    API-->>UI: マニフェスト
+    loop 再生
+        UI->>API: GET seg_00000.ts?token=…
+        UI->>API: PUT /users/me/progress（5秒ごと）
+    end
+    UI->>API: 次のエピソード（同一 <video>、全画面維持）
+```
+
 ```
 プレイヤー ──GET /hls/playlist.m3u8?start=進捗──▶ HLSManager
    │                                               ├─ ffmpeg セッション開始/終了
@@ -245,6 +345,17 @@ frontend/src/
 ```
 
 ## 6. 設定
+
+### 6.1 デプロイ形態
+
+| モード | 方法 | 備考 |
+| --- | --- | --- |
+| 開発 | `go run ./cmd/server` + `npm run dev` | Vite が `/api` を :8080 へプロキシ。ホットリロード |
+| シングルポート本番 | `make serve` | バックエンドが `frontend/dist` を配信。UI と API が同一ポート |
+| Docker データベース | `docker compose up -d db` | PostgreSQL 14 コンテナ。バックエンドはネイティブ実行 |
+| リバースプロキシ | Nginx/Caddy → :8080 + TLS | 公開アクセス推奨。`JWT_SECRET` を設定 |
+
+バックエンドは全インターフェース（`:8080`）にバインドするため、LAN クライアントから直接 UI にアクセスできます。
 
 | 変数 | デフォルト | 用途 |
 | --- | --- | --- |
