@@ -72,6 +72,10 @@ Backend
   Admin API: `GET|POST /api/admin/blocked-titles`,
   `DELETE /api/admin/blocked-titles/{id}`. Admin video lists may pass
   `include_blocked=1` to inspect/restore blocked items (ignored for non-admins).
+- Library-level blocking: `libraries.blocked` (migration 008) hides an entire
+  library; `visiblePaths` evaluates `NOT EXISTS (... lb.blocked)` so it works
+  even inside subqueries that do not join `libraries`. Admin API:
+  `PATCH /api/libraries/{id}` with `{"blocked": true|false}`.
 - Media endpoints (`/stream`, `/download`, `/poster`, `/hls/*`) keep accepting
   `?token=` so `<video>`/`<img>` tags work without headers.
 - API/error messages stay English; only the web UI is localized.

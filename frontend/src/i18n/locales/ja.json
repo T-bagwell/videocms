@@ -197,7 +197,13 @@
     "blockRemoved": "「{{title}}」のブロックを解除しました",
     "blockMatches": "一致する動画 {{count}} 件",
     "openFolder": "フォルダを開く",
-    "folderOpened": "サーバー上で開きました：{{path}}"
+    "folderOpened": "サーバー上で開きました：{{path}}",
+    "blockLibrary": "ライブラリをブロック",
+    "libBlockedBadge": "ブロック中",
+    "blockLibraryConfirm": "ライブラリ「{{name}}」をブロックしますか？メディアは全員に非表示になります。ファイルとレコードは保持されます。",
+    "unblockLibraryConfirm": "ライブラリ「{{name}}」のブロックを解除しますか？メディアが再び全員に見えるようになります。",
+    "libBlocked": "ライブラリ「{{name}}」をブロックしました",
+    "libUnblocked": "ライブラリ「{{name}}」のブロックを解除しました"
   },
   "picker": {
     "title": "サーバーフォルダを選択",

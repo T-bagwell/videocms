@@ -63,6 +63,7 @@ func (a *App) Routes() http.Handler {
 	mux.HandleFunc("POST /api/libraries/{id}/scan", authAdmin(a.scanLibrary))
 	mux.HandleFunc("POST /api/libraries/{id}/scan/cancel", authAdmin(a.cancelScan))
 	mux.HandleFunc("POST /api/libraries/{id}/open", authAdmin(a.openLibrary))
+	mux.HandleFunc("PATCH /api/libraries/{id}", authAdmin(a.setLibraryBlocked))
 	mux.HandleFunc("DELETE /api/libraries/{id}", authAdmin(a.deleteLibrary))
 
 	mux.HandleFunc("GET /api/admin/blocked-titles", authAdmin(a.listBlockedTitles))

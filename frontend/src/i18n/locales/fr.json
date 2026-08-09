@@ -197,7 +197,13 @@
     "blockRemoved": "« {{title}} » est débloqué",
     "blockMatches": "{{count}} vidéos correspondantes",
     "openFolder": "Ouvrir le dossier",
-    "folderOpened": "Ouvert sur le serveur : {{path}}"
+    "folderOpened": "Ouvert sur le serveur : {{path}}",
+    "blockLibrary": "Bloquer la bibliothèque",
+    "libBlockedBadge": "Bloquée",
+    "blockLibraryConfirm": "Bloquer la bibliothèque « {{name}} » ? Ses médias seront masqués pour tous. Fichiers et enregistrements sont conservés.",
+    "unblockLibraryConfirm": "Débloquer la bibliothèque « {{name}} » ? Ses médias redeviendront visibles pour tous.",
+    "libBlocked": "Bibliothèque « {{name}} » bloquée",
+    "libUnblocked": "Bibliothèque « {{name}} » débloquée"
   },
   "picker": {
     "title": "Choisir un dossier serveur",

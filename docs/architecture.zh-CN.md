@@ -123,7 +123,8 @@ backend/
 ```sql
 users           -- id, username(唯一), password_hash, display_name, role, created_at
 libraries       -- id, name, path(唯一), scan_status(idle|scanning|error|cancelled),
-                --   scan_error, scan_started_at, scan_finished_at, video_count
+                --   scan_error, scan_started_at, scan_finished_at, video_count,
+                --   blocked
 videos          -- id, library_id(外键), title, filename, file_path(唯一), size_bytes,
                 --   duration_sec, width, height, video_codec, container, year, synopsis,
                 --   genres(text[]), poster_path, subtitle_path, tmdb_id, scraped_at,
@@ -231,6 +232,8 @@ erDiagram
 - 内容屏蔽：`GET|POST /api/admin/blocked-titles`、
   `DELETE /api/admin/blocked-titles/{id}` — 标题按不区分大小写的子串匹配；
   被屏蔽的媒资保留在磁盘上，解除后立即恢复
+- 媒体库屏蔽：`PATCH /api/libraries/{id}`（`{"blocked": true|false}`）
+  隐藏整个媒体库；该标记在同一 SQL 可见性条件中求值
 
 ### 3.10 关键设计决策
 
@@ -244,6 +247,9 @@ erDiagram
 - **管理员内容屏蔽** — `blocked_titles` 并入统一的可见性条件
   （`visibleEpisodes`），被屏蔽的媒资会从所有列表（含剧集、收藏、播放列表）同时消失，
   文件不受影响；管理员可通过 `GET /api/videos?include_blocked=1` 查看被屏蔽的内容
+- **媒体库级屏蔽** — `libraries.blocked` 在 `visiblePaths` 中以
+  `NOT EXISTS (SELECT 1 FROM libraries lb WHERE lb.id = v.library_id AND lb.blocked)`
+  求值，被屏蔽的媒体库会从所有面向用户的列表（含剧集、继续观看）一次消失
 - **媒体 URL 携带用户 JWT**（`?token=`），因为 `<video>`/`<img>` 标签无法设置请求头
 
 ## 4. 前端设计

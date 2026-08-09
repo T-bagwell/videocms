@@ -31,6 +31,7 @@ type Library struct {
 	ScanStartedAt  *time.Time `json:"scan_started_at,omitempty"`
 	ScanFinishedAt *time.Time `json:"scan_finished_at,omitempty"`
 	VideoCount     int64      `json:"video_count"`
+	Blocked        bool       `json:"blocked"`
 	CreatedAt      time.Time  `json:"created_at"`
 }
 

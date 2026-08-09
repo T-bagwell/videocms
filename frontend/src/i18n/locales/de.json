@@ -197,7 +197,13 @@
     "blockRemoved": "„{{title}}“ ist freigegeben",
     "blockMatches": "{{count}} passende Videos",
     "openFolder": "Ordner öffnen",
-    "folderOpened": "Auf dem Server geöffnet: {{path}}"
+    "folderOpened": "Auf dem Server geöffnet: {{path}}",
+    "blockLibrary": "Bibliothek blockieren",
+    "libBlockedBadge": "Blockiert",
+    "blockLibraryConfirm": "Bibliothek „{{name}}“ blockieren? Ihre Medien werden für alle ausgeblendet. Dateien und Einträge bleiben erhalten.",
+    "unblockLibraryConfirm": "Bibliothek „{{name}}“ freigeben? Ihre Medien werden wieder für alle sichtbar.",
+    "libBlocked": "Bibliothek „{{name}}“ ist blockiert",
+    "libUnblocked": "Bibliothek „{{name}}“ ist freigegeben"
   },
   "picker": {
     "title": "Serverordner auswählen",

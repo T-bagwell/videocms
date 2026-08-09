@@ -124,7 +124,8 @@ backend/
 ```sql
 users           -- id, username(ユニーク), password_hash, display_name, role, created_at
 libraries       -- id, name, path(ユニーク), scan_status(idle|scanning|error|cancelled),
-                --   scan_error, scan_started_at, scan_finished_at, video_count
+                --   scan_error, scan_started_at, scan_finished_at, video_count,
+                --   blocked
 videos          -- id, library_id(FK), title, filename, file_path(ユニーク), size_bytes,
                 --   duration_sec, width, height, video_codec, container, year, synopsis,
                 --   genres(text[]), poster_path, subtitle_path, tmdb_id, scraped_at,
@@ -235,6 +236,8 @@ erDiagram
 - コンテンツブロック：`GET|POST /api/admin/blocked-titles`、
   `DELETE /api/admin/blocked-titles/{id}` — タイトルを大文字小文字を無視した
   部分一致で判定。ブロックされたメディアはディスクに残り、解除で即座に復元
+- ライブラリブロック：`PATCH /api/libraries/{id}`（`{"blocked": true|false}`）
+  でライブラリ全体を非表示。フラグは同じ SQL 可視性条件で評価
 
 ### 3.10 主要な設計判断
 
@@ -254,6 +257,10 @@ erDiagram
   （`visibleEpisodes`）に組み込まれ、ブロックされたメディアはすべての一覧
   （ドラマ・お気に入り・プレイリスト含む）から即座に消えます。ファイルには影響せず、
   管理者は `GET /api/videos?include_blocked=1` でブロック済みを確認できます
+- **ライブラリ単位のブロック** — `libraries.blocked` は `visiblePaths` 内で
+  `NOT EXISTS (SELECT 1 FROM libraries lb WHERE lb.id = v.library_id AND lb.blocked)`
+  として評価され、ブロックされたライブラリはユーザー向けの全一覧（ドラマや
+  続きを見る含む）から一度に消えます
 - **メディア URL はユーザー JWT を保持**（`?token=`）— `<video>`/`<img>` はヘッダーを設定できないため
 
 ## 4. フロントエンド設計

@@ -45,6 +45,7 @@ scripts/                 make-demo-media.sh and similar
 | POST | /api/libraries/{id}/scan | admin | start background scan |
 | POST | /api/libraries/{id}/scan/cancel | admin | cancel running scan |
 | POST | /api/libraries/{id}/open | admin | open library folder on the server (open / xdg-open / explorer) |
+| PATCH | /api/libraries/{id} | admin | block/unblock entire library (`{"blocked": true|false}`) |
 | DELETE | /api/libraries/{id} | admin | remove library |
 | GET | /api/videos | user | paginated list, `?library_id=`, `?q=`, hidden-path filtered |
 | GET | /api/videos/{id} | user | video detail |

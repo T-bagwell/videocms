@@ -128,6 +128,25 @@ function Libraries() {
     }
   }
 
+  async function toggleLibraryBlock(l) {
+    if (l.blocked) {
+      if (!window.confirm(t('admin.unblockLibraryConfirm', { name: l.name }))) return;
+    } else if (!window.confirm(t('admin.blockLibraryConfirm', { name: l.name }))) {
+      return;
+    }
+    setErr('');
+    setMsg('');
+    try {
+      await api(`/libraries/${l.id}`, { method: 'PATCH', body: { blocked: !l.blocked } });
+      setMsg(l.blocked
+        ? t('admin.libUnblocked', { name: l.name })
+        : t('admin.libBlocked', { name: l.name }));
+      refresh();
+    } catch (e2) {
+      setErr(e2.message);
+    }
+  }
+
   async function remove(id) {
     if (!window.confirm(t('admin.deleteLibraryConfirm'))) return;
     try {
@@ -181,6 +200,7 @@ function Libraries() {
                 <div>
                   <div className="playlist-name">
                     {l.name}
+                    {l.blocked && <span className="status-badge status-error">{t('admin.libBlockedBadge')}</span>}
                     <span className={`status-badge status-${l.scan_status}`}>
                       {l.scan_status === 'scanning'
                         ? t('admin.statusScanning')
@@ -215,6 +235,9 @@ function Libraries() {
                 )}
                 <button className="btn small" onClick={() => openFolder(l)}>
                   📂 {t('admin.openFolder')}
+                </button>
+                <button className="btn small danger-ghost" onClick={() => toggleLibraryBlock(l)}>
+                  {l.blocked ? t('admin.blockUnblock') : t('admin.blockLibrary')}
                 </button>
                 <button className="btn small danger-ghost" onClick={() => remove(l.id)}>{t('admin.delete')}</button>
               </div>

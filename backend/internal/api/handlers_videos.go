@@ -56,6 +56,8 @@ func visiblePaths(userParam int) string {
 		SELECT 1 FROM hidden_paths hp
 		WHERE hp.user_id=$%d
 		  AND (v.file_path = hp.path OR starts_with(v.file_path, hp.path || '/'))
+	) AND NOT EXISTS (
+		SELECT 1 FROM libraries lb WHERE lb.id = v.library_id AND lb.blocked
 	)`, userParam)
 }
 

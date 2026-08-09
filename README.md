@@ -43,6 +43,7 @@ favorites, playlists — and numbered files automatically group into TV Shows.
 | 👤 Personal | Continue watching, favorites (videos **and** series), playlists with sequential playback |
 | 🔐 Users | Register/login with JWT; admin/user roles; admin user management with safety guards |
 | 🚫 Content blocking | Admins block media by title in the admin panel — hidden for everyone, files and records kept, unblock anytime |
+| 🚫 Library blocking | Block an entire library from the admin panel — all its media vanishes for everyone, nothing is deleted |
 | 🚫 Path filters | Hide any server path per user — excluded everywhere (home, series, favorites, continue watching, playlists) |
 | 🌐 Interface | i18n: **English (default), 中文, Français, 日本語, Deutsch** |
 

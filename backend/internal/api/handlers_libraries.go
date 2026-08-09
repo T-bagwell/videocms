@@ -19,7 +19,7 @@ import (
 func (a *App) listLibraries(w http.ResponseWriter, r *http.Request) {
 	rows, err := a.pool.Query(r.Context(), `
 		SELECT l.id, l.name, l.path, l.scan_status, l.scan_error, l.scan_started_at,
-		       l.scan_finished_at, l.video_count, l.created_at
+		       l.scan_finished_at, l.video_count, l.blocked, l.created_at
 		FROM libraries l
 		ORDER BY l.created_at DESC`)
 	if err != nil {
@@ -32,7 +32,7 @@ func (a *App) listLibraries(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var lib models.Library
 		if err := rows.Scan(&lib.ID, &lib.Name, &lib.Path, &lib.ScanStatus, &lib.ScanError,
-			&lib.ScanStartedAt, &lib.ScanFinishedAt, &lib.VideoCount, &lib.CreatedAt); err != nil {
+			&lib.ScanStartedAt, &lib.ScanFinishedAt, &lib.VideoCount, &lib.Blocked, &lib.CreatedAt); err != nil {
 			writeErr(w, http.StatusInternalServerError, "scan library row failed")
 			return
 		}
@@ -207,6 +207,34 @@ func (a *App) openLibrary(w http.ResponseWriter, r *http.Request) {
 	// release resources without blocking the HTTP response
 	go func() { _ = cmd.Wait() }()
 	writeJSON(w, http.StatusOK, map[string]any{"message": "opened", "path": path})
+}
+
+// setLibraryBlocked toggles a library-wide content block. Blocked libraries
+// disappear from every user-facing listing; files and records are kept.
+func (a *App) setLibraryBlocked(w http.ResponseWriter, r *http.Request) {
+	id, err := uuid.Parse(r.PathValue("id"))
+	if err != nil {
+		writeErr(w, http.StatusBadRequest, "invalid library id")
+		return
+	}
+	var req struct {
+		Blocked bool `json:"blocked"`
+	}
+	if err := readJSON(w, r, &req); err != nil {
+		writeErr(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	tag, err := a.pool.Exec(r.Context(),
+		`UPDATE libraries SET blocked=$2 WHERE id=$1`, id, req.Blocked)
+	if err != nil {
+		writeErr(w, http.StatusInternalServerError, "update library failed")
+		return
+	}
+	if tag.RowsAffected() == 0 {
+		writeErr(w, http.StatusNotFound, "library not found")
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]any{"message": "updated", "blocked": req.Blocked})
 }
 
 func isUniqueViolation(err error) bool {

@@ -128,7 +128,8 @@ Managed by embedded SQL migrations (`schema_migrations` table tracks versions).
 ```sql
 users           -- id, username(unique), password_hash, display_name, role, created_at
 libraries       -- id, name, path(unique), scan_status(idle|scanning|error|cancelled),
-                --   scan_error, scan_started_at, scan_finished_at, video_count
+                --   scan_error, scan_started_at, scan_finished_at, video_count,
+                --   blocked
 videos          -- id, library_id(fk), title, filename, file_path(unique), size_bytes,
                 --   duration_sec, width, height, video_codec, container, year, synopsis,
                 --   genres(text[]), poster_path, subtitle_path, tmdb_id, scraped_at,
@@ -243,6 +244,9 @@ Optional (`TMDB_API_KEY`). `Scraper`:
   `DELETE /api/admin/blocked-titles/{id}` — titles are matched as
   case-insensitive substrings; blocked media stays on disk and is restored on
   unblock
+- Library blocking: `PATCH /api/libraries/{id}` (`{"blocked": true|false}`)
+  hides the entire library; the flag is evaluated in the same SQL visibility
+  condition
 
 ### 3.10 Key design decisions
 
@@ -264,6 +268,10 @@ Optional (`TMDB_API_KEY`). `Scraper`:
   every listing at once (including series, favorites and playlists) without
   touching the files; admins can list blocked videos via
   `GET /api/videos?include_blocked=1`
+- **Library-level blocking** — `libraries.blocked` is evaluated as
+  `NOT EXISTS (SELECT 1 FROM libraries lb WHERE lb.id = v.library_id AND lb.blocked)`
+  inside `visiblePaths`, so a blocked library vanishes from all user-facing
+  lists (including series and continue watching) in one query
 - **Media URLs carry the user JWT** (`?token=`) because `<video>`/`<img>` tags
   cannot set HTTP headers
 

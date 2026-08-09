@@ -197,7 +197,13 @@
     "blockRemoved": "已解除「{{title}}」的屏蔽",
     "blockMatches": "匹配 {{count}} 个视频",
     "openFolder": "打开文件夹",
-    "folderOpened": "已在服务器上打开：{{path}}"
+    "folderOpened": "已在服务器上打开：{{path}}",
+    "blockLibrary": "屏蔽媒体库",
+    "libBlockedBadge": "已屏蔽",
+    "blockLibraryConfirm": "屏蔽媒体库「{{name}}」？其媒资将对所有人隐藏，文件和记录都会保留。",
+    "unblockLibraryConfirm": "解除媒体库「{{name}}」的屏蔽？其媒资将重新对所有人可见。",
+    "libBlocked": "媒体库「{{name}}」已屏蔽",
+    "libUnblocked": "已解除媒体库「{{name}}」的屏蔽"
   },
   "picker": {
     "title": "选择服务器文件夹",

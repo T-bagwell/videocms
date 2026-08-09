@@ -127,6 +127,9 @@ Stats: videos, libraries, users, playlists, favorites, series and storage used.
 - Deleting a library removes its video records — files on disk are kept
 - **Open folder** opens the library directory on the server with the system
   file manager, so you can inspect or manage the actual media files
+- **Block library** hides the whole library for every user (home, series,
+  favorites, continue watching, playlists) without deleting anything;
+  unblock restores it immediately
 
 ### 5.3 Videos
 

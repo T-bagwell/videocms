@@ -197,7 +197,13 @@
     "blockRemoved": "“{{title}}” is unblocked",
     "blockMatches": "{{count}} matching videos",
     "openFolder": "Open folder",
-    "folderOpened": "Opened on the server: {{path}}"
+    "folderOpened": "Opened on the server: {{path}}",
+    "blockLibrary": "Block library",
+    "libBlockedBadge": "Blocked",
+    "blockLibraryConfirm": "Block library “{{name}}”? Its media will be hidden for everyone. Files and records are kept.",
+    "unblockLibraryConfirm": "Unblock library “{{name}}”? Its media becomes visible to everyone again.",
+    "libBlocked": "Library “{{name}}” is blocked",
+    "libUnblocked": "Library “{{name}}” is unblocked"
   },
   "picker": {
     "title": "Select server folder",

@@ -26,6 +26,7 @@ make them idempotent.
 | scan_error | text | |
 | scan_started_at / scan_finished_at | timestamptz | |
 | video_count | bigint | |
+| blocked | boolean | (migration 008) library-wide content block |
 | created_at | timestamptz | |
 
 ## videos
@@ -83,6 +84,11 @@ Used by `visibleEpisodes()`.
 Every query selecting `videoColumns` joins `blockedLateral` (longest matching
 rule) and surfaces `blocked_id`; `visibleEpisodes` = `visiblePaths AND
 blockedTitlesCondition`.
+
+`visiblePaths` also excludes videos whose library is blocked via
+`NOT EXISTS (SELECT 1 FROM libraries lb WHERE lb.id = v.library_id AND lb.blocked)`
+— written against `v.library_id` so it works in subqueries without a
+`libraries` join.
 
 ## Notes
 
