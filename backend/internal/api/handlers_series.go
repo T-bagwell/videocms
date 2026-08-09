@@ -23,7 +23,10 @@ func (a *App) listSeries(w http.ResponseWriter, r *http.Request) {
 		              WHERE sf.user_id=$1 AND sf.series_id=s.id) AS is_fav
 		FROM series s
 		JOIN libraries l ON l.id = s.library_id
-		ORDER BY lower(s.name), s.season`, user.ID)
+		ORDER BY COALESCE(
+			(SELECT max(v.created_at) FROM videos v
+			 WHERE v.series_id = s.id AND v.available),
+			s.created_at) DESC, lower(s.name), s.season`, user.ID)
 	if err != nil {
 		writeErr(w, http.StatusInternalServerError, "query series failed")
 		return

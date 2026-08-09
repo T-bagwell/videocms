@@ -4,6 +4,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"unicode"
 )
 
 var (
@@ -11,6 +12,7 @@ var (
 	episodeRe     = regexp.MustCompile(`(?i)\bep(?:isode)?[.\-_ ]?(\d{1,3})\b`)
 	bareEpisodeRe = regexp.MustCompile(`(?i)\be(\d{1,3})\b`)
 	cnEpisodeRe   = regexp.MustCompile(`第\s*(\d{1,3})\s*[集話话]`)
+	midNumberRe   = regexp.MustCompile(`^(.+?[^\d])(\d{2,3})([^\d]|$)`)
 	trailingRe    = regexp.MustCompile(`^(.*?)[\s]*[\(\[](\d{1,3})[\)\]]\s*$`)
 	bareTrailing  = regexp.MustCompile(`^(.*?)[\s\-_.]+(\d{1,3})\s*$`)
 )
@@ -40,6 +42,15 @@ func parseEpisode(title string) (seriesName string, season, episode int) {
 		episode, _ = strconv.Atoi(title[m[2]:m[3]])
 		return cleanSeriesName(title[:m[0]]), 0, episode
 	}
+	// "ShowName01EpisodeTitle" style: series name, then 2-3 digit episode number
+	if m := midNumberRe.FindStringSubmatchIndex(title); m != nil {
+		prefix := title[:m[3]]
+		// require a letter/CJK character so date-like prefixes (2024 02 12 …) don't match
+		if hasLetter(prefix) {
+			episode, _ = strconv.Atoi(title[m[4]:m[5]])
+			return cleanSeriesName(prefix), 0, episode
+		}
+	}
 	if m := trailingRe.FindStringSubmatchIndex(title); m != nil {
 		episode, _ = strconv.Atoi(title[m[4]:m[5]])
 		return cleanSeriesName(title[:m[3]]), 0, episode
@@ -49,6 +60,15 @@ func parseEpisode(title string) (seriesName string, season, episode int) {
 		return cleanSeriesName(title[:m[3]]), 0, episode
 	}
 	return "", 0, 0
+}
+
+func hasLetter(s string) bool {
+	for _, r := range s {
+		if unicode.IsLetter(r) {
+			return true
+		}
+	}
+	return false
 }
 
 func cleanSeriesName(name string) string {
