@@ -118,7 +118,10 @@
     "season": "Staffel {{n}}",
     "empty": "Keine Serien gefunden. Nummerierte Dateien (S01E01, E01, 第1集…) werden nach einem Scan automatisch gruppiert.",
     "back": "← Serien",
-    "episodeList": "Folgen"
+    "episodeList": "Folgen",
+    "favorite": "☆ Serie als Favorit",
+    "unfavorite": "Favorit entfernen",
+    "favorited": "★ Favorit"
   },
   "admin": {
     "title": "Verwaltung",

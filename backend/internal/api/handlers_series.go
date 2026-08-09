@@ -13,14 +13,17 @@ import (
 )
 
 func (a *App) listSeries(w http.ResponseWriter, r *http.Request) {
+	user := auth.UserFrom(r)
 	rows, err := a.pool.Query(r.Context(), `
 		SELECT s.id, s.library_id, l.name, s.name, s.season, s.episode_count, s.updated_at,
 		       (SELECT v.poster_path FROM videos v
 		        WHERE v.series_id = s.id AND v.available
-		        ORDER BY v.season, v.episode LIMIT 1) AS poster_path
+		        ORDER BY v.season, v.episode LIMIT 1) AS poster_path,
+		       EXISTS(SELECT 1 FROM series_favorites sf
+		              WHERE sf.user_id=$1 AND sf.series_id=s.id) AS is_fav
 		FROM series s
 		JOIN libraries l ON l.id = s.library_id
-		ORDER BY lower(s.name), s.season`)
+		ORDER BY lower(s.name), s.season`, user.ID)
 	if err != nil {
 		writeErr(w, http.StatusInternalServerError, "query series failed")
 		return
@@ -31,7 +34,7 @@ func (a *App) listSeries(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var s models.Series
 		if err := rows.Scan(&s.ID, &s.LibraryID, &s.LibraryName, &s.Name, &s.Season,
-			&s.EpisodeCount, &s.UpdatedAt, &s.PosterPath); err != nil {
+			&s.EpisodeCount, &s.UpdatedAt, &s.PosterPath, &s.IsFavorite); err != nil {
 			writeErr(w, http.StatusInternalServerError, "scan series failed")
 			return
 		}
@@ -54,11 +57,13 @@ func (a *App) getSeries(w http.ResponseWriter, r *http.Request) {
 		SELECT s.id, s.library_id, l.name, s.name, s.season, s.episode_count, s.updated_at,
 		       (SELECT v.poster_path FROM videos v
 		        WHERE v.series_id = s.id AND v.available
-		        ORDER BY v.season, v.episode LIMIT 1)
+		        ORDER BY v.season, v.episode LIMIT 1),
+		       EXISTS(SELECT 1 FROM series_favorites sf
+		              WHERE sf.user_id=$2 AND sf.series_id=s.id)
 		FROM series s JOIN libraries l ON l.id = s.library_id
-		WHERE s.id=$1`, id).Scan(
+		WHERE s.id=$1`, id, user.ID).Scan(
 		&s.ID, &s.LibraryID, &s.LibraryName, &s.Name, &s.Season,
-		&s.EpisodeCount, &s.UpdatedAt, &s.PosterPath)
+		&s.EpisodeCount, &s.UpdatedAt, &s.PosterPath, &s.IsFavorite)
 	if errors.Is(err, pgx.ErrNoRows) {
 		writeErr(w, http.StatusNotFound, "series not found")
 		return
@@ -91,6 +96,38 @@ func (a *App) getSeries(w http.ResponseWriter, r *http.Request) {
 		items = append(items, v)
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"series": s, "items": items})
+}
+
+func (a *App) addSeriesFavorite(w http.ResponseWriter, r *http.Request) {
+	id, err := uuid.Parse(r.PathValue("id"))
+	if err != nil {
+		writeErr(w, http.StatusBadRequest, "invalid series id")
+		return
+	}
+	user := auth.UserFrom(r)
+	if _, err := a.pool.Exec(r.Context(),
+		`INSERT INTO series_favorites (user_id, series_id) VALUES ($1,$2)
+		 ON CONFLICT DO NOTHING`, user.ID, id); err != nil {
+		writeErr(w, http.StatusInternalServerError, "add series favorite failed")
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]any{"message": "favorited"})
+}
+
+func (a *App) removeSeriesFavorite(w http.ResponseWriter, r *http.Request) {
+	id, err := uuid.Parse(r.PathValue("id"))
+	if err != nil {
+		writeErr(w, http.StatusBadRequest, "invalid series id")
+		return
+	}
+	user := auth.UserFrom(r)
+	if _, err := a.pool.Exec(r.Context(),
+		`DELETE FROM series_favorites WHERE user_id=$1 AND series_id=$2`,
+		user.ID, id); err != nil {
+		writeErr(w, http.StatusInternalServerError, "remove series favorite failed")
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]any{"message": "removed"})
 }
 
 func (a *App) seriesPoster(w http.ResponseWriter, r *http.Request) {

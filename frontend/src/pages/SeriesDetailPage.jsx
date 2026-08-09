@@ -18,6 +18,19 @@ export default function SeriesDetailPage() {
   const [items, setItems] = useState([]);
   const [err, setErr] = useState('');
 
+  async function toggleFavorite() {
+    try {
+      if (series.is_favorite) {
+        await api(`/series/${id}/favorite`, { method: 'DELETE' });
+      } else {
+        await api(`/series/${id}/favorite`, { method: 'POST' });
+      }
+      setSeries({ ...series, is_favorite: !series.is_favorite });
+    } catch (e) {
+      setErr(e.message);
+    }
+  }
+
   useEffect(() => {
     api(`/series/${id}`)
       .then((d) => {
@@ -50,6 +63,9 @@ export default function SeriesDetailPage() {
             <div className="detail-actions">
               <button className="btn primary big" onClick={() => navigate(`/player/${items[0].id}`)}>
                 ▶ {t('video.play')}
+              </button>
+              <button className="btn" onClick={toggleFavorite}>
+                {series.is_favorite ? t('series.unfavorite') : t('series.favorite')}
               </button>
             </div>
           )}
@@ -86,4 +102,3 @@ export default function SeriesDetailPage() {
     </div>
   );
 }
-

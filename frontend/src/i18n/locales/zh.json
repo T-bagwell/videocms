@@ -118,7 +118,10 @@
     "season": "第{{n}}季",
     "empty": "还没有剧集。扫描后，带序号的视频（S01E01、EP1、第1集…）会自动分组为剧集。",
     "back": "← 剧集",
-    "episodeList": "剧集列表"
+    "episodeList": "剧集列表",
+    "favorite": "☆ 收藏剧集",
+    "unfavorite": "取消收藏剧集",
+    "favorited": "★ 已收藏"
   },
   "admin": {
     "title": "管理后台",

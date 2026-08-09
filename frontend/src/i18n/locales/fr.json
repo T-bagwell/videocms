@@ -118,7 +118,10 @@
     "season": "Saison {{n}}",
     "empty": "Aucune série trouvée. Les fichiers numérotés (S01E01, E01, 第1集…) sont regroupés automatiquement après une analyse.",
     "back": "← Séries TV",
-    "episodeList": "Épisodes"
+    "episodeList": "Épisodes",
+    "favorite": "☆ Série favorite",
+    "unfavorite": "Retirer des favoris",
+    "favorited": "★ Favori"
   },
   "admin": {
     "title": "Administration",

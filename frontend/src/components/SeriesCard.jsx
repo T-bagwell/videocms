@@ -25,9 +25,9 @@ export default function SeriesCard({ series }) {
         </div>
         <div className="video-card-meta">
           <span>{t('series.episodes', { count: series.episode_count })}</span>
+          {series.is_favorite && <span className="fav-star">★</span>}
         </div>
       </div>
     </Link>
   );
 }
-

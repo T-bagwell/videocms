@@ -118,7 +118,10 @@
     "season": "Season {{n}}",
     "empty": "No TV series found. Numbered files (S01E01, E01, 第1集…) are grouped automatically after a scan.",
     "back": "← TV Shows",
-    "episodeList": "Episodes"
+    "episodeList": "Episodes",
+    "favorite": "☆ Favorite series",
+    "unfavorite": "Unfavorite series",
+    "favorited": "★ Favorited"
   },
   "admin": {
     "title": "Admin",
