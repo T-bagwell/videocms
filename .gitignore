@@ -1,0 +1,10 @@
+data/
+backend/bin/
+backend/data/
+frontend/node_modules/
+frontend/dist/
+.DS_Store
+*.log
+.env
+demo-media/
+

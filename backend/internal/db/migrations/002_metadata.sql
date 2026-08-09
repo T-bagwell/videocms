@@ -1,0 +1,3 @@
+ALTER TABLE videos ADD COLUMN IF NOT EXISTS scraped_at timestamptz;
+ALTER TABLE videos ADD COLUMN IF NOT EXISTS tmdb_id int NOT NULL DEFAULT 0;
+
