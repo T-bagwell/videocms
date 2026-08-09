@@ -21,6 +21,9 @@ All notable changes to VideoCMS are documented here.
   playlists with sequential playback
 - Users: JWT auth, admin/user roles, admin user management with safety guards
 - Per-user hidden-path filters applied across all listings
+- Admin content blocking by title: block media without deleting files/records,
+  hidden for everyone, unblock anytime
+- Open a library folder on the server with the system file manager (one click)
 - Series list ordered by newest import; library filter (like the home page)
 - i18n: en / 中文 / Français / 日本語 / Deutsch (English default)
 - Production mode: backend serves the built frontend on a single port (`make serve`)
@@ -35,4 +38,3 @@ All notable changes to VideoCMS are documented here.
 - HLS manifest buffering with VOD playlists (long files could not start)
 - NULL series fields breaking movie queries
 - Fullscreen lost between auto-advanced episodes
-

@@ -60,6 +60,8 @@ type Video struct {
 	IsFavorite  bool      `json:"is_favorite"`
 	ProgressSec float64   `json:"progress_sec"`
 	ProgressDur float64   `json:"progress_duration_sec"`
+	BlockedID   string    `json:"blocked_id,omitempty"`
+	Blocked     bool      `json:"blocked"`
 	SeriesID    *uuid.UUID `json:"series_id,omitempty"`
 	SeriesName  string    `json:"series_name,omitempty"`
 	Season      int       `json:"season,omitempty"`

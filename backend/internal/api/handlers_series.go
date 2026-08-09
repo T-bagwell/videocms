@@ -95,9 +95,10 @@ func (a *App) getSeries(w http.ResponseWriter, r *http.Request) {
 		SELECT %s FROM videos v
 		JOIN libraries l ON l.id = v.library_id
 		LEFT JOIN series s ON s.id = v.series_id
+		%s
 		WHERE v.series_id=$2 AND %s
 		ORDER BY v.season, v.episode, lower(v.title)`,
-		videoColumns, visibleEpisodes(1)), user.ID, id)
+		videoColumns, blockedLateral, visibleEpisodes(1)), user.ID, id)
 	if err != nil {
 		writeErr(w, http.StatusInternalServerError, "query episodes failed")
 		return

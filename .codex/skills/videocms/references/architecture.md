@@ -44,6 +44,7 @@ scripts/                 make-demo-media.sh and similar
 | POST | /api/libraries | admin | add library by server path |
 | POST | /api/libraries/{id}/scan | admin | start background scan |
 | POST | /api/libraries/{id}/scan/cancel | admin | cancel running scan |
+| POST | /api/libraries/{id}/open | admin | open library folder on the server (open / xdg-open / explorer) |
 | DELETE | /api/libraries/{id} | admin | remove library |
 | GET | /api/videos | user | paginated list, `?library_id=`, `?q=`, hidden-path filtered |
 | GET | /api/videos/{id} | user | video detail |
@@ -66,6 +67,8 @@ scripts/                 make-demo-media.sh and similar
 | GET | /api/users/me/hidden-paths | user | hidden path filters |
 | POST | /api/users/me/hidden-paths | user | add filter |
 | DELETE | /api/users/me/hidden-paths/{id} | user | remove filter |
+| GET/POST | /api/admin/blocked-titles | admin | list/add title blocks |
+| DELETE | /api/admin/blocked-titles/{id} | admin | remove title block |
 | GET/POST/PATCH/DELETE | /api/playlists[...] | user | playlists + items |
 | GET | /api/admin/users | admin | user management |
 | GET | /api/admin/paths | admin | server folder picker |
@@ -98,3 +101,10 @@ reaps idle sessions after 15 minutes.
 `hidden_paths` stores per-user prefixes. `visibleEpisodes($N)` returns
 `v.available AND NOT EXISTS (... v.file_path = hp.path OR starts_with(v.file_path, hp.path || '/'))`
 and is concatenated into every video listing.
+
+### Content blocking
+`blocked_titles` stores admin title rules; `visibleEpisodes` also applies
+`NOT EXISTS (... position(lower(bt.title) in lower(v.title)) > 0)`. Blocked
+videos stay on disk and return instantly when the rule is removed. Admins can
+list them with `GET /api/videos?include_blocked=1` (blocked_id included);
+regular users cannot bypass the filter.

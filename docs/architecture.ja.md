@@ -135,6 +135,9 @@ playlists       -- id, user_id(FK), name, description, タイムスタンプ
 playlist_items  -- PK(playlist_id, video_id), position, added_at
 series          -- id, library_id(FK), name, season, episode_count, タイムスタンプ
 videos          -- + series_id(FK→series, ON DELETE SET NULL), season, episode
+blocked_titles  -- id, title, created_at（管理者によるタイトル単位のブロック）
+hidden_paths    -- id, user_id(FK), path, created_at（ユーザーごとのパス非表示）
+series_favorites-- PK(user_id, series_id), created_at
 ```
 
 主要インデックス：`videos(lower(title))`、`videos(library_id)`、部分インデックス
@@ -148,6 +151,7 @@ erDiagram
     users ||--o{ playlists : 所有
     users ||--o{ hidden_paths : 非表示
     users ||--o{ series_favorites : ドラマお気に入り
+    admins ||--o{ blocked_titles : ブロック
     libraries ||--o{ videos : 包含
     libraries ||--o{ series : グループ化
     series ||--o{ videos : "エピソード (series_id)"
@@ -228,6 +232,9 @@ erDiagram
 - `GET /api/admin/paths?path=…` — サーバーディレクトリブラウザ（サブディレクトリ、
   親、ホームショートカット、`statfs` による空き容量）。フォルダ選択 UI で使用
 - ユーザー管理：一覧 / ロール変更 / パスワード再設定 / 削除（ガード付き）
+- コンテンツブロック：`GET|POST /api/admin/blocked-titles`、
+  `DELETE /api/admin/blocked-titles/{id}` — タイトルを大文字小文字を無視した
+  部分一致で判定。ブロックされたメディアはディスクに残り、解除で即座に復元
 
 ### 3.10 主要な設計判断
 
@@ -243,6 +250,10 @@ erDiagram
   数時間のファイルでも約 1 秒で再生開始
 - **ユーザー単位のプライバシーフィルター** — 非表示パスは SQL（`starts_with`）で評価し、
   すべての一覧に一貫して適用
+- **管理者によるコンテンツブロック** — `blocked_titles` は同じ可視性条件
+  （`visibleEpisodes`）に組み込まれ、ブロックされたメディアはすべての一覧
+  （ドラマ・お気に入り・プレイリスト含む）から即座に消えます。ファイルには影響せず、
+  管理者は `GET /api/videos?include_blocked=1` でブロック済みを確認できます
 - **メディア URL はユーザー JWT を保持**（`?token=`）— `<video>`/`<img>` はヘッダーを設定できないため
 
 ## 4. フロントエンド設計

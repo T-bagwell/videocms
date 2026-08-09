@@ -66,6 +66,12 @@ Backend
   `visibleEpisodes($N)` (defined in `backend/internal/api/handlers_videos.go`)
   so per-user hidden paths and unavailable files are respected: home,
   continue watching, favorites, playlists, series detail, and series list.
+- Admin content blocking: `blocked_titles` (migration 007) matches titles as
+  case-insensitive substrings. The condition is folded into `visibleEpisodes`,
+  so blocked media disappears from every listing without deleting files.
+  Admin API: `GET|POST /api/admin/blocked-titles`,
+  `DELETE /api/admin/blocked-titles/{id}`. Admin video lists may pass
+  `include_blocked=1` to inspect/restore blocked items (ignored for non-admins).
 - Media endpoints (`/stream`, `/download`, `/poster`, `/hls/*`) keep accepting
   `?token=` so `<video>`/`<img>` tags work without headers.
 - API/error messages stay English; only the web UI is localized.

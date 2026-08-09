@@ -42,6 +42,7 @@ favorites, playlists — and numbered files automatically group into TV Shows.
 | ▶️ Playback | H.264/WebM play natively (HTTP Range); **MKV/HEVC transcoded to HLS on the fly**; subtitles auto-detected (SRT→WebVTT); download for offline |
 | 👤 Personal | Continue watching, favorites (videos **and** series), playlists with sequential playback |
 | 🔐 Users | Register/login with JWT; admin/user roles; admin user management with safety guards |
+| 🚫 Content blocking | Admins block media by title in the admin panel — hidden for everyone, files and records kept, unblock anytime |
 | 🚫 Path filters | Hide any server path per user — excluded everywhere (home, series, favorites, continue watching, playlists) |
 | 🌐 Interface | i18n: **English (default), 中文, Français, 日本語, Deutsch** |
 

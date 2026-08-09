@@ -132,8 +132,9 @@ func (a *App) listFavorites(w http.ResponseWriter, r *http.Request) {
 		JOIN videos v ON v.id = f.video_id
 		JOIN libraries l ON l.id = v.library_id
 		LEFT JOIN series s ON s.id = v.series_id
+		%s
 		WHERE f.user_id=$2 AND `+visibleEpisodes(1)+`
-		ORDER BY f.created_at DESC`, videoColumns), user.ID, user.ID)
+		ORDER BY f.created_at DESC`, videoColumns, blockedLateral), user.ID, user.ID)
 	if err != nil {
 		writeErr(w, http.StatusInternalServerError, "query favorites failed")
 		return

@@ -139,6 +139,9 @@ playlists       -- id, user_id(fk), name, description, timestamps
 playlist_items  -- PK(playlist_id, video_id), position, added_at
 series          -- id, library_id(fk), name, season, episode_count, timestamps
 videos          -- + series_id(fk → series, ON DELETE SET NULL), season, episode
+blocked_titles  -- id, title, created_at (admin content blocking by title match)
+hidden_paths    -- id, user_id(fk), path, created_at (per-user path filters)
+series_favorites-- PK(user_id, series_id), created_at
 ```
 
 Key indexes: `videos(lower(title))`, `videos(library_id)`, partial
@@ -152,6 +155,7 @@ erDiagram
     users ||--o{ playlists : owns
     users ||--o{ hidden_paths : hides
     users ||--o{ series_favorites : saves
+    admins ||--o{ blocked_titles : blocks
     libraries ||--o{ videos : contains
     libraries ||--o{ series : groups
     series ||--o{ videos : "episodes (series_id)"
@@ -235,6 +239,10 @@ Optional (`TMDB_API_KEY`). `Scraper`:
 - `GET /api/admin/paths?path=…` — server directory browser (subdirs, parent,
   home shortcut, free disk space via `statfs`) used by the folder picker
 - User management: list / change role / reset password / delete (with guards)
+- Content blocking: `GET|POST /api/admin/blocked-titles`,
+  `DELETE /api/admin/blocked-titles/{id}` — titles are matched as
+  case-insensitive substrings; blocked media stays on disk and is restored on
+  unblock
 
 ### 3.10 Key design decisions
 
@@ -251,6 +259,11 @@ Optional (`TMDB_API_KEY`). `Scraper`:
   referenced only after they finish, so playback starts in ~1s even for hours-long files
 - **Per-user privacy filters** — hidden paths are evaluated in SQL
   (`starts_with`) so exclusions apply consistently across every listing
+- **Admin content blocking** — `blocked_titles` is folded into the same SQL
+  visibility condition (`visibleEpisodes`), so blocked media disappears from
+  every listing at once (including series, favorites and playlists) without
+  touching the files; admins can list blocked videos via
+  `GET /api/videos?include_blocked=1`
 - **Media URLs carry the user JWT** (`?token=`) because `<video>`/`<img>` tags
   cannot set HTTP headers
 

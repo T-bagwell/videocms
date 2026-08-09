@@ -93,8 +93,9 @@ func (a *App) getPlaylist(w http.ResponseWriter, r *http.Request) {
 		JOIN videos v ON v.id = pi.video_id
 		JOIN libraries l ON l.id = v.library_id
 		LEFT JOIN series s ON s.id = v.series_id
+		%s
 		WHERE pi.playlist_id=$2 AND `+visibleEpisodes(1)+`
-		ORDER BY pi.position, pi.added_at`, videoColumns), user.ID, id)
+		ORDER BY pi.position, pi.added_at`, videoColumns, blockedLateral), user.ID, id)
 	if err != nil {
 		writeErr(w, http.StatusInternalServerError, "load playlist items failed")
 		return

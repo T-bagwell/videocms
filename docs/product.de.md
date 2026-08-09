@@ -24,6 +24,7 @@ Hardware. Ihre Videos verlassen Ihr Netzwerk nie, außer Sie teilen sie bewusst.
 | Serien | Nummerierte Dateien (S01E01, EP1, 第1集…) automatisch nach Folge sortiert gruppiert |
 | Persönlich | Weiterschauen, Favoriten, Wiedergabelisten mit fortlaufender Wiedergabe |
 | Benutzer | Registrierung/Login, Admin-Rollen, Benutzerverwaltung |
+| Inhalts-Blockierung | Admins blockieren Medien per Titel — für alle ausgeblendet, Dateien und Einträge bleiben erhalten, jederzeit freigebbar |
 | Oberfläche | 5 Sprachen: Englisch (Standard), 中文, Français, 日本語, Deutsch |
 
 ## Screenshots
@@ -123,6 +124,8 @@ Statistiken: Videos, Bibliotheken, Benutzer, Wiedergabelisten, Favoriten, Serien
 - Hinzufügen mit Name und Server-Pfad (inkl. Ordnerauswahl)
 - **Scannen** indexiert neue/geänderte Dateien; **Scan stoppen** bricht ab; Fortschritt live
 - Das Löschen einer Bibliothek entfernt ihre Videoeinträge — Dateien auf der Platte bleiben
+- **Ordner öffnen** öffnet das Mediatheks-Verzeichnis auf dem Server im
+  System-Dateimanager, um die tatsächlichen Mediendateien anzusehen oder zu verwalten
 
 ### 5.3 Videos
 
@@ -136,6 +139,13 @@ Statistiken: Videos, Bibliotheken, Benutzer, Wiedergabelisten, Favoriten, Serien
 - Rollen ändern (Benutzer/Admin), Passwörter zurücksetzen, Konten löschen
 - Sicherungen: Sie können Ihr eigenes Konto nicht löschen; der letzte Admin kann
   weder gelöscht noch degradiert werden
+
+### 5.5 Blockierte Inhalte
+
+- Medien per Titel blockieren (z. B. Serienname), ohne Dateien oder Einträge zu löschen
+- Blockierte Titel sind für alle Benutzer ausgeblendet: Startseite, Serien, Favoriten,
+  Weiterschauen und Wiedergabelisten — Freigabe stellt sie sofort wieder her
+- Nutzen Sie die Suche, um vor dem Blockieren zu prüfen, welche Medien ein Titel betrifft
 
 ## 6. Konfiguration
 

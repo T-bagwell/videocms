@@ -4,6 +4,7 @@ import { api } from '../api.js';
 import { useAuth } from '../auth.jsx';
 import PathPicker from '../components/PathPicker.jsx';
 import { fmtBytes } from '../i18n';
+import BlockedAdmin from './BlockedAdmin.jsx';
 
 export default function AdminPage() {
   const [tab, setTab] = useState('overview');
@@ -22,6 +23,9 @@ export default function AdminPage() {
         <button className={tab === 'videos' ? 'tab active' : 'tab'} onClick={() => setTab('videos')}>
           {t('admin.tabVideos')}
         </button>
+        <button className={tab === 'blocked' ? 'tab active' : 'tab'} onClick={() => setTab('blocked')}>
+          {t('admin.tabBlocked')}
+        </button>
         <button className={tab === 'users' ? 'tab active' : 'tab'} onClick={() => setTab('users')}>
           {t('admin.tabUsers')}
         </button>
@@ -29,6 +33,7 @@ export default function AdminPage() {
       {tab === 'overview' && <Overview />}
       {tab === 'libraries' && <Libraries />}
       {tab === 'videos' && <VideoAdmin />}
+      {tab === 'blocked' && <BlockedAdmin />}
       {tab === 'users' && <Users />}
     </div>
   );
@@ -107,6 +112,17 @@ function Libraries() {
       await api(`/libraries/${id}/scan/cancel`, { method: 'POST' });
       setMsg(t('admin.stopRequested'));
       refresh();
+    } catch (e2) {
+      setErr(e2.message);
+    }
+  }
+
+  async function openFolder(l) {
+    setErr('');
+    setMsg('');
+    try {
+      const d = await api(`/libraries/${l.id}/open`, { method: 'POST' });
+      setMsg(t('admin.folderOpened', { path: d.path }));
     } catch (e2) {
       setErr(e2.message);
     }
@@ -197,6 +213,9 @@ function Libraries() {
                     {t('admin.scan')}
                   </button>
                 )}
+                <button className="btn small" onClick={() => openFolder(l)}>
+                  📂 {t('admin.openFolder')}
+                </button>
                 <button className="btn small danger-ghost" onClick={() => remove(l.id)}>{t('admin.delete')}</button>
               </div>
             </div>
@@ -221,7 +240,7 @@ function VideoAdmin() {
   const [scrapingId, setScrapingId] = useState(null);
 
   useEffect(() => {
-    const params = new URLSearchParams({ page: String(page), page_size: '50', sort: 'added_desc' });
+    const params = new URLSearchParams({ page: String(page), page_size: '50', sort: 'added_desc', include_blocked: '1' });
     if (search) params.set('q', search);
     api(`/videos?${params}`)
       .then((d) => {
@@ -292,6 +311,23 @@ function VideoAdmin() {
     }
   }
 
+  async function toggleBlock(v) {
+    setErr('');
+    try {
+      if (v.blocked) {
+        await api(`/admin/blocked-titles/${v.blocked_id}`, { method: 'DELETE' });
+        setMsg(t('admin.blockRemoved', { title: v.title }));
+      } else {
+        await api('/admin/blocked-titles', { method: 'POST', body: { title: v.title } });
+        setMsg(t('admin.blockAdded', { title: v.title }));
+      }
+      setPage(1);
+      setSearch(search);
+    } catch (e2) {
+      setErr(e2.message);
+    }
+  }
+
   return (
     <div>
       {msg && <div className="toast toast-success">{msg}</div>}
@@ -306,9 +342,18 @@ function VideoAdmin() {
         {videos.map((v) => (
           <div key={v.id} className="card admin-video-row">
             <div className="mono muted" style={{ flex: 1, minWidth: 0 }}>
-              <div className="ellipsis">{v.title}</div>
+              <div className="ellipsis">
+                {v.title}
+                {v.blocked && <span className="status-badge status-error">{t('admin.blockedBadge')}</span>}
+              </div>
               <div className="small-muted">{v.filename}</div>
             </div>
+            <button
+              className="btn small danger-ghost"
+              onClick={() => toggleBlock(v)}
+            >
+              {v.blocked ? t('admin.blockUnblock') : t('admin.blockThis')}
+            </button>
             <button
               className="btn small"
               onClick={() => {

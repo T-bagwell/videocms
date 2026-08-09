@@ -134,6 +134,9 @@ playlists       -- id, user_id(外键), name, description, 时间戳
 playlist_items  -- 主键(playlist_id, video_id), position, added_at
 series          -- id, library_id(外键), name, season, episode_count, 时间戳
 videos          -- + series_id(外键→series, ON DELETE SET NULL), season, episode
+blocked_titles  -- id, title, created_at（管理员按标题屏蔽内容）
+hidden_paths    -- id, user_id(外键), path, created_at（按用户隐藏路径）
+series_favorites-- 主键(user_id, series_id), created_at
 ```
 
 关键索引：`videos(lower(title))`、`videos(library_id)`、部分索引
@@ -147,6 +150,7 @@ erDiagram
     users ||--o{ playlists : 拥有
     users ||--o{ hidden_paths : 隐藏
     users ||--o{ series_favorites : 收藏剧集
+    admins ||--o{ blocked_titles : 屏蔽
     libraries ||--o{ videos : 包含
     libraries ||--o{ series : 归组
     series ||--o{ videos : "剧集 (series_id)"
@@ -224,6 +228,9 @@ erDiagram
 - `GET /api/admin/paths?path=…` — 服务器目录浏览器（子目录、上级、主目录快捷方式、
   通过 `statfs` 获取磁盘可用空间），供目录选择器使用
 - 用户管理：列表 / 改角色 / 重置密码 / 删除（带守卫）
+- 内容屏蔽：`GET|POST /api/admin/blocked-titles`、
+  `DELETE /api/admin/blocked-titles/{id}` — 标题按不区分大小写的子串匹配；
+  被屏蔽的媒资保留在磁盘上，解除后立即恢复
 
 ### 3.10 关键设计决策
 
@@ -234,6 +241,9 @@ erDiagram
 - **HLS 实时增长清单** — ffmpeg 原地写清单（不做 VOD 缓冲），完成时补写 `#EXT-X-ENDLIST`；
   分片完成后才进入清单，数小时的长片也能约 1 秒起播
 - **按用户隐私过滤** — 隐藏路径在 SQL 中求值（`starts_with`），对所有列表一致生效
+- **管理员内容屏蔽** — `blocked_titles` 并入统一的可见性条件
+  （`visibleEpisodes`），被屏蔽的媒资会从所有列表（含剧集、收藏、播放列表）同时消失，
+  文件不受影响；管理员可通过 `GET /api/videos?include_blocked=1` 查看被屏蔽的内容
 - **媒体 URL 携带用户 JWT**（`?token=`），因为 `<video>`/`<img>` 标签无法设置请求头
 
 ## 4. 前端设计

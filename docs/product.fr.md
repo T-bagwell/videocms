@@ -24,6 +24,7 @@ matériel. Vos vidéos ne quittent jamais votre réseau, sauf si vous choisissez
 | Séries TV | Fichiers numérotés (S01E01, EP1, 第1集…) regroupés automatiquement et triés par épisode |
 | Personnel | Reprendre la lecture, favoris, listes de lecture avec lecture séquentielle |
 | Utilisateurs | Inscription/connexion, rôles administrateur, gestion des utilisateurs |
+| Blocage de contenu | Les administrateurs bloquent des médias par titre — masqués pour tous, fichiers et enregistrements conservés, déblocage à tout moment |
 | Interface | 5 langues : anglais (défaut), 中文, Français, 日本語, Deutsch |
 
 ## Captures d’écran
@@ -125,6 +126,8 @@ Statistiques : vidéos, bibliothèques, utilisateurs, listes, favoris, séries e
 - Ajout avec un nom et un chemin serveur (sélecteur de dossiers inclus)
 - **Analyser** indexe les nouveautés ; **Arrêter l’analyse** annule ; progression en direct
 - Supprimer une bibliothèque retire ses enregistrements — les fichiers restent sur le disque
+- **Ouvrir le dossier** ouvre le répertoire de la médiathèque sur le serveur
+  avec le gestionnaire de fichiers système, pour inspecter ou gérer les médias
 
 ### 5.3 Vidéos
 
@@ -138,6 +141,13 @@ Statistiques : vidéos, bibliothèques, utilisateurs, listes, favoris, séries e
 - Changez les rôles (utilisateur/admin), réinitialisez les mots de passe, supprimez des comptes
 - Garde-fous : impossible de supprimer son propre compte ; le dernier admin ne peut
   être ni supprimé ni rétrogradé
+
+### 5.5 Contenu bloqué
+
+- Bloquez tout média par titre (ex. un nom de série) sans supprimer fichiers ni enregistrements
+- Les titres bloqués sont masqués pour tous les utilisateurs : accueil, séries, favoris,
+  reprise de lecture et listes de lecture — le déblocage restaure immédiatement
+- Utilisez la recherche pour prévisualiser quels médias un titre bloquerait avant de l’ajouter
 
 ## 6. Configuration
 

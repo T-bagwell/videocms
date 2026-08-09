@@ -72,6 +72,18 @@ PK (user_id, series_id); created_at.
 PK id, user_id FK, path text, created_at; UNIQUE (user_id, path).
 Used by `visibleEpisodes()`.
 
+## blocked_titles (migration 007)
+
+| column | type | notes |
+| --- | --- | --- |
+| id | uuid PK | |
+| title | text | case-insensitive substring matched against video titles |
+| created_at | timestamptz | |
+
+Every query selecting `videoColumns` joins `blockedLateral` (longest matching
+rule) and surfaces `blocked_id`; `visibleEpisodes` = `visiblePaths AND
+blockedTitlesCondition`.
+
 ## Notes
 
 - Never modify an applied migration; append `NNN_<name>.sql` and use

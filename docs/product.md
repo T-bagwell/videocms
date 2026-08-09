@@ -24,6 +24,7 @@ hardware. Your videos never leave your network unless you choose to share them.
 | TV Shows | Numbered files (S01E01, EP1, 第1集…) auto-grouped into series sorted by episode |
 | Personal | Continue watching, favorites, playlists with sequential playback |
 | Users | Register/login, admin roles, admin user management |
+| Content blocking | Admins block media by title — hidden for everyone, files and records kept, unblock anytime |
 | Interface | 5 languages: English (default), 中文, Français, 日本語, Deutsch |
 
 ## Screenshots
@@ -124,6 +125,8 @@ Stats: videos, libraries, users, playlists, favorites, series and storage used.
 - Add libraries with a name and a server path (folder picker included)
 - **Scan** indexes new/changed files; **Stop scan** cancels; progress is live
 - Deleting a library removes its video records — files on disk are kept
+- **Open folder** opens the library directory on the server with the system
+  file manager, so you can inspect or manage the actual media files
 
 ### 5.3 Videos
 
@@ -137,6 +140,13 @@ Stats: videos, libraries, users, playlists, favorites, series and storage used.
 - Change roles (user/admin), reset passwords, delete accounts
 - Safeguards: you cannot delete your own account, and the last admin cannot be
   deleted or demoted
+
+### 5.5 Blocked content
+
+- Block any media by title (e.g. a show name) without deleting files or records
+- Blocked titles are hidden for every user across home, series, favorites,
+  continue watching and playlists — unblocking restores them immediately
+- Use the search box to preview which media a title would block before adding it
 
 ## 6. Configuration
 

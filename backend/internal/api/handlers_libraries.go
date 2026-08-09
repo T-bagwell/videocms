@@ -2,9 +2,12 @@ package api
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/google/uuid"
@@ -160,6 +163,50 @@ func (a *App) deleteLibrary(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 	writeJSON(w, http.StatusOK, map[string]any{"message": "library deleted"})
+}
+
+// openLibrary opens the library folder on the server with the system file
+// manager (Finder / Files / Nautilus…). This runs on the server machine, not
+// on the browser client.
+func (a *App) openLibrary(w http.ResponseWriter, r *http.Request) {
+	id, err := uuid.Parse(r.PathValue("id"))
+	if err != nil {
+		writeErr(w, http.StatusBadRequest, "invalid library id")
+		return
+	}
+	var path string
+	err = a.pool.QueryRow(r.Context(),
+		`SELECT path FROM libraries WHERE id=$1`, id).Scan(&path)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			writeErr(w, http.StatusNotFound, "library not found")
+			return
+		}
+		writeErr(w, http.StatusInternalServerError, "query library failed")
+		return
+	}
+	if st, err := os.Stat(path); err != nil || !st.IsDir() {
+		writeErr(w, http.StatusNotFound, "library folder does not exist on the server")
+		return
+	}
+
+	var opener string
+	switch runtime.GOOS {
+	case "darwin":
+		opener = "open"
+	case "windows":
+		opener = "explorer"
+	default:
+		opener = "xdg-open"
+	}
+	cmd := exec.Command(opener, path)
+	if err := cmd.Start(); err != nil {
+		writeErr(w, http.StatusInternalServerError, "failed to open folder: "+err.Error())
+		return
+	}
+	// release resources without blocking the HTTP response
+	go func() { _ = cmd.Wait() }()
+	writeJSON(w, http.StatusOK, map[string]any{"message": "opened", "path": path})
 }
 
 func isUniqueViolation(err error) bool {
