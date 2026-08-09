@@ -1,0 +1,4 @@
+interface:
+  display_name: "VideoCMS"
+  short_description: "Build & debug the VideoCMS media server"
+  default_prompt: "Use $videocms to implement this feature following the repo's Go/React/i18n conventions."
