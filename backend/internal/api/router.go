@@ -75,6 +75,10 @@ func (a *App) Routes() http.Handler {
 	mux.HandleFunc("GET /api/videos/{id}/hls/{file...}", authUser(a.hlsHandler))
 	mux.HandleFunc("POST /api/videos/{id}/scrape", authAdmin(a.scrapeVideo))
 
+	mux.HandleFunc("GET /api/series", authUser(a.listSeries))
+	mux.HandleFunc("GET /api/series/{id}", authUser(a.getSeries))
+	mux.HandleFunc("GET /api/series/{id}/poster", authUser(a.seriesPoster))
+
 	mux.HandleFunc("GET /api/admin/users", authAdmin(a.listUsers))
 	mux.HandleFunc("PATCH /api/admin/users/{id}", authAdmin(a.updateUser))
 	mux.HandleFunc("POST /api/admin/users/{id}/reset-password", authAdmin(a.resetPassword))

@@ -4,6 +4,7 @@
   },
   "nav": {
     "home": "Startseite",
+    "tv": "Serien",
     "playlists": "Wiedergabelisten",
     "favorites": "Meine Favoriten",
     "admin": "Verwaltung",
@@ -48,6 +49,9 @@
     "sortDuration": "Nach Dauer (lang → kurz)",
     "sortAdded": "Nach Hinzugefügt",
     "sortFavorites": "Nach Favoriten",
+    "typeAll": "Alle",
+    "typeMovie": "Filme",
+    "typeTv": "Serien",
     "empty": "Keine Videos gefunden. Ein Administrator kann in der Verwaltung eine Bibliothek hinzufügen und scannen.",
     "loadMore": "Mehr laden ({{loaded}}/{{total}})",
     "footerUser": "Aktueller Benutzer: {{name}} · {{role}}",
@@ -108,6 +112,14 @@
     "title": "Meine Favoriten",
     "empty": "Noch keine Favoriten. Tippen Sie beim Stöbern auf ☆ Favorit."
   },
+  "series": {
+    "title": "Serien",
+    "episodes": "{{count}} Folgen",
+    "season": "Staffel {{n}}",
+    "empty": "Keine Serien gefunden. Nummerierte Dateien (S01E01, E01, 第1集…) werden nach einem Scan automatisch gruppiert.",
+    "back": "← Serien",
+    "episodeList": "Folgen"
+  },
   "admin": {
     "title": "Verwaltung",
     "tabOverview": "Übersicht",
@@ -119,6 +131,7 @@
     "statsUsers": "Benutzer",
     "statsPlaylists": "Wiedergabelisten",
     "statsFavorites": "Favoriten",
+    "statsSeries": "Serien",
     "statsStorage": "Belegter Speicher",
     "statsMissing": "Fehlende Dateien",
     "libName": "Bibliotheksname, z. B. Filme",

@@ -4,6 +4,7 @@
   },
   "nav": {
     "home": "Home",
+    "tv": "TV Shows",
     "playlists": "Playlists",
     "favorites": "My Favorites",
     "admin": "Admin",
@@ -48,6 +49,9 @@
     "sortDuration": "By duration (long → short)",
     "sortAdded": "By date added",
     "sortFavorites": "By favorites",
+    "typeAll": "All",
+    "typeMovie": "Movies",
+    "typeTv": "TV Shows",
     "empty": "No videos found. An admin can add and scan a library in Admin.",
     "loadMore": "Load more ({{loaded}}/{{total}})",
     "footerUser": "Current user: {{name}} · {{role}}",
@@ -108,6 +112,14 @@
     "title": "My Favorites",
     "empty": "No favorites yet. Tap ☆ Favorite while browsing."
   },
+  "series": {
+    "title": "TV Shows",
+    "episodes": "{{count}} episodes",
+    "season": "Season {{n}}",
+    "empty": "No TV series found. Numbered files (S01E01, E01, 第1集…) are grouped automatically after a scan.",
+    "back": "← TV Shows",
+    "episodeList": "Episodes"
+  },
   "admin": {
     "title": "Admin",
     "tabOverview": "Overview",
@@ -119,6 +131,7 @@
     "statsUsers": "Users",
     "statsPlaylists": "Playlists",
     "statsFavorites": "Favorites",
+    "statsSeries": "Series",
     "statsStorage": "Storage used",
     "statsMissing": "Missing files",
     "libName": "Library name, e.g. Movies",

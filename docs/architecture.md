@@ -110,6 +110,8 @@ watch_progress  -- PK(user_id, video_id), position_sec, duration_sec, updated_at
 favorites       -- PK(user_id, video_id), created_at
 playlists       -- id, user_id(fk), name, description, timestamps
 playlist_items  -- PK(playlist_id, video_id), position, added_at
+series          -- id, library_id(fk), name, season, episode_count, timestamps
+videos          -- + series_id(fk → series, ON DELETE SET NULL), season, episode
 ```
 
 Key indexes: `videos(lower(title))`, `videos(library_id)`, partial
@@ -161,6 +163,13 @@ The `HLSManager`:
    status becomes `cancelled` and already-indexed rows are preserved
 8. Panics are recovered and surface as `scan_status=error`; a server restart
    resets any stale `scanning` status to `error`
+
+**TV series grouping**: after each scan, `rebuildSeries` parses episode markers
+(`S01E01`, `EP1`, `E01`, `第1集`, trailing bracketed numbers) from titles,
+groups videos sharing a common prefix + season, and creates a `series` row when
+a group has ≥2 episodes. Videos store `series_id/season/episode`; series are
+listed via `GET /api/series` and browsed as a separate “TV Shows” category.
+Series with fewer than 2 available episodes are cleaned up.
 
 On probe failure the file is still indexed with empty technical metadata so the
 owner can see it and decide what to do.

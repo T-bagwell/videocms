@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { api } from '../api.js';
 import VideoCard from '../components/VideoCard.jsx';
+import SeriesCard from '../components/SeriesCard.jsx';
 import { useAuth } from '../auth.jsx';
 import { useTranslation } from 'react-i18next';
 
@@ -18,6 +20,8 @@ export default function BrowsePage() {
   const [search, setSearch] = useState('');
   const [libraryId, setLibraryId] = useState('');
   const [sort, setSort] = useState('title');
+  const [vtype, setVtype] = useState('');
+  const [series, setSeries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const loadedRef = useRef(false);
@@ -25,6 +29,7 @@ export default function BrowsePage() {
   useEffect(() => {
     api('/libraries').then((d) => setLibraries(d.items)).catch(() => {});
     api('/users/me/continue').then((d) => setContinueWatching(d.items)).catch(() => {});
+    api('/series').then((d) => setSeries(d.items)).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -37,6 +42,7 @@ export default function BrowsePage() {
     });
     if (search) params.set('q', search);
     if (libraryId) params.set('library_id', libraryId);
+    if (vtype) params.set('type', vtype);
     api(`/videos?${params}`)
       .then((d) => {
         if (cancelled) return;
@@ -57,7 +63,7 @@ export default function BrowsePage() {
     return () => {
       cancelled = true;
     };
-  }, [page, search, libraryId, sort]);
+  }, [page, search, libraryId, sort, vtype]);
 
   function submitSearch(e) {
     e.preventDefault();
@@ -76,6 +82,20 @@ export default function BrowsePage() {
           <div className="card-grid">
             {continueWatching.map((v) => (
               <VideoCard key={v.id} video={v} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {series.length > 0 && (
+        <section className="section">
+          <div className="section-head">
+            <h2>{t('series.title')}</h2>
+            <Link to="/series" className="section-more">→</Link>
+          </div>
+          <div className="card-grid">
+            {series.slice(0, 10).map((s) => (
+              <SeriesCard key={s.id} series={s} />
             ))}
           </div>
         </section>
@@ -106,6 +126,11 @@ export default function BrowsePage() {
             <option value="duration_desc">{t('browse.sortDuration')}</option>
             <option value="added_desc">{t('browse.sortAdded')}</option>
             <option value="favorites_desc">{t('browse.sortFavorites')}</option>
+          </select>
+          <select value={vtype} onChange={(e) => { setVtype(e.target.value); setPage(1); }}>
+            <option value="">{t('browse.typeAll')}</option>
+            <option value="movie">{t('browse.typeMovie')}</option>
+            <option value="tv">{t('browse.typeTv')}</option>
           </select>
         </div>
 

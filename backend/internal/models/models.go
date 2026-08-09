@@ -60,8 +60,24 @@ type Video struct {
 	IsFavorite  bool      `json:"is_favorite"`
 	ProgressSec float64   `json:"progress_sec"`
 	ProgressDur float64   `json:"progress_duration_sec"`
+	SeriesID    *uuid.UUID `json:"series_id,omitempty"`
+	SeriesName  string    `json:"series_name,omitempty"`
+	Season      int       `json:"season,omitempty"`
+	Episode     int       `json:"episode,omitempty"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
+}
+
+type Series struct {
+	ID           uuid.UUID `json:"id"`
+	LibraryID    uuid.UUID `json:"library_id"`
+	LibraryName  string    `json:"library_name"`
+	Name         string    `json:"name"`
+	Season       int       `json:"season,omitempty"`
+	EpisodeCount int       `json:"episode_count"`
+	HasPoster    bool      `json:"has_poster"`
+	PosterPath   string    `json:"-"`
+	UpdatedAt    time.Time `json:"updated_at"`
 }
 
 type Playlist struct {
@@ -91,6 +107,7 @@ type Progress struct {
 type Stats struct {
 	Users        int64 `json:"users"`
 	Libraries    int64 `json:"libraries"`
+	Series       int64 `json:"series"`
 	Videos       int64 `json:"videos"`
 	VideosMissing int64 `json:"videos_missing"`
 	Playlists    int64 `json:"playlists"`

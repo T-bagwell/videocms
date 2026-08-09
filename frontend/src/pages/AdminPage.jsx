@@ -48,6 +48,7 @@ function Overview() {
       <div className="card stat"><div className="stat-num">{stats.users}</div><div>{t('admin.statsUsers')}</div></div>
       <div className="card stat"><div className="stat-num">{stats.playlists}</div><div>{t('admin.statsPlaylists')}</div></div>
       <div className="card stat"><div className="stat-num">{stats.favorites}</div><div>{t('admin.statsFavorites')}</div></div>
+      <div className="card stat"><div className="stat-num">{stats.series}</div><div>{t('admin.statsSeries')}</div></div>
       <div className="card stat"><div className="stat-num">{fmtBytes(stats.total_bytes)}</div><div>{t('admin.statsStorage')}</div></div>
       {stats.videos_missing > 0 && (
         <div className="card stat warn"><div className="stat-num">{stats.videos_missing}</div><div>{t('admin.statsMissing')}</div></div>

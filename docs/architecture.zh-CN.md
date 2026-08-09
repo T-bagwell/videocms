@@ -105,6 +105,8 @@ watch_progress  -- 主键(user_id, video_id), position_sec, duration_sec, update
 favorites       -- 主键(user_id, video_id), created_at
 playlists       -- id, user_id(外键), name, description, 时间戳
 playlist_items  -- 主键(playlist_id, video_id), position, added_at
+series          -- id, library_id(外键), name, season, episode_count, 时间戳
+videos          -- + series_id(外键→series, ON DELETE SET NULL), season, episode
 ```
 
 关键索引：`videos(lower(title))`、`videos(library_id)`、部分索引
@@ -153,6 +155,12 @@ playlist_items  -- 主键(playlist_id, video_id), position, added_at
    状态变为 `cancelled`，已收录记录保留
 8. panic 会被恢复并显示为 `scan_status=error`；服务重启会把残留的 `scanning`
    状态重置为 `error`
+
+**剧集自动分组**：每次扫描后 `rebuildSeries` 从标题解析集数标记
+（`S01E01`、`EP1`、`E01`、`第1集`、结尾括号数字等），把共享前缀 + 同季的视频归组，
+组内 ≥2 集时创建 `series` 记录。视频保存 `series_id/season/episode`；
+通过 `GET /api/series` 列出，并作为独立的「电视剧 / 剧集」分类浏览。
+不足 2 集可用的剧集会自动清理。
 
 探测失败的文件仍会以空技术元数据入库，让所有者能看到并决定如何处理。
 

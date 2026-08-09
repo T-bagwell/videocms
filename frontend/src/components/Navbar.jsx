@@ -17,6 +17,9 @@ export default function Navbar() {
         <NavLink to="/" end className={({ isActive }) => (isActive ? 'active' : '')}>
           {t('nav.home')}
         </NavLink>
+        <NavLink to="/series" className={({ isActive }) => (isActive ? 'active' : '')}>
+          {t('nav.tv')}
+        </NavLink>
         <NavLink to="/playlists" className={({ isActive }) => (isActive ? 'active' : '')}>
           {t('nav.playlists')}
         </NavLink>

@@ -233,6 +233,7 @@ func (s *Scanner) scan(ctx context.Context, lib models.Library) {
 		log.Printf("scan %s had errors: %v", lib.Path, err)
 	}
 	s.markMissing(ctx, lib.ID, scanStart)
+	s.rebuildSeries(ctx, lib.ID)
 
 	status := "idle"
 	scanErr := ""
@@ -250,6 +251,85 @@ func (s *Scanner) scan(ctx context.Context, lib models.Library) {
 		log.Printf("update library count: %v", err)
 	}
 	log.Printf("scan finished for %q: %d videos (%d processed)", lib.Name, found, processed)
+}
+
+// rebuildSeries groups available videos in a library that carry episode markers
+// into TV series (>=2 episodes per group), sorted by season/episode.
+func (s *Scanner) rebuildSeries(ctx context.Context, libID uuid.UUID) {
+	type candidate struct {
+		videoID uuid.UUID
+		season  int
+		episode int
+	}
+	rows, err := s.pool.Query(ctx,
+		`SELECT id, title FROM videos WHERE library_id=$1 AND available=true`, libID)
+	if err != nil {
+		log.Printf("rebuild series query: %v", err)
+		return
+	}
+	byKey := map[string][]candidate{}
+	nameOf := map[string]string{}
+	for rows.Next() {
+		var videoID uuid.UUID
+		var title string
+		if err := rows.Scan(&videoID, &title); err != nil {
+			continue
+		}
+		seriesName, season, episode := parseEpisode(title)
+		if seriesName == "" || episode == 0 {
+			continue
+		}
+		key := strings.ToLower(seriesName) + "\x00" + strconv.Itoa(season)
+		byKey[key] = append(byKey[key], candidate{videoID: videoID, season: season, episode: episode})
+		if _, ok := nameOf[key]; !ok {
+			nameOf[key] = seriesName
+		}
+	}
+	rows.Close()
+
+	// reset previous assignments for this library (available rows)
+	if _, err := s.pool.Exec(ctx,
+		`UPDATE videos SET series_id=NULL, season=0, episode=0
+		 WHERE library_id=$1 AND available=true`, libID); err != nil {
+		log.Printf("reset series assignments: %v", err)
+		return
+	}
+
+	for key, group := range byKey {
+		if len(group) < 2 {
+			continue
+		}
+		parts := strings.SplitN(key, "\x00", 2)
+		season, _ := strconv.Atoi(parts[1])
+		var seriesID uuid.UUID
+		err := s.pool.QueryRow(ctx, `
+			INSERT INTO series (library_id, name, season, episode_count)
+			VALUES ($1,$2,$3,$4)
+			ON CONFLICT (library_id, name, season) DO UPDATE SET
+				episode_count=EXCLUDED.episode_count, updated_at=now()
+			RETURNING id`,
+			libID, nameOf[key], season, len(group)).Scan(&seriesID)
+		if err != nil {
+			log.Printf("upsert series %q: %v", nameOf[key], err)
+			continue
+		}
+		for _, c := range group {
+			if _, err := s.pool.Exec(ctx,
+				`UPDATE videos SET series_id=$1, season=$2, episode=$3 WHERE id=$4`,
+				seriesID, c.season, c.episode, c.videoID); err != nil {
+				log.Printf("assign episode: %v", err)
+			}
+		}
+	}
+
+	// remove series that no longer have at least 2 available episodes
+	if _, err := s.pool.Exec(ctx, `
+		DELETE FROM series WHERE library_id=$1 AND (
+			SELECT count(*) FROM videos v WHERE v.series_id=series.id AND v.available
+		) < 2`, libID); err != nil {
+		log.Printf("cleanup empty series: %v", err)
+	}
+	log.Printf("series rebuilt for library %s: %d groups", libID.String()[:8], len(byKey))
 }
 
 func scanWorkers() int {

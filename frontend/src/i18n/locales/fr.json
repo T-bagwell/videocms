@@ -4,6 +4,7 @@
   },
   "nav": {
     "home": "Accueil",
+    "tv": "Séries TV",
     "playlists": "Listes de lecture",
     "favorites": "Mes favoris",
     "admin": "Administration",
@@ -48,6 +49,9 @@
     "sortDuration": "Par durée (long → court)",
     "sortAdded": "Par date d'ajout",
     "sortFavorites": "Par favoris",
+    "typeAll": "Tout",
+    "typeMovie": "Films",
+    "typeTv": "Séries TV",
     "empty": "Aucune vidéo trouvée. Un administrateur peut ajouter une bibliothèque dans Administration.",
     "loadMore": "Charger plus ({{loaded}}/{{total}})",
     "footerUser": "Utilisateur actuel : {{name}} · {{role}}",
@@ -108,6 +112,14 @@
     "title": "Mes favoris",
     "empty": "Aucun favori pour le moment. Touchez ☆ Favori pendant la navigation."
   },
+  "series": {
+    "title": "Séries TV",
+    "episodes": "{{count}} épisodes",
+    "season": "Saison {{n}}",
+    "empty": "Aucune série trouvée. Les fichiers numérotés (S01E01, E01, 第1集…) sont regroupés automatiquement après une analyse.",
+    "back": "← Séries TV",
+    "episodeList": "Épisodes"
+  },
   "admin": {
     "title": "Administration",
     "tabOverview": "Aperçu",
@@ -119,6 +131,7 @@
     "statsUsers": "Utilisateurs",
     "statsPlaylists": "Listes de lecture",
     "statsFavorites": "Favoris",
+    "statsSeries": "Séries",
     "statsStorage": "Espace utilisé",
     "statsMissing": "Fichiers manquants",
     "libName": "Nom de la bibliothèque, ex. Films",

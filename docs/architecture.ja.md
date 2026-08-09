@@ -106,6 +106,8 @@ watch_progress  -- PK(user_id, video_id), position_sec, duration_sec, updated_at
 favorites       -- PK(user_id, video_id), created_at
 playlists       -- id, user_id(FK), name, description, タイムスタンプ
 playlist_items  -- PK(playlist_id, video_id), position, added_at
+series          -- id, library_id(FK), name, season, episode_count, タイムスタンプ
+videos          -- + series_id(FK→series, ON DELETE SET NULL), season, episode
 ```
 
 主要インデックス：`videos(lower(title))`、`videos(library_id)`、部分インデックス
@@ -155,6 +157,13 @@ playlist_items  -- PK(playlist_id, video_id), position, added_at
    ステータスを `cancelled` に。取り込み済みレコードは保持
 8. panic はリカバリされ `scan_status=error` に。サーバー再起動時は残った `scanning`
    状態を `error` にリセット
+
+**ドラマ自動グループ化**：スキャン後に `rebuildSeries` がタイトルからエピソード
+マーカー（`S01E01`、`EP1`、`E01`、`第1集`、末尾のかっこ数字など）を解析し、
+共通プレフィックス + シーズンを共有する動画をグループ化。2 話以上あれば `series` 行を
+作成します。動画には `series_id/season/episode` を保存し、
+`GET /api/series` で一覧され、独立した「ドラマ」カテゴリとして閲覧できます。
+2 話未満になったシリーズは自動的に整理されます。
 
 プローブ失敗のファイルも空の技術メタデータで登録されるため、所有者は内容を確認して判断できます。
 

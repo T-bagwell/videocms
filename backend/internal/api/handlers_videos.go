@@ -32,6 +32,7 @@ const videoColumns = `
 	v.id, v.library_id, l.name, v.title, v.filename, v.file_path, v.size_bytes,
 	v.duration_sec, v.width, v.height, v.video_codec, v.container, v.year,
 	v.synopsis, v.genres, v.poster_path, v.subtitle_path, v.available,
+	v.series_id, v.season, v.episode, COALESCE(s.name, ''),
 	v.created_at, v.updated_at,
 	EXISTS(SELECT 1 FROM favorites f WHERE f.user_id=$1 AND f.video_id=v.id) AS is_fav,
 	COALESCE((SELECT wp.position_sec FROM watch_progress wp WHERE wp.user_id=$1 AND wp.video_id=v.id), 0),
@@ -42,6 +43,7 @@ func scanVideo(row pgx.Row) (models.Video, error) {
 	err := row.Scan(&v.ID, &v.LibraryID, &v.LibraryName, &v.Title, &v.Filename, &v.FilePath,
 		&v.SizeBytes, &v.DurationSec, &v.Width, &v.Height, &v.VideoCodec, &v.Container,
 		&v.Year, &v.Synopsis, &v.Genres, &v.PosterPath, &v.SubtitlePath, &v.Available,
+		&v.SeriesID, &v.Season, &v.Episode, &v.SeriesName,
 		&v.CreatedAt, &v.UpdatedAt, &v.IsFavorite, &v.ProgressSec, &v.ProgressDur)
 	v.HasPoster = v.PosterPath != ""
 	v.HasSubtitle = v.SubtitlePath != ""
@@ -94,6 +96,11 @@ func (a *App) listVideos(w http.ResponseWriter, r *http.Request) {
 		args = append(args, user.ID)
 		argIdx++
 	}
+	if vtype := q.Get("type"); vtype == "tv" {
+		where = append(where, "v.series_id IS NOT NULL")
+	} else if vtype == "movie" {
+		where = append(where, "v.series_id IS NULL")
+	}
 
 	orderBy := "lower(v.title), v.year DESC"
 	switch q.Get("sort") {
@@ -123,6 +130,7 @@ func (a *App) listVideos(w http.ResponseWriter, r *http.Request) {
 	args = append(args, pageSize, (page-1)*pageSize)
 	sql := fmt.Sprintf(`SELECT %s
 		FROM videos v JOIN libraries l ON l.id=v.library_id
+		LEFT JOIN series s ON s.id = v.series_id
 		WHERE %s
 		ORDER BY %s
 		LIMIT $%d OFFSET $%d`, videoColumns, whereSQL, orderBy, argIdx, argIdx+1)
@@ -153,7 +161,9 @@ func (a *App) getVideo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	v, err := scanVideo(a.pool.QueryRow(r.Context(), fmt.Sprintf(`
-		SELECT %s FROM videos v JOIN libraries l ON l.id=v.library_id WHERE v.id=$2`,
+		SELECT %s FROM videos v JOIN libraries l ON l.id=v.library_id
+		LEFT JOIN series s ON s.id = v.series_id
+		WHERE v.id=$2`,
 		videoColumns), auth.UserFrom(r).ID, id))
 	if errors.Is(err, pgx.ErrNoRows) {
 		writeErr(w, http.StatusNotFound, "video not found")

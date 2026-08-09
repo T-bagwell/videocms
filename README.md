@@ -35,6 +35,8 @@ posters, watch progress, favorites, playlists, and a fully localized interface.
   macOS `._` resource-fork files and `.m3u8` HLS stream folders
 - **Metadata**: ffprobe extracts duration/resolution/codec; filename parsing for
   title/year; ffmpeg generates posters; optional **TMDB scraping** (zh/en)
+- **TV series auto-grouping**: numbered files (S01E01, EP1, 第1集…) are grouped
+  into series sorted by episode, with a separate “TV Shows” category
 - **Playback**: HTTP Range streaming for H.264 MP4/WebM; **HLS transcoding** for
   MKV/HEVC via ffmpeg (seek + resume supported); subtitle auto-detection
 - **Users**: register/login, JWT, admin/user roles; admin user management

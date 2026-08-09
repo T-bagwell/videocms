@@ -92,6 +92,7 @@ func (a *App) getPlaylist(w http.ResponseWriter, r *http.Request) {
 		FROM playlist_items pi
 		JOIN videos v ON v.id = pi.video_id
 		JOIN libraries l ON l.id = v.library_id
+		LEFT JOIN series s ON s.id = v.series_id
 		WHERE pi.playlist_id=$2
 		ORDER BY pi.position, pi.added_at`, videoColumns), user.ID, id)
 	if err != nil {
@@ -108,6 +109,7 @@ func (a *App) getPlaylist(w http.ResponseWriter, r *http.Request) {
 			&it.Video.SizeBytes, &it.Video.DurationSec, &it.Video.Width, &it.Video.Height,
 			&it.Video.VideoCodec, &it.Video.Container, &it.Video.Year, &it.Video.Synopsis,
 			&it.Video.Genres, &it.Video.PosterPath, &it.Video.SubtitlePath, &it.Video.Available,
+			&it.Video.SeriesID, &it.Video.Season, &it.Video.Episode, &it.Video.SeriesName,
 			&it.Video.CreatedAt, &it.Video.UpdatedAt, &it.Video.IsFavorite,
 			&it.Video.ProgressSec, &it.Video.ProgressDur); err != nil {
 			writeErr(w, http.StatusInternalServerError, "scan item failed")
@@ -237,4 +239,3 @@ func (a *App) removePlaylistItem(w http.ResponseWriter, r *http.Request) {
 	a.pool.Exec(r.Context(), `UPDATE playlists SET updated_at=now() WHERE id=$1`, playlistID)
 	writeJSON(w, http.StatusOK, map[string]any{"message": "removed"})
 }
-

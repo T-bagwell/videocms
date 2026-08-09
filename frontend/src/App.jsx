@@ -7,6 +7,8 @@ import PlayerPage from './pages/PlayerPage.jsx';
 import PlaylistsPage from './pages/PlaylistsPage.jsx';
 import PlaylistDetailPage from './pages/PlaylistDetailPage.jsx';
 import FavoritesPage from './pages/FavoritesPage.jsx';
+import SeriesListPage from './pages/SeriesListPage.jsx';
+import SeriesDetailPage from './pages/SeriesDetailPage.jsx';
 import AdminPage from './pages/AdminPage.jsx';
 import { useAuth } from './auth.jsx';
 import { useTranslation } from 'react-i18next';
@@ -73,6 +75,22 @@ export default function App() {
             element={
               <RequireAuth>
                 <FavoritesPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/series"
+            element={
+              <RequireAuth>
+                <SeriesListPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/series/:id"
+            element={
+              <RequireAuth>
+                <SeriesDetailPage />
               </RequireAuth>
             }
           />

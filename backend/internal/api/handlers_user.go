@@ -51,12 +51,14 @@ func (a *App) continueWatching(w http.ResponseWriter, r *http.Request) {
 		SELECT v.id, v.library_id, l.name, v.title, v.filename, v.file_path, v.size_bytes,
 		       v.duration_sec, v.width, v.height, v.video_codec, v.container, v.year,
 		       v.synopsis, v.genres, v.poster_path, v.subtitle_path, v.available,
+		       v.series_id, v.season, v.episode, COALESCE(s.name, ''),
 		       v.created_at, v.updated_at,
 		       EXISTS(SELECT 1 FROM favorites f WHERE f.user_id=$1 AND f.video_id=v.id),
 		       wp.position_sec, wp.duration_sec
 		FROM watch_progress wp
 		JOIN videos v ON v.id = wp.video_id
 		JOIN libraries l ON l.id = v.library_id
+		LEFT JOIN series s ON s.id = v.series_id
 		WHERE wp.user_id=$1 AND v.available=true AND wp.position_sec > 5
 		  AND wp.position_sec < wp.duration_sec * 0.95
 		ORDER BY wp.updated_at DESC
@@ -73,6 +75,7 @@ func (a *App) continueWatching(w http.ResponseWriter, r *http.Request) {
 		if err := rows.Scan(&v.ID, &v.LibraryID, &v.LibraryName, &v.Title, &v.Filename, &v.FilePath,
 			&v.SizeBytes, &v.DurationSec, &v.Width, &v.Height, &v.VideoCodec, &v.Container,
 			&v.Year, &v.Synopsis, &v.Genres, &v.PosterPath, &v.SubtitlePath, &v.Available,
+			&v.SeriesID, &v.Season, &v.Episode, &v.SeriesName,
 			&v.CreatedAt, &v.UpdatedAt, &v.IsFavorite, &v.ProgressSec, &v.ProgressDur); err != nil {
 			writeErr(w, http.StatusInternalServerError, "scan row failed")
 			return
@@ -128,6 +131,7 @@ func (a *App) listFavorites(w http.ResponseWriter, r *http.Request) {
 		SELECT %s FROM favorites f
 		JOIN videos v ON v.id = f.video_id
 		JOIN libraries l ON l.id = v.library_id
+		LEFT JOIN series s ON s.id = v.series_id
 		WHERE f.user_id=$2 AND v.available=true
 		ORDER BY f.created_at DESC`, videoColumns), user.ID, user.ID)
 	if err != nil {

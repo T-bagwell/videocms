@@ -4,6 +4,7 @@
   },
   "nav": {
     "home": "首页",
+    "tv": "剧集",
     "playlists": "播放列表",
     "favorites": "我的收藏",
     "admin": "管理",
@@ -48,6 +49,9 @@
     "sortDuration": "按时长（长→短）",
     "sortAdded": "按入库时间",
     "sortFavorites": "按收藏数",
+    "typeAll": "全部",
+    "typeMovie": "电影",
+    "typeTv": "电视剧",
     "empty": "没有找到视频。管理员可以在「管理」中添加媒体库并扫描。",
     "loadMore": "加载更多（{{loaded}}/{{total}}）",
     "footerUser": "当前用户：{{name}} · {{role}}",
@@ -108,6 +112,14 @@
     "title": "我的收藏",
     "empty": "还没有收藏视频，浏览时点「☆ 收藏」即可加入。"
   },
+  "series": {
+    "title": "剧集",
+    "episodes": "{{count}} 集",
+    "season": "第{{n}}季",
+    "empty": "还没有剧集。扫描后，带序号的视频（S01E01、EP1、第1集…）会自动分组为剧集。",
+    "back": "← 剧集",
+    "episodeList": "剧集列表"
+  },
   "admin": {
     "title": "管理后台",
     "tabOverview": "概览",
@@ -119,6 +131,7 @@
     "statsUsers": "用户",
     "statsPlaylists": "播放列表",
     "statsFavorites": "收藏",
+    "statsSeries": "剧集",
     "statsStorage": "占用空间",
     "statsMissing": "文件缺失",
     "libName": "媒体库名称，如：电影",

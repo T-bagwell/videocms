@@ -7,6 +7,12 @@ export default function VideoCard({ video }) {
     video.progress_sec > 5 && video.progress_duration_sec > 0
       ? Math.min(95, Math.round((video.progress_sec / video.progress_duration_sec) * 100))
       : 0;
+  const episodeLabel =
+    video.series_name && video.episode
+      ? video.season > 0
+        ? `S${String(video.season).padStart(2, '0')}E${String(video.episode).padStart(2, '0')}`
+        : `E${String(video.episode).padStart(2, '0')}`
+      : '';
 
   return (
     <Link to={`/video/${video.id}`} className="video-card">
@@ -22,6 +28,12 @@ export default function VideoCard({ video }) {
         )}
       </div>
       <div className="video-card-info">
+        {video.series_name && (
+          <div className="video-card-series" title={video.series_name}>
+            📺 {video.series_name}
+            {episodeLabel && <span className="episode-tag">{episodeLabel}</span>}
+          </div>
+        )}
         <div className="video-card-title" title={video.title}>
           {video.title}
         </div>
