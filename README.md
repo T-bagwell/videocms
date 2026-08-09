@@ -47,6 +47,21 @@ favorites, playlists — and numbered files automatically group into TV Shows.
 | 🚫 Path filters | Hide any server path per user — excluded everywhere (home, series, favorites, continue watching, playlists) |
 | 🌐 Interface | i18n: **English (default), 中文, Français, 日本語, Deutsch** |
 
+## Content Controls
+
+Three independent layers decide who sees what — files and records are never
+touched by any of them:
+
+| Layer | Who manages | Scope | Where it applies |
+| --- | --- | --- | --- |
+| 🏷️ Title blocking | Admin | Videos whose title contains the blocked text | Every listing for everyone |
+| 📚 Library blocking | Admin | An entire library (all its videos) | Every listing for everyone |
+| 🛤️ Path filters | Each user | Any server path the user chooses | Every listing for that user only |
+
+All three are evaluated in SQL on every listing (home, TV shows, favorites,
+continue watching, playlists), so a blocked item disappears everywhere at once
+and reappears immediately when unblocked.
+
 ## Screenshots
 
 > *Coming soon — the UI is live at `http://<your-server>:8080` after `make serve`.*
@@ -65,7 +80,7 @@ All documentation is multi-language. Start at the **[docs index](docs/README.md)
 
 ### Requirements
 
-- Go 1.22+ (to build) or a prebuilt binary
+- Go 1.26+ (to build) or a prebuilt binary
 - PostgreSQL 14+
 - ffmpeg + ffprobe (metadata, posters, transcoding)
 - Node.js 18+ (frontend development only — the built UI is served by the backend)
@@ -166,6 +181,7 @@ See also [SECURITY.md](SECURITY.md).
 - [x] Native playback + HLS transcoding
 - [x] TV series auto-grouping (multiple naming patterns)
 - [x] Favorites (videos & series), playlists, continue watching
+- [x] Content controls: title blocking, library blocking, per-user path filters
 - [x] i18n (en/zh/fr/ja/de)
 - [ ] Filesystem watching for incremental indexing
 - [ ] Adaptive-bitrate (multi-quality) HLS

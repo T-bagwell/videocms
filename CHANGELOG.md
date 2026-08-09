@@ -2,6 +2,18 @@
 
 All notable changes to VideoCMS are documented here.
 
+## [Unreleased]
+
+### Added
+
+- Admin content blocking by title: block media without deleting files/records,
+  hidden for everyone, unblock anytime (`blocked_titles` table)
+- Library-level blocking: block/unblock an entire library from the admin panel,
+  hidden for everyone, nothing deleted (`libraries.blocked` column)
+- Open a library folder on the server with the system file manager (one click)
+- Project-level Codex skill (`.codex/skills/videocms/`) with environment
+  wrapper, commands and conventions
+
 ## [0.1.0] — 2026-08-09
 
 ### Added
@@ -21,11 +33,6 @@ All notable changes to VideoCMS are documented here.
   playlists with sequential playback
 - Users: JWT auth, admin/user roles, admin user management with safety guards
 - Per-user hidden-path filters applied across all listings
-- Admin content blocking by title: block media without deleting files/records,
-  hidden for everyone, unblock anytime
-- Open a library folder on the server with the system file manager (one click)
-- Block/unblock an entire library from the admin panel — hidden for everyone,
-  files and records kept
 - Series list ordered by newest import; library filter (like the home page)
 - i18n: en / 中文 / Français / 日本語 / Deutsch (English default)
 - Production mode: backend serves the built frontend on a single port (`make serve`)

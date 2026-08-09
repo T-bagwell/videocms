@@ -247,6 +247,8 @@ Optional (`TMDB_API_KEY`). `Scraper`:
 - Library blocking: `PATCH /api/libraries/{id}` (`{"blocked": true|false}`)
   hides the entire library; the flag is evaluated in the same SQL visibility
   condition
+- Open library folder: `POST /api/libraries/{id}/open` runs the system file
+  manager (`open` / `xdg-open` / `explorer`) on the server for the library path
 
 ### 3.10 Key design decisions
 

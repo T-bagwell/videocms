@@ -195,6 +195,12 @@ firewall prompt on first run.
 The default deployment is plain HTTP with a development JWT secret. For anything
 exposed beyond a trusted LAN, use an HTTPS reverse proxy and set `JWT_SECRET`.
 
+**How do I hide content without deleting files?**
+Admins can block a media title (**Admin → Blocked**) or an entire library
+(**Admin → Libraries → Block library**); blocked content vanishes for every
+user everywhere and returns immediately when unblocked. Regular users can also
+hide any server path for themselves via the path filter.
+
 ## 8. Technology & License
 
 Go + React + PostgreSQL, with ffmpeg for media processing. The interface is fully

@@ -191,6 +191,13 @@ ersten Start die macOS-Firewall-Abfrage.
 Die Standardinstallation nutzt unverschlüsseltes HTTP mit einem Entwicklungs-JWT.
 Für alles außerhalb eines vertrauenswürdigen LAN: HTTPS-Reverse-Proxy und `JWT_SECRET` setzen.
 
+**Wie blende ich Inhalte aus, ohne Dateien zu löschen?**
+Admins können einen Titel (Admin → Blockierte Inhalte) oder eine ganze Bibliothek
+(Admin → Bibliotheken → Bibliothek blockieren) blockieren; blockierte Inhalte
+verschwinden überall für alle Benutzer und kehren nach der Freigabe sofort zurück.
+Normale Benutzer können über den Pfadfilter auch beliebige Serverpfade für sich
+selbst ausblenden.
+
 ## 8. Technik und Lizenz
 
 Go + React + PostgreSQL, mit ffmpeg für die Medienverarbeitung. Die Oberfläche ist

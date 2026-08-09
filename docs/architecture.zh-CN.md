@@ -234,6 +234,8 @@ erDiagram
   被屏蔽的媒资保留在磁盘上，解除后立即恢复
 - 媒体库屏蔽：`PATCH /api/libraries/{id}`（`{"blocked": true|false}`）
   隐藏整个媒体库；该标记在同一 SQL 可见性条件中求值
+- 打开媒体库目录：`POST /api/libraries/{id}/open` 在服务器上调用系统文件管理器
+  （`open` / `xdg-open` / `explorer`）打开媒体库路径
 
 ### 3.10 关键设计决策
 

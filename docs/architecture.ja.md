@@ -238,6 +238,8 @@ erDiagram
   部分一致で判定。ブロックされたメディアはディスクに残り、解除で即座に復元
 - ライブラリブロック：`PATCH /api/libraries/{id}`（`{"blocked": true|false}`）
   でライブラリ全体を非表示。フラグは同じ SQL 可視性条件で評価
+- ライブラリフォルダを開く：`POST /api/libraries/{id}/open` はサーバー上で
+  システムのファイルマネージャー（`open` / `xdg-open` / `explorer`）を起動します
 
 ### 3.10 主要な設計判断
 

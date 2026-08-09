@@ -25,10 +25,14 @@ directly. Include:
   a trusted LAN
 - Keep PostgreSQL credentials private; don’t reuse the app database for other apps
 - Use the per-user hidden-path filters if some folders should not be visible
+- Use admin content controls (title blocking and library blocking) to hide
+  content globally without deleting files
 - Restrict media library paths to what the process actually needs to read
 
 ## Notes
 
 - Media URLs require a valid user JWT (header or `?token=`)
 - All mutation endpoints are admin-only
+- `POST /api/libraries/{id}/open` launches the system file manager on the
+  server; it is admin-only and requires the library path to exist
 - Passwords are stored as bcrypt hashes only

@@ -194,6 +194,13 @@ pare-feu macOS à la première exécution.
 Le déploiement par défaut est en HTTP non chiffré avec un secret JWT de développement.
 Pour tout accès hors LAN de confiance, utilisez un proxy inverse HTTPS et définissez `JWT_SECRET`.
 
+**Comment masquer du contenu sans supprimer de fichiers ?**
+Les administrateurs peuvent bloquer un titre (**Admin → Contenu bloqué**) ou une
+bibliothèque entière (**Admin → Bibliothèques → Bloquer la bibliothèque**) ;
+le contenu bloqué disparaît pour tous et partout, puis revient immédiatement au
+déblocage. Les utilisateurs peuvent aussi masquer n’importe quel chemin serveur
+pour eux-mêmes via le filtre de chemins.
+
 ## 8. Technologies et licence
 
 Go + React + PostgreSQL, avec ffmpeg pour le traitement média. Interface entièrement

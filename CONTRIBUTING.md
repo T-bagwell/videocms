@@ -10,8 +10,11 @@ environment and what to keep in mind when contributing.
 createdb videocms
 
 # 2. Backend
-cd backend
-go run ./cmd/server          # http://localhost:8080
+# This machine's ambient Go env is polluted (bad GOPATH entry, wrong proxy);
+# always go through the repo wrapper:
+./.codex/skills/videocms/scripts/goenv.sh --in backend go run ./cmd/server
+# or source it once:  source ./.codex/skills/videocms/scripts/goenv.sh
+# (module lives in backend/, hence --in backend; wrapper runs from repo root)
 
 # 3. Frontend
 cd frontend
@@ -20,6 +23,10 @@ npm run dev                  # http://localhost:5173 (proxies /api to :8080)
 ```
 
 Login with the initial admin **admin / admin123**.
+
+> The repository ships a **project-level Codex skill** at
+> `.codex/skills/videocms/` that encodes the environment, commands and
+> conventions below. Codex agents working in this repo should load it.
 
 ## Project layout
 
@@ -44,6 +51,12 @@ frontend/src/
 - DB schema changes go in a new numbered migration
   (`backend/internal/db/migrations/NNN_*.sql`)
 - Media endpoints keep accepting `?token=` for `<video>`/`<img>` tags
+- Every video listing must apply the shared SQL visibility conditions
+  (`visibleEpisodes` / `visiblePaths` in `backend/internal/api/handlers_videos.go`)
+  so per-user path filters, admin title blocks and blocked libraries are
+  respected consistently (home, series, favorites, continue watching, playlists)
+- HLS: keep the live-growing manifest — never add `-hls_playlist_type vod`;
+  do not use `temp_file`; force key frames every 6s
 
 ## Adding a language
 
@@ -54,8 +67,8 @@ frontend/src/
 ## Tests
 
 ```bash
-cd backend
-go test ./...
+./.codex/skills/videocms/scripts/goenv.sh --in backend go test ./...
+./.codex/skills/videocms/scripts/goenv.sh --in backend go vet ./...
 ```
 
 Add unit tests alongside parsing/scanning logic
@@ -67,4 +80,5 @@ Add unit tests alongside parsing/scanning logic
 - Verify `go test ./...`, `go vet ./...`, and `npm run build` pass
 - Update the [CHANGELOG.md](CHANGELOG.md) for user-visible changes
 - Multi-language docs/UI: update or add the other languages when touching them
-
+  (UI: en/zh/fr/ja/de; README: en/zh-CN/ja; architecture: en/zh-CN/ja)
+- Keep docs/README.md in sync when adding or renaming documentation files
