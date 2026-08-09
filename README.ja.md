@@ -51,4 +51,5 @@ make serve                                  # http://<LAN IP>:8080
 
 ## ドキュメント
 
+- [製品ドキュメント](docs/product.ja.md)（[English](docs/product.md) | [中文](docs/product.zh-CN.md) | [Français](docs/product.fr.md) | [Deutsch](docs/product.de.md)）
 - [システムアーキテクチャ設計](docs/architecture.ja.md)（[English](docs/architecture.md) | [中文](docs/architecture.zh-CN.md)）

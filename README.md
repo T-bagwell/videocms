@@ -157,4 +157,5 @@ Media URLs (`<video>`/`<img>` cannot set headers) accept `?token=JWT`.
 
 ## Documentation
 
+- [Product documentation](docs/product.md) (English | [中文](docs/product.zh-CN.md) | [Français](docs/product.fr.md) | [日本語](docs/product.ja.md) | [Deutsch](docs/product.de.md))
 - [System architecture design](docs/architecture.md) (English | [中文](docs/architecture.zh-CN.md) | [日本語](docs/architecture.ja.md))

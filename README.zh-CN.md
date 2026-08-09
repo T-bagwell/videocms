@@ -67,4 +67,5 @@ make serve                                  # 访问 http://<局域网IP>:8080
 
 ## 文档
 
+- [产品文档](docs/product.zh-CN.md)（[English](docs/product.md) | [Français](docs/product.fr.md) | [日本語](docs/product.ja.md) | [Deutsch](docs/product.de.md)）
 - [系统架构设计](docs/architecture.zh-CN.md)（[English](docs/architecture.md) | [日本語](docs/architecture.ja.md)）
