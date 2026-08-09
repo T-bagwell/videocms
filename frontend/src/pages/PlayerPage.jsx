@@ -17,7 +17,7 @@ export default function PlayerPage() {
   const lastRestartRef = useRef(0);
   const [video, setVideo] = useState(null);
   const [queue, setQueue] = useState([]);
-  const [playlistName, setPlaylistName] = useState('');
+  const [queueTitle, setQueueTitle] = useState('');
   const [useTranscode, setUseTranscode] = useState(false);
   const [transcoding, setTranscoding] = useState(false);
   const [hlsErr, setHlsErr] = useState('');
@@ -42,15 +42,25 @@ export default function PlayerPage() {
     api(`/videos/${id}`).then(setVideo).catch((e) => setErr(e.message));
 
     const playlistId = searchParams.get('playlist');
+    const seriesId = searchParams.get('series');
+    setQueue([]);
+    setQueueTitle('');
     if (playlistId) {
       api(`/playlists/${playlistId}`)
         .then((d) => {
           setQueue(d.items.map((i) => i.video));
-          setPlaylistName(d.playlist.name);
+          setQueueTitle(t('player.fromPlaylist', { name: d.playlist.name }));
+        })
+        .catch(() => {});
+    } else if (seriesId) {
+      api(`/series/${seriesId}`)
+        .then((d) => {
+          setQueue(d.items);
+          setQueueTitle(t('player.fromSeries', { name: d.series.name }));
         })
         .catch(() => {});
     }
-  }, [id, searchParams]);
+  }, [id, searchParams, t]);
 
   const startTranscode = useCallback(async () => {
     if (!video) return;
@@ -106,8 +116,17 @@ export default function PlayerPage() {
     const idx = queue.findIndex((v) => v.id === id);
     const next = queue[idx + 1];
     if (next) {
-      navigate(`/player/${next.id}?playlist=${searchParams.get('playlist')}`);
+      const qp = queueParam();
+      navigate(qp ? `/player/${next.id}?${qp}` : `/player/${next.id}`);
     }
+  }
+
+  function queueParam() {
+    const p = searchParams.get('playlist');
+    if (p) return `playlist=${p}`;
+    const s = searchParams.get('series');
+    if (s) return `series=${s}`;
+    return '';
   }
 
   function onLoadedMetadata() {
@@ -162,7 +181,7 @@ export default function PlayerPage() {
         <Link to={`/video/${video.id}`} className="btn ghost">{t('player.backToDetail')}</Link>
         <div>
           <h1>{video.title}</h1>
-          {playlistName && <p className="muted">{t('player.fromPlaylist', { name: playlistName })}</p>}
+          {queueTitle && <p className="muted">{queueTitle}</p>}
         </div>
       </div>
 
@@ -219,7 +238,10 @@ export default function PlayerPage() {
               className={`queue-item ${v.id === id ? 'current' : ''}`}
               onClick={() =>
                 v.id !== id &&
-                navigate(`/player/${v.id}?playlist=${searchParams.get('playlist')}`)
+                (() => {
+                  const qp = queueParam();
+                  navigate(qp ? `/player/${v.id}?${qp}` : `/player/${v.id}`);
+                })()
               }
             >
               <span className="queue-idx">{i + 1}</span>

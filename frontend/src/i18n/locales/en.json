@@ -91,7 +91,8 @@
     "transcodePlay": "Transcode play",
     "download": "Download",
     "queue": "Play queue ({{count}})",
-    "nowPlaying": "Playing"
+    "nowPlaying": "Playing",
+    "fromSeries": "From TV show: {{name}}"
   },
   "playlists": {
     "title": "Playlists",
@@ -123,7 +124,8 @@
     "episodeList": "Episodes",
     "favorite": "☆ Favorite series",
     "unfavorite": "Unfavorite series",
-    "favorited": "★ Favorited"
+    "favorited": "★ Favorited",
+    "playAll": "▶ Play all episodes"
   },
   "admin": {
     "title": "Admin",

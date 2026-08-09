@@ -91,7 +91,8 @@
     "transcodePlay": "Lecture transcodée",
     "download": "Télécharger",
     "queue": "File de lecture ({{count}})",
-    "nowPlaying": "En lecture"
+    "nowPlaying": "En lecture",
+    "fromSeries": "De la série : {{name}}"
   },
   "playlists": {
     "title": "Listes de lecture",
@@ -123,7 +124,8 @@
     "episodeList": "Épisodes",
     "favorite": "☆ Série favorite",
     "unfavorite": "Retirer des favoris",
-    "favorited": "★ Favori"
+    "favorited": "★ Favori",
+    "playAll": "▶ Tout lire"
   },
   "admin": {
     "title": "Administration",

@@ -91,7 +91,8 @@
     "transcodePlay": "Transkodiert abspielen",
     "download": "Herunterladen",
     "queue": "Wiedergabewarteschlange ({{count}})",
-    "nowPlaying": "Läuft"
+    "nowPlaying": "Läuft",
+    "fromSeries": "Aus Serie: {{name}}"
   },
   "playlists": {
     "title": "Wiedergabelisten",
@@ -123,7 +124,8 @@
     "episodeList": "Folgen",
     "favorite": "☆ Serie als Favorit",
     "unfavorite": "Favorit entfernen",
-    "favorited": "★ Favorit"
+    "favorited": "★ Favorit",
+    "playAll": "▶ Alle Folgen abspielen"
   },
   "admin": {
     "title": "Verwaltung",

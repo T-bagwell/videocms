@@ -91,7 +91,8 @@
     "transcodePlay": "转码播放",
     "download": "下载",
     "queue": "播放队列（{{count}}）",
-    "nowPlaying": "播放中"
+    "nowPlaying": "播放中",
+    "fromSeries": "来自剧集：{{name}}"
   },
   "playlists": {
     "title": "播放列表",
@@ -123,7 +124,8 @@
     "episodeList": "剧集列表",
     "favorite": "☆ 收藏剧集",
     "unfavorite": "取消收藏剧集",
-    "favorited": "★ 已收藏"
+    "favorited": "★ 已收藏",
+    "playAll": "▶ 列表播放"
   },
   "admin": {
     "title": "管理后台",

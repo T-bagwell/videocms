@@ -91,7 +91,8 @@
     "transcodePlay": "トランスコード再生",
     "download": "ダウンロード",
     "queue": "再生キュー（{{count}}）",
-    "nowPlaying": "再生中"
+    "nowPlaying": "再生中",
+    "fromSeries": "ドラマ: {{name}}"
   },
   "playlists": {
     "title": "プレイリスト",
@@ -123,7 +124,8 @@
     "episodeList": "エピソード",
     "favorite": "☆ お気に入りに追加",
     "unfavorite": "お気に入り解除",
-    "favorited": "★ お気に入り"
+    "favorited": "★ お気に入り",
+    "playAll": "▶ リスト再生"
   },
   "admin": {
     "title": "管理画面",

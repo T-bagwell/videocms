@@ -61,8 +61,11 @@ export default function SeriesDetailPage() {
           <h1>{series.name}</h1>
           {items.length > 0 && (
             <div className="detail-actions">
-              <button className="btn primary big" onClick={() => navigate(`/player/${items[0].id}`)}>
-                ▶ {t('video.play')}
+              <button
+                className="btn primary big"
+                onClick={() => navigate(`/player/${items[0].id}?series=${id}`)}
+              >
+                {t('series.playAll')}
               </button>
               <button className="btn" onClick={toggleFavorite}>
                 {series.is_favorite ? t('series.unfavorite') : t('series.favorite')}
