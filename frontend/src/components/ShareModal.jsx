@@ -8,6 +8,7 @@ export default function ShareModal({ kind, id, onClose }) {
   const { t } = useTranslation();
   const [hours, setHours] = useState(168);
   const [password, setPassword] = useState('');
+  const [domains, setDomains] = useState('');
   const [shares, setShares] = useState([]);
   const [created, setCreated] = useState('');
   const [copied, setCopied] = useState(false);
@@ -23,7 +24,14 @@ export default function ShareModal({ kind, id, onClose }) {
     try {
       const d = await api(`/${kind}/${id}/share`, {
         method: 'POST',
-        body: { hours: Number(hours) || 168, password: password || undefined },
+        body: {
+          hours: Number(hours) || 168,
+          password: password || undefined,
+          domains: domains
+            .split(',')
+            .map((s) => s.trim())
+            .filter(Boolean),
+        },
       });
       setCreated(`${window.location.origin}${d.url}`);
       const list = await api(`/${kind}/${id}/shares`);
@@ -76,6 +84,14 @@ export default function ShareModal({ kind, id, onClose }) {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder={t('video.sharePasswordPlaceholder')}
+          />
+        </label>
+        <label className="share-password-field">
+          {t('video.shareDomains')}
+          <input
+            value={domains}
+            onChange={(e) => setDomains(e.target.value)}
+            placeholder={t('video.shareDomainsPlaceholder')}
           />
         </label>
         {created && (

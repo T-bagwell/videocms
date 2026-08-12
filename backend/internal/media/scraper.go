@@ -1,6 +1,7 @@
 package media
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -54,9 +55,17 @@ func NewScraper(pool *pgxpool.Pool, dataDir, apiKey string) *Scraper {
 }
 
 func (s *Scraper) Enabled() bool {
-	// TMDB needs a key; without one we fall back to the keyless TVMaze API
-	// (disable with TVMAZE_ENABLED=0).
-	return s.apiKey != "" || os.Getenv("TVMAZE_ENABLED") != "0"
+	// TMDB needs a key; without one we fall back to the keyless TVMaze and
+	// AniList APIs (disable individually with TVMAZE_ENABLED=0 / ANILIST_ENABLED=0).
+	return s.apiKey != "" || tvmazeEnabled() || anilistEnabled()
+}
+
+func tvmazeEnabled() bool {
+	return os.Getenv("TVMAZE_ENABLED") != "0"
+}
+
+func anilistEnabled() bool {
+	return os.Getenv("ANILIST_ENABLED") != "0"
 }
 
 type roundTripperFunc func(*http.Request) (*http.Response, error)
@@ -99,7 +108,7 @@ func (s *Scraper) MaybeScrape(ctx context.Context, videoID uuid.UUID) error {
 // Scrape performs a manual scrape and always overwrites the existing metadata.
 func (s *Scraper) Scrape(ctx context.Context, videoID uuid.UUID) error {
 	if !s.Enabled() {
-		return errors.New("no metadata provider configured (set TMDB_API_KEY or keep TVMAZE_ENABLED=1)")
+		return errors.New("no metadata provider configured (set TMDB_API_KEY or keep TVMAZE_ENABLED/ANILIST_ENABLED=1)")
 	}
 	var title string
 	var year int
@@ -134,7 +143,19 @@ func (s *Scraper) search(ctx context.Context, title string, year int) (*tmdbInfo
 	if s.apiKey != "" {
 		return s.searchTMDB(ctx, title, year)
 	}
-	return s.searchTVMaze(ctx, title, year)
+	if tvmazeEnabled() {
+		info, err := s.searchTVMaze(ctx, title, year)
+		if err != nil {
+			return nil, err
+		}
+		if info.TmdbID != 0 {
+			return info, nil
+		}
+	}
+	if anilistEnabled() {
+		return s.searchAniList(ctx, title, year)
+	}
+	return &tmdbInfo{}, nil
 }
 
 func (s *Scraper) searchTMDB(ctx context.Context, title string, year int) (*tmdbInfo, error) {
@@ -231,6 +252,59 @@ func (s *Scraper) searchTVMaze(ctx context.Context, title string, year int) (*tm
 	}, nil
 }
 
+// searchAniList is the third keyless metadata provider (anime/animation via the
+// AniList GraphQL API).
+func (s *Scraper) searchAniList(ctx context.Context, title string, year int) (*tmdbInfo, error) {
+	query := `query ($q: String) {
+		Media(search: $q, type: ANIME) {
+			id
+			title { romaji english native }
+			startDate { year }
+			genres
+			description(asHtml: false)
+			coverImage { medium }
+		}
+	}`
+	payload, _ := json.Marshal(map[string]any{
+		"query":     query,
+		"variables": map[string]any{"q": title},
+	})
+	var out struct {
+		Data struct {
+			Media struct {
+				ID        int      `json:"id"`
+				Title     struct{ Romaji, English, Native string } `json:"title"`
+				StartDate struct{ Year int } `json:"startDate"`
+				Genres    []string `json:"genres"`
+				Desc      string   `json:"description"`
+				Cover     struct{ Medium string } `json:"coverImage"`
+			} `json:"Media"`
+		} `json:"data"`
+	}
+	if err := s.postJSON(ctx, "https://graphql.anilist.co", payload, &out); err != nil {
+		return nil, err
+	}
+	m := out.Data.Media
+	if m.ID == 0 {
+		return &tmdbInfo{}, nil
+	}
+	name := m.Title.English
+	if name == "" {
+		name = m.Title.Romaji
+	}
+	if name == "" {
+		name = m.Title.Native
+	}
+	return &tmdbInfo{
+		TmdbID:   m.ID,
+		Title:    name,
+		Year:     m.StartDate.Year,
+		Synopsis: stripHTML(m.Desc),
+		Genres:   m.Genres,
+		Poster:   m.Cover.Medium,
+	}, nil
+}
+
 func (s *Scraper) apply(ctx context.Context, videoID uuid.UUID, info *tmdbInfo) error {
 	posterPath := ""
 	if info.Poster != "" {
@@ -316,6 +390,25 @@ func (s *Scraper) getJSON(ctx context.Context, url string, dst any) error {
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(io.LimitReader(resp.Body, 512))
 		return fmt.Errorf("tmdb http %d: %s", resp.StatusCode, strings.TrimSpace(string(body)))
+	}
+	return json.NewDecoder(resp.Body).Decode(dst)
+}
+
+func (s *Scraper) postJSON(ctx context.Context, url string, payload []byte, dst any) error {
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(payload))
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+	resp, err := s.client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(io.LimitReader(resp.Body, 512))
+		return fmt.Errorf("provider http %d: %s", resp.StatusCode, strings.TrimSpace(string(body)))
 	}
 	return json.NewDecoder(resp.Body).Decode(dst)
 }

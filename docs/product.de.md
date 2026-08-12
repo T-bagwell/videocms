@@ -128,6 +128,8 @@ Eine Gruppe braucht mindestens 2 Folgen, um eine Serie zu werden.
 - Links laufen automatisch ab und können jederzeit im selben Dialog widerrufen werden
 - Links können passwortgeschützt werden — auf der öffentlichen Seite wird vor dem
   Laden der Inhalt das Passwort abgefragt
+- Links können auf eine Liste erlaubter Domains beschränkt werden — Anfragen
+  von anderen Hosts werden abgelehnt
 - Geteilte Inhalte respektieren die Verwaltungskontrollen: blockierte Titel und
   Bibliotheken erscheinen nie in Teilen-Links
 

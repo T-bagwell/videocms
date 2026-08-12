@@ -139,8 +139,8 @@ hidden_paths    -- id, user_id(FK), path, created_at（ユーザーごとのパ�
 series_favorites-- PK(user_id, series_id), created_at
 share_tokens    -- id, scope(video|series|playlist), video_id/series_id/playlist_id
                 --   (FK, ON DELETE CASCADE), token(ユニーク), expires_at,
-                --   password_hash（任意 bcrypt）, created_by(FK→users),
-                --   created_at（公開共有リンク）
+                --   password_hash（任意 bcrypt）, allowed_domains（text[]）,
+                --   created_by(FK→users), created_at（公開共有リンク）
 subtitle_tracks -- id, video_id(FK, ON DELETE CASCADE), position, lang, title,
                 --   path, kind(sidecar|embedded|upload), source_key(動画内でユニーク),
                 --   stream_index（多言語字幕トラック）
@@ -233,10 +233,10 @@ erDiagram
 
 プローブ失敗のファイルも空の技術メタデータで登録されるため、所有者は内容を確認して判断できます。
 
-### 3.8 メタデータスクレイピング（TMDB / TVMaze）
+### 3.8 メタデータスクレイピング（TMDB / TVMaze / AniList）
 
-任意。`TMDB_API_KEY` 設定時は TMDB、未設定時は免キーの TVMaze に自動フォールバック
-（`TVMAZE_ENABLED=0` で無効化）。`Scraper`：
+任意。`TMDB_API_KEY` 設定時は TMDB、未設定時は免キーの TVMaze、続いて AniList に
+自動フォールバック（`TVMAZE_ENABLED=0` / `ANILIST_ENABLED=0` で個別に無効化）。`Scraper`：
 
 - プロバイダを検索（TMDB の言語は設定可能、デフォルト `zh-CN`）。TMDB ではさらに
   詳細を取得してローカライズ済みジャンル名を取得
@@ -428,6 +428,4 @@ sequenceDiagram
 
 ## 9. 拡張ポイント
 
-- **TMDB/TVMaze 以外のオンラインメタデータソース**（JAV DB、AniList など）
-- **共有リンクのドメインホワイトリスト**（パスワードは対応済み）
-- **期限切れ共有トークンの定期クリーンアップ**
+- **TMDB/TVMaze/AniList 以外のオンラインメタデータソース**（JAV DB など）

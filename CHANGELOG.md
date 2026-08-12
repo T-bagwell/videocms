@@ -41,6 +41,11 @@ All notable changes to VideoCMS are documented here.
   video (saved in `user_subtitle_prefs`); admins can also set the global default
 - Share links can be password-protected: an optional password is bcrypt-hashed
   at creation time and required on every public endpoint (header or `?pw=`)
+- Share links can be restricted to allowed domains: the request host (or
+  Origin) must match the list set at creation time
+- Expired share tokens are deleted automatically every hour
+- Third keyless metadata provider: AniList (anime/animation) is tried after
+  TVMaze when `TMDB_API_KEY` is empty (`ANILIST_ENABLED=0` disables it)
 - Backup restore: admins can import a backup exported by the admin export
   endpoint (libraries/videos/series upserted by path/name; personal data
   restored for existing users)

@@ -138,8 +138,8 @@ hidden_paths    -- id, user_id(外键), path, created_at（按用户隐藏路径
 series_favorites-- 主键(user_id, series_id), created_at
 share_tokens    -- id, scope(video|series|playlist), video_id/series_id/playlist_id
                 --   (外键, ON DELETE CASCADE), token(唯一), expires_at,
-                --   password_hash（可选 bcrypt）, created_by(外键→users),
-                --   created_at（公开分享链接）
+                --   password_hash（可选 bcrypt）, allowed_domains（text[]）,
+                --   created_by(外键→users), created_at（公开分享链接）
 subtitle_tracks -- id, video_id(外键, ON DELETE CASCADE), position, lang, title,
                 --   path, kind(sidecar|embedded|upload), source_key(视频内唯一),
                 --   stream_index（多语言字幕轨道）
@@ -228,10 +228,10 @@ watcher）与差异扫描结合。变更文件（包括大小不变的修改）�
 
 探测失败的文件仍会以空技术元数据入库，让所有者能看到并决定如何处理。
 
-### 3.8 元数据刮削（TMDB / TVMaze）
+### 3.8 元数据刮削（TMDB / TVMaze / AniList）
 
-可选。配置了 `TMDB_API_KEY` 时走 TMDB；未配置时自动使用免密钥的 TVMaze
-（`TVMAZE_ENABLED=0` 可关闭）。`Scraper`：
+可选。配置了 `TMDB_API_KEY` 时走 TMDB；未配置时依次回退到免密钥的 TVMaze 与
+AniList（`TVMAZE_ENABLED=0` / `ANILIST_ENABLED=0` 可分别关闭）。`Scraper`：
 
 - 先搜索提供商（TMDB 语言可配置，默认 `zh-CN`），TMDB 再取影片详情获取本地化类型名
 - 下载 `w500` 海报到 `data/posters/<video-id>.<ext>`
@@ -413,6 +413,4 @@ sequenceDiagram
 
 ## 9. 扩展点
 
-- **更多在线元数据源**（TMDB/TVMaze 之外：JAV 数据库、AniList 等）
-- **分享链接域名白名单**（密码已支持）
-- **过期分享 token 的定时清理**
+- **更多在线元数据源**（TMDB/TVMaze/AniList 之外，如 JAV 数据库等）

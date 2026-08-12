@@ -131,6 +131,8 @@ en fin de nom (`1 (4)`, `-535`). Un groupe doit contenir au moins 2 épisodes.
   depuis la même fenêtre
 - Les liens peuvent être protégés par mot de passe — le mot de passe est demandé
   sur la page publique avant le chargement du contenu
+- Les liens peuvent être limités à une liste de domaines autorisés — les
+  requêtes depuis d’autres hôtes sont rejetées
 - Le contenu partagé respecte les contrôles d’administration : les titres et
   bibliothèques bloqués n’apparaissent jamais dans les liens de partage
 

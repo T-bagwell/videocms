@@ -128,6 +128,8 @@ as `1 (4)` or `-535`. A group needs at least 2 episodes to become a series.
 - Links expire automatically and can be revoked anytime from the same dialog
 - Links can be password-protected — viewers are asked for the password on the
   public page before anything loads
+- Links can be restricted to an allow-list of domains — requests from other
+  hosts are rejected
 - Shared content still respects admin controls: blocked titles and blocked
   libraries never show up in share links
 

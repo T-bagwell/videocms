@@ -104,7 +104,9 @@
     "subtitlePrefSaved": "Subtitle preference saved",
     "subtitleTrack": "Subtitle track",
     "sharePassword": "Password (optional)",
-    "sharePasswordPlaceholder": "Leave empty for open access"
+    "sharePasswordPlaceholder": "Leave empty for open access",
+    "shareDomains": "Allowed domains (optional)",
+    "shareDomainsPlaceholder": "e.g. example.com, mysite.org — empty allows anyone"
   },
   "player": {
     "backToDetail": "← Detail",

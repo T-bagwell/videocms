@@ -104,7 +104,9 @@
     "subtitlePrefSaved": "字幕偏好已保存",
     "subtitleTrack": "字幕轨",
     "sharePassword": "密码（可选）",
-    "sharePasswordPlaceholder": "留空则公开访问"
+    "sharePasswordPlaceholder": "留空则公开访问",
+    "shareDomains": "允许访问的域名（可选）",
+    "shareDomainsPlaceholder": "如 example.com, mysite.org —— 留空允许任何人"
   },
   "player": {
     "backToDetail": "← 详情",

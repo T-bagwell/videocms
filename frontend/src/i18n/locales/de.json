@@ -104,7 +104,9 @@
     "subtitlePrefSaved": "Untertitel-Präferenz gespeichert",
     "subtitleTrack": "Untertitelspur",
     "sharePassword": "Passwort (optional)",
-    "sharePasswordPlaceholder": "Leer lassen für offenen Zugriff"
+    "sharePasswordPlaceholder": "Leer lassen für offenen Zugriff",
+    "shareDomains": "Erlaubte Domains (optional)",
+    "shareDomainsPlaceholder": "z. B. example.com, mysite.org — leer erlaubt jedem"
   },
   "player": {
     "backToDetail": "← Details",

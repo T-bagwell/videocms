@@ -40,7 +40,7 @@ favorites, playlists — and numbered files automatically group into TV Shows.
 | 🏷️ Metadata | ffprobe extracts codec/resolution/duration; posters generated from the video; editable title/year/synopsis/genres; optional **TMDB scraping** |
 | 📺 TV Shows | Numbered files (`S01E01`, `EP1`, `第1集`, `Show01Title`…) auto-group into series sorted by episode; season-aware; play-all with continuous playback |
 | ▶️ Playback | H.264/WebM play natively (HTTP Range); **MKV/HEVC transcoded to adaptive multi-quality HLS on the fly** (quality selector); subtitles auto-detected (SRT→WebVTT), embedded-subtitle extraction, upload, **multi-language switching** and per-user subtitle preference; download for offline |
-| 🔗 Sharing | Short-lived public share links for **videos, TV shows and playlists** (signed, expiring, revocable, optional password) — anyone with the link can watch without an account; content blocking is respected |
+| 🔗 Sharing | Short-lived public share links for **videos, TV shows and playlists** (signed, expiring, revocable, optional password and domain allow-list) — anyone with the link can watch without an account; content blocking is respected |
 | 👤 Personal | Continue watching, favorites (videos **and** series), playlists with sequential playback |
 | 🔐 Users | Register/login with JWT; admin/user roles; admin user management with safety guards |
 | 🚫 Content blocking | Admins block media by title in the admin panel — hidden for everyone, files and records kept, unblock anytime |
@@ -136,8 +136,9 @@ All settings are environment variables:
 | `DATA_DIR` | `data` | Posters + HLS segments |
 | `ADMIN_USERNAME` / `ADMIN_PASSWORD` | admin / admin123 | Initial admin |
 | `FFPROBE_BIN` / `FFMPEG_BIN` | auto-detect | Tool paths (Homebrew fallback) |
-| `TMDB_API_KEY` / `TMDB_LANGUAGE` | empty / zh-CN | Metadata scraping; without a key the free TVMaze API is used |
+| `TMDB_API_KEY` / `TMDB_LANGUAGE` | empty / zh-CN | Metadata scraping; without a key the free TVMaze and AniList APIs are used |
 | `TVMAZE_ENABLED` | `1` | Set `0` to disable the keyless TVMaze metadata fallback |
+| `ANILIST_ENABLED` | `1` | Set `0` to disable the keyless AniList metadata fallback |
 | `SCAN_WORKERS` | `4` | Parallel scan workers (1–16) |
 | `WATCH_INTERVAL` | `30` | Fallback interval for incremental scans (fsnotify events index immediately); `0` disables watching |
 | `WEB_ROOT` | auto (`frontend/dist`) | Built frontend for production mode |

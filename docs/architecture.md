@@ -143,8 +143,8 @@ hidden_paths    -- id, user_id(fk), path, created_at (per-user path filters)
 series_favorites-- PK(user_id, series_id), created_at
 share_tokens    -- id, scope(video|series|playlist), video_id/series_id/playlist_id
                 --   (fk, ON DELETE CASCADE), token(unique), expires_at,
-                --   password_hash (optional bcrypt), created_by(fk → users),
-                --   created_at (public share links)
+                --   password_hash (optional bcrypt), allowed_domains (text[]),
+                --   created_by(fk → users), created_at (public share links)
 subtitle_tracks -- id, video_id(fk, ON DELETE CASCADE), position, lang, title,
                 --   path, kind(sidecar|embedded|upload), source_key(unique per video),
                 --   stream_index (multi-language subtitle tracks)
@@ -241,9 +241,11 @@ Series with fewer than 2 available episodes are cleaned up.
 On probe failure the file is still indexed with empty technical metadata so the
 owner can see it and decide what to do.
 
-### 3.8 Metadata scraping (TMDB)
+### 3.8 Metadata scraping (TMDB / TVMaze / AniList)
 
-Optional (`TMDB_API_KEY`). `Scraper`:
+Optional. With `TMDB_API_KEY` set the scraper uses TMDB; without a key it falls
+back to the keyless TVMaze API and then AniList (`TVMAZE_ENABLED=0` /
+`ANILIST_ENABLED=0` disable them). `Scraper`:
 
 - Searches TMDB (`language` configurable, default `zh-CN`), then fetches movie
   details for localized genre names
@@ -441,6 +443,4 @@ The backend binds all interfaces (`:8080`), so LAN clients reach the UI directly
 
 ## 9. Extension Points
 
-- **Online metadata providers** beyond TMDB/TVMaze (JAV database, AniList, etc.)
-- **Share link domain whitelist** (passwords are supported today)
-- **Scheduled cleanup** of expired share tokens
+- **Online metadata providers** beyond TMDB/TVMaze/AniList (JAV database, etc.)

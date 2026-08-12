@@ -104,7 +104,9 @@
     "subtitlePrefSaved": "字幕の優先設定を保存しました",
     "subtitleTrack": "字幕トラック",
     "sharePassword": "パスワード（任意）",
-    "sharePasswordPlaceholder": "空の場合は公開アクセス"
+    "sharePasswordPlaceholder": "空の場合は公開アクセス",
+    "shareDomains": "許可するドメイン（任意）",
+    "shareDomainsPlaceholder": "例: example.com, mysite.org — 空なら誰でも可"
   },
   "player": {
     "backToDetail": "← 詳細",

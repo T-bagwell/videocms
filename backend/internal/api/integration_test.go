@@ -618,3 +618,45 @@ func TestBackupImport(t *testing.T) {
 		t.Fatalf("import counts look wrong: %v", imported.Counts)
 	}
 }
+
+func TestShareDomainRestriction(t *testing.T) {
+	e := newIntegrationEnv(t)
+	token := e.loginAdmin(t)
+	libID := e.insertLibrary(t, false)
+	videoID := e.insertVideo(t, libID, "Movie J", ".mp4")
+
+	var created struct {
+		Token string `json:"token"`
+	}
+	resp := e.doJSON(t, http.MethodPost, "/api/videos/"+videoID.String()+"/share",
+		map[string]any{"hours": 24, "domains": []string{"allowed.test"}}, token, &created)
+	if resp.StatusCode != http.StatusCreated || created.Token == "" {
+		t.Fatalf("create domain share: %d", resp.StatusCode)
+	}
+
+	req, _ := http.NewRequest(http.MethodGet,
+		e.server.URL+"/api/share/"+created.Token+"/info", nil)
+	req.Host = "evil.test"
+	bad, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer bad.Body.Close()
+	var denied map[string]any
+	json.NewDecoder(bad.Body).Decode(&denied)
+	if bad.StatusCode != http.StatusForbidden || denied["domain_required"] != true {
+		t.Fatalf("disallowed host: got %d %v, want 403 domain_required", bad.StatusCode, denied)
+	}
+
+	req, _ = http.NewRequest(http.MethodGet,
+		e.server.URL+"/api/share/"+created.Token+"/info", nil)
+	req.Host = "allowed.test"
+	good, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer good.Body.Close()
+	if good.StatusCode != http.StatusOK {
+		t.Fatalf("allowed host: got %d, want 200", good.StatusCode)
+	}
+}

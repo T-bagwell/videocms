@@ -104,7 +104,9 @@
     "subtitlePrefSaved": "Préférence de sous-titres enregistrée",
     "subtitleTrack": "Piste de sous-titres",
     "sharePassword": "Mot de passe (facultatif)",
-    "sharePasswordPlaceholder": "Laisser vide pour un accès ouvert"
+    "sharePasswordPlaceholder": "Laisser vide pour un accès ouvert",
+    "shareDomains": "Domaines autorisés (facultatif)",
+    "shareDomainsPlaceholder": "ex. example.com, mysite.org — vide autorise tout le monde"
   },
   "player": {
     "backToDetail": "← Détails",

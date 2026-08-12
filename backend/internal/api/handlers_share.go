@@ -7,8 +7,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"mime"
 	"net/http"
+	"net/url"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -31,25 +34,33 @@ func newShareToken() (string, error) {
 }
 
 type shareRequest struct {
-	Hours    int    `json:"hours"`
-	Password string `json:"password"`
+	Hours    int      `json:"hours"`
+	Password string   `json:"password"`
+	Domains  []string `json:"domains"`
 }
 
 // parseShareRequest reads hours and an optional password from the request
 // body, returning the expiry hours and the bcrypt hash of the password ("" when
 // no password was set).
-func parseShareRequest(r *http.Request) (int, string, error) {
+func parseShareRequest(r *http.Request) (int, string, []string, error) {
 	hours := defaultShareHours
 	password := ""
+	domains := []string{}
 	if r.Body != nil {
 		var body shareRequest
 		if err := json.NewDecoder(io.LimitReader(r.Body, 1<<20)).Decode(&body); err != nil && err != io.EOF {
-			return hours, "", err
+			return hours, "", nil, err
 		}
 		if body.Hours > 0 {
 			hours = body.Hours
 		}
 		password = body.Password
+		for _, d := range body.Domains {
+			d = normalizeDomain(d)
+			if d != "" {
+				domains = append(domains, d)
+			}
+		}
 	}
 	if hours > 24*365 {
 		hours = 24 * 365
@@ -57,11 +68,24 @@ func parseShareRequest(r *http.Request) (int, string, error) {
 	if password != "" {
 		hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 		if err != nil {
-			return hours, "", err
+			return hours, "", nil, err
 		}
 		password = string(hash)
 	}
-	return hours, password, nil
+	return hours, password, domains, nil
+}
+
+func normalizeDomain(d string) string {
+	d = strings.TrimSpace(strings.ToLower(d))
+	d = strings.TrimPrefix(strings.TrimPrefix(d, "https://"), "http://")
+	d = strings.TrimSuffix(d, "/")
+	if i := strings.IndexByte(d, '/'); i >= 0 {
+		d = d[:i]
+	}
+	if i := strings.IndexByte(d, ':'); i >= 0 {
+		d = d[:i]
+	}
+	return d
 }
 
 func nullableUUID(id uuid.UUID) any {
@@ -71,15 +95,15 @@ func nullableUUID(id uuid.UUID) any {
 	return id
 }
 
-func (a *App) insertShare(ctx context.Context, scope string, videoID, seriesID, playlistID uuid.UUID, expires time.Time, passwordHash string, userID uuid.UUID) (string, error) {
+func (a *App) insertShare(ctx context.Context, scope string, videoID, seriesID, playlistID uuid.UUID, expires time.Time, passwordHash string, domains []string, userID uuid.UUID) (string, error) {
 	token, err := newShareToken()
 	if err != nil {
 		return "", err
 	}
 	_, err = a.pool.Exec(ctx, `
-		INSERT INTO share_tokens (scope, video_id, series_id, playlist_id, token, expires_at, password_hash, created_by)
-		VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`,
-		scope, nullableUUID(videoID), nullableUUID(seriesID), nullableUUID(playlistID), token, expires, passwordHash, userID)
+		INSERT INTO share_tokens (scope, video_id, series_id, playlist_id, token, expires_at, password_hash, allowed_domains, created_by)
+		VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`,
+		scope, nullableUUID(videoID), nullableUUID(seriesID), nullableUUID(playlistID), token, expires, passwordHash, domains, userID)
 	if err != nil {
 		return "", err
 	}
@@ -111,13 +135,13 @@ func (a *App) createVideoShare(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusNotFound, "video not found or not visible")
 		return
 	}
-	hours, passwordHash, err := parseShareRequest(r)
+	hours, passwordHash, domains, err := parseShareRequest(r)
 	if err != nil {
 		writeErr(w, http.StatusBadRequest, "invalid share request")
 		return
 	}
 	expires := time.Now().Add(time.Duration(hours) * time.Hour)
-	token, err := a.insertShare(r.Context(), "video", id, uuid.Nil, uuid.Nil, expires, passwordHash, user.ID)
+	token, err := a.insertShare(r.Context(), "video", id, uuid.Nil, uuid.Nil, expires, passwordHash, domains, user.ID)
 	if err != nil {
 		writeErr(w, http.StatusInternalServerError, "create share failed")
 		return
@@ -142,13 +166,13 @@ func (a *App) createSeriesShare(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusNotFound, "series not found or not visible")
 		return
 	}
-	hours, passwordHash, err := parseShareRequest(r)
+	hours, passwordHash, domains, err := parseShareRequest(r)
 	if err != nil {
 		writeErr(w, http.StatusBadRequest, "invalid share request")
 		return
 	}
 	expires := time.Now().Add(time.Duration(hours) * time.Hour)
-	token, err := a.insertShare(r.Context(), "series", uuid.Nil, id, uuid.Nil, expires, passwordHash, user.ID)
+	token, err := a.insertShare(r.Context(), "series", uuid.Nil, id, uuid.Nil, expires, passwordHash, domains, user.ID)
 	if err != nil {
 		writeErr(w, http.StatusInternalServerError, "create share failed")
 		return
@@ -165,7 +189,7 @@ func (a *App) createPlaylistShare(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusBadRequest, "invalid playlist id")
 		return
 	}
-	hours, passwordHash, err := parseShareRequest(r)
+	hours, passwordHash, domains, err := parseShareRequest(r)
 	if err != nil {
 		writeErr(w, http.StatusBadRequest, "invalid share request")
 		return
@@ -177,9 +201,9 @@ func (a *App) createPlaylistShare(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	tag, err := a.pool.Exec(r.Context(), `
-		INSERT INTO share_tokens (scope, playlist_id, token, expires_at, password_hash, created_by)
-		SELECT 'playlist', id, $1, $2, $3, $4 FROM playlists WHERE id=$5 AND user_id=$4`,
-		token, expires, passwordHash, user.ID, id)
+		INSERT INTO share_tokens (scope, playlist_id, token, expires_at, password_hash, allowed_domains, created_by)
+		SELECT 'playlist', id, $1, $2, $3, $4, $5 FROM playlists WHERE id=$6 AND user_id=$5`,
+		token, expires, passwordHash, domains, user.ID, id)
 	if err != nil {
 		writeErr(w, http.StatusInternalServerError, "create share failed")
 		return
@@ -197,7 +221,7 @@ func (a *App) listSharesFor(w http.ResponseWriter, r *http.Request, col string, 
 	user := auth.UserFrom(r)
 	rows, err := a.pool.Query(r.Context(), fmt.Sprintf(`
 		SELECT st.token, st.expires_at, st.created_at, COALESCE(u.username, ''),
-		       st.password_hash <> ''
+		       st.password_hash <> '', st.allowed_domains
 		FROM share_tokens st
 		LEFT JOIN users u ON u.id = st.created_by
 		WHERE st.%s = $1 AND (st.created_by = $2 OR $3::boolean)
@@ -213,7 +237,8 @@ func (a *App) listSharesFor(w http.ResponseWriter, r *http.Request, col string, 
 		var token, username string
 		var expiresAt, createdAt time.Time
 		var passwordProtected bool
-		if err := rows.Scan(&token, &expiresAt, &createdAt, &username, &passwordProtected); err != nil {
+		var allowedDomains []string
+		if err := rows.Scan(&token, &expiresAt, &createdAt, &username, &passwordProtected, &allowedDomains); err != nil {
 			writeErr(w, http.StatusInternalServerError, "list shares failed")
 			return
 		}
@@ -224,6 +249,7 @@ func (a *App) listSharesFor(w http.ResponseWriter, r *http.Request, col string, 
 			"created_at":         createdAt,
 			"created_by":         username,
 			"password_protected": passwordProtected,
+			"allowed_domains":    allowedDomains,
 		})
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"items": items})
@@ -282,17 +308,18 @@ type shareTokenRow struct {
 	SeriesID     uuid.UUID
 	PlaylistID   uuid.UUID
 	PasswordHash string
+	AllowedDomains []string
 }
 
 func (a *App) resolveShareToken(r *http.Request, token string) (shareTokenRow, bool) {
 	var row shareTokenRow
 	err := a.pool.QueryRow(r.Context(), `
-		SELECT scope, expires_at, password_hash,
+		SELECT scope, expires_at, password_hash, allowed_domains,
 		       COALESCE(video_id, '00000000-0000-0000-0000-000000000000'),
 		       COALESCE(series_id, '00000000-0000-0000-0000-000000000000'),
 		       COALESCE(playlist_id, '00000000-0000-0000-0000-000000000000')
 		FROM share_tokens WHERE token=$1 AND expires_at > now()`, token).
-		Scan(&row.Scope, &row.ExpiresAt, &row.PasswordHash, &row.VideoID, &row.SeriesID, &row.PlaylistID)
+		Scan(&row.Scope, &row.ExpiresAt, &row.PasswordHash, &row.AllowedDomains, &row.VideoID, &row.SeriesID, &row.PlaylistID)
 	if err != nil {
 		return shareTokenRow{}, false
 	}
@@ -315,6 +342,28 @@ func sharePasswordOK(r *http.Request, hash string) bool {
 	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(pw)) == nil
 }
 
+// shareDomainOK verifies the request host against the share's allowed domains.
+// An empty allow-list permits any host. This is a convenience restriction, not
+// a security boundary (host headers are spoofable).
+func shareDomainOK(r *http.Request, allowed []string) bool {
+	if len(allowed) == 0 {
+		return true
+	}
+	host := r.Host
+	if o := r.Header.Get("Origin"); o != "" {
+		if u, err := url.Parse(o); err == nil && u.Host != "" {
+			host = u.Host
+		}
+	}
+	host = normalizeDomain(host)
+	for _, d := range allowed {
+		if host == d || strings.HasSuffix(host, "."+d) {
+			return true
+		}
+	}
+	return false
+}
+
 // shareGuard resolves the token and enforces expiry and the optional password,
 // writing the error response itself when access is denied.
 func (a *App) shareGuard(w http.ResponseWriter, r *http.Request) (shareTokenRow, bool) {
@@ -323,14 +372,36 @@ func (a *App) shareGuard(w http.ResponseWriter, r *http.Request) (shareTokenRow,
 		writeErr(w, http.StatusNotFound, "share link not found or expired")
 		return shareTokenRow{}, false
 	}
-	if !sharePasswordOK(r, row.PasswordHash) {
+	pwOK := sharePasswordOK(r, row.PasswordHash)
+	domainOK := shareDomainOK(r, row.AllowedDomains)
+	if !pwOK || !domainOK {
 		writeJSON(w, http.StatusForbidden, map[string]any{
-			"error":             "share link requires a password",
-			"password_required": true,
+			"error":             "share link access denied",
+			"password_required": !pwOK,
+			"domain_required":   !domainOK,
 		})
 		return shareTokenRow{}, false
 	}
 	return row, true
+}
+
+// StartShareCleanup periodically deletes expired share tokens.
+func (a *App) StartShareCleanup(ctx context.Context) {
+	go func() {
+		ticker := time.NewTicker(time.Hour)
+		defer ticker.Stop()
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-ticker.C:
+				if _, err := a.pool.Exec(context.Background(),
+					`DELETE FROM share_tokens WHERE expires_at < now()`); err != nil {
+					log.Printf("share cleanup: %v", err)
+				}
+			}
+		}
+	}()
 }
 
 // publicVideoCond matches videos that are available, not in a blocked library

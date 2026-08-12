@@ -38,6 +38,7 @@ func main() {
 		log.Fatalf("init api: %v", err)
 	}
 	app.StartFileWatcher(ctx)
+	app.StartShareCleanup(ctx)
 
 	srv := &http.Server{
 		Addr:              cfg.Addr,
