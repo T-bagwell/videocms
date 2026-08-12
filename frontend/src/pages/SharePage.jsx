@@ -23,16 +23,29 @@ export default function SharePage() {
   const [nativeTracks, setNativeTracks] = useState([]);
   const [subtitleTracks, setSubtitleTracks] = useState([]);
   const [subtitleIdx, setSubtitleIdx] = useState(-1);
+  const [pw, setPw] = useState('');
+  const [pwInput, setPwInput] = useState('');
+  const [askPassword, setAskPassword] = useState(false);
+
+  function shareFetch(path) {
+    const headers = pw ? { 'X-Share-Password': pw } : {};
+    return fetch(publicUrl(path), { headers });
+  }
 
   useEffect(() => {
-    fetch(publicUrl(`/share/${token}/info`))
-      .then((res) => res.json().then((d) => ({ ok: res.ok, data: d })))
-      .then(({ ok, data: d }) => {
-        if (!ok) throw new Error(d.error || t('share.invalid'));
+    shareFetch(`/share/${token}/info`)
+      .then(async (res) => {
+        const d = await res.json();
+        if (res.status === 403 && d.password_required) {
+          setAskPassword(true);
+          return;
+        }
+        if (!res.ok) throw new Error(d.error || t('share.invalid'));
+        setAskPassword(false);
         setData(d);
       })
       .catch((e) => setErr(e.message || t('share.invalid')));
-  }, [token, t]);
+  }, [token, pw, t]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // build the play queue from the share scope
   useEffect(() => {
@@ -51,7 +64,10 @@ export default function SharePage() {
   }, [data]);
 
   const active = queue[activeIdx];
-  const media = (path) => publicUrl(`/share/${token}/video/${active.id}${path}`);
+  const media = (path) => {
+    const u = publicUrl(`/share/${token}/video/${active.id}${path}`);
+    return pw ? `${u}${u.includes('?') ? '&' : '?'}pw=${encodeURIComponent(pw)}` : u;
+  };
 
   useEffect(() => {
     if (!active || !videoRef.current) return;
@@ -72,6 +88,9 @@ export default function SharePage() {
             startPosition: 0,
             maxBufferLength: 30,
             maxMaxBufferLength: 90,
+            xhrSetup: (xhr) => {
+              if (pw) xhr.setRequestHeader('X-Share-Password', pw);
+            },
           });
           hlsRef.current = hls;
           setTranscoding(true);
@@ -126,12 +145,12 @@ export default function SharePage() {
     }
 
     // native playback: load subtitle tracks so the CC menu works
-    fetch(publicUrl(`/share/${token}/video/${active.id}/subtitle-tracks`))
+    shareFetch(`/share/${token}/video/${active.id}/subtitle-tracks`)
       .then((res) => res.json())
       .then((d) => setNativeTracks(d.items || []))
       .catch(() => setNativeTracks([]));
     return undefined;
-  }, [active, token, t]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [active, token, pw, t]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function changeQuality(q) {
     setQuality(q);
@@ -158,6 +177,37 @@ export default function SharePage() {
         <Link className="btn ghost" to="/">
           {t('share.backToSite')}
         </Link>
+      </div>
+    );
+  }
+  if (askPassword && !data) {
+    return (
+      <div className="container share-page">
+        <form
+          className="modal share-password"
+          onSubmit={(e) => {
+            e.preventDefault();
+            setErr('');
+            setPw(pwInput);
+          }}
+        >
+          <h3>{t('share.passwordTitle')}</h3>
+          <input
+            type="password"
+            value={pwInput}
+            onChange={(e) => setPwInput(e.target.value)}
+            placeholder={t('share.passwordPlaceholder')}
+            autoFocus
+          />
+          <div className="modal-actions">
+            <button className="btn primary" type="submit">
+              {t('common.save')}
+            </button>
+            <Link className="btn ghost" to="/">
+              {t('share.backToSite')}
+            </Link>
+          </div>
+        </form>
       </div>
     );
   }

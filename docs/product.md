@@ -113,8 +113,9 @@ as `1 (4)` or `-535`. A group needs at least 2 episodes to become a series.
   then seeking and next-episode autoplay work as usual
 - Transcoded playback uses an adaptive multi-quality ladder — use the quality
   selector above the player to switch (Auto by default)
-- Subtitles (sidecar, embedded or uploaded) can be toggled in the player and
-  switched between languages when several tracks exist
+- Subtitles (sidecar, embedded or uploaded) can be toggled in the player,
+  switched between languages when several tracks exist, and each user can set
+  their own default per video (admins can set the global default)
 - On a phone, rotate to landscape for the best playback experience; use the
   queue below the player to jump between episodes
 
@@ -125,6 +126,8 @@ as `1 (4)` or `-535`. A group needs at least 2 episodes to become a series.
 - Anyone with the link can watch on a public page — no account needed; TV show
   and playlist links play through the whole queue
 - Links expire automatically and can be revoked anytime from the same dialog
+- Links can be password-protected — viewers are asked for the password on the
+  public page before anything loads
 - Shared content still respects admin controls: blocked titles and blocked
   libraries never show up in share links
 
@@ -133,6 +136,10 @@ as `1 (4)` or `-535`. A group needs at least 2 episodes to become a series.
 ### 5.1 Overview
 
 Stats: videos, libraries, users, playlists, favorites, series and storage used.
+
+- **Export / import backup**: download a full JSON backup of the server
+  metadata, or restore one (libraries and videos are upserted by path; personal
+  data is restored for existing users)
 
 ### 5.2 Libraries
 

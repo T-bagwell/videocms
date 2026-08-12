@@ -13,6 +13,7 @@ import (
 
 	"github.com/google/uuid"
 
+	"videocms/backend/internal/auth"
 	"videocms/backend/internal/media"
 )
 
@@ -86,11 +87,12 @@ func (a *App) listSubtitleTracks(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusBadRequest, "invalid video id")
 		return
 	}
+	user := auth.UserFrom(r)
 	var active string
 	_ = a.pool.QueryRow(r.Context(),
 		`SELECT subtitle_path FROM videos WHERE id=$1`, id).Scan(&active)
 
-	items, err := a.listTracksForVideo(r.Context(), id, active)
+	items, err := a.listTracksForVideo(r.Context(), id, active, &user.ID)
 	if err != nil {
 		writeErr(w, http.StatusInternalServerError, "list subtitle tracks failed")
 		return
@@ -126,9 +128,61 @@ func (a *App) getSubtitleTrack(w http.ResponseWriter, r *http.Request) {
 	serveSubtitleFile(w, r, path)
 }
 
-// setActiveSubtitleTrack makes a track the default subtitle for a video.
+// setActiveSubtitleTrack saves the current user's subtitle preference for a
+// video.
 // PUT /api/videos/{id}/subtitles/{trackId}/active
 func (a *App) setActiveSubtitleTrack(w http.ResponseWriter, r *http.Request) {
+	user := auth.UserFrom(r)
+	id, err := uuid.Parse(r.PathValue("id"))
+	if err != nil {
+		writeErr(w, http.StatusBadRequest, "invalid video id")
+		return
+	}
+	trackID, err := uuid.Parse(r.PathValue("trackId"))
+	if err != nil {
+		writeErr(w, http.StatusBadRequest, "invalid track id")
+		return
+	}
+	_, ok := a.loadSubtitleTrack(r.Context(), id, trackID)
+	if !ok {
+		writeErr(w, http.StatusNotFound, "subtitle track not found")
+		return
+	}
+	if _, err := a.pool.Exec(r.Context(), `
+		INSERT INTO user_subtitle_prefs (user_id, video_id, track_id)
+		VALUES ($1,$2,$3)
+		ON CONFLICT (user_id, video_id)
+		DO UPDATE SET track_id=EXCLUDED.track_id, updated_at=now()`,
+		user.ID, id, trackID); err != nil {
+		writeErr(w, http.StatusInternalServerError, "update video failed")
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]any{"message": "subtitle preference saved"})
+}
+
+// clearSubtitlePreference removes the current user's personal subtitle choice
+// so the global default applies again.
+// DELETE /api/videos/{id}/subtitles/preference
+func (a *App) clearSubtitlePreference(w http.ResponseWriter, r *http.Request) {
+	user := auth.UserFrom(r)
+	id, err := uuid.Parse(r.PathValue("id"))
+	if err != nil {
+		writeErr(w, http.StatusBadRequest, "invalid video id")
+		return
+	}
+	if _, err := a.pool.Exec(r.Context(),
+		`DELETE FROM user_subtitle_prefs WHERE user_id=$1 AND video_id=$2`,
+		user.ID, id); err != nil {
+		writeErr(w, http.StatusInternalServerError, "clear preference failed")
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]any{"message": "subtitle preference cleared"})
+}
+
+// setGlobalSubtitleDefault makes a track the video's default subtitle for
+// everyone (admin only). Personal preferences still win per user.
+// PUT /api/videos/{id}/subtitles/{trackId}/default
+func (a *App) setGlobalSubtitleDefault(w http.ResponseWriter, r *http.Request) {
 	id, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
 		writeErr(w, http.StatusBadRequest, "invalid video id")
@@ -154,7 +208,7 @@ func (a *App) setActiveSubtitleTrack(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusInternalServerError, "update video failed")
 		return
 	}
-	writeJSON(w, http.StatusOK, map[string]any{"message": "subtitle track activated"})
+	writeJSON(w, http.StatusOK, map[string]any{"message": "global subtitle default set"})
 }
 
 // uploadSubtitle stores an uploaded subtitle file for a video and activates it.

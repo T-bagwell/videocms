@@ -97,7 +97,14 @@
     "subtitleRemove": "Untertitel entfernen",
     "subtitleUploaded": "Untertitel hochgeladen",
     "subtitleExtracted": "Eingebettete Untertitel extrahiert",
-    "subtitleRemoved": "Untertitel entfernt"
+    "subtitleRemoved": "Untertitel entfernt",
+    "subtitlePreference": "Untertitel-Präferenz",
+    "subtitleGlobal": "Globaler Standard",
+    "subtitleSetGlobal": "Auch als globalen Standard setzen",
+    "subtitlePrefSaved": "Untertitel-Präferenz gespeichert",
+    "subtitleTrack": "Untertitelspur",
+    "sharePassword": "Passwort (optional)",
+    "sharePasswordPlaceholder": "Leer lassen für offenen Zugriff"
   },
   "player": {
     "backToDetail": "← Details",
@@ -226,7 +233,9 @@
     "unblockLibraryConfirm": "Bibliothek „{{name}}“ freigeben? Ihre Medien werden wieder für alle sichtbar.",
     "libBlocked": "Bibliothek „{{name}}“ ist blockiert",
     "libUnblocked": "Bibliothek „{{name}}“ ist freigegeben",
-    "export": "Daten exportieren"
+    "export": "Daten exportieren",
+    "import": "Backup importieren",
+    "importDone": "Backup importiert: {{counts}}"
   },
   "picker": {
     "title": "Serverordner auswählen",
@@ -240,6 +249,8 @@
   },
   "share": {
     "invalid": "Dieser Teilen-Link ist ungültig oder abgelaufen.",
-    "backToSite": "← Zurück zu VideoCMS"
+    "backToSite": "← Zurück zu VideoCMS",
+    "passwordTitle": "Dieser Teilen-Link ist passwortgeschützt",
+    "passwordPlaceholder": "Teilen-Passwort eingeben"
   }
 }

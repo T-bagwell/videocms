@@ -138,10 +138,13 @@ hidden_paths    -- id, user_id(外键), path, created_at（按用户隐藏路径
 series_favorites-- 主键(user_id, series_id), created_at
 share_tokens    -- id, scope(video|series|playlist), video_id/series_id/playlist_id
                 --   (外键, ON DELETE CASCADE), token(唯一), expires_at,
-                --   created_by(外键→users), created_at（公开分享链接）
+                --   password_hash（可选 bcrypt）, created_by(外键→users),
+                --   created_at（公开分享链接）
 subtitle_tracks -- id, video_id(外键, ON DELETE CASCADE), position, lang, title,
                 --   path, kind(sidecar|embedded|upload), source_key(视频内唯一),
                 --   stream_index（多语言字幕轨道）
+user_subtitle_prefs -- 主键(user_id, video_id), track_id(外键, ON DELETE CASCADE),
+                --   updated_at（按用户的默认字幕轨）
 ```
 
 关键索引：`videos(lower(title))`、`videos(library_id)`、部分索引
@@ -411,6 +414,5 @@ sequenceDiagram
 ## 9. 扩展点
 
 - **更多在线元数据源**（TMDB/TVMaze 之外：JAV 数据库、AniList 等）
-- **按用户保存字幕偏好**（目前生效字幕是全局的）
-- **分享链接加密码/白名单**
-- **导出备份的导入/恢复**
+- **分享链接域名白名单**（密码已支持）
+- **过期分享 token 的定时清理**

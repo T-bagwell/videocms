@@ -37,6 +37,13 @@ All notable changes to VideoCMS are documented here.
 - Keyless metadata fallback: when `TMDB_API_KEY` is empty, scraping uses the
   free TVMaze API (`TVMAZE_ENABLED=0` disables it)
 - README screenshots replaced the "coming soon" placeholder
+- Per-user subtitle preference: each user can pick their own subtitle track per
+  video (saved in `user_subtitle_prefs`); admins can also set the global default
+- Share links can be password-protected: an optional password is bcrypt-hashed
+  at creation time and required on every public endpoint (header or `?pw=`)
+- Backup restore: admins can import a backup exported by the admin export
+  endpoint (libraries/videos/series upserted by path/name; personal data
+  restored for existing users)
 - Admin content blocking by title: block media without deleting files/records,
   hidden for everyone, unblock anytime (`blocked_titles` table)
 - Library-level blocking: block/unblock an entire library from the admin panel,

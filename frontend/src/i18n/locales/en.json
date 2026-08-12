@@ -97,7 +97,14 @@
     "subtitleRemove": "Remove subtitle",
     "subtitleUploaded": "Subtitle uploaded",
     "subtitleExtracted": "Embedded subtitle extracted",
-    "subtitleRemoved": "Subtitle removed"
+    "subtitleRemoved": "Subtitle removed",
+    "subtitlePreference": "Subtitle preference",
+    "subtitleGlobal": "Global default",
+    "subtitleSetGlobal": "Also set as global default",
+    "subtitlePrefSaved": "Subtitle preference saved",
+    "subtitleTrack": "Subtitle track",
+    "sharePassword": "Password (optional)",
+    "sharePasswordPlaceholder": "Leave empty for open access"
   },
   "player": {
     "backToDetail": "← Detail",
@@ -226,7 +233,9 @@
     "unblockLibraryConfirm": "Unblock library “{{name}}”? Its media becomes visible to everyone again.",
     "libBlocked": "Library “{{name}}” is blocked",
     "libUnblocked": "Library “{{name}}” is unblocked",
-    "export": "Export data"
+    "export": "Export data",
+    "import": "Import backup",
+    "importDone": "Backup imported: {{counts}}"
   },
   "picker": {
     "title": "Select server folder",
@@ -240,6 +249,8 @@
   },
   "share": {
     "invalid": "This share link is invalid or has expired.",
-    "backToSite": "← Back to VideoCMS"
+    "backToSite": "← Back to VideoCMS",
+    "passwordTitle": "This share is password protected",
+    "passwordPlaceholder": "Enter the share password"
   }
 }

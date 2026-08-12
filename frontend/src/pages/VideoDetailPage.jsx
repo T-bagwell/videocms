@@ -23,10 +23,13 @@ export default function VideoDetailPage() {
   const [err, setErr] = useState('');
   const [showShare, setShowShare] = useState(false);
   const [subtitleBusy, setSubtitleBusy] = useState(false);
+  const [tracks, setTracks] = useState([]);
+  const [setGlobal, setSetGlobal] = useState(false);
 
   useEffect(() => {
     api(`/videos/${id}`).then(setVideo).catch((e) => setErr(e.message));
     api('/playlists').then((d) => setPlaylists(d.items)).catch(() => {});
+    api(`/videos/${id}/subtitle-tracks`).then((d) => setTracks(d.items)).catch(() => setTracks([]));
   }, [id]);
 
   async function toggleFavorite() {
@@ -128,6 +131,8 @@ export default function VideoDetailPage() {
       await api(`/videos/${video.id}/subtitles`, { method: 'POST', form: fd });
       const fresh = await api(`/videos/${video.id}`);
       setVideo(fresh);
+      const td = await api(`/videos/${video.id}/subtitle-tracks`);
+      setTracks(td.items);
       setMsg(t('video.subtitleUploaded'));
     } catch (e2) {
       setErr(e2.message);
@@ -143,6 +148,8 @@ export default function VideoDetailPage() {
       await api(`/videos/${video.id}/subtitles/extract`, { method: 'POST' });
       const fresh = await api(`/videos/${video.id}`);
       setVideo(fresh);
+      const td = await api(`/videos/${video.id}/subtitle-tracks`);
+      setTracks(td.items);
       setMsg(t('video.subtitleExtracted'));
     } catch (e2) {
       setErr(e2.message);
@@ -158,11 +165,32 @@ export default function VideoDetailPage() {
       await api(`/videos/${video.id}/subtitles`, { method: 'DELETE' });
       const fresh = await api(`/videos/${video.id}`);
       setVideo(fresh);
+      const td = await api(`/videos/${video.id}/subtitle-tracks`);
+      setTracks(td.items);
       setMsg(t('video.subtitleRemoved'));
     } catch (e2) {
       setErr(e2.message);
     } finally {
       setSubtitleBusy(false);
+    }
+  }
+
+  async function changeSubtitlePref(trackId) {
+    setErr('');
+    try {
+      if (!trackId) {
+        await api(`/videos/${video.id}/subtitles/preference`, { method: 'DELETE' });
+      } else {
+        await api(`/videos/${video.id}/subtitles/${trackId}/active`, { method: 'PUT' });
+        if (user?.role === 'admin' && setGlobal) {
+          await api(`/videos/${video.id}/subtitles/${trackId}/default`, { method: 'PUT' });
+        }
+      }
+      const d = await api(`/videos/${video.id}/subtitle-tracks`);
+      setTracks(d.items);
+      setMsg(t('video.subtitlePrefSaved'));
+    } catch (e2) {
+      setErr(e2.message);
     }
   }
 
@@ -253,6 +281,34 @@ export default function VideoDetailPage() {
           </div>
           {msg && <div className="toast toast-success">{msg}</div>}
           {err && <div className="form-error">{err}</div>}
+          {tracks.length > 0 && (
+            <div className="subtitle-pref">
+              <label>
+                {t('video.subtitlePreference')}
+                <select
+                  value={tracks.find((tr) => tr.is_active)?.id || ''}
+                  onChange={(e) => changeSubtitlePref(e.target.value)}
+                >
+                  <option value="">{t('video.subtitleGlobal')}</option>
+                  {tracks.map((tr) => (
+                    <option key={tr.id} value={tr.id}>
+                      {tr.title || tr.lang || t('video.subtitleTrack')}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              {user?.role === 'admin' && (
+                <label className="subtitle-global-check">
+                  <input
+                    type="checkbox"
+                    checked={setGlobal}
+                    onChange={(e) => setSetGlobal(e.target.checked)}
+                  />
+                  {t('video.subtitleSetGlobal')}
+                </label>
+              )}
+            </div>
+          )}
         </div>
       </div>
 

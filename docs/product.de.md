@@ -113,7 +113,9 @@ Eine Gruppe braucht mindestens 2 Folgen, um eine Serie zu werden.
 - Die transkodierte Wiedergabe nutzt eine mehrstufige adaptive Qualitätsleiter —
   über den Qualitätsauswahl oberhalb des Players umschaltbar (Standard: Auto)
 - Untertitel (danebenliegend, eingebettet oder hochgeladen) lassen sich im Player
-  ein- und ausschalten sowie zwischen Sprachen wechseln, wenn mehrere Spuren existieren
+  ein- und ausschalten, zwischen Sprachen wechseln, wenn mehrere Spuren existieren,
+  und jeder Benutzer kann pro Video seinen eigenen Standard setzen (Admins den
+  globalen Standard)
 - Auf dem Handy lohnt sich das Querformat; nutzen Sie die Warteschlange unter dem
   Player zum Wechseln zwischen Folgen
 
@@ -124,6 +126,8 @@ Eine Gruppe braucht mindestens 2 Folgen, um eine Serie zu werden.
 - Jeder mit dem Link kann auf einer öffentlichen Seite ansehen — kein Konto
   erforderlich; Serien- und Wiedergabelisten-Links spielen die gesamte Warteschlange
 - Links laufen automatisch ab und können jederzeit im selben Dialog widerrufen werden
+- Links können passwortgeschützt werden — auf der öffentlichen Seite wird vor dem
+  Laden der Inhalt das Passwort abgefragt
 - Geteilte Inhalte respektieren die Verwaltungskontrollen: blockierte Titel und
   Bibliotheken erscheinen nie in Teilen-Links
 
@@ -132,6 +136,11 @@ Eine Gruppe braucht mindestens 2 Folgen, um eine Serie zu werden.
 ### 5.1 Übersicht
 
 Statistiken: Videos, Bibliotheken, Benutzer, Wiedergabelisten, Favoriten, Serien und belegter Speicher.
+
+- **Backup exportieren / importieren**: vollständiges JSON-Backup der
+  Server-Metadaten herunterladen oder wiederherstellen (Bibliotheken und Videos
+  werden nach Pfad idempotent zusammengeführt; persönliche Daten werden nur für
+  bestehende Benutzer wiederhergestellt)
 
 ### 5.2 Bibliotheken
 

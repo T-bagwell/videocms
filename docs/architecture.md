@@ -143,10 +143,13 @@ hidden_paths    -- id, user_id(fk), path, created_at (per-user path filters)
 series_favorites-- PK(user_id, series_id), created_at
 share_tokens    -- id, scope(video|series|playlist), video_id/series_id/playlist_id
                 --   (fk, ON DELETE CASCADE), token(unique), expires_at,
-                --   created_by(fk → users), created_at (public share links)
+                --   password_hash (optional bcrypt), created_by(fk → users),
+                --   created_at (public share links)
 subtitle_tracks -- id, video_id(fk, ON DELETE CASCADE), position, lang, title,
                 --   path, kind(sidecar|embedded|upload), source_key(unique per video),
                 --   stream_index (multi-language subtitle tracks)
+user_subtitle_prefs -- PK(user_id, video_id), track_id(fk, ON DELETE CASCADE),
+                --   updated_at (per-user default subtitle track)
 ```
 
 Key indexes: `videos(lower(title))`, `videos(library_id)`, partial
@@ -439,6 +442,5 @@ The backend binds all interfaces (`:8080`), so LAN clients reach the UI directly
 ## 9. Extension Points
 
 - **Online metadata providers** beyond TMDB/TVMaze (JAV database, AniList, etc.)
-- **Per-user subtitle preference** (the active track is global today)
-- **Share password/whitelist** on public links
-- **Import/restore** of exported backups
+- **Share link domain whitelist** (passwords are supported today)
+- **Scheduled cleanup** of expired share tokens

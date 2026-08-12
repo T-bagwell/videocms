@@ -42,9 +42,27 @@ export default function AdminPage() {
 function Overview() {
   const { t } = useTranslation();
   const [stats, setStats] = useState(null);
+  const [importMsg, setImportMsg] = useState('');
+  const [importErr, setImportErr] = useState('');
   useEffect(() => {
     api('/admin/stats').then(setStats).catch(() => {});
   }, []);
+  async function importBackup(e) {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    setImportMsg('');
+    setImportErr('');
+    try {
+      const fd = new FormData();
+      fd.append('backup', file);
+      const d = await api('/admin/import', { method: 'POST', form: fd });
+      setImportMsg(t('admin.importDone', { counts: JSON.stringify(d.counts || {}) }));
+      api('/admin/stats').then(setStats).catch(() => {});
+    } catch (e2) {
+      setImportErr(e2.message);
+    }
+  }
   if (!stats) return <div className="loading">{t('common.loading')}</div>;
   return (
     <>
@@ -60,9 +78,17 @@ function Overview() {
           <div className="card stat warn"><div className="stat-num">{stats.videos_missing}</div><div>{t('admin.statsMissing')}</div></div>
         )}
       </div>
-      <a className="btn ghost" href={mediaUrl('/admin/export')}>
-        {t('admin.export')}
-      </a>
+      <div className="detail-actions">
+        <a className="btn ghost" href={mediaUrl('/admin/export')}>
+          {t('admin.export')}
+        </a>
+        <label className="btn ghost">
+          {t('admin.import')}
+          <input type="file" accept=".json,application/json" hidden onChange={importBackup} />
+        </label>
+      </div>
+      {importMsg && <div className="toast toast-success">{importMsg}</div>}
+      {importErr && <div className="form-error">{importErr}</div>}
     </>
   );
 }

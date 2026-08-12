@@ -16,6 +16,7 @@ export default function PlayerPage() {
   const videoRef = useRef(null);
   const savedRef = useRef(null);
   const hlsRef = useRef(null);
+  const tracksRef = useRef([]);
   const offsetRef = useRef(0);
   const lastRestartRef = useRef(0);
   const [video, setVideo] = useState(null);
@@ -52,7 +53,15 @@ export default function PlayerPage() {
 
   useEffect(() => {
     api(`/videos/${activeId}`).then(setVideo).catch((e) => setErr(e.message));
-    api(`/videos/${activeId}/subtitle-tracks`).then((d) => setTracks(d.items)).catch(() => setTracks([]));
+    api(`/videos/${activeId}/subtitle-tracks`)
+      .then((d) => {
+        setTracks(d.items);
+        tracksRef.current = d.items;
+      })
+      .catch(() => {
+        setTracks([]);
+        tracksRef.current = [];
+      });
 
     const playlistId = searchParams.get('playlist');
     const seriesId = searchParams.get('series');
@@ -113,6 +122,15 @@ export default function PlayerPage() {
           label: tr.name || tr.lang || `${t('player.subtitles')} ${i + 1}`,
         })),
       );
+      const pref = tracksRef.current.find((t) => t.is_active);
+      if (pref && list.length > 0) {
+        const idx = list.findIndex((tr) => String(tr.id).includes(pref.id));
+        if (idx >= 0 && hls.subtitleTrack !== idx) {
+          hls.subtitleTrack = idx;
+          setSubtitleIdx(idx);
+          return;
+        }
+      }
       setSubtitleIdx(hls.subtitleTrack);
     });
     hls.on(Hls.Events.SUBTITLE_TRACK_SWITCH, (_event, d) => {

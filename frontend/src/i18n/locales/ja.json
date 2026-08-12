@@ -97,7 +97,14 @@
     "subtitleRemove": "字幕を削除",
     "subtitleUploaded": "字幕をアップロードしました",
     "subtitleExtracted": "埋め込み字幕を抽出しました",
-    "subtitleRemoved": "字幕を削除しました"
+    "subtitleRemoved": "字幕を削除しました",
+    "subtitlePreference": "字幕の優先設定",
+    "subtitleGlobal": "グローバル既定",
+    "subtitleSetGlobal": "グローバル既定にも設定",
+    "subtitlePrefSaved": "字幕の優先設定を保存しました",
+    "subtitleTrack": "字幕トラック",
+    "sharePassword": "パスワード（任意）",
+    "sharePasswordPlaceholder": "空の場合は公開アクセス"
   },
   "player": {
     "backToDetail": "← 詳細",
@@ -226,7 +233,9 @@
     "unblockLibraryConfirm": "ライブラリ「{{name}}」のブロックを解除しますか？メディアが再び全員に見えるようになります。",
     "libBlocked": "ライブラリ「{{name}}」をブロックしました",
     "libUnblocked": "ライブラリ「{{name}}」のブロックを解除しました",
-    "export": "データをエクスポート"
+    "export": "データをエクスポート",
+    "import": "バックアップをインポート",
+    "importDone": "バックアップをインポートしました：{{counts}}"
   },
   "picker": {
     "title": "サーバーフォルダを選択",
@@ -240,6 +249,8 @@
   },
   "share": {
     "invalid": "この共有リンクは無効か期限切れです。",
-    "backToSite": "← VideoCMS に戻る"
+    "backToSite": "← VideoCMS に戻る",
+    "passwordTitle": "この共有はパスワードで保護されています",
+    "passwordPlaceholder": "共有パスワードを入力"
   }
 }

@@ -97,7 +97,14 @@
     "subtitleRemove": "Retirer les sous-titres",
     "subtitleUploaded": "Sous-titres téléversés",
     "subtitleExtracted": "Sous-titres intégrés extraits",
-    "subtitleRemoved": "Sous-titres retirés"
+    "subtitleRemoved": "Sous-titres retirés",
+    "subtitlePreference": "Préférence de sous-titres",
+    "subtitleGlobal": "Défaut global",
+    "subtitleSetGlobal": "Définir aussi comme défaut global",
+    "subtitlePrefSaved": "Préférence de sous-titres enregistrée",
+    "subtitleTrack": "Piste de sous-titres",
+    "sharePassword": "Mot de passe (facultatif)",
+    "sharePasswordPlaceholder": "Laisser vide pour un accès ouvert"
   },
   "player": {
     "backToDetail": "← Détails",
@@ -226,7 +233,9 @@
     "unblockLibraryConfirm": "Débloquer la bibliothèque « {{name}} » ? Ses médias redeviendront visibles pour tous.",
     "libBlocked": "Bibliothèque « {{name}} » bloquée",
     "libUnblocked": "Bibliothèque « {{name}} » débloquée",
-    "export": "Exporter les données"
+    "export": "Exporter les données",
+    "import": "Importer la sauvegarde",
+    "importDone": "Sauvegarde importée : {{counts}}"
   },
   "picker": {
     "title": "Choisir un dossier serveur",
@@ -240,6 +249,8 @@
   },
   "share": {
     "invalid": "Ce lien de partage est invalide ou a expiré.",
-    "backToSite": "← Retour à VideoCMS"
+    "backToSite": "← Retour à VideoCMS",
+    "passwordTitle": "Ce partage est protégé par mot de passe",
+    "passwordPlaceholder": "Saisissez le mot de passe du partage"
   }
 }

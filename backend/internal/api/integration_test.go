@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"math/rand"
+	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -430,5 +431,190 @@ func TestExportEndpoints(t *testing.T) {
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
 		t.Fatalf("user export: got %d", resp.StatusCode)
+	}
+}
+
+func TestSubtitlePreference(t *testing.T) {
+	e := newIntegrationEnv(t)
+	token := e.loginAdmin(t)
+	libID := e.insertLibrary(t, false)
+	videoID := e.insertVideo(t, libID, "Movie G", ".mp4")
+
+	dir := t.TempDir()
+	a := filepath.Join(dir, "a.srt")
+	b := filepath.Join(dir, "b.srt")
+	os.WriteFile(a, []byte("1\n00:00:01,000 --> 00:00:02,000\nA\n"), 0o644)
+	os.WriteFile(b, []byte("1\n00:00:01,000 --> 00:00:02,000\nB\n"), 0o644)
+	trackIDs := []string{}
+	for i, p := range []string{a, b} {
+		var id uuid.UUID
+		if err := e.pool.QueryRow(context.Background(), `
+			INSERT INTO subtitle_tracks (video_id, position, lang, title, path, kind, source_key)
+			VALUES ($1,$2,'en',$3,$4,'sidecar',$4) RETURNING id`,
+			videoID, i, fmt.Sprintf("track %d", i), p).Scan(&id); err != nil {
+			t.Fatal(err)
+		}
+		trackIDs = append(trackIDs, id.String())
+	}
+	if _, err := e.pool.Exec(context.Background(),
+		`UPDATE videos SET subtitle_path=$1 WHERE id=$2`, a, videoID); err != nil {
+		t.Fatal(err)
+	}
+
+	var list struct {
+		Items []struct {
+			ID       string `json:"id"`
+			IsActive bool   `json:"is_active"`
+		} `json:"items"`
+	}
+	e.doJSON(t, http.MethodGet, "/api/videos/"+videoID.String()+"/subtitle-tracks", nil, token, &list)
+	if len(list.Items) != 2 || !list.Items[0].IsActive {
+		t.Fatalf("global default should be track 0: %+v", list.Items)
+	}
+
+	resp := e.doJSON(t, http.MethodPut,
+		"/api/videos/"+videoID.String()+"/subtitles/"+trackIDs[1]+"/active", nil, token, nil)
+	if resp.StatusCode != http.StatusOK {
+		t.Fatalf("set pref: got %d", resp.StatusCode)
+	}
+	e.doJSON(t, http.MethodGet, "/api/videos/"+videoID.String()+"/subtitle-tracks", nil, token, &list)
+	if !list.Items[1].IsActive || list.Items[0].IsActive {
+		t.Fatalf("user pref not applied: %+v", list.Items)
+	}
+
+	e.doJSON(t, http.MethodDelete, "/api/videos/"+videoID.String()+"/subtitles/preference", nil, token, nil)
+	e.doJSON(t, http.MethodGet, "/api/videos/"+videoID.String()+"/subtitle-tracks", nil, token, &list)
+	if !list.Items[0].IsActive {
+		t.Fatalf("global default should apply after clearing pref: %+v", list.Items)
+	}
+}
+
+func TestSharePassword(t *testing.T) {
+	e := newIntegrationEnv(t)
+	token := e.loginAdmin(t)
+	libID := e.insertLibrary(t, false)
+	videoID := e.insertVideo(t, libID, "Movie H", ".mp4")
+
+	var created struct {
+		Token string `json:"token"`
+	}
+	resp := e.doJSON(t, http.MethodPost, "/api/videos/"+videoID.String()+"/share",
+		map[string]any{"hours": 24, "password": "secret"}, token, &created)
+	if resp.StatusCode != http.StatusCreated || created.Token == "" {
+		t.Fatalf("create password share: %d", resp.StatusCode)
+	}
+
+	// without the password the info endpoint only says a password is required
+	var denied map[string]any
+	resp = e.doJSON(t, http.MethodGet, "/api/share/"+created.Token+"/info", nil, "", &denied)
+	if resp.StatusCode != http.StatusForbidden || denied["password_required"] != true {
+		t.Fatalf("no password: got %d %v", resp.StatusCode, denied)
+	}
+
+	// wrong password is also denied
+	req, _ := http.NewRequest(http.MethodGet,
+		e.server.URL+"/api/share/"+created.Token+"/info", nil)
+	req.Header.Set("X-Share-Password", "nope")
+	bad, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	bad.Body.Close()
+	if bad.StatusCode != http.StatusForbidden {
+		t.Fatalf("wrong password: got %d, want 403", bad.StatusCode)
+	}
+
+	// correct password works
+	req, _ = http.NewRequest(http.MethodGet,
+		e.server.URL+"/api/share/"+created.Token+"/info", nil)
+	req.Header.Set("X-Share-Password", "secret")
+	good, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	good.Body.Close()
+	if good.StatusCode != http.StatusOK {
+		t.Fatalf("correct password: got %d, want 200", good.StatusCode)
+	}
+
+	// media endpoints accept the password as a query parameter too
+	resp = e.doJSON(t, http.MethodGet,
+		"/api/share/"+created.Token+"/video/"+videoID.String()+"/stream?pw=secret", nil, "", nil)
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusPartialContent {
+		t.Fatalf("stream with pw query: got %d, want 200/206", resp.StatusCode)
+	}
+}
+
+func TestBackupImport(t *testing.T) {
+	e := newIntegrationEnv(t)
+	token := e.loginAdmin(t)
+	libID := e.insertLibrary(t, false)
+	e.insertVideo(t, libID, "Movie I", ".mp4")
+	if _, err := e.pool.Exec(context.Background(),
+		`INSERT INTO blocked_titles (title) VALUES ('Banned Show')`); err != nil {
+		t.Fatal(err)
+	}
+
+	// export and check uuids serialize as strings
+	req, _ := http.NewRequest(http.MethodGet, e.server.URL+"/api/admin/export", nil)
+	req.Header.Set("Authorization", "Bearer "+token)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	exportBody, _ := io.ReadAll(resp.Body)
+	resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		t.Fatalf("export: got %d", resp.StatusCode)
+	}
+	var dump map[string]any
+	if err := json.Unmarshal(exportBody, &dump); err != nil {
+		t.Fatalf("export not JSON: %v", err)
+	}
+	videos, ok := dump["videos"].([]any)
+	if !ok || len(videos) == 0 {
+		t.Fatal("export has no videos")
+	}
+	first := videos[0].(map[string]any)
+	if _, ok := first["id"].(string); !ok {
+		t.Fatalf("exported video id must be a string, got %T", first["id"])
+	}
+	// add a brand-new blocked title to the backup so the import has something
+	// that does not already exist locally
+	dump["blocked_titles"] = append(
+		dump["blocked_titles"].([]any),
+		map[string]any{"title": "Freshly Banned"},
+	)
+	exportBody, err = json.Marshal(dump)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// import the same backup back (idempotent upsert)
+	var buf bytes.Buffer
+	mw := multipart.NewWriter(&buf)
+	fw, _ := mw.CreateFormFile("backup", "backup.json")
+	fw.Write(exportBody)
+	mw.Close()
+
+	req, _ = http.NewRequest(http.MethodPost, e.server.URL+"/api/admin/import", &buf)
+	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("Content-Type", mw.FormDataContentType())
+	resp, err = http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer resp.Body.Close()
+	var imported struct {
+		Counts map[string]int `json:"counts"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&imported); err != nil {
+		t.Fatalf("import response: %v", err)
+	}
+	if resp.StatusCode != http.StatusOK {
+		t.Fatalf("import: got %d %v", resp.StatusCode, imported)
+	}
+	if imported.Counts["videos"] < 1 || imported.Counts["blocked_titles"] < 1 || imported.Counts["libraries"] < 1 {
+		t.Fatalf("import counts look wrong: %v", imported.Counts)
 	}
 }

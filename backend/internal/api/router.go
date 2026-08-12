@@ -80,6 +80,8 @@ func (a *App) Routes() http.Handler {
 	mux.HandleFunc("GET /api/videos/{id}/subtitle-tracks", authUser(a.listSubtitleTracks))
 	mux.HandleFunc("GET /api/videos/{id}/subtitles/{trackId}", authUser(a.getSubtitleTrack))
 	mux.HandleFunc("PUT /api/videos/{id}/subtitles/{trackId}/active", authUser(a.setActiveSubtitleTrack))
+	mux.HandleFunc("DELETE /api/videos/{id}/subtitles/preference", authUser(a.clearSubtitlePreference))
+	mux.HandleFunc("PUT /api/videos/{id}/subtitles/{trackId}/default", authAdmin(a.setGlobalSubtitleDefault))
 	mux.HandleFunc("POST /api/videos/{id}/subtitles", authAdmin(a.uploadSubtitle))
 	mux.HandleFunc("DELETE /api/videos/{id}/subtitles", authAdmin(a.deleteSubtitle))
 	mux.HandleFunc("POST /api/videos/{id}/subtitles/extract", authAdmin(a.extractEmbeddedSubtitle))
@@ -134,6 +136,7 @@ func (a *App) Routes() http.Handler {
 
 	mux.HandleFunc("GET /api/admin/stats", authAdmin(a.stats))
 	mux.HandleFunc("GET /api/admin/export", authAdmin(a.exportAll))
+	mux.HandleFunc("POST /api/admin/import", authAdmin(a.importBackup))
 	mux.HandleFunc("GET /api/admin/paths", authAdmin(a.listServerPaths))
 	mux.HandleFunc("GET /api/healthz", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})

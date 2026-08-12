@@ -7,6 +7,7 @@ import { api } from '../api.js';
 export default function ShareModal({ kind, id, onClose }) {
   const { t } = useTranslation();
   const [hours, setHours] = useState(168);
+  const [password, setPassword] = useState('');
   const [shares, setShares] = useState([]);
   const [created, setCreated] = useState('');
   const [copied, setCopied] = useState(false);
@@ -22,7 +23,7 @@ export default function ShareModal({ kind, id, onClose }) {
     try {
       const d = await api(`/${kind}/${id}/share`, {
         method: 'POST',
-        body: { hours: Number(hours) || 168 },
+        body: { hours: Number(hours) || 168, password: password || undefined },
       });
       setCreated(`${window.location.origin}${d.url}`);
       const list = await api(`/${kind}/${id}/shares`);
@@ -68,6 +69,15 @@ export default function ShareModal({ kind, id, onClose }) {
           />
           <button className="btn small primary">{t('video.shareCreate')}</button>
         </form>
+        <label className="share-password-field">
+          {t('video.sharePassword')}
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder={t('video.sharePasswordPlaceholder')}
+          />
+        </label>
         {created && (
           <div className="share-link-row">
             <code className="share-link">{created}</code>

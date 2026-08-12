@@ -115,7 +115,9 @@ en fin de nom (`1 (4)`, `-535`). Un groupe doit contenir au moins 2 épisodes.
 - La lecture transcodée utilise une échelle multi-qualité adaptative — utilisez
   le sélecteur de qualité au-dessus du lecteur pour changer (Auto par défaut)
 - Les sous-titres (fichiers à côté, intégrés ou téléversés) peuvent être activés
-  ou désactivés dans le lecteur et changés de langue quand plusieurs pistes existent
+  ou désactivés dans le lecteur, changés de langue quand plusieurs pistes existent,
+  et chaque utilisateur peut définir son propre défaut par vidéo (les admins
+  peuvent définir le défaut global)
 - Sur mobile, passez en paysage pour une meilleure expérience ; utilisez la file
   sous le lecteur pour changer d’épisode
 
@@ -127,6 +129,8 @@ en fin de nom (`1 (4)`, `-535`). Un groupe doit contenir au moins 2 épisodes.
   compte n’est nécessaire ; les liens de série et de liste jouent toute la file
 - Les liens expirent automatiquement et peuvent être révoqués à tout moment
   depuis la même fenêtre
+- Les liens peuvent être protégés par mot de passe — le mot de passe est demandé
+  sur la page publique avant le chargement du contenu
 - Le contenu partagé respecte les contrôles d’administration : les titres et
   bibliothèques bloqués n’apparaissent jamais dans les liens de partage
 
@@ -135,6 +139,11 @@ en fin de nom (`1 (4)`, `-535`). Un groupe doit contenir au moins 2 épisodes.
 ### 5.1 Aperçu
 
 Statistiques : vidéos, bibliothèques, utilisateurs, listes, favoris, séries et espace utilisé.
+
+- **Export / import de sauvegarde** : téléchargez une sauvegarde JSON complète
+  des métadonnées du serveur, ou restaurez-en une (bibliothèques et vidéos sont
+  fusionnées par chemin ; les données personnelles sont restaurées pour les
+  utilisateurs existants)
 
 ### 5.2 Bibliothèques
 

@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 
 	"videocms/backend/internal/auth"
 	"videocms/backend/internal/media"
@@ -29,20 +30,38 @@ func newShareToken() (string, error) {
 	return hex.EncodeToString(b), nil
 }
 
-func parseShareHours(r *http.Request) int {
+type shareRequest struct {
+	Hours    int    `json:"hours"`
+	Password string `json:"password"`
+}
+
+// parseShareRequest reads hours and an optional password from the request
+// body, returning the expiry hours and the bcrypt hash of the password ("" when
+// no password was set).
+func parseShareRequest(r *http.Request) (int, string, error) {
 	hours := defaultShareHours
+	password := ""
 	if r.Body != nil {
-		var body struct {
-			Hours int `json:"hours"`
+		var body shareRequest
+		if err := json.NewDecoder(io.LimitReader(r.Body, 1<<20)).Decode(&body); err != nil && err != io.EOF {
+			return hours, "", err
 		}
-		if err := json.NewDecoder(io.LimitReader(r.Body, 1<<20)).Decode(&body); err == nil && body.Hours > 0 {
+		if body.Hours > 0 {
 			hours = body.Hours
 		}
+		password = body.Password
 	}
 	if hours > 24*365 {
 		hours = 24 * 365
 	}
-	return hours
+	if password != "" {
+		hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+		if err != nil {
+			return hours, "", err
+		}
+		password = string(hash)
+	}
+	return hours, password, nil
 }
 
 func nullableUUID(id uuid.UUID) any {
@@ -52,15 +71,15 @@ func nullableUUID(id uuid.UUID) any {
 	return id
 }
 
-func (a *App) insertShare(ctx context.Context, scope string, videoID, seriesID, playlistID uuid.UUID, expires time.Time, userID uuid.UUID) (string, error) {
+func (a *App) insertShare(ctx context.Context, scope string, videoID, seriesID, playlistID uuid.UUID, expires time.Time, passwordHash string, userID uuid.UUID) (string, error) {
 	token, err := newShareToken()
 	if err != nil {
 		return "", err
 	}
 	_, err = a.pool.Exec(ctx, `
-		INSERT INTO share_tokens (scope, video_id, series_id, playlist_id, token, expires_at, created_by)
-		VALUES ($1,$2,$3,$4,$5,$6,$7)`,
-		scope, nullableUUID(videoID), nullableUUID(seriesID), nullableUUID(playlistID), token, expires, userID)
+		INSERT INTO share_tokens (scope, video_id, series_id, playlist_id, token, expires_at, password_hash, created_by)
+		VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`,
+		scope, nullableUUID(videoID), nullableUUID(seriesID), nullableUUID(playlistID), token, expires, passwordHash, userID)
 	if err != nil {
 		return "", err
 	}
@@ -92,9 +111,13 @@ func (a *App) createVideoShare(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusNotFound, "video not found or not visible")
 		return
 	}
-	hours := parseShareHours(r)
+	hours, passwordHash, err := parseShareRequest(r)
+	if err != nil {
+		writeErr(w, http.StatusBadRequest, "invalid share request")
+		return
+	}
 	expires := time.Now().Add(time.Duration(hours) * time.Hour)
-	token, err := a.insertShare(r.Context(), "video", id, uuid.Nil, uuid.Nil, expires, user.ID)
+	token, err := a.insertShare(r.Context(), "video", id, uuid.Nil, uuid.Nil, expires, passwordHash, user.ID)
 	if err != nil {
 		writeErr(w, http.StatusInternalServerError, "create share failed")
 		return
@@ -119,9 +142,13 @@ func (a *App) createSeriesShare(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusNotFound, "series not found or not visible")
 		return
 	}
-	hours := parseShareHours(r)
+	hours, passwordHash, err := parseShareRequest(r)
+	if err != nil {
+		writeErr(w, http.StatusBadRequest, "invalid share request")
+		return
+	}
 	expires := time.Now().Add(time.Duration(hours) * time.Hour)
-	token, err := a.insertShare(r.Context(), "series", uuid.Nil, id, uuid.Nil, expires, user.ID)
+	token, err := a.insertShare(r.Context(), "series", uuid.Nil, id, uuid.Nil, expires, passwordHash, user.ID)
 	if err != nil {
 		writeErr(w, http.StatusInternalServerError, "create share failed")
 		return
@@ -138,7 +165,11 @@ func (a *App) createPlaylistShare(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusBadRequest, "invalid playlist id")
 		return
 	}
-	hours := parseShareHours(r)
+	hours, passwordHash, err := parseShareRequest(r)
+	if err != nil {
+		writeErr(w, http.StatusBadRequest, "invalid share request")
+		return
+	}
 	expires := time.Now().Add(time.Duration(hours) * time.Hour)
 	token, err := newShareToken()
 	if err != nil {
@@ -146,9 +177,9 @@ func (a *App) createPlaylistShare(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	tag, err := a.pool.Exec(r.Context(), `
-		INSERT INTO share_tokens (scope, playlist_id, token, expires_at, created_by)
-		SELECT 'playlist', id, $1, $2, $3 FROM playlists WHERE id=$4 AND user_id=$3`,
-		token, expires, user.ID, id)
+		INSERT INTO share_tokens (scope, playlist_id, token, expires_at, password_hash, created_by)
+		SELECT 'playlist', id, $1, $2, $3, $4 FROM playlists WHERE id=$5 AND user_id=$4`,
+		token, expires, passwordHash, user.ID, id)
 	if err != nil {
 		writeErr(w, http.StatusInternalServerError, "create share failed")
 		return
@@ -165,7 +196,8 @@ func (a *App) createPlaylistShare(w http.ResponseWriter, r *http.Request) {
 func (a *App) listSharesFor(w http.ResponseWriter, r *http.Request, col string, id uuid.UUID) {
 	user := auth.UserFrom(r)
 	rows, err := a.pool.Query(r.Context(), fmt.Sprintf(`
-		SELECT st.token, st.expires_at, st.created_at, COALESCE(u.username, '')
+		SELECT st.token, st.expires_at, st.created_at, COALESCE(u.username, ''),
+		       st.password_hash <> ''
 		FROM share_tokens st
 		LEFT JOIN users u ON u.id = st.created_by
 		WHERE st.%s = $1 AND (st.created_by = $2 OR $3::boolean)
@@ -180,16 +212,18 @@ func (a *App) listSharesFor(w http.ResponseWriter, r *http.Request, col string, 
 	for rows.Next() {
 		var token, username string
 		var expiresAt, createdAt time.Time
-		if err := rows.Scan(&token, &expiresAt, &createdAt, &username); err != nil {
+		var passwordProtected bool
+		if err := rows.Scan(&token, &expiresAt, &createdAt, &username, &passwordProtected); err != nil {
 			writeErr(w, http.StatusInternalServerError, "list shares failed")
 			return
 		}
 		items = append(items, map[string]any{
-			"token":      token,
-			"url":        "/share/" + token,
-			"expires_at": expiresAt,
-			"created_at": createdAt,
-			"created_by": username,
+			"token":              token,
+			"url":                "/share/" + token,
+			"expires_at":         expiresAt,
+			"created_at":         createdAt,
+			"created_by":         username,
+			"password_protected": passwordProtected,
 		})
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"items": items})
@@ -242,23 +276,58 @@ func (a *App) deleteShare(w http.ResponseWriter, r *http.Request) {
 }
 
 type shareTokenRow struct {
-	Scope      string
-	ExpiresAt  time.Time
-	VideoID    uuid.UUID
-	SeriesID   uuid.UUID
-	PlaylistID uuid.UUID
+	Scope        string
+	ExpiresAt    time.Time
+	VideoID      uuid.UUID
+	SeriesID     uuid.UUID
+	PlaylistID   uuid.UUID
+	PasswordHash string
 }
 
 func (a *App) resolveShareToken(r *http.Request, token string) (shareTokenRow, bool) {
 	var row shareTokenRow
 	err := a.pool.QueryRow(r.Context(), `
-		SELECT scope, expires_at,
+		SELECT scope, expires_at, password_hash,
 		       COALESCE(video_id, '00000000-0000-0000-0000-000000000000'),
 		       COALESCE(series_id, '00000000-0000-0000-0000-000000000000'),
 		       COALESCE(playlist_id, '00000000-0000-0000-0000-000000000000')
 		FROM share_tokens WHERE token=$1 AND expires_at > now()`, token).
-		Scan(&row.Scope, &row.ExpiresAt, &row.VideoID, &row.SeriesID, &row.PlaylistID)
+		Scan(&row.Scope, &row.ExpiresAt, &row.PasswordHash, &row.VideoID, &row.SeriesID, &row.PlaylistID)
 	if err != nil {
+		return shareTokenRow{}, false
+	}
+	return row, true
+}
+
+// sharePasswordOK verifies an optional share password from the
+// X-Share-Password header or the ?pw= query parameter.
+func sharePasswordOK(r *http.Request, hash string) bool {
+	if hash == "" {
+		return true
+	}
+	pw := r.Header.Get("X-Share-Password")
+	if pw == "" {
+		pw = r.URL.Query().Get("pw")
+	}
+	if pw == "" {
+		return false
+	}
+	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(pw)) == nil
+}
+
+// shareGuard resolves the token and enforces expiry and the optional password,
+// writing the error response itself when access is denied.
+func (a *App) shareGuard(w http.ResponseWriter, r *http.Request) (shareTokenRow, bool) {
+	row, ok := a.resolveShareToken(r, r.PathValue("token"))
+	if !ok {
+		writeErr(w, http.StatusNotFound, "share link not found or expired")
+		return shareTokenRow{}, false
+	}
+	if !sharePasswordOK(r, row.PasswordHash) {
+		writeJSON(w, http.StatusForbidden, map[string]any{
+			"error":             "share link requires a password",
+			"password_required": true,
+		})
 		return shareTokenRow{}, false
 	}
 	return row, true
@@ -355,9 +424,8 @@ func (a *App) listPublicVideos(ctx context.Context, where string, args ...any) (
 // GET /api/share/{token}/info
 func (a *App) shareInfo(w http.ResponseWriter, r *http.Request) {
 	token := r.PathValue("token")
-	row, ok := a.resolveShareToken(r, token)
+	row, ok := a.shareGuard(w, r)
 	if !ok {
-		writeErr(w, http.StatusNotFound, "share link not found or expired")
 		return
 	}
 	base := map[string]any{
@@ -419,7 +487,7 @@ func (a *App) shareInfo(w http.ResponseWriter, r *http.Request) {
 			writeErr(w, http.StatusNotFound, "video not found")
 			return
 		}
-		tracks, err := a.listTracksForVideo(r.Context(), v.ID, v.SubtitlePath)
+		tracks, err := a.listTracksForVideo(r.Context(), v.ID, v.SubtitlePath, nil)
 		if err != nil {
 			writeErr(w, http.StatusInternalServerError, "load subtitle tracks failed")
 			return
@@ -430,7 +498,15 @@ func (a *App) shareInfo(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, base)
 }
 
-func (a *App) listTracksForVideo(ctx context.Context, videoID uuid.UUID, activePath string) ([]models.SubtitleTrack, error) {
+func (a *App) listTracksForVideo(ctx context.Context, videoID uuid.UUID, activePath string, userID *uuid.UUID) ([]models.SubtitleTrack, error) {
+	var pref uuid.UUID
+	hasPref := false
+	if userID != nil {
+		err := a.pool.QueryRow(ctx,
+			`SELECT track_id FROM user_subtitle_prefs WHERE user_id=$1 AND video_id=$2`,
+			*userID, videoID).Scan(&pref)
+		hasPref = err == nil
+	}
 	rows, err := a.pool.Query(ctx, `
 		SELECT id, position, lang, title, path, kind
 		FROM subtitle_tracks WHERE video_id=$1 ORDER BY position`, videoID)
@@ -446,15 +522,22 @@ func (a *App) listTracksForVideo(ctx context.Context, videoID uuid.UUID, activeP
 			return nil, err
 		}
 		t.Kind = kind
-		t.IsActive = path != "" && path == activePath
+		if hasPref {
+			t.IsActive = t.ID == pref
+		} else {
+			t.IsActive = path != "" && path == activePath
+		}
 		items = append(items, t)
 	}
 	return items, rows.Err()
 }
 
 // shareVideoFromRequest resolves the token + {videoId} path pair for the
-// per-video public media endpoints.
-func (a *App) shareVideoFromRequest(r *http.Request) (models.Video, string, bool) {
+// per-video public media endpoints, enforcing the share password first.
+func (a *App) shareVideoFromRequest(w http.ResponseWriter, r *http.Request) (models.Video, string, bool) {
+	if _, ok := a.shareGuard(w, r); !ok {
+		return models.Video{}, "", false
+	}
 	videoID, err := uuid.Parse(r.PathValue("videoId"))
 	if err != nil {
 		return models.Video{}, "", false
@@ -464,7 +547,7 @@ func (a *App) shareVideoFromRequest(r *http.Request) (models.Video, string, bool
 
 // GET /api/share/{token}/video/{videoId}/stream
 func (a *App) shareStream(w http.ResponseWriter, r *http.Request) {
-	_, path, ok := a.shareVideoFromRequest(r)
+	_, path, ok := a.shareVideoFromRequest(w, r)
 	if !ok {
 		writeErr(w, http.StatusNotFound, "share link not found or expired")
 		return
@@ -474,7 +557,7 @@ func (a *App) shareStream(w http.ResponseWriter, r *http.Request) {
 
 // GET /api/share/{token}/video/{videoId}/download
 func (a *App) shareDownload(w http.ResponseWriter, r *http.Request) {
-	v, path, ok := a.shareVideoFromRequest(r)
+	v, path, ok := a.shareVideoFromRequest(w, r)
 	if !ok {
 		writeErr(w, http.StatusNotFound, "share link not found or expired")
 		return
@@ -485,7 +568,7 @@ func (a *App) shareDownload(w http.ResponseWriter, r *http.Request) {
 
 // GET /api/share/{token}/video/{videoId}/poster
 func (a *App) sharePoster(w http.ResponseWriter, r *http.Request) {
-	v, _, ok := a.shareVideoFromRequest(r)
+	v, _, ok := a.shareVideoFromRequest(w, r)
 	if !ok || !v.HasPoster {
 		writeErr(w, http.StatusNotFound, "poster not found")
 		return
@@ -495,7 +578,7 @@ func (a *App) sharePoster(w http.ResponseWriter, r *http.Request) {
 
 // GET /api/share/{token}/video/{videoId}/subtitles
 func (a *App) shareSubtitles(w http.ResponseWriter, r *http.Request) {
-	v, _, ok := a.shareVideoFromRequest(r)
+	v, _, ok := a.shareVideoFromRequest(w, r)
 	if !ok || !v.HasSubtitle {
 		writeErr(w, http.StatusNotFound, "subtitles not found")
 		return
@@ -505,12 +588,12 @@ func (a *App) shareSubtitles(w http.ResponseWriter, r *http.Request) {
 
 // GET /api/share/{token}/video/{videoId}/subtitle-tracks
 func (a *App) shareSubtitleTracks(w http.ResponseWriter, r *http.Request) {
-	v, _, ok := a.shareVideoFromRequest(r)
+	v, _, ok := a.shareVideoFromRequest(w, r)
 	if !ok {
 		writeErr(w, http.StatusNotFound, "share link not found or expired")
 		return
 	}
-	items, err := a.listTracksForVideo(r.Context(), v.ID, v.SubtitlePath)
+	items, err := a.listTracksForVideo(r.Context(), v.ID, v.SubtitlePath, nil)
 	if err != nil {
 		writeErr(w, http.StatusInternalServerError, "load subtitle tracks failed")
 		return
@@ -520,7 +603,7 @@ func (a *App) shareSubtitleTracks(w http.ResponseWriter, r *http.Request) {
 
 // GET /api/share/{token}/video/{videoId}/subtitles/{trackId}
 func (a *App) shareSubtitleTrack(w http.ResponseWriter, r *http.Request) {
-	v, _, ok := a.shareVideoFromRequest(r)
+	v, _, ok := a.shareVideoFromRequest(w, r)
 	if !ok {
 		writeErr(w, http.StatusNotFound, "share link not found or expired")
 		return
@@ -545,7 +628,7 @@ func (a *App) shareSubtitleTrack(w http.ResponseWriter, r *http.Request) {
 
 // GET /api/share/{token}/video/{videoId}/hls/{file...}
 func (a *App) shareHLS(w http.ResponseWriter, r *http.Request) {
-	v, _, ok := a.shareVideoFromRequest(r)
+	v, _, ok := a.shareVideoFromRequest(w, r)
 	if !ok {
 		writeErr(w, http.StatusNotFound, "share link not found or expired")
 		return

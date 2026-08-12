@@ -139,10 +139,13 @@ hidden_paths    -- id, user_id(FK), path, created_at（ユーザーごとのパ�
 series_favorites-- PK(user_id, series_id), created_at
 share_tokens    -- id, scope(video|series|playlist), video_id/series_id/playlist_id
                 --   (FK, ON DELETE CASCADE), token(ユニーク), expires_at,
-                --   created_by(FK→users), created_at（公開共有リンク）
+                --   password_hash（任意 bcrypt）, created_by(FK→users),
+                --   created_at（公開共有リンク）
 subtitle_tracks -- id, video_id(FK, ON DELETE CASCADE), position, lang, title,
                 --   path, kind(sidecar|embedded|upload), source_key(動画内でユニーク),
                 --   stream_index（多言語字幕トラック）
+user_subtitle_prefs -- PK(user_id, video_id), track_id(FK, ON DELETE CASCADE),
+                --   updated_at（ユーザー別の既定字幕トラック）
 ```
 
 主要インデックス：`videos(lower(title))`、`videos(library_id)`、部分インデックス
@@ -426,6 +429,5 @@ sequenceDiagram
 ## 9. 拡張ポイント
 
 - **TMDB/TVMaze 以外のオンラインメタデータソース**（JAV DB、AniList など）
-- **ユーザー別の字幕プリファレンス**（現在は動画ごとにグローバル）
-- **共有リンクへのパスワード / ホワイトリスト**
-- **エクスポートしたバックアップのインポート / 復元**
+- **共有リンクのドメインホワイトリスト**（パスワードは対応済み）
+- **期限切れ共有トークンの定期クリーンアップ**
