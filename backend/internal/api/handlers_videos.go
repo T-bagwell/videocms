@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -390,6 +391,10 @@ func (a *App) subtitles(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusNotFound, "subtitles not found")
 		return
 	}
+	serveSubtitleFile(w, r, path)
+}
+
+func serveSubtitleFile(w http.ResponseWriter, r *http.Request, path string) {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		writeErr(w, http.StatusNotFound, "subtitle file unreadable")
@@ -403,24 +408,53 @@ func (a *App) subtitles(w http.ResponseWriter, r *http.Request) {
 	w.Write(data)
 }
 
+type hlsVideo struct {
+	FilePath     string
+	Width        int
+	Height       int
+	SubtitlePath string
+	Available    bool
+}
+
+func (a *App) videoForHLS(ctx context.Context, id uuid.UUID) (hlsVideo, bool) {
+	var v hlsVideo
+	err := a.pool.QueryRow(ctx,
+		`SELECT file_path, width, height, subtitle_path, available FROM videos WHERE id=$1`, id,
+	).Scan(&v.FilePath, &v.Width, &v.Height, &v.SubtitlePath, &v.Available)
+	if err != nil || !v.Available {
+		return hlsVideo{}, false
+	}
+	return v, true
+}
+
 func (a *App) hlsHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
 		writeErr(w, http.StatusBadRequest, "invalid video id")
 		return
 	}
-	file := r.PathValue("file")
+	v, ok := a.videoForHLS(r.Context(), id)
+	if !ok {
+		writeErr(w, http.StatusNotFound, "video not found or unavailable")
+		return
+	}
+	a.serveHLS(w, r, id, v, r.PathValue("file"))
+}
+
+// serveHLS serves master / variant / subtitle playlists and HLS segments. It
+// is shared by the authed route and the public share route.
+func (a *App) serveHLS(w http.ResponseWriter, r *http.Request, id uuid.UUID, v hlsVideo, file string) {
+	token := r.URL.Query().Get("token")
+	if token == "" {
+		token = strings.TrimPrefix(r.Header.Get("Authorization"), "Bearer ")
+	}
+
 	if file == "playlist.m3u8" {
-		input, ok := a.videoFileFor(r)
-		if !ok {
-			writeErr(w, http.StatusNotFound, "video not found or unavailable")
-			return
-		}
 		start := 0.0
 		if s := r.URL.Query().Get("start"); s != "" {
 			start, _ = strconv.ParseFloat(s, 64)
 		}
-		manifest, err := a.hls.Playlist(r.Context(), id, input, start)
+		manifest, err := a.hls.Playlist(r.Context(), id, v.FilePath, start, v.Width, v.Height, v.SubtitlePath != "")
 		if err != nil {
 			log.Printf("[hls] %v", err)
 			writeErr(w, http.StatusInternalServerError, "failed to start transcode session: "+err.Error())
@@ -431,38 +465,65 @@ func (a *App) hlsHandler(w http.ResponseWriter, r *http.Request) {
 			writeErr(w, http.StatusInternalServerError, "read manifest failed")
 			return
 		}
-		token := r.URL.Query().Get("token")
-		if token == "" {
-			token = strings.TrimPrefix(r.Header.Get("Authorization"), "Bearer ")
-		}
 		w.Header().Set("Content-Type", "application/vnd.apple.mpegurl")
 		w.Header().Set("Cache-Control", "no-store")
 		w.Write(rewriteManifest(data, token))
 		return
 	}
 
-	path, ok := a.hls.Segment(id, file)
+	if file == "subs/playlist.m3u8" {
+		if v.SubtitlePath == "" {
+			writeErr(w, http.StatusNotFound, "subtitles not found")
+			return
+		}
+		w.Header().Set("Content-Type", "application/vnd.apple.mpegurl")
+		w.Header().Set("Cache-Control", "no-store")
+		w.Write(buildSubtitlePlaylist(token))
+		return
+	}
+	if file == "subs/subtitle.vtt" {
+		if v.SubtitlePath == "" {
+			writeErr(w, http.StatusNotFound, "subtitles not found")
+			return
+		}
+		serveSubtitleFile(w, r, v.SubtitlePath)
+		return
+	}
+
+	path, ok := a.hls.SessionFile(id, file)
 	if !ok {
 		writeErr(w, http.StatusNotFound, "segment not found")
+		return
+	}
+	if strings.HasSuffix(file, ".m3u8") {
+		data, err := os.ReadFile(path)
+		if err != nil {
+			writeErr(w, http.StatusInternalServerError, "read manifest failed")
+			return
+		}
+		w.Header().Set("Content-Type", "application/vnd.apple.mpegurl")
+		w.Header().Set("Cache-Control", "no-store")
+		w.Write(rewriteManifest(data, token))
 		return
 	}
 	w.Header().Set("Content-Type", "video/mp2t")
 	http.ServeFile(w, r, path)
 }
 
+func buildSubtitlePlaylist(token string) []byte {
+	return []byte("#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-TARGETDURATION:99999\n#EXT-X-MEDIA-SEQUENCE:0\n#EXTINF:214748.000000,\nsubtitle.vtt?token=" + url.QueryEscape(token) + "\n#EXT-X-ENDLIST\n")
+}
+
 func rewriteManifest(data []byte, token string) []byte {
 	lines := strings.Split(string(data), "\n")
 	for i, line := range lines {
 		trimmed := strings.TrimSpace(line)
-		if segmentNameRe(trimmed) {
-			lines[i] = trimmed + "?token=" + url.QueryEscape(token)
+		if trimmed == "" || strings.HasPrefix(trimmed, "#") {
+			continue
 		}
+		lines[i] = trimmed + "?token=" + url.QueryEscape(token)
 	}
 	return []byte(strings.Join(lines, "\n"))
-}
-
-func segmentNameRe(name string) bool {
-	return media.SegmentNameMatch(name)
 }
 
 func (a *App) scrapeVideo(w http.ResponseWriter, r *http.Request) {

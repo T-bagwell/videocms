@@ -81,7 +81,23 @@
     "fieldTitle": "标题",
     "fieldYear": "年份",
     "fieldGenres": "类型（逗号分隔）",
-    "fieldSynopsis": "简介"
+    "fieldSynopsis": "简介",
+    "share": "🔗 分享",
+    "shareTitle": "分享这个视频",
+    "shareHours": "有效期（小时）",
+    "shareCreate": "生成链接",
+    "shareCopy": "复制",
+    "shareCopied": "已复制",
+    "shareList": "分享链接",
+    "shareExpires": "有效期至 {{date}}",
+    "shareRevoke": "撤销",
+    "subtitleUpload": "上传字幕",
+    "subtitleExtract": "提取内嵌字幕",
+    "subtitleBusy": "处理中…",
+    "subtitleRemove": "移除字幕",
+    "subtitleUploaded": "字幕已上传",
+    "subtitleExtracted": "内嵌字幕已提取",
+    "subtitleRemoved": "字幕已移除"
   },
   "player": {
     "backToDetail": "← 详情",
@@ -92,7 +108,12 @@
     "download": "下载",
     "queue": "播放队列（{{count}}）",
     "nowPlaying": "播放中",
-    "fromSeries": "来自剧集：{{name}}"
+    "fromSeries": "来自剧集：{{name}}",
+    "quality": "清晰度",
+    "qualityAuto": "自动",
+    "subtitles": "字幕",
+    "subtitlesOn": "字幕：开",
+    "subtitlesOff": "字幕：关"
   },
   "playlists": {
     "title": "播放列表",
@@ -214,5 +235,9 @@
     "empty": "此文件夹下没有子文件夹，可直接选择当前路径",
     "current": "当前：{{path}}",
     "select": "选择此文件夹"
+  },
+  "share": {
+    "invalid": "这个分享链接无效或已过期。",
+    "backToSite": "← 返回 VideoCMS"
   }
 }

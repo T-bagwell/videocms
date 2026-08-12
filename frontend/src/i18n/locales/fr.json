@@ -81,7 +81,23 @@
     "fieldTitle": "Titre",
     "fieldYear": "Année",
     "fieldGenres": "Genres (séparés par des virgules)",
-    "fieldSynopsis": "Synopsis"
+    "fieldSynopsis": "Synopsis",
+    "share": "🔗 Partager",
+    "shareTitle": "Partager cette vidéo",
+    "shareHours": "Validité (heures)",
+    "shareCreate": "Créer le lien",
+    "shareCopy": "Copier",
+    "shareCopied": "Copié",
+    "shareList": "Liens de partage",
+    "shareExpires": "Expire le {{date}}",
+    "shareRevoke": "Révoquer",
+    "subtitleUpload": "Téléverser des sous-titres",
+    "subtitleExtract": "Extraire les sous-titres intégrés",
+    "subtitleBusy": "En cours…",
+    "subtitleRemove": "Retirer les sous-titres",
+    "subtitleUploaded": "Sous-titres téléversés",
+    "subtitleExtracted": "Sous-titres intégrés extraits",
+    "subtitleRemoved": "Sous-titres retirés"
   },
   "player": {
     "backToDetail": "← Détails",
@@ -92,7 +108,12 @@
     "download": "Télécharger",
     "queue": "File de lecture ({{count}})",
     "nowPlaying": "En lecture",
-    "fromSeries": "De la série : {{name}}"
+    "fromSeries": "De la série : {{name}}",
+    "quality": "Qualité",
+    "qualityAuto": "Auto",
+    "subtitles": "Sous-titres",
+    "subtitlesOn": "Sous-titres : activés",
+    "subtitlesOff": "Sous-titres : désactivés"
   },
   "playlists": {
     "title": "Listes de lecture",
@@ -214,5 +235,9 @@
     "empty": "Aucun sous-dossier ici. Vous pouvez sélectionner le chemin actuel.",
     "current": "Actuel : {{path}}",
     "select": "Choisir ce dossier"
+  },
+  "share": {
+    "invalid": "Ce lien de partage est invalide ou a expiré.",
+    "backToSite": "← Retour à VideoCMS"
   }
 }

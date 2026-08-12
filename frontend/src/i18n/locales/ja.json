@@ -81,7 +81,23 @@
     "fieldTitle": "タイトル",
     "fieldYear": "年",
     "fieldGenres": "ジャンル（カンマ区切り）",
-    "fieldSynopsis": "あらすじ"
+    "fieldSynopsis": "あらすじ",
+    "share": "🔗 共有",
+    "shareTitle": "この動画を共有",
+    "shareHours": "有効期限（時間）",
+    "shareCreate": "リンクを作成",
+    "shareCopy": "コピー",
+    "shareCopied": "コピーしました",
+    "shareList": "共有リンク",
+    "shareExpires": "{{date}} まで有効",
+    "shareRevoke": "取り消し",
+    "subtitleUpload": "字幕をアップロード",
+    "subtitleExtract": "埋め込み字幕を抽出",
+    "subtitleBusy": "処理中…",
+    "subtitleRemove": "字幕を削除",
+    "subtitleUploaded": "字幕をアップロードしました",
+    "subtitleExtracted": "埋め込み字幕を抽出しました",
+    "subtitleRemoved": "字幕を削除しました"
   },
   "player": {
     "backToDetail": "← 詳細",
@@ -92,7 +108,12 @@
     "download": "ダウンロード",
     "queue": "再生キュー（{{count}}）",
     "nowPlaying": "再生中",
-    "fromSeries": "ドラマ: {{name}}"
+    "fromSeries": "ドラマ: {{name}}",
+    "quality": "画質",
+    "qualityAuto": "自動",
+    "subtitles": "字幕",
+    "subtitlesOn": "字幕: オン",
+    "subtitlesOff": "字幕: オフ"
   },
   "playlists": {
     "title": "プレイリスト",
@@ -214,5 +235,9 @@
     "empty": "サブフォルダがありません。現在のパスを選択できます。",
     "current": "現在: {{path}}",
     "select": "このフォルダを選択"
+  },
+  "share": {
+    "invalid": "この共有リンクは無効か期限切れです。",
+    "backToSite": "← VideoCMS に戻る"
   }
 }

@@ -21,8 +21,6 @@ VideoCMS 是一个自托管的视频资源管理系统。用户把服务器上�
 ### 1.2 当前范围外的目标
 
 - 不接入在线流媒体服务、不做 P2P
-- 暂无自适应码率（ABR）多档位（当前单码率 HLS）
-- 暂无文件系统监听增量入库（扫描为全量差异重扫）
 
 ## 2. 系统总览
 
@@ -138,6 +136,8 @@ videos          -- + series_id(外键→series, ON DELETE SET NULL), season, epi
 blocked_titles  -- id, title, created_at（管理员按标题屏蔽内容）
 hidden_paths    -- id, user_id(外键), path, created_at（按用户隐藏路径）
 series_favorites-- 主键(user_id, series_id), created_at
+share_tokens    -- id, video_id(外键, ON DELETE CASCADE), token(唯一), expires_at,
+                --   created_by(外键→users), created_at（公开分享链接）
 ```
 
 关键索引：`videos(lower(title))`、`videos(library_id)`、部分索引
@@ -174,12 +174,14 @@ erDiagram
 
 `HLSManager`：
 
-- 每个视频会话启动一个 ffmpeg 进程：
-  `-ss <start> -i <input> -c:v libx264 -preset veryfast -crf 23 -vf scale=1280:-2
-  -c:a aac -b:a 128k -f hls -hls_time 6 -hls_playlist_type vod -hls_list_size 0
-  -hls_flags independent_segments+temp_file`
-- 分片写入 `data/hls/<video-id>/`，由增长的 VOD 播放列表引用；`temp_file` 防止
-  未写完的分片进入清单
+- 每个视频会话启动一个 ffmpeg 进程，同时产出多档自适应码率
+  （1280/854/640/426px，按源分辨率截断）：
+  `-ss <start> -i <input> -c:v libx264 -preset veryfast -crf 23
+  -vf scale=<width>:-2 -force_key_frames expr:gte(t,n_forced*6) -c:a aac -b:a 96k
+  -f hls -hls_time 6 -hls_list_size 0 -hls_flags independent_segments`
+- 每档写入 `data/hls/<video-id>/v<宽度>/`；服务端生成引用所有档位（以及视频
+  有字幕时的字幕组）的 master 播放列表。清单随转码增长，ffmpeg 结束后由服务端
+  追加 `#EXT-X-ENDLIST`
 - 请求的 `start` 与当前会话相差超过一个分片（6 秒）时，杀掉旧会话并从新位置重启（跳转）
 - 清单在响应时重写，使每个分片 URL 都携带 `?token=`
 - 空闲会话 **15 分钟**后回收，同时删除会话目录
@@ -392,13 +394,11 @@ sequenceDiagram
 - 并行扫描（4 工作池）在外部 USB 硬盘上约 80 秒索引 1,600 个文件
 - 跳过 `._` 资源分叉和 `.m3u8` 分片目录，避免数千次无效探测
 - 数据库查询有索引，列表查询分页（默认每页 24 条）
-- HLS 转码为单码率、CPU 密集；空闲会话自动回收
+- HLS 转码每个会话最多同时产出 4 档、CPU 密集；空闲会话自动回收
 
 ## 9. 扩展点
 
-- **文件系统监听**（fsnotify）实现增量入库
-- **ABR 多码率**（多档 HLS），可复用现有会话管理器
 - **更多在线元数据源**（JAV 数据库、剧集刮削等）
-- **字幕增强**：内嵌轨道提取、上传、多语言选择
+- **字幕增强**：多语言选择与多轨切换（视频级字幕已支持）
+- **分享扩展**：剧集与播放列表分享（目前支持视频级分享）
 - **元数据与用户数据导出/备份**
-- **公开分享**：使用签名的短时 URL 而非账号 JWT

@@ -9,6 +9,20 @@ All notable changes to VideoCMS are documented here.
 - Filesystem watching for incremental indexing: new, changed, and removed
   files are picked up automatically (default every 30s, `WATCH_INTERVAL`),
   without a full rescan
+- Adaptive-bitrate HLS: transcoded playback now generates a multi-quality
+  ladder (up to 1280px, capped by source resolution) with a master playlist
+  and a quality selector in the player
+- Embedded subtitle extraction: text subtitle streams inside MKV/MP4 are
+  extracted to WebVTT automatically during scanning (and on demand from the
+  video page); image-based tracks (PGS, VobSub…) are skipped
+- Subtitle upload: admins can upload `.srt/.vtt/.ass/.ssa` subtitles for any
+  video, replace or remove them
+- Player subtitles: sidecar, embedded and uploaded subtitles are now displayed
+  in the player (native `<track>` for direct playback, HLS subtitle group for
+  transcoded playback, with a subtitle toggle)
+- Public sharing: any user can create short-lived, revocable share links
+  (default 7 days, 1 hour–1 year) that play in a public page without an
+  account; share links respect admin title/library blocking and expire server-side
 - Admin content blocking by title: block media without deleting files/records,
   hidden for everyone, unblock anytime (`blocked_titles` table)
 - Library-level blocking: block/unblock an entire library from the admin panel,

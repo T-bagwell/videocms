@@ -20,10 +20,18 @@ export default function VideoDetailPage() {
   const [form, setForm] = useState(null);
   const [msg, setMsg] = useState('');
   const [err, setErr] = useState('');
+  const [showShare, setShowShare] = useState(false);
+  const [shareHours, setShareHours] = useState(168);
+  const [shares, setShares] = useState([]);
+  const [createdShare, setCreatedShare] = useState('');
+  const [copied, setCopied] = useState(false);
+  const [shareErr, setShareErr] = useState('');
+  const [subtitleBusy, setSubtitleBusy] = useState(false);
 
   useEffect(() => {
     api(`/videos/${id}`).then(setVideo).catch((e) => setErr(e.message));
     api('/playlists').then((d) => setPlaylists(d.items)).catch(() => {});
+    api(`/videos/${id}/shares`).then((d) => setShares(d.items)).catch(() => {});
   }, [id]);
 
   async function toggleFavorite() {
@@ -113,6 +121,93 @@ export default function VideoDetailPage() {
     }
   }
 
+  async function createShareLink(e) {
+    e.preventDefault();
+    setShareErr('');
+    try {
+      const d = await api(`/videos/${video.id}/share`, {
+        method: 'POST',
+        body: { hours: Number(shareHours) || 168 },
+      });
+      setCreatedShare(`${window.location.origin}${d.url}`);
+      const list = await api(`/videos/${video.id}/shares`);
+      setShares(list.items);
+    } catch (e2) {
+      setShareErr(e2.message);
+    }
+  }
+
+  async function revokeShare(token) {
+    setShareErr('');
+    try {
+      await api(`/share/${token}`, { method: 'DELETE' });
+      setShares((prev) => prev.filter((s) => s.token !== token));
+      if (createdShare && createdShare.endsWith(token)) setCreatedShare('');
+    } catch (e2) {
+      setShareErr(e2.message);
+    }
+  }
+
+  async function copyShare() {
+    try {
+      await navigator.clipboard.writeText(createdShare);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      // clipboard unavailable; the link is still visible to copy manually
+    }
+  }
+
+  async function uploadSubtitle(e) {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    setSubtitleBusy(true);
+    setErr('');
+    try {
+      const fd = new FormData();
+      fd.append('subtitle', file);
+      await api(`/videos/${video.id}/subtitles`, { method: 'POST', form: fd });
+      const fresh = await api(`/videos/${video.id}`);
+      setVideo(fresh);
+      setMsg(t('video.subtitleUploaded'));
+    } catch (e2) {
+      setErr(e2.message);
+    } finally {
+      setSubtitleBusy(false);
+    }
+  }
+
+  async function extractSubtitle() {
+    setSubtitleBusy(true);
+    setErr('');
+    try {
+      await api(`/videos/${video.id}/subtitles/extract`, { method: 'POST' });
+      const fresh = await api(`/videos/${video.id}`);
+      setVideo(fresh);
+      setMsg(t('video.subtitleExtracted'));
+    } catch (e2) {
+      setErr(e2.message);
+    } finally {
+      setSubtitleBusy(false);
+    }
+  }
+
+  async function removeSubtitle() {
+    setSubtitleBusy(true);
+    setErr('');
+    try {
+      await api(`/videos/${video.id}/subtitles`, { method: 'DELETE' });
+      const fresh = await api(`/videos/${video.id}`);
+      setVideo(fresh);
+      setMsg(t('video.subtitleRemoved'));
+    } catch (e2) {
+      setErr(e2.message);
+    } finally {
+      setSubtitleBusy(false);
+    }
+  }
+
   if (err && !video) return <div className="container"><div className="form-error">{err}</div></div>;
   if (!video) return <div className="container"><div className="loading">{t('common.loading')}</div></div>;
 
@@ -152,11 +247,35 @@ export default function VideoDetailPage() {
             <a className="btn" href={mediaUrl(`/videos/${video.id}/download`)}>
               {t('common.download')}
             </a>
+            <button className="btn" onClick={() => setShowShare(true)}>
+              {t('video.share')}
+            </button>
             {user?.role === 'admin' && (
               <>
                 <button className="btn ghost" onClick={scrape} disabled={scraping}>
                   {scraping ? t('video.scraping') : t('video.scrape')}
                 </button>
+                <label className="btn ghost" disabled={subtitleBusy}>
+                  {t('video.subtitleUpload')}
+                  <input
+                    type="file"
+                    accept=".srt,.vtt,.ass,.ssa"
+                    hidden
+                    onChange={uploadSubtitle}
+                  />
+                </label>
+                <button
+                  className="btn ghost"
+                  onClick={extractSubtitle}
+                  disabled={subtitleBusy}
+                >
+                  {subtitleBusy ? t('video.subtitleBusy') : t('video.subtitleExtract')}
+                </button>
+                {video.has_subtitle && (
+                  <button className="btn ghost" onClick={removeSubtitle} disabled={subtitleBusy}>
+                    {t('video.subtitleRemove')}
+                  </button>
+                )}
                 <button
                   className="btn ghost"
                   onClick={() => {
@@ -247,6 +366,54 @@ export default function VideoDetailPage() {
               </button>
             </div>
           </form>
+        </div>
+      )}
+
+      {showShare && (
+        <div className="modal-backdrop" onClick={() => setShowShare(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h3>{t('video.shareTitle')}</h3>
+            <form onSubmit={createShareLink} className="inline-form">
+              <input
+                type="number"
+                min="1"
+                max="8760"
+                value={shareHours}
+                onChange={(e) => setShareHours(e.target.value)}
+                placeholder={t('video.shareHours')}
+              />
+              <button className="btn small primary">{t('video.shareCreate')}</button>
+            </form>
+            {createdShare && (
+              <div className="share-link-row">
+                <code className="share-link">{createdShare}</code>
+                <button className="btn small" onClick={copyShare}>
+                  {copied ? t('video.shareCopied') : t('video.shareCopy')}
+                </button>
+              </div>
+            )}
+            {shareErr && <div className="form-error">{shareErr}</div>}
+            {shares.length > 0 && (
+              <div className="share-list">
+                <h4>{t('video.shareList')}</h4>
+                {shares.map((s) => (
+                  <div key={s.token} className="share-row">
+                    <span className="muted">
+                      {t('video.shareExpires', {
+                        date: new Date(s.expires_at).toLocaleString(),
+                      })}
+                    </span>
+                    <button className="btn small ghost" onClick={() => revokeShare(s.token)}>
+                      {t('video.shareRevoke')}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+            <button className="btn ghost" onClick={() => setShowShare(false)}>
+              {t('common.close')}
+            </button>
+          </div>
         </div>
       )}
 

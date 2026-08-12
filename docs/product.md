@@ -111,8 +111,20 @@ as `1 (4)` or `-535`. A group needs at least 2 episodes to become a series.
   picks up where you left off
 - MKV/HEVC files are transcoded to HLS — the first playback takes a few seconds,
   then seeking and next-episode autoplay work as usual
+- Transcoded playback uses an adaptive multi-quality ladder — use the quality
+  selector above the player to switch (Auto by default)
+- Subtitles (sidecar, embedded or uploaded) can be toggled in the player
 - On a phone, rotate to landscape for the best playback experience; use the
   queue below the player to jump between episodes
+
+### 4.6 Sharing
+
+- Open a video and press **Share** to create a link (default 7 days, valid from
+  1 hour up to 1 year)
+- Anyone with the link can watch the video on a public page — no account needed
+- Links expire automatically and can be revoked anytime from the same dialog
+- Shared content still respects admin controls: blocked titles and blocked
+  libraries never show up in share links
 
 ## 5. Admin Guide
 

@@ -21,8 +21,6 @@ Emby / Jellyfin に代わる、軽量で拡張性が高く、所有者が完全�
 ### 1.2 現在の対象外
 
 - オンラインストリーミング連携・P2P はなし
-- アダプティブビットレート（ABR）の多段階配信は未対応（現在は単一 HLS レンディション）
-- ファイルシステム監視による増分スキャンは未対応（全量の差分更新スキャン）
 
 ## 2. システム全体像
 
@@ -139,6 +137,8 @@ videos          -- + series_id(FK→series, ON DELETE SET NULL), season, episode
 blocked_titles  -- id, title, created_at（管理者によるタイトル単位のブロック）
 hidden_paths    -- id, user_id(FK), path, created_at（ユーザーごとのパス非表示）
 series_favorites-- PK(user_id, series_id), created_at
+share_tokens    -- id, video_id(FK, ON DELETE CASCADE), token(ユニーク), expires_at,
+                --   created_by(FK→users), created_at（公開共有リンク）
 ```
 
 主要インデックス：`videos(lower(title))`、`videos(library_id)`、部分インデックス
@@ -175,12 +175,14 @@ erDiagram
 
 `HLSManager`：
 
-- ビデオごとに 1 つの ffmpeg プロセスを起動：
-  `-ss <start> -i <input> -c:v libx264 -preset veryfast -crf 23 -vf scale=1280:-2
-  -c:a aac -b:a 128k -f hls -hls_time 6 -hls_playlist_type vod -hls_list_size 0
-  -hls_flags independent_segments+temp_file`
-- セグメントは `data/hls/<video-id>/` に書き込み、成長する VOD プレイリストが参照。
-  `temp_file` により書きかけのセグメントはリストに載らない
+- ビデオごとに 1 つの ffmpeg プロセスを起動し、アダプティブな多段階レンディション
+  （1280/854/640/426px、ソース解像度で上限）を同時生成：
+  `-ss <start> -i <input> -c:v libx264 -preset veryfast -crf 23
+  -vf scale=<width>:-2 -force_key_frames expr:gte(t,n_forced*6) -c:a aac -b:a 96k
+  -f hls -hls_time 6 -hls_list_size 0 -hls_flags independent_segments`
+- 各レンディションは `data/hls/<video-id>/v<幅>/` に書き込み。サーバーは全
+  レンディション（字幕がある場合は字幕グループも）を参照する master プレイリストを
+  生成。プレイリストは変換中に成長し、ffmpeg 完了後にサーバーが `#EXT-X-ENDLIST` を追記
 - 要求された `start` が実行中セッションと 1 セグメント（6 秒）以上ずれている場合、
   セッションを終了して新しい位置で再開（シーク）
 - プレイリストは応答時に書き換えられ、各セグメント URL に `?token=` が付く
@@ -404,13 +406,12 @@ sequenceDiagram
 - 並列スキャン（4 ワーカー）は外付け USB ドライブで約 1,600 ファイルを約 80 秒で処理
 - `._` リソースフォークと `.m3u8` セグメントフォルダをスキップし、無駄なプローブを数千回削減
 - DB はインデックス化、一覧はページング（デフォルト 1 ページ 24 件）
-- HLS トランスコードは単一レンディションで CPU 負荷が高く、アイドルセッションは回収
+- HLS トランスコードはセッションごとに最大 4 レンディションで CPU 負荷が高く、
+  アイドルセッションは回収
 
 ## 9. 拡張ポイント
 
-- **ファイルシステム監視**（fsnotify）による増分取り込み
-- **ABR 多段階配信**（既存のセッションマネージャを活用）
 - **TMDB 以外のオンラインメタデータソース**（JAV DB、TV シリーズなど）
-- **字幕強化**：内蔵トラック抽出、アップロード、言語別選択
+- **字幕強化**：言語別選択・複数トラック切り替え（動画単位の字幕は対応済み）
+- **共有拡張**：シリーズ・プレイリストの共有（動画単位は対応済み）
 - **メタデータ・ユーザーデータのエクスポート / バックアップ**
-- **公開共有**：アカウント JWT ではなく署名付き短時間 URL を使用

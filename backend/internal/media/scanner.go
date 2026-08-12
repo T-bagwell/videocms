@@ -136,6 +136,8 @@ type probeInfo struct {
 	Height    int
 	Codec     string
 	Container string
+	SubIndex  int    // first text subtitle stream index, -1 when none
+	SubCodec  string
 }
 
 func (s *Scanner) scan(ctx context.Context, lib models.Library) {
@@ -647,6 +649,16 @@ func (s *Scanner) upsert(ctx context.Context, libID uuid.UUID, path string, info
 			log.Printf("poster extraction for %s: %v", path, err)
 		}
 	}
+	if subtitle == "" && info.SubIndex >= 0 {
+		if p, err := s.extractEmbedded(ctx, id, path, info.SubIndex); err == nil {
+			if _, err := s.pool.Exec(ctx,
+				`UPDATE videos SET subtitle_path=$1 WHERE id=$2`, p, id); err != nil {
+				log.Printf("save embedded subtitle path: %v", err)
+			}
+		} else {
+			log.Printf("embedded subtitle extraction for %s: %v", path, err)
+		}
+	}
 	if s.enricher != nil {
 		if err := s.enricher.MaybeScrape(ctx, id); err != nil {
 			log.Printf("enrich %s: %v", path, err)
@@ -682,6 +694,7 @@ func (s *Scanner) probe(ctx context.Context, path string) (probeInfo, error) {
 			CodecName string `json:"codec_name"`
 			Width     int    `json:"width"`
 			Height    int    `json:"height"`
+			Index     int    `json:"index"`
 		} `json:"streams"`
 		Format struct {
 			Duration   string `json:"duration"`
@@ -695,15 +708,35 @@ func (s *Scanner) probe(ctx context.Context, path string) (probeInfo, error) {
 	info.Duration, _ = strconv.ParseFloat(raw.Format.Duration, 64)
 	info.Size, _ = strconv.ParseInt(raw.Format.Size, 10, 64)
 	info.Container = raw.Format.FormatName
+	info.SubIndex = -1
 	for _, st := range raw.Streams {
-		if st.CodecType == "video" {
+		switch st.CodecType {
+		case "video":
 			info.Codec = st.CodecName
 			info.Width = st.Width
 			info.Height = st.Height
-			break
+		case "subtitle":
+			if info.SubIndex < 0 && !IsImageSubtitleCodec(st.CodecName) {
+				info.SubIndex = st.Index
+				info.SubCodec = st.CodecName
+			}
 		}
 	}
 	return info, nil
+}
+
+// extractEmbedded extracts one embedded text subtitle stream into the server's
+// subtitle directory and returns the stored file path.
+func (s *Scanner) extractEmbedded(ctx context.Context, videoID uuid.UUID, path string, streamIndex int) (string, error) {
+	dir := filepath.Join(s.dataDir, "subtitles")
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		return "", err
+	}
+	dst := filepath.Join(dir, videoID.String()+"-embedded.vtt")
+	if err := ExtractEmbeddedSubtitle(ctx, s.ffmpegBin, path, streamIndex, dst); err != nil {
+		return "", err
+	}
+	return dst, nil
 }
 
 func (s *Scanner) extractPoster(ctx context.Context, videoID uuid.UUID, path string, duration float64) (string, error) {

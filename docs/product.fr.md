@@ -112,8 +112,23 @@ en fin de nom (`1 (4)`, `-535`). Un groupe doit contenir au moins 2 épisodes.
 - Les MKV/HEVC sont transcodés en HLS — la première lecture prend quelques
   secondes, puis le défilement et la lecture automatique de l’épisode suivant
   fonctionnent normalement
+- La lecture transcodée utilise une échelle multi-qualité adaptative — utilisez
+  le sélecteur de qualité au-dessus du lecteur pour changer (Auto par défaut)
+- Les sous-titres (fichiers à côté, intégrés ou téléversés) peuvent être activés
+  ou désactivés dans le lecteur
 - Sur mobile, passez en paysage pour une meilleure expérience ; utilisez la file
   sous le lecteur pour changer d’épisode
+
+### 4.6 Partage
+
+- Ouvrez une vidéo et appuyez sur **Partager** pour créer un lien (7 jours par
+  défaut, de 1 heure à 1 an)
+- Toute personne ayant le lien peut regarder la vidéo sur une page publique —
+  aucun compte n’est nécessaire
+- Les liens expirent automatiquement et peuvent être révoqués à tout moment
+  depuis la même fenêtre
+- Le contenu partagé respecte les contrôles d’administration : les titres et
+  bibliothèques bloqués n’apparaissent jamais dans les liens de partage
 
 ## 5. Guide administrateur
 

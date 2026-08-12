@@ -110,8 +110,22 @@ Eine Gruppe braucht mindestens 2 Folgen, um eine Serie zu werden.
 - Der Fortschritt wird automatisch fortgesetzt; „Weiterschauen“ bringt Sie an die letzte Position
 - MKV/HEVC werden live nach HLS transkodiert — die erste Wiedergabe dauert einige
   Sekunden, danach funktionieren Suchen und automatisches Abspielen der nächsten Folge normal
+- Die transkodierte Wiedergabe nutzt eine mehrstufige adaptive Qualitätsleiter —
+  über den Qualitätsauswahl oberhalb des Players umschaltbar (Standard: Auto)
+- Untertitel (danebenliegend, eingebettet oder hochgeladen) lassen sich im Player
+  ein- und ausschalten
 - Auf dem Handy lohnt sich das Querformat; nutzen Sie die Warteschlange unter dem
   Player zum Wechseln zwischen Folgen
+
+### 4.6 Teilen
+
+- Öffnen Sie ein Video und klicken Sie auf **Teilen**, um einen Link zu erstellen
+  (Standard 7 Tage, von 1 Stunde bis 1 Jahr)
+- Jeder mit dem Link kann das Video auf einer öffentlichen Seite ansehen — kein
+  Konto erforderlich
+- Links laufen automatisch ab und können jederzeit im selben Dialog widerrufen werden
+- Geteilte Inhalte respektieren die Verwaltungskontrollen: blockierte Titel und
+  Bibliotheken erscheinen nie in Teilen-Links
 
 ## 5. Administrationshandbuch
 

@@ -81,7 +81,23 @@
     "fieldTitle": "Titel",
     "fieldYear": "Jahr",
     "fieldGenres": "Genres (durch Kommas getrennt)",
-    "fieldSynopsis": "Beschreibung"
+    "fieldSynopsis": "Beschreibung",
+    "share": "🔗 Teilen",
+    "shareTitle": "Dieses Video teilen",
+    "shareHours": "Gültigkeit (Stunden)",
+    "shareCreate": "Link erstellen",
+    "shareCopy": "Kopieren",
+    "shareCopied": "Kopiert",
+    "shareList": "Teilen-Links",
+    "shareExpires": "Läuft ab am {{date}}",
+    "shareRevoke": "Widerrufen",
+    "subtitleUpload": "Untertitel hochladen",
+    "subtitleExtract": "Eingebettete Untertitel extrahieren",
+    "subtitleBusy": "Wird verarbeitet…",
+    "subtitleRemove": "Untertitel entfernen",
+    "subtitleUploaded": "Untertitel hochgeladen",
+    "subtitleExtracted": "Eingebettete Untertitel extrahiert",
+    "subtitleRemoved": "Untertitel entfernt"
   },
   "player": {
     "backToDetail": "← Details",
@@ -92,7 +108,12 @@
     "download": "Herunterladen",
     "queue": "Wiedergabewarteschlange ({{count}})",
     "nowPlaying": "Läuft",
-    "fromSeries": "Aus Serie: {{name}}"
+    "fromSeries": "Aus Serie: {{name}}",
+    "quality": "Qualität",
+    "qualityAuto": "Automatisch",
+    "subtitles": "Untertitel",
+    "subtitlesOn": "Untertitel: an",
+    "subtitlesOff": "Untertitel: aus"
   },
   "playlists": {
     "title": "Wiedergabelisten",
@@ -214,5 +235,9 @@
     "empty": "Keine Unterordner vorhanden. Sie können den aktuellen Pfad auswählen.",
     "current": "Aktuell: {{path}}",
     "select": "Diesen Ordner auswählen"
+  },
+  "share": {
+    "invalid": "Dieser Teilen-Link ist ungültig oder abgelaufen.",
+    "backToSite": "← Zurück zu VideoCMS"
   }
 }

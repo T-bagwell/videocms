@@ -23,8 +23,6 @@ alternative to Emby/Jellyfin that is fully under the owner's control.
 ### 1.2 Non-goals (current scope)
 
 - No online streaming service integration, no P2P
-- No adaptive-bitrate (ABR) multi-quality ladder yet (single HLS rendition)
-- No filesystem-watch incremental scanning yet (scan is a full diff-based walk)
 
 ## 2. System Overview
 
@@ -143,6 +141,8 @@ videos          -- + series_id(fk → series, ON DELETE SET NULL), season, episo
 blocked_titles  -- id, title, created_at (admin content blocking by title match)
 hidden_paths    -- id, user_id(fk), path, created_at (per-user path filters)
 series_favorites-- PK(user_id, series_id), created_at
+share_tokens    -- id, video_id(fk, ON DELETE CASCADE), token(unique), expires_at,
+                --   created_by(fk → users), created_at (public share links)
 ```
 
 Key indexes: `videos(lower(title))`, `videos(library_id)`, partial
@@ -180,12 +180,15 @@ For formats browsers cannot play (e.g. MKV/HEVC), the player falls back to
 
 The `HLSManager`:
 
-- Starts one ffmpeg process per video session:
-  `-ss <start> -i <input> -c:v libx264 -preset veryfast -crf 23 -vf scale=1280:-2
-  -c:a aac -b:a 128k -f hls -hls_time 6 -hls_playlist_type vod -hls_list_size 0
-  -hls_flags independent_segments+temp_file`
-- Segments are written to `data/hls/<video-id>/` and referenced by a growing
-  VOD playlist; `temp_file` keeps half-written segments out of the manifest
+- Starts one ffmpeg process per video session that emits an adaptive ladder of
+  renditions (1280/854/640/426px, capped by the source resolution):
+  `-ss <start> -i <input> -c:v libx264 -preset veryfast -crf 23
+  -vf scale=<width>:-2 -force_key_frames expr:gte(t,n_forced*6) -c:a aac -b:a 96k
+  -f hls -hls_time 6 -hls_list_size 0 -hls_flags independent_segments`
+- Each rendition is written to `data/hls/<video-id>/v<width>/`; the server
+  writes a master playlist referencing every rendition (and the subtitle group,
+  when the video has subtitles). Playlists grow while transcoding and `#EXT-X-ENDLIST`
+  is appended server-side when ffmpeg finishes
 - If the requested `start` differs from the running session by more than one
   segment (6s), the session is killed and restarted at the new position (seek)
 - The manifest is rewritten on the fly so every segment URL carries `?token=`
@@ -417,13 +420,13 @@ The backend binds all interfaces (`:8080`), so LAN clients reach the UI directly
 - Parallel scanning (4 workers) indexed ~1,600 files in ~80s on an external USB drive
 - Skipping `._` forks and `.m3u8` segment folders avoids thousands of wasted probes
 - DB lookups are indexed; list queries use pagination (default page size 24)
-- HLS transcoding is single-rendition and CPU-bound; idle sessions are reaped
+- HLS transcoding runs up to four renditions per session and is CPU-bound;
+  idle sessions are reaped
 
 ## 9. Extension Points
 
-- **Filesystem watching** (fsnotify) for incremental indexing
-- **ABR ladder** (multi-quality HLS) driven by the existing session manager
 - **Online metadata providers** beyond TMDB (JAV database, TV series, etc.)
-- **Subtitles**: embedded-track extraction, upload, per-language selection
+- **Subtitles**: per-language selection and switching between multiple tracks
+- **Sharing**: share links for series and playlists (videos are supported today)
 - **Export/backup** of metadata and per-user data
 - **Public sharing** with signed short-lived URLs instead of the account JWT

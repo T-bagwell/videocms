@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"sync"
 	"time"
@@ -17,10 +18,83 @@ import (
 
 const (
 	hlsSegmentDur   = 6
-	hlsMaxWidth     = 1280
 	hlsIdleTimeout  = 15 * time.Minute
 	hlsManifestWait = 6 * time.Second
+	// hlsMaxWidth caps the largest rendition; transcoding 4K at native
+	// resolution would be too heavy for a self-hosted box.
+	hlsMaxWidth = 1280
 )
+
+// rendition is one quality level in the adaptive HLS ladder.
+type rendition struct {
+	Name     string // e.g. "v1280"; used as subdirectory + playlist name
+	Width    int
+	Height   int
+	BitrateK int
+}
+
+// renditionPlan builds a downward ladder from the source resolution, capped at
+// hlsMaxWidth. Renditions wider than the source are skipped; for unknown source
+// dimensions it falls back to a single 1280px rendition.
+func renditionPlan(srcWidth, srcHeight int) []rendition {
+	if srcWidth <= 0 || srcHeight <= 0 {
+		// Probe failed or dimensions are unknown: fall back to a single
+		// 1280px rendition so playback still works.
+		return []rendition{{Name: "v1280", Width: 1280, Height: 720, BitrateK: 2500}}
+	}
+	targets := []struct{ width, bitrateK int }{
+		{1280, 2500},
+		{854, 1500},
+		{640, 900},
+		{426, 500},
+	}
+	var out []rendition
+	for _, t := range targets {
+		if t.width > srcWidth {
+			continue
+		}
+		height := 0
+		height = int(math.Round(float64(t.width)*float64(srcHeight)/float64(srcWidth)/2)) * 2
+		if height < 2 {
+			height = 2
+		}
+		out = append(out, rendition{
+			Name:     fmt.Sprintf("v%d", t.width),
+			Width:    t.width,
+			Height:   height,
+			BitrateK: t.bitrateK,
+		})
+	}
+	if len(out) == 0 {
+		// Source is narrower than the smallest ladder step: keep one rendition
+		// so the master playlist is never empty.
+		height := int(math.Round(float64(426)*float64(srcHeight)/float64(srcWidth)/2)) * 2
+		if height < 2 {
+			height = 2
+		}
+		out = append(out, rendition{Name: "v426", Width: 426, Height: height, BitrateK: 500})
+	}
+	return out
+}
+
+// buildMaster returns the master playlist referencing every rendition and, when
+// the video has subtitles, an HLS subtitle group.
+func buildMaster(rends []rendition, hasSubtitle bool) []byte {
+	var b strings.Builder
+	b.WriteString("#EXTM3U\n")
+	b.WriteString("#EXT-X-VERSION:3\n")
+	if hasSubtitle {
+		b.WriteString("#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID=\"subs\",NAME=\"Subtitles\",DEFAULT=YES,AUTOSELECT=YES,URI=\"subs/playlist.m3u8\"\n")
+	}
+	for _, r := range rends {
+		fmt.Fprintf(&b, "#EXT-X-STREAM-INF:BANDWIDTH=%d,AVERAGE-BANDWIDTH=%d,RESOLUTION=%dx%d\n",
+			r.BitrateK*1000, r.BitrateK*800, r.Width, r.Height)
+		b.WriteString(r.Name + "/index.m3u8\n")
+	}
+	return []byte(b.String())
+}
+
+var variantDirRe = regexp.MustCompile(`^v\d+$`)
 
 type HLSSession struct {
 	cancel     context.CancelFunc
@@ -51,10 +125,9 @@ func (m *HLSManager) sessionDir(videoID uuid.UUID) string {
 }
 
 // Playlist ensures a transcode session exists for the video and returns the
-// path of its generated manifest. If startSec differs from the running
-// session's offset by more than one segment, the session is restarted at that
-// position.
-func (m *HLSManager) Playlist(ctx context.Context, videoID uuid.UUID, input string, startSec float64) (string, error) {
+// path of its master manifest. If startSec differs from the running session's
+// offset by more than one segment, the session is restarted at that position.
+func (m *HLSManager) Playlist(ctx context.Context, videoID uuid.UUID, input string, startSec float64, srcWidth, srcHeight int, hasSubtitle bool) (string, error) {
 	if startSec < 0 {
 		startSec = 0
 	}
@@ -79,24 +152,34 @@ func (m *HLSManager) Playlist(ctx context.Context, videoID uuid.UUID, input stri
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return "", err
 	}
-	segPattern := filepath.Join(dir, "seg_%05d.ts")
-	manifestPath := filepath.Join(dir, "index.m3u8")
 
-	args := []string{
-		"-v", "error", "-y",
-		"-ss", fmt.Sprintf("%.2f", startSec),
-		"-i", input,
-		"-map", "0:v:0", "-map", "0:a:0?",
-		"-c:v", "libx264", "-preset", "veryfast", "-crf", "23",
-		"-vf", "scale=" + fmt.Sprint(hlsMaxWidth) + ":-2",
-		"-force_key_frames", "expr:gte(t,n_forced*6)",
-		"-c:a", "aac", "-b:a", "128k",
-		"-f", "hls",
-		"-hls_time", fmt.Sprint(hlsSegmentDur),
-		"-hls_list_size", "0",
-		"-hls_flags", "independent_segments",
-		"-hls_segment_filename", segPattern,
-		manifestPath,
+	rends := renditionPlan(srcWidth, srcHeight)
+	masterPath := filepath.Join(dir, "master.m3u8")
+	if err := os.WriteFile(masterPath, buildMaster(rends, hasSubtitle), 0o644); err != nil {
+		return "", err
+	}
+
+	args := []string{"-v", "error", "-y", "-ss", fmt.Sprintf("%.2f", startSec), "-i", input}
+	for _, r := range rends {
+		outDir := filepath.Join(dir, r.Name)
+		if err := os.MkdirAll(outDir, 0o755); err != nil {
+			return "", err
+		}
+		segPattern := filepath.Join(outDir, "seg_%05d.ts")
+		manifest := filepath.Join(outDir, "index.m3u8")
+		args = append(args,
+			"-map", "0:v:0", "-map", "0:a:0?",
+			"-c:v", "libx264", "-preset", "veryfast", "-crf", "23",
+			"-vf", "scale="+fmt.Sprint(r.Width)+":-2",
+			"-force_key_frames", "expr:gte(t,n_forced*6)",
+			"-c:a", "aac", "-b:a", "96k",
+			"-f", "hls",
+			"-hls_time", fmt.Sprint(hlsSegmentDur),
+			"-hls_list_size", "0",
+			"-hls_flags", "independent_segments",
+			"-hls_segment_filename", segPattern,
+			manifest,
+		)
 	}
 
 	sctx, cancel := context.WithCancel(context.Background())
@@ -123,12 +206,14 @@ func (m *HLSManager) Playlist(ctx context.Context, videoID uuid.UUID, input stri
 		if err := cmd.Wait(); err != nil && sctx.Err() == nil {
 			log.Printf("[hls:%s] ffmpeg exited: %v", videoID.String()[:8], err)
 		}
-		// the manifest grows while transcoding; signal completion only when the
+		// manifests grow while transcoding; signal completion only when the
 		// transcode actually finished (not when the session was cancelled)
 		if sctx.Err() == nil {
-			if f, ferr := os.OpenFile(manifestPath, os.O_APPEND|os.O_WRONLY, 0o644); ferr == nil {
-				f.WriteString("#EXT-X-ENDLIST\n")
-				f.Close()
+			for _, r := range rends {
+				if f, ferr := os.OpenFile(filepath.Join(dir, r.Name, "index.m3u8"), os.O_APPEND|os.O_WRONLY, 0o644); ferr == nil {
+					f.WriteString("#EXT-X-ENDLIST\n")
+					f.Close()
+				}
 			}
 		}
 	}()
@@ -140,15 +225,25 @@ func (m *HLSManager) Playlist(ctx context.Context, videoID uuid.UUID, input stri
 	return m.waitManifest(ctx, dir)
 }
 
+// waitManifest waits until transcoding produced the first variant playlist.
+// The master playlist is written up front, so its presence is not meaningful.
 func (m *HLSManager) waitManifest(ctx context.Context, dir string) (string, error) {
-	path := filepath.Join(dir, "index.m3u8")
+	master := filepath.Join(dir, "master.m3u8")
 	deadline := time.Now().Add(hlsManifestWait)
 	for time.Now().Before(deadline) {
 		if ctx.Err() != nil {
 			return "", ctx.Err()
 		}
-		if st, err := os.Stat(path); err == nil && st.Size() > 0 {
-			return path, nil
+		entries, err := os.ReadDir(dir)
+		if err == nil {
+			for _, e := range entries {
+				if !e.IsDir() || !variantDirRe.MatchString(e.Name()) {
+					continue
+				}
+				if st, err := os.Stat(filepath.Join(dir, e.Name(), "index.m3u8")); err == nil && st.Size() > 0 {
+					return master, nil
+				}
+			}
 		}
 		time.Sleep(150 * time.Millisecond)
 	}
@@ -160,14 +255,20 @@ func (m *HLSManager) waitForExit(sess *HLSSession) {
 	time.Sleep(300 * time.Millisecond)
 }
 
-func (m *HLSManager) Segment(videoID uuid.UUID, name string) (string, bool) {
-	if !SegmentNameMatch(name) {
+// SessionFile returns the on-disk path for a variant playlist or segment under
+// a session directory, validating both the name pattern and the path so
+// requests can never escape the session.
+func (m *HLSManager) SessionFile(videoID uuid.UUID, name string) (string, bool) {
+	parts := strings.Split(name, "/")
+	if len(parts) != 2 || !variantDirRe.MatchString(parts[0]) {
+		return "", false
+	}
+	if parts[1] != "index.m3u8" && !SegmentNameMatch(parts[1]) {
 		return "", false
 	}
 	dir := m.sessionDir(videoID)
 	path := filepath.Join(dir, name)
-	cleanDir := filepath.Clean(dir)
-	if !strings.HasPrefix(filepath.Clean(path), cleanDir+string(os.PathSeparator)) {
+	if !strings.HasPrefix(path, dir+string(os.PathSeparator)) {
 		return "", false
 	}
 	if st, err := os.Stat(path); err != nil || st.IsDir() {

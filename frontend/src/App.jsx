@@ -10,6 +10,7 @@ import FavoritesPage from './pages/FavoritesPage.jsx';
 import SeriesListPage from './pages/SeriesListPage.jsx';
 import SeriesDetailPage from './pages/SeriesDetailPage.jsx';
 import AdminPage from './pages/AdminPage.jsx';
+import SharePage from './pages/SharePage.jsx';
 import { useAuth } from './auth.jsx';
 import { useTranslation } from 'react-i18next';
 
@@ -30,6 +31,7 @@ export default function App() {
       <main className="main">
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/share/:token" element={<SharePage />} />
           <Route
             path="/"
             element={

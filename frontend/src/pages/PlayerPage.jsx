@@ -25,6 +25,10 @@ export default function PlayerPage() {
   const [transcoding, setTranscoding] = useState(false);
   const [hlsErr, setHlsErr] = useState('');
   const [err, setErr] = useState('');
+  const [levels, setLevels] = useState([]);
+  const [quality, setQuality] = useState('auto');
+  const [subtitleAvailable, setSubtitleAvailable] = useState(false);
+  const [subtitlesOn, setSubtitlesOn] = useState(true);
 
   useEffect(() => {
     setActiveId(id);
@@ -81,9 +85,28 @@ export default function PlayerPage() {
     hlsRef.current = hls;
     setTranscoding(true);
     setHlsErr('');
+    setLevels([]);
     const url = mediaUrl(`/videos/${activeId}/hls/playlist.m3u8`) + `&start=${start}`;
 
-    hls.on(Hls.Events.MANIFEST_PARSED, () => setTranscoding(false));
+    hls.on(Hls.Events.MANIFEST_PARSED, () => {
+      setTranscoding(false);
+      if (hls.levels && hls.levels.length > 1) {
+        setLevels(
+          hls.levels.map((l, i) => ({
+            i,
+            label: l.height ? `${l.height}p` : `${Math.round(l.bitrate / 1000)}k`,
+          })),
+        );
+      }
+    });
+    hls.on(Hls.Events.LEVEL_SWITCHED, (_event, d) => {
+      setQuality(String(d.level));
+    });
+    hls.on(Hls.Events.SUBTITLE_TRACKS_UPDATED, (_event, d) => {
+      const has = (d.subtitleTracks || []).length > 0;
+      setSubtitleAvailable(has);
+      if (has) hls.subtitleTrack = 0;
+    });
     hls.on(Hls.Events.ERROR, (_event, data) => {
       if (!data.fatal) return;
       if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
@@ -96,6 +119,20 @@ export default function PlayerPage() {
     hls.attachMedia(videoRef.current);
     hls.loadSource(url);
   }, [activeId, video, t]);
+
+  function changeQuality(q) {
+    setQuality(q);
+    const hls = hlsRef.current;
+    if (!hls || !hls.levels || !hls.levels.length) return;
+    hls.currentLevel = q === 'auto' ? -1 : Number(q);
+  }
+
+  function toggleSubtitles() {
+    const hls = hlsRef.current;
+    if (!hls) return;
+    hls.subtitleTrack = subtitlesOn ? -1 : 0;
+    setSubtitlesOn(!subtitlesOn);
+  }
 
   useEffect(() => {
     if (!video) return;
@@ -237,7 +274,40 @@ export default function PlayerPage() {
           playNext();
         }}
         onError={onError}
-      />
+      >
+        {video.has_subtitle && !useTranscode && (
+          <track
+            kind="subtitles"
+            srcLang="und"
+            label={t('player.subtitles')}
+            src={mediaUrl(`/videos/${activeId}/subtitles`)}
+            default
+          />
+        )}
+      </video>
+
+      {(useTranscode || video.has_subtitle) && (
+        <div className="player-tools">
+          {useTranscode && levels.length > 1 && (
+            <label className="player-tool">
+              {t('player.quality')}
+              <select value={quality} onChange={(e) => changeQuality(e.target.value)}>
+                <option value="auto">{t('player.qualityAuto')}</option>
+                {levels.map((l) => (
+                  <option key={l.i} value={l.i}>
+                    {l.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
+          {useTranscode && subtitleAvailable && (
+            <button className="btn small" onClick={toggleSubtitles}>
+              {subtitlesOn ? t('player.subtitlesOff') : t('player.subtitlesOn')}
+            </button>
+          )}
+        </div>
+      )}
 
       {transcoding && (
         <div className="banner info">{t('player.transcoding')}</div>

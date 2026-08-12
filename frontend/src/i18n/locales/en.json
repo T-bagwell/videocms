@@ -81,7 +81,23 @@
     "fieldTitle": "Title",
     "fieldYear": "Year",
     "fieldGenres": "Genres (comma separated)",
-    "fieldSynopsis": "Synopsis"
+    "fieldSynopsis": "Synopsis",
+    "share": "🔗 Share",
+    "shareTitle": "Share this video",
+    "shareHours": "Validity (hours)",
+    "shareCreate": "Create link",
+    "shareCopy": "Copy",
+    "shareCopied": "Copied",
+    "shareList": "Share links",
+    "shareExpires": "Expires {{date}}",
+    "shareRevoke": "Revoke",
+    "subtitleUpload": "Upload subtitle",
+    "subtitleExtract": "Extract embedded subtitle",
+    "subtitleBusy": "Working…",
+    "subtitleRemove": "Remove subtitle",
+    "subtitleUploaded": "Subtitle uploaded",
+    "subtitleExtracted": "Embedded subtitle extracted",
+    "subtitleRemoved": "Subtitle removed"
   },
   "player": {
     "backToDetail": "← Detail",
@@ -92,7 +108,12 @@
     "download": "Download",
     "queue": "Play queue ({{count}})",
     "nowPlaying": "Playing",
-    "fromSeries": "From TV show: {{name}}"
+    "fromSeries": "From TV show: {{name}}",
+    "quality": "Quality",
+    "qualityAuto": "Auto",
+    "subtitles": "Subtitles",
+    "subtitlesOn": "Subtitles: On",
+    "subtitlesOff": "Subtitles: Off"
   },
   "playlists": {
     "title": "Playlists",
@@ -214,5 +235,9 @@
     "empty": "No subfolders here. You can select the current path.",
     "current": "Current: {{path}}",
     "select": "Select this folder"
+  },
+  "share": {
+    "invalid": "This share link is invalid or has expired.",
+    "backToSite": "← Back to VideoCMS"
   }
 }

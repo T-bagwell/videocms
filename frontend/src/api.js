@@ -14,6 +14,11 @@ export function mediaUrl(path) {
   return `/api${path}${path.includes('?') ? '&' : '?'}token=${encodeURIComponent(token || '')}`;
 }
 
+// publicUrl builds an API URL that needs no auth (public share endpoints).
+export function publicUrl(path) {
+  return `/api${path}`;
+}
+
 export async function api(path, { method = 'GET', body, form } = {}) {
   const headers = {};
   const token = getToken();
