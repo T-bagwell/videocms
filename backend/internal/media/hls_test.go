@@ -47,20 +47,25 @@ func TestRenditionPlanKeepsAspectRatio(t *testing.T) {
 }
 
 func TestBuildMaster(t *testing.T) {
-	master := string(buildMaster(renditionPlan(1920, 1080), true))
+	subs := []HLSSubtitle{
+		{ID: "a", Name: "English", Active: true},
+		{ID: "b", Name: "中文"},
+	}
+	master := string(buildMaster(renditionPlan(1920, 1080), subs))
 	for _, want := range []string{
 		"#EXT-X-STREAM-INF:BANDWIDTH=2500000",
 		"#EXT-X-STREAM-INF:BANDWIDTH=1500000",
 		"v1280/index.m3u8",
 		"v854/index.m3u8",
-		"#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID=\"subs\",NAME=\"Subtitles\",DEFAULT=YES,AUTOSELECT=YES,URI=\"subs/playlist.m3u8\"",
+		"#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID=\"subs\",NAME=\"English\",DEFAULT=YES,AUTOSELECT=YES,URI=\"subs/a/playlist.m3u8\"",
+		"#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID=\"subs\",NAME=\"中文\",DEFAULT=NO,AUTOSELECT=YES,URI=\"subs/b/playlist.m3u8\"",
 	} {
 		if !strings.Contains(master, want) {
 			t.Errorf("master playlist missing %q:\n%s", want, master)
 		}
 	}
 
-	plain := string(buildMaster(renditionPlan(1920, 1080), false))
+	plain := string(buildMaster(renditionPlan(1920, 1080), nil))
 	if strings.Contains(plain, "SUBTITLES") {
 		t.Error("master playlist should not reference subtitles when none exist")
 	}

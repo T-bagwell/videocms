@@ -115,16 +115,16 @@ en fin de nom (`1 (4)`, `-535`). Un groupe doit contenir au moins 2 épisodes.
 - La lecture transcodée utilise une échelle multi-qualité adaptative — utilisez
   le sélecteur de qualité au-dessus du lecteur pour changer (Auto par défaut)
 - Les sous-titres (fichiers à côté, intégrés ou téléversés) peuvent être activés
-  ou désactivés dans le lecteur
+  ou désactivés dans le lecteur et changés de langue quand plusieurs pistes existent
 - Sur mobile, passez en paysage pour une meilleure expérience ; utilisez la file
   sous le lecteur pour changer d’épisode
 
 ### 4.6 Partage
 
-- Ouvrez une vidéo et appuyez sur **Partager** pour créer un lien (7 jours par
-  défaut, de 1 heure à 1 an)
-- Toute personne ayant le lien peut regarder la vidéo sur une page publique —
-  aucun compte n’est nécessaire
+- Ouvrez une vidéo, une série ou une liste de lecture et appuyez sur **Partager**
+  pour créer un lien (7 jours par défaut, de 1 heure à 1 an)
+- Toute personne ayant le lien peut regarder sur une page publique — aucun
+  compte n’est nécessaire ; les liens de série et de liste jouent toute la file
 - Les liens expirent automatiquement et peuvent être révoqués à tout moment
   depuis la même fenêtre
 - Le contenu partagé respecte les contrôles d’administration : les titres et

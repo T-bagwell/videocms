@@ -113,16 +113,16 @@ Eine Gruppe braucht mindestens 2 Folgen, um eine Serie zu werden.
 - Die transkodierte Wiedergabe nutzt eine mehrstufige adaptive Qualitätsleiter —
   über den Qualitätsauswahl oberhalb des Players umschaltbar (Standard: Auto)
 - Untertitel (danebenliegend, eingebettet oder hochgeladen) lassen sich im Player
-  ein- und ausschalten
+  ein- und ausschalten sowie zwischen Sprachen wechseln, wenn mehrere Spuren existieren
 - Auf dem Handy lohnt sich das Querformat; nutzen Sie die Warteschlange unter dem
   Player zum Wechseln zwischen Folgen
 
 ### 4.6 Teilen
 
-- Öffnen Sie ein Video und klicken Sie auf **Teilen**, um einen Link zu erstellen
-  (Standard 7 Tage, von 1 Stunde bis 1 Jahr)
-- Jeder mit dem Link kann das Video auf einer öffentlichen Seite ansehen — kein
-  Konto erforderlich
+- Öffnen Sie ein Video, eine Serie oder eine Wiedergabeliste und klicken Sie auf
+  **Teilen**, um einen Link zu erstellen (Standard 7 Tage, von 1 Stunde bis 1 Jahr)
+- Jeder mit dem Link kann auf einer öffentlichen Seite ansehen — kein Konto
+  erforderlich; Serien- und Wiedergabelisten-Links spielen die gesamte Warteschlange
 - Links laufen automatisch ab und können jederzeit im selben Dialog widerrufen werden
 - Geteilte Inhalte respektieren die Verwaltungskontrollen: blockierte Titel und
   Bibliotheken erscheinen nie in Teilen-Links

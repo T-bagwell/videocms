@@ -134,7 +134,8 @@
     "title": "My Favorites",
     "empty": "No favorites yet. Tap ☆ Favorite while browsing.",
     "videosTitle": "Favorited videos",
-    "seriesTitle": "Favorited TV shows"
+    "seriesTitle": "Favorited TV shows",
+    "exportMyData": "Export my data"
   },
   "series": {
     "title": "TV Shows",
@@ -224,7 +225,8 @@
     "blockLibraryConfirm": "Block library “{{name}}”? Its media will be hidden for everyone. Files and records are kept.",
     "unblockLibraryConfirm": "Unblock library “{{name}}”? Its media becomes visible to everyone again.",
     "libBlocked": "Library “{{name}}” is blocked",
-    "libUnblocked": "Library “{{name}}” is unblocked"
+    "libUnblocked": "Library “{{name}}” is unblocked",
+    "export": "Export data"
   },
   "picker": {
     "title": "Select server folder",

@@ -27,8 +27,9 @@ export default function PlayerPage() {
   const [err, setErr] = useState('');
   const [levels, setLevels] = useState([]);
   const [quality, setQuality] = useState('auto');
-  const [subtitleAvailable, setSubtitleAvailable] = useState(false);
-  const [subtitlesOn, setSubtitlesOn] = useState(true);
+  const [tracks, setTracks] = useState([]);
+  const [subtitleTracks, setSubtitleTracks] = useState([]);
+  const [subtitleIdx, setSubtitleIdx] = useState(-1);
 
   useEffect(() => {
     setActiveId(id);
@@ -51,6 +52,7 @@ export default function PlayerPage() {
 
   useEffect(() => {
     api(`/videos/${activeId}`).then(setVideo).catch((e) => setErr(e.message));
+    api(`/videos/${activeId}/subtitle-tracks`).then((d) => setTracks(d.items)).catch(() => setTracks([]));
 
     const playlistId = searchParams.get('playlist');
     const seriesId = searchParams.get('series');
@@ -103,9 +105,18 @@ export default function PlayerPage() {
       setQuality(String(d.level));
     });
     hls.on(Hls.Events.SUBTITLE_TRACKS_UPDATED, (_event, d) => {
-      const has = (d.subtitleTracks || []).length > 0;
-      setSubtitleAvailable(has);
-      if (has) hls.subtitleTrack = 0;
+      const list = d.subtitleTracks || [];
+      setSubtitleTracks(
+        list.map((tr, i) => ({
+          i,
+          id: tr.id,
+          label: tr.name || tr.lang || `${t('player.subtitles')} ${i + 1}`,
+        })),
+      );
+      setSubtitleIdx(hls.subtitleTrack);
+    });
+    hls.on(Hls.Events.SUBTITLE_TRACK_SWITCH, (_event, d) => {
+      setSubtitleIdx(d.id ?? -1);
     });
     hls.on(Hls.Events.ERROR, (_event, data) => {
       if (!data.fatal) return;
@@ -127,11 +138,11 @@ export default function PlayerPage() {
     hls.currentLevel = q === 'auto' ? -1 : Number(q);
   }
 
-  function toggleSubtitles() {
+  function changeSubtitle(i) {
     const hls = hlsRef.current;
     if (!hls) return;
-    hls.subtitleTrack = subtitlesOn ? -1 : 0;
-    setSubtitlesOn(!subtitlesOn);
+    hls.subtitleTrack = i;
+    setSubtitleIdx(i);
   }
 
   useEffect(() => {
@@ -275,18 +286,20 @@ export default function PlayerPage() {
         }}
         onError={onError}
       >
-        {video.has_subtitle && !useTranscode && (
-          <track
-            kind="subtitles"
-            srcLang="und"
-            label={t('player.subtitles')}
-            src={mediaUrl(`/videos/${activeId}/subtitles`)}
-            default
-          />
-        )}
+        {!useTranscode &&
+          tracks.map((tr) => (
+            <track
+              key={tr.id}
+              kind="subtitles"
+              srcLang={tr.lang || undefined}
+              label={tr.title || tr.lang || t('player.subtitles')}
+              src={mediaUrl(`/videos/${activeId}/subtitles/${tr.id}`)}
+              default={tr.is_active}
+            />
+          ))}
       </video>
 
-      {(useTranscode || video.has_subtitle) && (
+      {useTranscode && (levels.length > 1 || subtitleTracks.length > 0) && (
         <div className="player-tools">
           {useTranscode && levels.length > 1 && (
             <label className="player-tool">
@@ -301,10 +314,21 @@ export default function PlayerPage() {
               </select>
             </label>
           )}
-          {useTranscode && subtitleAvailable && (
-            <button className="btn small" onClick={toggleSubtitles}>
-              {subtitlesOn ? t('player.subtitlesOff') : t('player.subtitlesOn')}
-            </button>
+          {subtitleTracks.length > 0 && (
+            <label className="player-tool">
+              {t('player.subtitles')}
+              <select
+                value={subtitleIdx}
+                onChange={(e) => changeSubtitle(Number(e.target.value))}
+              >
+                <option value={-1}>{t('player.subtitlesOff')}</option>
+                {subtitleTracks.map((tr) => (
+                  <option key={tr.id} value={tr.i}>
+                    {tr.label}
+                  </option>
+                ))}
+              </select>
+            </label>
           )}
         </div>
       )}

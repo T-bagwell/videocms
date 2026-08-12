@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { api, mediaUrl } from '../api.js';
+import ShareModal from '../components/ShareModal.jsx';
 
 function episodeLabel(season, episode) {
   if (!episode) return '';
@@ -17,6 +18,7 @@ export default function SeriesDetailPage() {
   const [series, setSeries] = useState(null);
   const [items, setItems] = useState([]);
   const [err, setErr] = useState('');
+  const [showShare, setShowShare] = useState(false);
 
   async function toggleFavorite() {
     try {
@@ -70,10 +72,14 @@ export default function SeriesDetailPage() {
               <button className="btn" onClick={toggleFavorite}>
                 {series.is_favorite ? t('series.unfavorite') : t('series.favorite')}
               </button>
+              <button className="btn" onClick={() => setShowShare(true)}>
+                {t('video.share')}
+              </button>
             </div>
           )}
         </div>
       </div>
+      {showShare && <ShareModal kind="series" id={series.id} onClose={() => setShowShare(false)} />}
 
       <h2>{t('series.episodeList')}</h2>
       <div className="playlist-items">

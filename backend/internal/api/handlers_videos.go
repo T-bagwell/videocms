@@ -414,6 +414,7 @@ type hlsVideo struct {
 	Height       int
 	SubtitlePath string
 	Available    bool
+	Subs         []media.HLSSubtitle
 }
 
 func (a *App) videoForHLS(ctx context.Context, id uuid.UUID) (hlsVideo, bool) {
@@ -423,6 +424,27 @@ func (a *App) videoForHLS(ctx context.Context, id uuid.UUID) (hlsVideo, bool) {
 	).Scan(&v.FilePath, &v.Width, &v.Height, &v.SubtitlePath, &v.Available)
 	if err != nil || !v.Available {
 		return hlsVideo{}, false
+	}
+	rows, err := a.pool.Query(ctx, `
+		SELECT id::text, lang, title, path FROM subtitle_tracks
+		WHERE video_id=$1 ORDER BY position`, id)
+	if err == nil {
+		defer rows.Close()
+		for rows.Next() {
+			var trackID, lang, title, path string
+			if err := rows.Scan(&trackID, &lang, &title, &path); err != nil {
+				continue
+			}
+			name := title
+			if name == "" {
+				name = lang
+			}
+			v.Subs = append(v.Subs, media.HLSSubtitle{
+				ID:     trackID,
+				Name:   name,
+				Active: path != "" && path == v.SubtitlePath,
+			})
+		}
 	}
 	return v, true
 }
@@ -454,7 +476,7 @@ func (a *App) serveHLS(w http.ResponseWriter, r *http.Request, id uuid.UUID, v h
 		if s := r.URL.Query().Get("start"); s != "" {
 			start, _ = strconv.ParseFloat(s, 64)
 		}
-		manifest, err := a.hls.Playlist(r.Context(), id, v.FilePath, start, v.Width, v.Height, v.SubtitlePath != "")
+		manifest, err := a.hls.Playlist(r.Context(), id, v.FilePath, start, v.Width, v.Height, v.Subs)
 		if err != nil {
 			log.Printf("[hls] %v", err)
 			writeErr(w, http.StatusInternalServerError, "failed to start transcode session: "+err.Error())
@@ -471,22 +493,30 @@ func (a *App) serveHLS(w http.ResponseWriter, r *http.Request, id uuid.UUID, v h
 		return
 	}
 
-	if file == "subs/playlist.m3u8" {
-		if v.SubtitlePath == "" {
-			writeErr(w, http.StatusNotFound, "subtitles not found")
-			return
+	if strings.HasPrefix(file, "subs/") {
+		parts := strings.Split(file, "/")
+		if len(parts) == 3 && parts[0] == "subs" {
+			trackID, err := uuid.Parse(parts[1])
+			if err == nil {
+				if parts[2] == "playlist.m3u8" {
+					if _, ok := a.loadSubtitleTrack(r.Context(), id, trackID); ok {
+						w.Header().Set("Content-Type", "application/vnd.apple.mpegurl")
+						w.Header().Set("Cache-Control", "no-store")
+						w.Write(buildSubtitlePlaylist(token))
+						return
+					}
+				} else if parts[2] == "subtitle.vtt" {
+					t, ok := a.loadSubtitleTrack(r.Context(), id, trackID)
+					if ok {
+						if path, err := a.ensureSubtitlePath(r.Context(), id, &t); err == nil {
+							serveSubtitleFile(w, r, path)
+							return
+						}
+					}
+				}
+			}
 		}
-		w.Header().Set("Content-Type", "application/vnd.apple.mpegurl")
-		w.Header().Set("Cache-Control", "no-store")
-		w.Write(buildSubtitlePlaylist(token))
-		return
-	}
-	if file == "subs/subtitle.vtt" {
-		if v.SubtitlePath == "" {
-			writeErr(w, http.StatusNotFound, "subtitles not found")
-			return
-		}
-		serveSubtitleFile(w, r, v.SubtitlePath)
+		writeErr(w, http.StatusNotFound, "subtitles not found")
 		return
 	}
 

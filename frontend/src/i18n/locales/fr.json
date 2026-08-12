@@ -134,7 +134,8 @@
     "title": "Mes favoris",
     "empty": "Aucun favori pour le moment. Touchez ☆ Favori pendant la navigation.",
     "videosTitle": "Vidéos favorites",
-    "seriesTitle": "Séries TV favorites"
+    "seriesTitle": "Séries TV favorites",
+    "exportMyData": "Exporter mes données"
   },
   "series": {
     "title": "Séries TV",
@@ -224,7 +225,8 @@
     "blockLibraryConfirm": "Bloquer la bibliothèque « {{name}} » ? Ses médias seront masqués pour tous. Fichiers et enregistrements sont conservés.",
     "unblockLibraryConfirm": "Débloquer la bibliothèque « {{name}} » ? Ses médias redeviendront visibles pour tous.",
     "libBlocked": "Bibliothèque « {{name}} » bloquée",
-    "libUnblocked": "Bibliothèque « {{name}} » débloquée"
+    "libUnblocked": "Bibliothèque « {{name}} » débloquée",
+    "export": "Exporter les données"
   },
   "picker": {
     "title": "Choisir un dossier serveur",

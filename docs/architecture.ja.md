@@ -137,8 +137,12 @@ videos          -- + series_id(FK→series, ON DELETE SET NULL), season, episode
 blocked_titles  -- id, title, created_at（管理者によるタイトル単位のブロック）
 hidden_paths    -- id, user_id(FK), path, created_at（ユーザーごとのパス非表示）
 series_favorites-- PK(user_id, series_id), created_at
-share_tokens    -- id, video_id(FK, ON DELETE CASCADE), token(ユニーク), expires_at,
+share_tokens    -- id, scope(video|series|playlist), video_id/series_id/playlist_id
+                --   (FK, ON DELETE CASCADE), token(ユニーク), expires_at,
                 --   created_by(FK→users), created_at（公開共有リンク）
+subtitle_tracks -- id, video_id(FK, ON DELETE CASCADE), position, lang, title,
+                --   path, kind(sidecar|embedded|upload), source_key(動画内でユニーク),
+                --   stream_index（多言語字幕トラック）
 ```
 
 主要インデックス：`videos(lower(title))`、`videos(library_id)`、部分インデックス
@@ -181,8 +185,10 @@ erDiagram
   -vf scale=<width>:-2 -force_key_frames expr:gte(t,n_forced*6) -c:a aac -b:a 96k
   -f hls -hls_time 6 -hls_list_size 0 -hls_flags independent_segments`
 - 各レンディションは `data/hls/<video-id>/v<幅>/` に書き込み。サーバーは全
-  レンディション（字幕がある場合は字幕グループも）を参照する master プレイリストを
-  生成。プレイリストは変換中に成長し、ffmpeg 完了後にサーバーが `#EXT-X-ENDLIST` を追記
+  レンディションと、字幕トラックごとに `#EXT-X-MEDIA` エントリ
+  （`subs/<トラックid>/playlist.m3u8`、内蔵トラックは初回リクエスト時に遅延抽出）を
+  参照する master プレイリストを生成。プレイリストは変換中に成長し、ffmpeg 完了後に
+  サーバーが `#EXT-X-ENDLIST` を追記
 - 要求された `start` が実行中セッションと 1 セグメント（6 秒）以上ずれている場合、
   セッションを終了して新しい位置で再開（シーク）
 - プレイリストは応答時に書き換えられ、各セグメント URL に `?token=` が付く
@@ -199,7 +205,9 @@ erDiagram
 3. ワーカープール（デフォルト **4**、`SCAN_WORKERS` で 1-16）が ffprobe で各ファイルを
    プローブ（30 秒タイムアウト）し、動画レコードを書き込み
 4. 新規レコードは ffmpeg でポスターフレームを抽出（60 秒タイムアウト、
-   `scale=480:-2`、15% 地点のフレーム）。同ディレクトリの字幕（`.srt/.vtt/.ass`）を関連付け
+   `scale=480:-2`、15% 地点のフレーム）。同ディレクトリの字幕（`.srt/.vtt/.ass/.ssa`）と
+   すべての内蔵テキスト字幕トラックを `subtitle_tracks` に登録し、先頭を
+   有効な `subtitle_path` に
 5. 20 件ごとに `video_count` を更新し、UI にリアルタイム進捗を表示
 6. 完了後、今回スキャンされなかったファイルは `available=false` に
    （`last_scanned_at < scan_start` 基準）。キャンセル時に誤判定しない
@@ -207,6 +215,11 @@ erDiagram
    ステータスを `cancelled` に。取り込み済みレコードは保持
 8. panic はリカバリされ `scan_status=error` に。サーバー再起動時は残った `scanning`
    状態を `error` にリセット
+
+**増分取り込み**：`Scanner.Watch` は fsnotify イベント監視（再帰、ライブラリの
+ルートごとに 1 つ）と差分スキャンを組み合わせます。変更ファイル（サイズが同じ
+変更を含む）は数秒以内に再プローブされ、削除されたファイル/ディレクトリは
+即座に利用不可に。さらに `WATCH_INTERVAL` ごとの全量差分スキャンも保険として継続
 
 **ドラマ自動グループ化**：スキャン後に `rebuildSeries` がタイトルからエピソード
 マーカー（`S01E01`、`EP1`、`E01`、`第1集`、末尾のかっこ数字など）を解析し、
@@ -217,12 +230,13 @@ erDiagram
 
 プローブ失敗のファイルも空の技術メタデータで登録されるため、所有者は内容を確認して判断できます。
 
-### 3.8 メタデータスクレイピング（TMDB）
+### 3.8 メタデータスクレイピング（TMDB / TVMaze）
 
-任意（`TMDB_API_KEY`）。`Scraper`：
+任意。`TMDB_API_KEY` 設定時は TMDB、未設定時は免キーの TVMaze に自動フォールバック
+（`TVMAZE_ENABLED=0` で無効化）。`Scraper`：
 
-- TMDB を検索（言語は設定可能、デフォルト `zh-CN`）し、詳細を取得してローカライズ済み
-  ジャンル名を取得
+- プロバイダを検索（TMDB の言語は設定可能、デフォルト `zh-CN`）。TMDB ではさらに
+  詳細を取得してローカライズ済みジャンル名を取得
 - `w500` ポスターを `data/posters/<video-id>.<ext>` にダウンロード
 - `title, year, synopsis, genres, poster_path, tmdb_id, scraped_at` を更新
 - レート制限：400ms に 1 リクエスト
@@ -411,7 +425,7 @@ sequenceDiagram
 
 ## 9. 拡張ポイント
 
-- **TMDB 以外のオンラインメタデータソース**（JAV DB、TV シリーズなど）
-- **字幕強化**：言語別選択・複数トラック切り替え（動画単位の字幕は対応済み）
-- **共有拡張**：シリーズ・プレイリストの共有（動画単位は対応済み）
-- **メタデータ・ユーザーデータのエクスポート / バックアップ**
+- **TMDB/TVMaze 以外のオンラインメタデータソース**（JAV DB、AniList など）
+- **ユーザー別の字幕プリファレンス**（現在は動画ごとにグローバル）
+- **共有リンクへのパスワード / ホワイトリスト**
+- **エクスポートしたバックアップのインポート / 復元**

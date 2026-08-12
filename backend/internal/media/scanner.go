@@ -18,6 +18,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/fsnotify/fsnotify"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 
@@ -136,8 +137,14 @@ type probeInfo struct {
 	Height    int
 	Codec     string
 	Container string
-	SubIndex  int    // first text subtitle stream index, -1 when none
-	SubCodec  string
+	Subs      []probeSubtitle // text subtitle streams inside the container
+}
+
+type probeSubtitle struct {
+	Index    int
+	Codec    string
+	Language string
+	Title    string
 }
 
 func (s *Scanner) scan(ctx context.Context, lib models.Library) {
@@ -278,18 +285,24 @@ func (s *Scanner) indexFiles(ctx context.Context, libID uuid.UUID, paths chan st
 	return found.Load()
 }
 
-// Watch periodically indexes new, changed, and removed files for every
-// library, so media added on disk appears without a manual rescan. The first
-// pass runs immediately, then every interval until ctx is done. An interval
-// <= 0 disables watching.
+// Watch keeps the library index in sync with the disk. It reacts to
+// filesystem events immediately via fsnotify (recursively watched library
+// roots), and keeps the proven full diff-based pass running every interval as
+// a safety net for missed events. An interval <= 0 disables watching.
 func (s *Scanner) Watch(ctx context.Context, interval time.Duration) {
 	if interval <= 0 {
 		return
 	}
-	log.Printf("filesystem watcher enabled: checking libraries every %s", interval)
+	log.Printf("filesystem watcher enabled: fsnotify events + fallback scan every %s", interval)
 	s.watchOnce(ctx)
 	ticker := time.NewTicker(interval)
 	defer ticker.Stop()
+	if watcher, err := fsnotify.NewWatcher(); err == nil {
+		defer watcher.Close()
+		go s.watchEvents(ctx, watcher)
+	} else {
+		log.Printf("fsnotify unavailable (%v); falling back to periodic scans", err)
+	}
 	for {
 		select {
 		case <-ctx.Done():
@@ -298,6 +311,205 @@ func (s *Scanner) Watch(ctx context.Context, interval time.Duration) {
 		case <-ticker.C:
 			s.watchOnce(ctx)
 		}
+	}
+}
+
+type eventDirty struct {
+	videos  map[string]struct{}
+	removed map[string]struct{}
+}
+
+// watchEvents reacts to filesystem events under every library root, collects
+// changed paths per library and flushes them after a short quiet period.
+func (s *Scanner) watchEvents(ctx context.Context, watcher *fsnotify.Watcher) {
+	dirToLib := map[string]uuid.UUID{}
+	dirty := map[uuid.UUID]*eventDirty{}
+	var timer *time.Timer
+
+	addWatch := func(dir string, libID uuid.UUID) {
+		if _, ok := dirToLib[dir]; ok {
+			return
+		}
+		if err := watcher.Add(dir); err == nil {
+			dirToLib[dir] = libID
+		}
+	}
+	libForPath := func(path string) (uuid.UUID, bool) {
+		for dir := path; ; dir = filepath.Dir(dir) {
+			if id, ok := dirToLib[dir]; ok {
+				return id, true
+			}
+			if dir == filepath.Dir(dir) {
+				return uuid.Nil, false
+			}
+		}
+	}
+	flush := func() {
+		timer = nil
+		for libID, d := range dirty {
+			if s.IsScanning(libID) {
+				continue // a full scan is already indexing this library
+			}
+			s.applyEventBatch(ctx, libID, d.videos, d.removed)
+		}
+		dirty = map[uuid.UUID]*eventDirty{}
+	}
+	schedule := func() {
+		if timer == nil {
+			timer = time.AfterFunc(2*time.Second, flush)
+		}
+	}
+
+	libs, err := s.loadLibraries(ctx)
+	if err != nil {
+		log.Printf("watcher: load libraries for fsnotify: %v", err)
+		return
+	}
+	for _, lib := range libs {
+		if st, err := os.Stat(lib.Path); err == nil && st.IsDir() {
+			addWatch(lib.Path, lib.ID)
+		}
+	}
+
+	for {
+		select {
+		case <-ctx.Done():
+			if timer != nil {
+				timer.Stop()
+			}
+			return
+		case err, ok := <-watcher.Errors:
+			if !ok {
+				return
+			}
+			log.Printf("watcher: fsnotify error: %v", err)
+		case ev, ok := <-watcher.Events:
+			if !ok {
+				return
+			}
+			libID, ok := libForPath(ev.Name)
+			if !ok {
+				continue
+			}
+			d := dirty[libID]
+			if d == nil {
+				d = &eventDirty{videos: map[string]struct{}{}, removed: map[string]struct{}{}}
+				dirty[libID] = d
+			}
+			base := filepath.Base(ev.Name)
+			if strings.HasPrefix(base, "._") || base == ".DS_Store" {
+				continue
+			}
+			isFile := isVideoFile(base) || isSubtitleFile(base)
+			if ev.Op&(fsnotify.Create|fsnotify.Write) != 0 {
+				if isFile {
+					d.videos[ev.Name] = struct{}{}
+				} else if st, err := os.Stat(ev.Name); err == nil && st.IsDir() {
+					addWatch(ev.Name, libID)
+				}
+				schedule()
+				continue
+			}
+			if ev.Op&(fsnotify.Remove|fsnotify.Rename) != 0 {
+				if isFile {
+					d.videos[ev.Name] = struct{}{}
+				} else {
+					d.removed[ev.Name] = struct{}{}
+					for dir := range dirToLib {
+						if dir == ev.Name || strings.HasPrefix(dir, ev.Name+string(os.PathSeparator)) {
+							delete(dirToLib, dir)
+						}
+					}
+				}
+				schedule()
+			}
+		}
+	}
+}
+
+func isVideoFile(name string) bool {
+	return videoExts[strings.ToLower(filepath.Ext(name))]
+}
+
+func isSubtitleFile(name string) bool {
+	ext := strings.ToLower(filepath.Ext(name))
+	for _, e := range subtitleExts {
+		if e == ext {
+			return true
+		}
+	}
+	return false
+}
+
+// applyEventBatch reprobes exactly the files that changed on disk and marks
+// removed files/directories unavailable — no full tree walk.
+func (s *Scanner) applyEventBatch(ctx context.Context, libID uuid.UUID, videos map[string]struct{}, removedDirs map[string]struct{}) {
+	changed := false
+	for dir := range removedDirs {
+		tag, err := s.pool.Exec(ctx, `
+			UPDATE videos SET available=false, updated_at=now()
+			WHERE library_id=$1 AND available AND starts_with(file_path, $2 || '/')`,
+			libID, dir)
+		if err != nil {
+			log.Printf("watcher: mark removed dir %s: %v", dir, err)
+		} else if tag.RowsAffected() > 0 {
+			changed = true
+		}
+	}
+
+	var candidates []string
+	for p := range videos {
+		if st, err := os.Stat(p); err == nil && !st.IsDir() {
+			candidates = append(candidates, p)
+			continue
+		}
+		var vid uuid.UUID
+		if err := s.pool.QueryRow(ctx,
+			`SELECT id FROM videos WHERE file_path=$1`, p).Scan(&vid); err != nil {
+			continue // never indexed
+		}
+		if _, err := s.pool.Exec(ctx,
+			`UPDATE videos SET available=false, updated_at=now() WHERE id=$1`, vid); err == nil {
+			changed = true
+		}
+		if _, err := s.pool.Exec(ctx,
+			`DELETE FROM subtitle_tracks WHERE video_id=$1 AND kind IN ('sidecar','embedded')`, vid); err != nil {
+			log.Printf("watcher: drop subtitle tracks: %v", err)
+		}
+	}
+
+	if len(candidates) > 0 {
+		paths := make(chan string, scanWorkers()*4)
+		go func() {
+			defer close(paths)
+			for _, p := range candidates {
+				select {
+				case paths <- p:
+				case <-ctx.Done():
+					return
+				}
+			}
+		}()
+		if n := s.indexFiles(ctx, libID, paths, scanWorkers(), nil); n > 0 {
+			changed = true
+		}
+	}
+
+	if !changed {
+		return
+	}
+	var lib models.Library
+	if err := s.pool.QueryRow(ctx,
+		`SELECT id, name, path FROM libraries WHERE id=$1`, libID).
+		Scan(&lib.ID, &lib.Name, &lib.Path); err != nil {
+		log.Printf("watcher: load library: %v", err)
+		return
+	}
+	s.rebuildSeries(ctx, lib)
+	if _, err := s.pool.Exec(ctx,
+		`UPDATE libraries SET video_count=(SELECT count(*) FROM videos WHERE library_id=$1 AND available=true) WHERE id=$2`,
+		libID, libID); err != nil {
+		log.Printf("watcher: update video count: %v", err)
 	}
 }
 
@@ -606,7 +818,11 @@ func (s *Scanner) setStatus(ctx context.Context, libID uuid.UUID, status, scanEr
 func (s *Scanner) upsert(ctx context.Context, libID uuid.UUID, path string, info probeInfo) error {
 	filename := filepath.Base(path)
 	title, year := deriveTitle(filename)
-	subtitle := findSubtitle(path)
+	sidecars := findSidecarSubtitles(path)
+	subtitle := ""
+	if len(sidecars) > 0 {
+		subtitle = sidecars[0]
+	}
 
 	var id uuid.UUID
 	var posterPath string
@@ -627,7 +843,7 @@ func (s *Scanner) upsert(ctx context.Context, libID uuid.UUID, path string, info
 			video_codec = EXCLUDED.video_codec,
 			container = EXCLUDED.container,
 			year = EXCLUDED.year,
-			subtitle_path = EXCLUDED.subtitle_path,
+			subtitle_path = COALESCE(NULLIF(EXCLUDED.subtitle_path, ''), videos.subtitle_path),
 			available = true,
 			updated_at = now(),
 			last_scanned_at = now()
@@ -649,14 +865,14 @@ func (s *Scanner) upsert(ctx context.Context, libID uuid.UUID, path string, info
 			log.Printf("poster extraction for %s: %v", path, err)
 		}
 	}
-	if subtitle == "" && info.SubIndex >= 0 {
-		if p, err := s.extractEmbedded(ctx, id, path, info.SubIndex); err == nil {
-			if _, err := s.pool.Exec(ctx,
-				`UPDATE videos SET subtitle_path=$1 WHERE id=$2`, p, id); err != nil {
-				log.Printf("save embedded subtitle path: %v", err)
-			}
-		} else {
-			log.Printf("embedded subtitle extraction for %s: %v", path, err)
+	active, err := s.syncSubtitleTracks(ctx, id, path, sidecars, info.Subs)
+	if err != nil {
+		log.Printf("sync subtitle tracks for %s: %v", path, err)
+	}
+	if active != "" && active != subtitle {
+		if _, err := s.pool.Exec(ctx,
+			`UPDATE videos SET subtitle_path=$1 WHERE id=$2`, active, id); err != nil {
+			log.Printf("save active subtitle path: %v", err)
 		}
 	}
 	if s.enricher != nil {
@@ -695,6 +911,10 @@ func (s *Scanner) probe(ctx context.Context, path string) (probeInfo, error) {
 			Width     int    `json:"width"`
 			Height    int    `json:"height"`
 			Index     int    `json:"index"`
+			Tags      struct {
+				Language string `json:"language"`
+				Title    string `json:"title"`
+			} `json:"tags"`
 		} `json:"streams"`
 		Format struct {
 			Duration   string `json:"duration"`
@@ -708,7 +928,6 @@ func (s *Scanner) probe(ctx context.Context, path string) (probeInfo, error) {
 	info.Duration, _ = strconv.ParseFloat(raw.Format.Duration, 64)
 	info.Size, _ = strconv.ParseInt(raw.Format.Size, 10, 64)
 	info.Container = raw.Format.FormatName
-	info.SubIndex = -1
 	for _, st := range raw.Streams {
 		switch st.CodecType {
 		case "video":
@@ -716,10 +935,15 @@ func (s *Scanner) probe(ctx context.Context, path string) (probeInfo, error) {
 			info.Width = st.Width
 			info.Height = st.Height
 		case "subtitle":
-			if info.SubIndex < 0 && !IsImageSubtitleCodec(st.CodecName) {
-				info.SubIndex = st.Index
-				info.SubCodec = st.CodecName
+			if IsImageSubtitleCodec(st.CodecName) {
+				continue
 			}
+			info.Subs = append(info.Subs, probeSubtitle{
+				Index:    st.Index,
+				Codec:    st.CodecName,
+				Language: st.Tags.Language,
+				Title:    st.Tags.Title,
+			})
 		}
 	}
 	return info, nil
@@ -732,7 +956,7 @@ func (s *Scanner) extractEmbedded(ctx context.Context, videoID uuid.UUID, path s
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return "", err
 	}
-	dst := filepath.Join(dir, videoID.String()+"-embedded.vtt")
+	dst := filepath.Join(dir, fmt.Sprintf("%s-e%d.vtt", videoID.String(), streamIndex))
 	if err := ExtractEmbeddedSubtitle(ctx, s.ffmpegBin, path, streamIndex, dst); err != nil {
 		return "", err
 	}
@@ -766,6 +990,83 @@ func findSubtitle(videoPath string) string {
 		}
 	}
 	return ""
+}
+
+// findSidecarSubtitles returns every existing sidecar subtitle file for a
+// video, in preference order. Unlike findSubtitle it returns all of them so
+// the subtitle-track UI can offer multi-language sidecars.
+func findSidecarSubtitles(videoPath string) []string {
+	base := strings.TrimSuffix(videoPath, filepath.Ext(videoPath))
+	var out []string
+	for _, ext := range subtitleExts {
+		p := base + ext
+		if st, err := os.Stat(p); err == nil && !st.IsDir() {
+			out = append(out, p)
+		}
+	}
+	return out
+}
+
+// syncSubtitleTracks reconciles the subtitle_tracks rows for a video with the
+// sidecar files and embedded text streams currently on disk. Uploaded tracks
+// are never touched. It returns the path that should be active (first sidecar,
+// else the first embedded track, else ""), extracting embedded tracks on
+// demand as needed.
+func (s *Scanner) syncSubtitleTracks(ctx context.Context, videoID uuid.UUID, videoPath string, sidecars []string, embeds []probeSubtitle) (string, error) {
+	wanted := map[string]struct{}{}
+	insert := func(kind, sourceKey, path, lang, title string, pos, streamIndex int) error {
+		wanted[sourceKey] = struct{}{}
+		_, err := s.pool.Exec(ctx, `
+			INSERT INTO subtitle_tracks (video_id, position, lang, title, path, kind, source_key, stream_index)
+			VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+			ON CONFLICT (video_id, source_key) WHERE source_key <> ''
+			DO UPDATE SET position=EXCLUDED.position, lang=EXCLUDED.lang,
+			              title=EXCLUDED.title, path=EXCLUDED.path,
+			              stream_index=EXCLUDED.stream_index`,
+			videoID, pos, lang, title, path, kind, sourceKey, streamIndex)
+		return err
+	}
+
+	for i, p := range sidecars {
+		if err := insert("sidecar", "sidecar:"+filepath.Base(p), p, "", "", i, -1); err != nil {
+			return "", err
+		}
+	}
+	for i, e := range embeds {
+		if err := insert("embedded", "embedded:"+strconv.Itoa(e.Index), "", e.Language, e.Title, len(sidecars)+i, e.Index); err != nil {
+			return "", err
+		}
+	}
+
+	keys := make([]string, 0, len(wanted))
+	for k := range wanted {
+		keys = append(keys, k)
+	}
+	if _, err := s.pool.Exec(ctx, `
+		DELETE FROM subtitle_tracks
+		WHERE video_id=$1 AND kind IN ('sidecar','embedded')
+		  AND (source_key = '' OR NOT (source_key = ANY($2::text[])))`,
+		videoID, keys); err != nil {
+		return "", err
+	}
+
+	if len(sidecars) > 0 {
+		return sidecars[0], nil
+	}
+	if len(embeds) > 0 {
+		dst, err := s.extractEmbedded(ctx, videoID, videoPath, embeds[0].Index)
+		if err != nil {
+			log.Printf("extract embedded subtitle for %s: %v", videoPath, err)
+			return "", nil
+		}
+		if _, err := s.pool.Exec(ctx,
+			`UPDATE subtitle_tracks SET path=$1 WHERE video_id=$2 AND source_key=$3`,
+			dst, videoID, "embedded:"+strconv.Itoa(embeds[0].Index)); err != nil {
+			return "", err
+		}
+		return dst, nil
+	}
+	return "", nil
 }
 
 var (

@@ -11,20 +11,22 @@ export default function SharePage() {
   const { t } = useTranslation();
   const [data, setData] = useState(null);
   const [err, setErr] = useState('');
+  const [queue, setQueue] = useState([]);
+  const [queueTitle, setQueueTitle] = useState('');
+  const [activeIdx, setActiveIdx] = useState(0);
   const videoRef = useRef(null);
   const hlsRef = useRef(null);
   const [useTranscode, setUseTranscode] = useState(false);
   const [transcoding, setTranscoding] = useState(false);
   const [levels, setLevels] = useState([]);
   const [quality, setQuality] = useState('auto');
-  const [subtitleAvailable, setSubtitleAvailable] = useState(false);
-  const [subtitlesOn, setSubtitlesOn] = useState(true);
+  const [nativeTracks, setNativeTracks] = useState([]);
+  const [subtitleTracks, setSubtitleTracks] = useState([]);
+  const [subtitleIdx, setSubtitleIdx] = useState(-1);
 
   useEffect(() => {
     fetch(publicUrl(`/share/${token}/info`))
-      .then((res) =>
-        res.json().then((d) => ({ ok: res.ok, data: d })),
-      )
+      .then((res) => res.json().then((d) => ({ ok: res.ok, data: d })))
       .then(({ ok, data: d }) => {
         if (!ok) throw new Error(d.error || t('share.invalid'));
         setData(d);
@@ -32,68 +34,104 @@ export default function SharePage() {
       .catch((e) => setErr(e.message || t('share.invalid')));
   }, [token, t]);
 
+  // build the play queue from the share scope
   useEffect(() => {
-    if (!data || !videoRef.current) return;
-    const video = data.video;
-    const ext = video.filename?.match(/\.[^.]+$/)?.[0]?.toLowerCase() || '';
+    if (!data) return;
+    if (data.scope === 'series') {
+      setQueue(data.items || []);
+      setQueueTitle(data.series?.name || '');
+    } else if (data.scope === 'playlist') {
+      setQueue(data.items || []);
+      setQueueTitle(data.playlist?.name || '');
+    } else {
+      setQueue(data.video ? [data.video] : []);
+      setQueueTitle('');
+    }
+    setActiveIdx(0);
+  }, [data]);
+
+  const active = queue[activeIdx];
+  const media = (path) => publicUrl(`/share/${token}/video/${active.id}${path}`);
+
+  useEffect(() => {
+    if (!active || !videoRef.current) return;
+    setLevels([]);
+    setSubtitleTracks([]);
+    setNativeTracks([]);
+    setErr('');
+
+    const ext = active.filename?.match(/\.[^.]+$/)?.[0]?.toLowerCase() || '';
     const shouldTranscode = !BROWSER_PLAYABLE.includes(ext);
     setUseTranscode(shouldTranscode);
-    if (!shouldTranscode) return;
-
-    let cancelled = false;
-    import('hls.js')
-      .then(({ default: Hls }) => {
-        if (cancelled) return;
-        const hls = new Hls({
-          startPosition: 0,
-          maxBufferLength: 30,
-          maxMaxBufferLength: 90,
-        });
-        hlsRef.current = hls;
-        setTranscoding(true);
-        setLevels([]);
-        hls.on(Hls.Events.MANIFEST_PARSED, () => {
-          setTranscoding(false);
-          if (hls.levels && hls.levels.length > 1) {
-            setLevels(
-              hls.levels.map((l, i) => ({
+    if (shouldTranscode) {
+      let cancelled = false;
+      import('hls.js')
+        .then(({ default: Hls }) => {
+          if (cancelled) return;
+          const hls = new Hls({
+            startPosition: 0,
+            maxBufferLength: 30,
+            maxMaxBufferLength: 90,
+          });
+          hlsRef.current = hls;
+          setTranscoding(true);
+          hls.on(Hls.Events.MANIFEST_PARSED, () => {
+            setTranscoding(false);
+            if (hls.levels && hls.levels.length > 1) {
+              setLevels(
+                hls.levels.map((l, i) => ({
+                  i,
+                  label: l.height ? `${l.height}p` : `${Math.round(l.bitrate / 1000)}k`,
+                })),
+              );
+            }
+          });
+          hls.on(Hls.Events.LEVEL_SWITCHED, (_event, d) => setQuality(String(d.level)));
+          hls.on(Hls.Events.SUBTITLE_TRACKS_UPDATED, (_event, d) => {
+            const list = d.subtitleTracks || [];
+            setSubtitleTracks(
+              list.map((tr, i) => ({
                 i,
-                label: l.height ? `${l.height}p` : `${Math.round(l.bitrate / 1000)}k`,
+                id: tr.id,
+                label: tr.name || tr.lang || `${t('player.subtitles')} ${i + 1}`,
               })),
             );
-          }
+            setSubtitleIdx(hls.subtitleTrack);
+          });
+          hls.on(Hls.Events.SUBTITLE_TRACK_SWITCH, (_event, d) => {
+            setSubtitleIdx(d.id ?? -1);
+          });
+          hls.on(Hls.Events.ERROR, (_event, d) => {
+            if (!d.fatal) return;
+            if (d.type === Hls.ErrorTypes.NETWORK_ERROR) {
+              hls.startLoad();
+              return;
+            }
+            setErr(t('player.transcodeFailed', { detail: d.details || 'unknown' }));
+            setTranscoding(false);
+          });
+          hls.attachMedia(videoRef.current);
+          hls.loadSource(media('/hls/playlist.m3u8'));
+        })
+        .catch(() => {
+          if (!cancelled) setErr(t('share.invalid'));
         });
-        hls.on(Hls.Events.LEVEL_SWITCHED, (_event, d) => {
-          setQuality(String(d.level));
-        });
-        hls.on(Hls.Events.SUBTITLE_TRACKS_UPDATED, (_event, d) => {
-          const has = (d.subtitleTracks || []).length > 0;
-          setSubtitleAvailable(has);
-          if (has) hls.subtitleTrack = 0;
-        });
-        hls.on(Hls.Events.ERROR, (_event, d) => {
-          if (!d.fatal) return;
-          if (d.type === Hls.ErrorTypes.NETWORK_ERROR) {
-            hls.startLoad();
-            return;
-          }
-          setErr(t('player.transcodeFailed', { detail: d.details || 'unknown' }));
-          setTranscoding(false);
-        });
-        hls.attachMedia(videoRef.current);
-        hls.loadSource(publicUrl(`/share/${token}/hls/playlist.m3u8`));
-      })
-      .catch(() => {
-        if (!cancelled) setErr(t('share.invalid'));
-      });
-    return () => {
-      cancelled = true;
-      if (hlsRef.current) {
-        hlsRef.current.destroy();
-        hlsRef.current = null;
-      }
-    };
-  }, [data, token, t]);
+      return () => {
+        cancelled = true;
+        if (hlsRef.current) {
+          hlsRef.current.destroy();
+          hlsRef.current = null;
+        }
+      };
+    }
+
+    // native playback: load subtitle tracks so the CC menu works
+    fetch(publicUrl(`/share/${token}/video/${active.id}/subtitle-tracks`))
+      .then((res) => res.json())
+      .then((d) => setNativeTracks(d.items || []))
+      .catch(() => setNativeTracks([]));
+    return undefined;
+  }, [active, token, t]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function changeQuality(q) {
     setQuality(q);
@@ -102,11 +140,15 @@ export default function SharePage() {
     hls.currentLevel = q === 'auto' ? -1 : Number(q);
   }
 
-  function toggleSubtitles() {
+  function changeSubtitle(i) {
     const hls = hlsRef.current;
     if (!hls) return;
-    hls.subtitleTrack = subtitlesOn ? -1 : 0;
-    setSubtitlesOn(!subtitlesOn);
+    hls.subtitleTrack = i;
+    setSubtitleIdx(i);
+  }
+
+  function playNext() {
+    if (activeIdx < queue.length - 1) setActiveIdx(activeIdx + 1);
   }
 
   if (err) {
@@ -119,7 +161,7 @@ export default function SharePage() {
       </div>
     );
   }
-  if (!data) {
+  if (!data || !active) {
     return (
       <div className="container share-page">
         <div className="loading">{t('common.loading')}</div>
@@ -127,8 +169,7 @@ export default function SharePage() {
     );
   }
 
-  const video = data.video;
-  const streamUrl = useTranscode ? undefined : publicUrl(`/share/${token}/stream`);
+  const streamUrl = useTranscode ? undefined : media('/stream');
 
   return (
     <div className="container share-page">
@@ -137,19 +178,20 @@ export default function SharePage() {
           {t('share.backToSite')}
         </Link>
         <div>
-          <h1>{video.title}</h1>
+          <h1>{queueTitle || active.title}</h1>
           <div className="detail-facts">
-            {video.year > 0 && <span>{video.year}</span>}
-            <span>{fmtDuration(video.duration_sec)}</span>
-            {video.width > 0 && (
+            {active.year > 0 && <span>{active.year}</span>}
+            <span>{fmtDuration(active.duration_sec)}</span>
+            {active.width > 0 && (
               <span>
-                {video.width}×{video.height}
+                {active.width}×{active.height}
               </span>
             )}
-            <span>{video.video_codec}</span>
-            {video.size_bytes > 0 && <span>{fmtBytes(video.size_bytes)}</span>}
+            <span>{active.video_codec}</span>
+            {active.size_bytes > 0 && <span>{fmtBytes(active.size_bytes)}</span>}
+            {queue.length > 1 && <span>{activeIdx + 1}/{queue.length}</span>}
           </div>
-          {video.synopsis && <p className="synopsis">{video.synopsis}</p>}
+          {active.synopsis && <p className="synopsis">{active.synopsis}</p>}
         </div>
       </div>
 
@@ -159,22 +201,25 @@ export default function SharePage() {
         controls
         autoPlay
         src={streamUrl}
-        poster={video.has_poster ? publicUrl(`/share/${token}/poster`) : undefined}
+        poster={active.has_poster ? media('/poster') : undefined}
+        onEnded={playNext}
       >
-        {video.has_subtitle && !useTranscode && (
-          <track
-            kind="subtitles"
-            srcLang="und"
-            label={t('player.subtitles')}
-            src={publicUrl(`/share/${token}/subtitles`)}
-            default
-          />
-        )}
+        {!useTranscode &&
+          nativeTracks.map((tr) => (
+            <track
+              key={tr.id}
+              kind="subtitles"
+              srcLang={tr.lang || undefined}
+              label={tr.title || tr.lang || t('player.subtitles')}
+              src={media(`/subtitles/${tr.id}`)}
+              default={tr.is_active}
+            />
+          ))}
       </video>
 
-      {(useTranscode || video.has_subtitle) && (
+      {useTranscode && (levels.length > 1 || subtitleTracks.length > 0) && (
         <div className="player-tools">
-          {useTranscode && levels.length > 1 && (
+          {levels.length > 1 && (
             <label className="player-tool">
               {t('player.quality')}
               <select value={quality} onChange={(e) => changeQuality(e.target.value)}>
@@ -187,18 +232,47 @@ export default function SharePage() {
               </select>
             </label>
           )}
-          {useTranscode && subtitleAvailable && (
-            <button className="btn small" onClick={toggleSubtitles}>
-              {subtitlesOn ? t('player.subtitlesOff') : t('player.subtitlesOn')}
-            </button>
+          {subtitleTracks.length > 0 && (
+            <label className="player-tool">
+              {t('player.subtitles')}
+              <select value={subtitleIdx} onChange={(e) => changeSubtitle(Number(e.target.value))}>
+                <option value={-1}>{t('player.subtitlesOff')}</option>
+                {subtitleTracks.map((tr) => (
+                  <option key={tr.id} value={tr.i}>
+                    {tr.label}
+                  </option>
+                ))}
+              </select>
+            </label>
           )}
-          <a className="btn small" href={publicUrl(`/share/${token}/download`)}>
+          <a className="btn small" href={media('/download')}>
             {t('common.download')}
           </a>
         </div>
       )}
 
       {transcoding && <div className="banner info">{t('player.transcoding')}</div>}
+
+      {queue.length > 1 && (
+        <div className="queue">
+          <h3>{t('player.queue', { count: queue.length })}</h3>
+          {queue.map((v, i) => (
+            <button
+              key={v.id}
+              className={`queue-item ${i === activeIdx ? 'current' : ''}`}
+              onClick={() => i !== activeIdx && setActiveIdx(i)}
+            >
+              <span className="queue-idx">
+                {v.season > 0
+                  ? `S${String(v.season).padStart(2, '0')}E${String(v.episode).padStart(2, '0')}`
+                  : i + 1}
+              </span>
+              <span className="queue-title">{v.title}</span>
+              {i === activeIdx && <span className="queue-now">{t('player.nowPlaying')}</span>}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

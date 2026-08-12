@@ -134,7 +134,8 @@
     "title": "Meine Favoriten",
     "empty": "Noch keine Favoriten. Tippen Sie beim Stöbern auf ☆ Favorit.",
     "videosTitle": "Favorisierte Videos",
-    "seriesTitle": "Favorisierte Serien"
+    "seriesTitle": "Favorisierte Serien",
+    "exportMyData": "Meine Daten exportieren"
   },
   "series": {
     "title": "Serien",
@@ -224,7 +225,8 @@
     "blockLibraryConfirm": "Bibliothek „{{name}}“ blockieren? Ihre Medien werden für alle ausgeblendet. Dateien und Einträge bleiben erhalten.",
     "unblockLibraryConfirm": "Bibliothek „{{name}}“ freigeben? Ihre Medien werden wieder für alle sichtbar.",
     "libBlocked": "Bibliothek „{{name}}“ ist blockiert",
-    "libUnblocked": "Bibliothek „{{name}}“ ist freigegeben"
+    "libUnblocked": "Bibliothek „{{name}}“ ist freigegeben",
+    "export": "Daten exportieren"
   },
   "picker": {
     "title": "Serverordner auswählen",

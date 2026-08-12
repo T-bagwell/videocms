@@ -33,6 +33,13 @@ type rendition struct {
 	BitrateK int
 }
 
+// HLSSubtitle describes one subtitle track advertised in the master playlist.
+type HLSSubtitle struct {
+	ID     string
+	Name   string
+	Active bool
+}
+
 // renditionPlan builds a downward ladder from the source resolution, capped at
 // hlsMaxWidth. Renditions wider than the source are skipped; for unknown source
 // dimensions it falls back to a single 1280px rendition.
@@ -77,14 +84,23 @@ func renditionPlan(srcWidth, srcHeight int) []rendition {
 	return out
 }
 
-// buildMaster returns the master playlist referencing every rendition and, when
-// the video has subtitles, an HLS subtitle group.
-func buildMaster(rends []rendition, hasSubtitle bool) []byte {
+// buildMaster returns the master playlist referencing every rendition and the
+// video's subtitle tracks (if any) as an HLS subtitle group.
+func buildMaster(rends []rendition, subs []HLSSubtitle) []byte {
 	var b strings.Builder
 	b.WriteString("#EXTM3U\n")
 	b.WriteString("#EXT-X-VERSION:3\n")
-	if hasSubtitle {
-		b.WriteString("#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID=\"subs\",NAME=\"Subtitles\",DEFAULT=YES,AUTOSELECT=YES,URI=\"subs/playlist.m3u8\"\n")
+	for i, s := range subs {
+		def := "NO"
+		if s.Active || i == 0 {
+			def = "YES"
+		}
+		name := strings.ReplaceAll(s.Name, `"`, "'")
+		if name == "" {
+			name = fmt.Sprintf("Subtitle %d", i+1)
+		}
+		fmt.Fprintf(&b, "#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID=\"subs\",NAME=\"%s\",DEFAULT=%s,AUTOSELECT=YES,URI=\"subs/%s/playlist.m3u8\"\n",
+			name, def, s.ID)
 	}
 	for _, r := range rends {
 		fmt.Fprintf(&b, "#EXT-X-STREAM-INF:BANDWIDTH=%d,AVERAGE-BANDWIDTH=%d,RESOLUTION=%dx%d\n",
@@ -127,7 +143,7 @@ func (m *HLSManager) sessionDir(videoID uuid.UUID) string {
 // Playlist ensures a transcode session exists for the video and returns the
 // path of its master manifest. If startSec differs from the running session's
 // offset by more than one segment, the session is restarted at that position.
-func (m *HLSManager) Playlist(ctx context.Context, videoID uuid.UUID, input string, startSec float64, srcWidth, srcHeight int, hasSubtitle bool) (string, error) {
+func (m *HLSManager) Playlist(ctx context.Context, videoID uuid.UUID, input string, startSec float64, srcWidth, srcHeight int, subs []HLSSubtitle) (string, error) {
 	if startSec < 0 {
 		startSec = 0
 	}
@@ -155,7 +171,7 @@ func (m *HLSManager) Playlist(ctx context.Context, videoID uuid.UUID, input stri
 
 	rends := renditionPlan(srcWidth, srcHeight)
 	masterPath := filepath.Join(dir, "master.m3u8")
-	if err := os.WriteFile(masterPath, buildMaster(rends, hasSubtitle), 0o644); err != nil {
+	if err := os.WriteFile(masterPath, buildMaster(rends, subs), 0o644); err != nil {
 		return "", err
 	}
 

@@ -23,6 +23,20 @@ All notable changes to VideoCMS are documented here.
 - Public sharing: any user can create short-lived, revocable share links
   (default 7 days, 1 hour–1 year) that play in a public page without an
   account; share links respect admin title/library blocking and expire server-side
+- Sharing extended to **TV shows and playlists**: share links for a series
+  play every episode in order, playlist links play the playlist sequence
+- Multi-language subtitle tracks: all sidecar subtitle files and every embedded
+  text track are now listed, extractable and switchable in the player (native
+  `track` menu or an HLS subtitle group with per-track playlists)
+- Filesystem watching is now event-driven (fsnotify, recursive per library):
+  new, changed, removed and same-size-modified files are indexed within
+  seconds, with the periodic diff-based pass kept as a fallback
+- Data export/backup: admins can download a full JSON backup (users, libraries,
+  videos, series, playlists, personal data, content controls) and every user
+  can export their own favorites, progress, hidden paths and playlists
+- Keyless metadata fallback: when `TMDB_API_KEY` is empty, scraping uses the
+  free TVMaze API (`TVMAZE_ENABLED=0` disables it)
+- README screenshots replaced the "coming soon" placeholder
 - Admin content blocking by title: block media without deleting files/records,
   hidden for everyone, unblock anytime (`blocked_titles` table)
 - Library-level blocking: block/unblock an entire library from the admin panel,

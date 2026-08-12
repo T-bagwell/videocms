@@ -322,6 +322,8 @@ label input, label textarea { margin-top: 6px; }
   font-size: 13px;
 }
 .share-row:last-child { border-bottom: none; }
+.page-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.page-head h1 { margin: 0; }
 
 @media (max-width: 720px) {
   .detail { grid-template-columns: 1fr; }

@@ -136,8 +136,12 @@ videos          -- + series_id(外键→series, ON DELETE SET NULL), season, epi
 blocked_titles  -- id, title, created_at（管理员按标题屏蔽内容）
 hidden_paths    -- id, user_id(外键), path, created_at（按用户隐藏路径）
 series_favorites-- 主键(user_id, series_id), created_at
-share_tokens    -- id, video_id(外键, ON DELETE CASCADE), token(唯一), expires_at,
+share_tokens    -- id, scope(video|series|playlist), video_id/series_id/playlist_id
+                --   (外键, ON DELETE CASCADE), token(唯一), expires_at,
                 --   created_by(外键→users), created_at（公开分享链接）
+subtitle_tracks -- id, video_id(外键, ON DELETE CASCADE), position, lang, title,
+                --   path, kind(sidecar|embedded|upload), source_key(视频内唯一),
+                --   stream_index（多语言字幕轨道）
 ```
 
 关键索引：`videos(lower(title))`、`videos(library_id)`、部分索引
@@ -179,9 +183,10 @@ erDiagram
   `-ss <start> -i <input> -c:v libx264 -preset veryfast -crf 23
   -vf scale=<width>:-2 -force_key_frames expr:gte(t,n_forced*6) -c:a aac -b:a 96k
   -f hls -hls_time 6 -hls_list_size 0 -hls_flags independent_segments`
-- 每档写入 `data/hls/<video-id>/v<宽度>/`；服务端生成引用所有档位（以及视频
-  有字幕时的字幕组）的 master 播放列表。清单随转码增长，ffmpeg 结束后由服务端
-  追加 `#EXT-X-ENDLIST`
+- 每档写入 `data/hls/<video-id>/v<宽度>/`；服务端生成引用所有档位、并为每条字幕轨
+  输出一个 `#EXT-X-MEDIA` 条目（`subs/<轨道id>/playlist.m3u8`，内嵌轨首次请求时
+  按需提取）的 master 播放列表。清单随转码增长，ffmpeg 结束后由服务端追加
+  `#EXT-X-ENDLIST`
 - 请求的 `start` 与当前会话相差超过一个分片（6 秒）时，杀掉旧会话并从新位置重启（跳转）
 - 清单在响应时重写，使每个分片 URL 都携带 `?token=`
 - 空闲会话 **15 分钟**后回收，同时删除会话目录
@@ -197,7 +202,8 @@ erDiagram
 3. 工作池（默认 **4**，`SCAN_WORKERS` 可设 1-16）用 ffprobe 探测每个文件（30 秒超时）
    并写入视频记录
 4. 新记录用 ffmpeg 抽取海报帧（60 秒超时，`scale=480:-2`，取 15% 处画面）；
-   同目录字幕（`.srt/.vtt/.ass`）自动关联
+   同目录字幕（`.srt/.vtt/.ass/.ssa`）与全部内嵌文字字幕轨登记为
+   `subtitle_tracks`，第一条成为生效的 `subtitle_path`
 5. 每收录 20 个更新 `video_count`，UI 显示实时进度
 6. 完成后，本次未扫描到的文件标记 `available=false`
    （依据 `last_scanned_at < scan_start`），取消扫描不会误标
@@ -205,6 +211,11 @@ erDiagram
    状态变为 `cancelled`，已收录记录保留
 8. panic 会被恢复并显示为 `scan_status=error`；服务重启会把残留的 `scanning`
    状态重置为 `error`
+
+**增量入库**：`Scanner.Watch` 将 fsnotify 事件监听（递归，每个库根目录一个
+watcher）与差异扫描结合。变更文件（包括大小不变的修改）数秒内即被重新探测，
+被删除的文件/目录立即标记为不可用；同时仍以 `WATCH_INTERVAL` 周期跑全量差异
+扫描作为兜底。
 
 **剧集自动分组**：每次扫描后 `rebuildSeries` 从标题解析集数标记
 （`S01E01`、`EP1`、`E01`、`第1集`、结尾括号数字等），把共享前缀 + 同季的视频归组，
@@ -214,11 +225,12 @@ erDiagram
 
 探测失败的文件仍会以空技术元数据入库，让所有者能看到并决定如何处理。
 
-### 3.8 元数据刮削（TMDB）
+### 3.8 元数据刮削（TMDB / TVMaze）
 
-可选（`TMDB_API_KEY`）。`Scraper`：
+可选。配置了 `TMDB_API_KEY` 时走 TMDB；未配置时自动使用免密钥的 TVMaze
+（`TVMAZE_ENABLED=0` 可关闭）。`Scraper`：
 
-- 先搜索 TMDB（语言可配置，默认 `zh-CN`），再取影片详情获取本地化类型名
+- 先搜索提供商（TMDB 语言可配置，默认 `zh-CN`），TMDB 再取影片详情获取本地化类型名
 - 下载 `w500` 海报到 `data/posters/<video-id>.<ext>`
 - 更新 `title, year, synopsis, genres, poster_path, tmdb_id, scraped_at`
 - 限速：每 400ms 一次请求
@@ -398,7 +410,7 @@ sequenceDiagram
 
 ## 9. 扩展点
 
-- **更多在线元数据源**（JAV 数据库、剧集刮削等）
-- **字幕增强**：多语言选择与多轨切换（视频级字幕已支持）
-- **分享扩展**：剧集与播放列表分享（目前支持视频级分享）
-- **元数据与用户数据导出/备份**
+- **更多在线元数据源**（TMDB/TVMaze 之外：JAV 数据库、AniList 等）
+- **按用户保存字幕偏好**（目前生效字幕是全局的）
+- **分享链接加密码/白名单**
+- **导出备份的导入/恢复**

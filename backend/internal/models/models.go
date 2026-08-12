@@ -71,6 +71,16 @@ type Video struct {
 	UpdatedAt   time.Time `json:"updated_at"`
 }
 
+type SubtitleTrack struct {
+	ID       uuid.UUID `json:"id"`
+	VideoID  uuid.UUID `json:"-"`
+	Position int       `json:"position"`
+	Lang     string    `json:"lang"`
+	Title    string    `json:"title"`
+	Kind     string    `json:"kind"`
+	IsActive bool      `json:"is_active"`
+}
+
 type Series struct {
 	ID           uuid.UUID `json:"id"`
 	LibraryID    uuid.UUID `json:"library_id"`

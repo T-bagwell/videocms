@@ -38,8 +38,8 @@
 | 🔍 扫描 | 递归发现 mp4/mkv/webm/avi/mov/ts…；并行探测（4 worker，`SCAN_WORKERS` 可调）；实时进度；**可随时取消**；自动跳过 macOS `._` 文件和 `.m3u8` 流文件夹 |
 | 🏷️ 元数据 | ffprobe 提取编码/分辨率/时长；自动生成海报；可编辑标题/年份/简介/类型；可选 **TMDB 在线刮削** |
 | 📺 剧集 | 带序号的文件（`S01E01`、`EP1`、`第1集`、`剧名01集名`…）自动按集数归组；按季区分；支持列表连播 |
-| ▶️ 播放 | H.264/WebM 原生播放（HTTP Range）；**MKV/HEVC 实时转码为多档自适应 HLS**（可切换清晰度）；字幕自动识别（SRT→WebVTT）、内嵌字幕提取、字幕上传；支持下载 |
-| 🔗 分享 | 短时公开分享链接（签名、限期、可撤销）——拿到链接即可免登录观看；同样遵循内容屏蔽 |
+| ▶️ 播放 | H.264/WebM 原生播放（HTTP Range）；**MKV/HEVC 实时转码为多档自适应 HLS**（可切换清晰度）；字幕自动识别（SRT→WebVTT）、内嵌字幕提取、字幕上传与**多语言切换**；支持下载 |
+| 🔗 分享 | 支持**视频、剧集与播放列表**的短时公开分享链接（签名、限期、可撤销）——拿到链接即可免登录观看；同样遵循内容屏蔽 |
 | 👤 个性化 | 继续观看、收藏（视频与剧集）、可顺序播放的播放列表 |
 | 🔐 用户 | 注册/登录（JWT）；管理员/普通用户角色；带安全守卫的用户管理 |
 | 🚫 内容屏蔽 | 管理员可在后台按媒资名屏蔽——对所有人隐藏，文件和记录保留，可随时解除 |
@@ -62,7 +62,10 @@
 
 ## 截图
 
-> *即将补充——`make serve` 后访问 `http://<服务器IP>:8080` 即可看到界面。*
+![首页](docs/screenshots/home.png)
+![剧集](docs/screenshots/series.png)
+![视频详情](docs/screenshots/detail.png)
+![播放器](docs/screenshots/player.png)
 
 ## 文档
 
@@ -128,9 +131,10 @@ make serve                                 # 构建前端并统一在 :8080 提�
 | `DATA_DIR` | `data` | 海报 + HLS 分片 |
 | `ADMIN_USERNAME` / `ADMIN_PASSWORD` | admin / admin123 | 初始管理员 |
 | `FFPROBE_BIN` / `FFMPEG_BIN` | 自动探测 | 工具路径（含 Homebrew 回退） |
-| `TMDB_API_KEY` / `TMDB_LANGUAGE` | 空 / zh-CN | 元数据刮削 |
+| `TMDB_API_KEY` / `TMDB_LANGUAGE` | 空 / zh-CN | 元数据刮削；未配置 key 时自动使用免费的 TVMaze |
+| `TVMAZE_ENABLED` | `1` | 设为 `0` 可关闭免密钥的 TVMaze 兜底刮削 |
 | `SCAN_WORKERS` | `4` | 并行扫描工作数（1-16） |
-| `WATCH_INTERVAL` | `30` | 自动增量扫描间隔（秒），`0` 关闭 |
+| `WATCH_INTERVAL` | `30` | 增量扫描的兜底间隔（fsnotify 事件即时索引）；`0` 关闭监听 |
 | `WEB_ROOT` | 自动（`frontend/dist`） | 生产模式的前端目录 |
 
 ## 项目结构

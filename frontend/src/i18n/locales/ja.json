@@ -134,7 +134,8 @@
     "title": "お気に入り",
     "empty": "お気に入りはまだありません。閲覧中に「☆ お気に入り」をタップしてください。",
     "videosTitle": "お気に入りの動画",
-    "seriesTitle": "お気に入りのドラマ"
+    "seriesTitle": "お気に入りのドラマ",
+    "exportMyData": "自分のデータをエクスポート"
   },
   "series": {
     "title": "ドラマ",
@@ -224,7 +225,8 @@
     "blockLibraryConfirm": "ライブラリ「{{name}}」をブロックしますか？メディアは全員に非表示になります。ファイルとレコードは保持されます。",
     "unblockLibraryConfirm": "ライブラリ「{{name}}」のブロックを解除しますか？メディアが再び全員に見えるようになります。",
     "libBlocked": "ライブラリ「{{name}}」をブロックしました",
-    "libUnblocked": "ライブラリ「{{name}}」のブロックを解除しました"
+    "libUnblocked": "ライブラリ「{{name}}」のブロックを解除しました",
+    "export": "データをエクスポート"
   },
   "picker": {
     "title": "サーバーフォルダを選択",

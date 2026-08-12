@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { api } from '../api.js';
+import { api, mediaUrl } from '../api.js';
 import { useAuth } from '../auth.jsx';
 import PathPicker from '../components/PathPicker.jsx';
 import { fmtBytes } from '../i18n';
@@ -47,18 +47,23 @@ function Overview() {
   }, []);
   if (!stats) return <div className="loading">{t('common.loading')}</div>;
   return (
-    <div className="stats-grid">
-      <div className="card stat"><div className="stat-num">{stats.videos}</div><div>{t('admin.statsVideos')}</div></div>
-      <div className="card stat"><div className="stat-num">{stats.libraries}</div><div>{t('admin.statsLibraries')}</div></div>
-      <div className="card stat"><div className="stat-num">{stats.users}</div><div>{t('admin.statsUsers')}</div></div>
-      <div className="card stat"><div className="stat-num">{stats.playlists}</div><div>{t('admin.statsPlaylists')}</div></div>
-      <div className="card stat"><div className="stat-num">{stats.favorites}</div><div>{t('admin.statsFavorites')}</div></div>
-      <div className="card stat"><div className="stat-num">{stats.series}</div><div>{t('admin.statsSeries')}</div></div>
-      <div className="card stat"><div className="stat-num">{fmtBytes(stats.total_bytes)}</div><div>{t('admin.statsStorage')}</div></div>
-      {stats.videos_missing > 0 && (
-        <div className="card stat warn"><div className="stat-num">{stats.videos_missing}</div><div>{t('admin.statsMissing')}</div></div>
-      )}
-    </div>
+    <>
+      <div className="stats-grid">
+        <div className="card stat"><div className="stat-num">{stats.videos}</div><div>{t('admin.statsVideos')}</div></div>
+        <div className="card stat"><div className="stat-num">{stats.libraries}</div><div>{t('admin.statsLibraries')}</div></div>
+        <div className="card stat"><div className="stat-num">{stats.users}</div><div>{t('admin.statsUsers')}</div></div>
+        <div className="card stat"><div className="stat-num">{stats.playlists}</div><div>{t('admin.statsPlaylists')}</div></div>
+        <div className="card stat"><div className="stat-num">{stats.favorites}</div><div>{t('admin.statsFavorites')}</div></div>
+        <div className="card stat"><div className="stat-num">{stats.series}</div><div>{t('admin.statsSeries')}</div></div>
+        <div className="card stat"><div className="stat-num">{fmtBytes(stats.total_bytes)}</div><div>{t('admin.statsStorage')}</div></div>
+        {stats.videos_missing > 0 && (
+          <div className="card stat warn"><div className="stat-num">{stats.videos_missing}</div><div>{t('admin.statsMissing')}</div></div>
+        )}
+      </div>
+      <a className="btn ghost" href={mediaUrl('/admin/export')}>
+        {t('admin.export')}
+      </a>
+    </>
   );
 }
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { api } from '../api.js';
+import { api, mediaUrl } from '../api.js';
 import VideoCard from '../components/VideoCard.jsx';
 import SeriesCard from '../components/SeriesCard.jsx';
 
@@ -23,7 +23,12 @@ export default function FavoritesPage() {
 
   return (
     <div className="container">
-      <h1>{t('favorites.title')}</h1>
+      <div className="page-head">
+        <h1>{t('favorites.title')}</h1>
+        <a className="btn ghost" href={mediaUrl('/users/me/export')}>
+          {t('favorites.exportMyData')}
+        </a>
+      </div>
       {err && <div className="form-error">{err}</div>}
       {loading ? (
         <div className="loading">{t('common.loading')}</div>

@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { api, mediaUrl } from '../api.js';
 import Poster from '../components/Poster.jsx';
+import ShareModal from '../components/ShareModal.jsx';
 import { useAuth } from '../auth.jsx';
 import { fmtBytes, fmtDuration } from '../i18n';
 
@@ -21,17 +22,11 @@ export default function VideoDetailPage() {
   const [msg, setMsg] = useState('');
   const [err, setErr] = useState('');
   const [showShare, setShowShare] = useState(false);
-  const [shareHours, setShareHours] = useState(168);
-  const [shares, setShares] = useState([]);
-  const [createdShare, setCreatedShare] = useState('');
-  const [copied, setCopied] = useState(false);
-  const [shareErr, setShareErr] = useState('');
   const [subtitleBusy, setSubtitleBusy] = useState(false);
 
   useEffect(() => {
     api(`/videos/${id}`).then(setVideo).catch((e) => setErr(e.message));
     api('/playlists').then((d) => setPlaylists(d.items)).catch(() => {});
-    api(`/videos/${id}/shares`).then((d) => setShares(d.items)).catch(() => {});
   }, [id]);
 
   async function toggleFavorite() {
@@ -118,43 +113,6 @@ export default function VideoDetailPage() {
       setErr(e2.message);
     } finally {
       setScraping(false);
-    }
-  }
-
-  async function createShareLink(e) {
-    e.preventDefault();
-    setShareErr('');
-    try {
-      const d = await api(`/videos/${video.id}/share`, {
-        method: 'POST',
-        body: { hours: Number(shareHours) || 168 },
-      });
-      setCreatedShare(`${window.location.origin}${d.url}`);
-      const list = await api(`/videos/${video.id}/shares`);
-      setShares(list.items);
-    } catch (e2) {
-      setShareErr(e2.message);
-    }
-  }
-
-  async function revokeShare(token) {
-    setShareErr('');
-    try {
-      await api(`/share/${token}`, { method: 'DELETE' });
-      setShares((prev) => prev.filter((s) => s.token !== token));
-      if (createdShare && createdShare.endsWith(token)) setCreatedShare('');
-    } catch (e2) {
-      setShareErr(e2.message);
-    }
-  }
-
-  async function copyShare() {
-    try {
-      await navigator.clipboard.writeText(createdShare);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    } catch {
-      // clipboard unavailable; the link is still visible to copy manually
     }
   }
 
@@ -369,53 +327,7 @@ export default function VideoDetailPage() {
         </div>
       )}
 
-      {showShare && (
-        <div className="modal-backdrop" onClick={() => setShowShare(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h3>{t('video.shareTitle')}</h3>
-            <form onSubmit={createShareLink} className="inline-form">
-              <input
-                type="number"
-                min="1"
-                max="8760"
-                value={shareHours}
-                onChange={(e) => setShareHours(e.target.value)}
-                placeholder={t('video.shareHours')}
-              />
-              <button className="btn small primary">{t('video.shareCreate')}</button>
-            </form>
-            {createdShare && (
-              <div className="share-link-row">
-                <code className="share-link">{createdShare}</code>
-                <button className="btn small" onClick={copyShare}>
-                  {copied ? t('video.shareCopied') : t('video.shareCopy')}
-                </button>
-              </div>
-            )}
-            {shareErr && <div className="form-error">{shareErr}</div>}
-            {shares.length > 0 && (
-              <div className="share-list">
-                <h4>{t('video.shareList')}</h4>
-                {shares.map((s) => (
-                  <div key={s.token} className="share-row">
-                    <span className="muted">
-                      {t('video.shareExpires', {
-                        date: new Date(s.expires_at).toLocaleString(),
-                      })}
-                    </span>
-                    <button className="btn small ghost" onClick={() => revokeShare(s.token)}>
-                      {t('video.shareRevoke')}
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-            <button className="btn ghost" onClick={() => setShowShare(false)}>
-              {t('common.close')}
-            </button>
-          </div>
-        </div>
-      )}
+      {showShare && <ShareModal kind="videos" id={video.id} onClose={() => setShowShare(false)} />}
 
       <div className="back-link">
         <Link to="/">← {t('nav.home')}</Link>

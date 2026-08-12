@@ -141,8 +141,12 @@ videos          -- + series_id(fk → series, ON DELETE SET NULL), season, episo
 blocked_titles  -- id, title, created_at (admin content blocking by title match)
 hidden_paths    -- id, user_id(fk), path, created_at (per-user path filters)
 series_favorites-- PK(user_id, series_id), created_at
-share_tokens    -- id, video_id(fk, ON DELETE CASCADE), token(unique), expires_at,
+share_tokens    -- id, scope(video|series|playlist), video_id/series_id/playlist_id
+                --   (fk, ON DELETE CASCADE), token(unique), expires_at,
                 --   created_by(fk → users), created_at (public share links)
+subtitle_tracks -- id, video_id(fk, ON DELETE CASCADE), position, lang, title,
+                --   path, kind(sidecar|embedded|upload), source_key(unique per video),
+                --   stream_index (multi-language subtitle tracks)
 ```
 
 Key indexes: `videos(lower(title))`, `videos(library_id)`, partial
@@ -186,9 +190,10 @@ The `HLSManager`:
   -vf scale=<width>:-2 -force_key_frames expr:gte(t,n_forced*6) -c:a aac -b:a 96k
   -f hls -hls_time 6 -hls_list_size 0 -hls_flags independent_segments`
 - Each rendition is written to `data/hls/<video-id>/v<width>/`; the server
-  writes a master playlist referencing every rendition (and the subtitle group,
-  when the video has subtitles). Playlists grow while transcoding and `#EXT-X-ENDLIST`
-  is appended server-side when ffmpeg finishes
+  writes a master playlist referencing every rendition and one
+  `#EXT-X-MEDIA` subtitle entry per track (`subs/<track-id>/playlist.m3u8`,
+  lazy-extracting embedded tracks on first request). Playlists grow while
+  transcoding and `#EXT-X-ENDLIST` is appended server-side when ffmpeg finishes
 - If the requested `start` differs from the running session by more than one
   segment (6s), the session is killed and restarted at the new position (seek)
 - The manifest is rewritten on the fly so every segment URL carries `?token=`
@@ -205,7 +210,9 @@ The `HLSManager`:
 3. A worker pool (default **4**, `SCAN_WORKERS` 1-16) probes each file with
    ffprobe (30s timeout) and upserts the video row
 4. For new rows, ffmpeg extracts a poster frame (60s timeout, `scale=480:-2`,
-   frame at 15% of duration); a sibling subtitle (`.srt/.vtt/.ass`) is linked
+   frame at 15% of duration); sidecar subtitles (`.srt/.vtt/.ass/.ssa`) and all
+   embedded text subtitle streams are registered as `subtitle_tracks`, and the
+   first one becomes the active `subtitle_path`
 5. Every 20 indexed videos, `video_count` is updated so the UI shows live progress
 6. On completion, files not seen in this scan are marked `available=false`
    (based on `last_scanned_at < scan_start`), which never misflags videos when a
@@ -214,6 +221,12 @@ The `HLSManager`:
    status becomes `cancelled` and already-indexed rows are preserved
 8. Panics are recovered and surface as `scan_status=error`; a server restart
    resets any stale `scanning` status to `error`
+
+**Incremental indexing**: `Scanner.Watch` combines fsnotify event watchers
+(recursive, one per library root) with the diff-based pass. Changed files are
+probed within seconds — including same-size modifications — and removed
+files/directories are marked unavailable immediately, while the full pass
+still runs every `WATCH_INTERVAL` as a safety net.
 
 **TV series grouping**: after each scan, `rebuildSeries` parses episode markers
 (`S01E01`, `EP1`, `E01`, `第1集`, trailing bracketed numbers) from titles,
@@ -425,8 +438,7 @@ The backend binds all interfaces (`:8080`), so LAN clients reach the UI directly
 
 ## 9. Extension Points
 
-- **Online metadata providers** beyond TMDB (JAV database, TV series, etc.)
-- **Subtitles**: per-language selection and switching between multiple tracks
-- **Sharing**: share links for series and playlists (videos are supported today)
-- **Export/backup** of metadata and per-user data
-- **Public sharing** with signed short-lived URLs instead of the account JWT
+- **Online metadata providers** beyond TMDB/TVMaze (JAV database, AniList, etc.)
+- **Per-user subtitle preference** (the active track is global today)
+- **Share password/whitelist** on public links
+- **Import/restore** of exported backups

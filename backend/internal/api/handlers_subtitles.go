@@ -1,6 +1,9 @@
 package api
 
 import (
+	"context"
+	"errors"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -15,8 +18,143 @@ import (
 
 var uploadSubtitleExts = map[string]bool{".srt": true, ".vtt": true, ".ass": true, ".ssa": true}
 
+type subtitleTrackRow struct {
+	ID          uuid.UUID
+	Position    int
+	Lang        string
+	Title       string
+	Path        string
+	Kind        string
+	SourceKey   string
+	StreamIndex int
+}
+
 func (a *App) subtitleDir() string {
 	return filepath.Join(a.cfg.DataDir, "subtitles")
+}
+
+func (a *App) loadSubtitleTrack(ctx context.Context, videoID, trackID uuid.UUID) (subtitleTrackRow, bool) {
+	var t subtitleTrackRow
+	err := a.pool.QueryRow(ctx, `
+		SELECT id, position, lang, title, path, kind, source_key, stream_index
+		FROM subtitle_tracks WHERE id=$1 AND video_id=$2`, trackID, videoID).
+		Scan(&t.ID, &t.Position, &t.Lang, &t.Title, &t.Path, &t.Kind, &t.SourceKey, &t.StreamIndex)
+	if err != nil {
+		return subtitleTrackRow{}, false
+	}
+	return t, true
+}
+
+// ensureSubtitlePath returns a readable subtitle file for a track, extracting
+// embedded tracks on first use.
+func (a *App) ensureSubtitlePath(ctx context.Context, videoID uuid.UUID, t *subtitleTrackRow) (string, error) {
+	if t.Path != "" {
+		if _, err := os.Stat(t.Path); err == nil {
+			return t.Path, nil
+		}
+	}
+	if t.Kind != "embedded" || t.StreamIndex < 0 {
+		return "", errors.New("subtitle file unavailable")
+	}
+	var input string
+	if err := a.pool.QueryRow(ctx,
+		`SELECT file_path FROM videos WHERE id=$1`, videoID).Scan(&input); err != nil {
+		return "", err
+	}
+	dir := a.subtitleDir()
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		return "", err
+	}
+	dst := filepath.Join(dir, fmt.Sprintf("%s-e%d.vtt", videoID.String(), t.StreamIndex))
+	if err := media.ExtractEmbeddedSubtitle(ctx, a.ffmpegBin(), input, t.StreamIndex, dst); err != nil {
+		return "", err
+	}
+	t.Path = dst
+	if _, err := a.pool.Exec(ctx,
+		`UPDATE subtitle_tracks SET path=$1 WHERE id=$2`, dst, t.ID); err != nil {
+		return "", err
+	}
+	return dst, nil
+}
+
+// listSubtitleTracks returns all subtitle tracks of a video with the active
+// flag, so the player can offer language switching.
+// GET /api/videos/{id}/subtitle-tracks
+func (a *App) listSubtitleTracks(w http.ResponseWriter, r *http.Request) {
+	id, err := uuid.Parse(r.PathValue("id"))
+	if err != nil {
+		writeErr(w, http.StatusBadRequest, "invalid video id")
+		return
+	}
+	var active string
+	_ = a.pool.QueryRow(r.Context(),
+		`SELECT subtitle_path FROM videos WHERE id=$1`, id).Scan(&active)
+
+	items, err := a.listTracksForVideo(r.Context(), id, active)
+	if err != nil {
+		writeErr(w, http.StatusInternalServerError, "list subtitle tracks failed")
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]any{"items": items})
+}
+
+// getSubtitleTrack serves the WebVTT for one specific track, extracting
+// embedded tracks on first request.
+// GET /api/videos/{id}/subtitles/{trackId}
+func (a *App) getSubtitleTrack(w http.ResponseWriter, r *http.Request) {
+	id, err := uuid.Parse(r.PathValue("id"))
+	if err != nil {
+		writeErr(w, http.StatusBadRequest, "invalid video id")
+		return
+	}
+	trackID, err := uuid.Parse(r.PathValue("trackId"))
+	if err != nil {
+		writeErr(w, http.StatusBadRequest, "invalid track id")
+		return
+	}
+	t, ok := a.loadSubtitleTrack(r.Context(), id, trackID)
+	if !ok {
+		writeErr(w, http.StatusNotFound, "subtitle track not found")
+		return
+	}
+	path, err := a.ensureSubtitlePath(r.Context(), id, &t)
+	if err != nil {
+		log.Printf("serve subtitle track %s: %v", trackID.String()[:8], err)
+		writeErr(w, http.StatusInternalServerError, "subtitle unavailable: "+err.Error())
+		return
+	}
+	serveSubtitleFile(w, r, path)
+}
+
+// setActiveSubtitleTrack makes a track the default subtitle for a video.
+// PUT /api/videos/{id}/subtitles/{trackId}/active
+func (a *App) setActiveSubtitleTrack(w http.ResponseWriter, r *http.Request) {
+	id, err := uuid.Parse(r.PathValue("id"))
+	if err != nil {
+		writeErr(w, http.StatusBadRequest, "invalid video id")
+		return
+	}
+	trackID, err := uuid.Parse(r.PathValue("trackId"))
+	if err != nil {
+		writeErr(w, http.StatusBadRequest, "invalid track id")
+		return
+	}
+	t, ok := a.loadSubtitleTrack(r.Context(), id, trackID)
+	if !ok {
+		writeErr(w, http.StatusNotFound, "subtitle track not found")
+		return
+	}
+	path, err := a.ensureSubtitlePath(r.Context(), id, &t)
+	if err != nil {
+		writeErr(w, http.StatusInternalServerError, "subtitle unavailable: "+err.Error())
+		return
+	}
+	if _, err := a.pool.Exec(r.Context(),
+		`UPDATE videos SET subtitle_path=$1, updated_at=now() WHERE id=$2`, path, id); err != nil {
+		writeErr(w, http.StatusInternalServerError, "update video failed")
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]any{"message": "subtitle track activated"})
 }
 
 // uploadSubtitle stores an uploaded subtitle file for a video and activates it.
@@ -61,13 +199,19 @@ func (a *App) uploadSubtitle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var oldPath string
+	var pos int
 	if err := a.pool.QueryRow(r.Context(),
-		`SELECT subtitle_path FROM videos WHERE id=$1`, id).Scan(&oldPath); err != nil {
-		writeErr(w, http.StatusNotFound, "video not found")
+		`SELECT COALESCE(MAX(position), -1) + 1 FROM subtitle_tracks WHERE video_id=$1`, id).Scan(&pos); err != nil {
+		writeErr(w, http.StatusInternalServerError, "create track failed")
 		return
 	}
-	removeOldSubtitle(dir, oldPath, dst)
+	if _, err := a.pool.Exec(r.Context(), `
+		INSERT INTO subtitle_tracks (video_id, position, lang, title, path, kind, source_key, stream_index)
+		VALUES ($1,$2,'',$3,$4,'upload','upload:'||$3,-1)`,
+		id, pos, header.Filename, dst); err != nil {
+		writeErr(w, http.StatusInternalServerError, "create track failed")
+		return
+	}
 	if _, err := a.pool.Exec(r.Context(),
 		`UPDATE videos SET subtitle_path=$1, updated_at=now() WHERE id=$2`, dst, id); err != nil {
 		writeErr(w, http.StatusInternalServerError, "update video failed")
@@ -76,7 +220,8 @@ func (a *App) uploadSubtitle(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]any{"message": "subtitle uploaded"})
 }
 
-// deleteSubtitle removes the active subtitle (file + record) of a video.
+// deleteSubtitle removes the active subtitle (track + file) of a video and
+// promotes the next track if one remains.
 // DELETE /api/videos/{id}/subtitles
 func (a *App) deleteSubtitle(w http.ResponseWriter, r *http.Request) {
 	id, err := uuid.Parse(r.PathValue("id"))
@@ -84,24 +229,53 @@ func (a *App) deleteSubtitle(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusBadRequest, "invalid video id")
 		return
 	}
-	var path string
+	var active string
 	if err := a.pool.QueryRow(r.Context(),
-		`SELECT subtitle_path FROM videos WHERE id=$1`, id).Scan(&path); err != nil || path == "" {
+		`SELECT subtitle_path FROM videos WHERE id=$1`, id).Scan(&active); err != nil || active == "" {
 		writeErr(w, http.StatusNotFound, "no subtitle to remove")
 		return
 	}
-	removeOldSubtitle(a.subtitleDir(), path, "")
+
+	var trackID uuid.UUID
+	var trackPath, trackKind string
+	err = a.pool.QueryRow(r.Context(), `
+		SELECT id, path, kind FROM subtitle_tracks
+		WHERE video_id=$1 AND path=$2 ORDER BY position LIMIT 1`, id, active).
+		Scan(&trackID, &trackPath, &trackKind)
+	if err == nil {
+		if _, err := a.pool.Exec(r.Context(),
+			`DELETE FROM subtitle_tracks WHERE id=$1`, trackID); err != nil {
+			writeErr(w, http.StatusInternalServerError, "remove track failed")
+			return
+		}
+		removeOldSubtitle(a.subtitleDir(), trackPath, "")
+	}
+
+	// promote the first remaining track, if any
+	next := subtitleTrackRow{}
+	err = a.pool.QueryRow(r.Context(), `
+		SELECT id, position, lang, title, path, kind, source_key, stream_index
+		FROM subtitle_tracks WHERE video_id=$1 ORDER BY position LIMIT 1`, id).
+		Scan(&next.ID, &next.Position, &next.Lang, &next.Title, &next.Path, &next.Kind, &next.SourceKey, &next.StreamIndex)
+	if err == nil {
+		p, err := a.ensureSubtitlePath(r.Context(), id, &next)
+		if err == nil {
+			active = p
+		}
+	} else {
+		active = ""
+	}
 	if _, err := a.pool.Exec(r.Context(),
-		`UPDATE videos SET subtitle_path='', updated_at=now() WHERE id=$1`, id); err != nil {
+		`UPDATE videos SET subtitle_path=$1, updated_at=now() WHERE id=$2`, active, id); err != nil {
 		writeErr(w, http.StatusInternalServerError, "update video failed")
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"message": "subtitle removed"})
 }
 
-// extractEmbeddedSubtitle finds the first text subtitle stream inside the video
-// container, converts it to WebVTT and activates it. Image-based tracks (PGS,
-// VobSub…) are rejected because they cannot be converted without OCR.
+// extractEmbeddedSubtitle makes sure every text subtitle stream inside the
+// video container has a track row and extracts the ones that are not yet on
+// disk. Image-based tracks (PGS, VobSub…) are skipped.
 // POST /api/videos/{id}/subtitles/extract
 func (a *App) extractEmbeddedSubtitle(w http.ResponseWriter, r *http.Request) {
 	id, err := uuid.Parse(r.PathValue("id"))
@@ -109,11 +283,9 @@ func (a *App) extractEmbeddedSubtitle(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusBadRequest, "invalid video id")
 		return
 	}
-	var input, oldPath string
-	var available bool
+	var input string
 	if err := a.pool.QueryRow(r.Context(),
-		`SELECT file_path, subtitle_path, available FROM videos WHERE id=$1`, id,
-	).Scan(&input, &oldPath, &available); err != nil || !available {
+		`SELECT file_path FROM videos WHERE id=$1`, id).Scan(&input); err != nil {
 		writeErr(w, http.StatusNotFound, "video not found or unavailable")
 		return
 	}
@@ -123,8 +295,13 @@ func (a *App) extractEmbeddedSubtitle(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusBadGateway, err.Error())
 		return
 	}
-	idx := media.FirstTextSubtitle(streams)
-	if idx < 0 {
+	var text []media.SubtitleStream
+	for _, s := range streams {
+		if !media.IsImageSubtitleCodec(s.Codec) {
+			text = append(text, s)
+		}
+	}
+	if len(text) == 0 {
 		if len(streams) == 0 {
 			writeErr(w, http.StatusBadRequest, "no embedded subtitle streams found")
 			return
@@ -133,27 +310,49 @@ func (a *App) extractEmbeddedSubtitle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	dir := a.subtitleDir()
-	if err := os.MkdirAll(dir, 0o755); err != nil {
-		writeErr(w, http.StatusInternalServerError, "cannot create subtitle dir")
+	// ensure a track row exists for every text stream
+	var basePos int
+	_ = a.pool.QueryRow(r.Context(),
+		`SELECT COALESCE(MAX(position), -1) + 1 FROM subtitle_tracks WHERE video_id=$1 AND kind='embedded'`, id).
+		Scan(&basePos)
+	for i, s := range text {
+		if _, err := a.pool.Exec(r.Context(), `
+			INSERT INTO subtitle_tracks (video_id, position, lang, title, path, kind, source_key, stream_index)
+			VALUES ($1,$2,$3,$4,'','embedded','embedded:'||$5,$5)
+			ON CONFLICT (video_id, source_key) WHERE source_key <> '' DO NOTHING`,
+			id, basePos+i, s.Language, s.Title, s.Index); err != nil {
+			writeErr(w, http.StatusInternalServerError, "create track failed")
+			return
+		}
+	}
+
+	rows, err := a.pool.Query(r.Context(), `
+		SELECT id, stream_index FROM subtitle_tracks
+		WHERE video_id=$1 AND kind='embedded' AND path=''`, id)
+	if err != nil {
+		writeErr(w, http.StatusInternalServerError, "load tracks failed")
 		return
 	}
-	dst := filepath.Join(dir, id.String()+"-embedded.vtt")
-	if err := media.ExtractEmbeddedSubtitle(r.Context(), a.ffmpegBin(), input, idx, dst); err != nil {
-		log.Printf("extract subtitle %s: %v", id.String()[:8], err)
-		writeErr(w, http.StatusInternalServerError, "subtitle extraction failed: "+err.Error())
-		return
+	defer rows.Close()
+	extracted := 0
+	for rows.Next() {
+		var trackID uuid.UUID
+		var streamIndex int
+		if err := rows.Scan(&trackID, &streamIndex); err != nil {
+			continue
+		}
+		t := subtitleTrackRow{ID: trackID, Kind: "embedded", StreamIndex: streamIndex}
+		if _, err := a.ensureSubtitlePath(r.Context(), id, &t); err == nil {
+			extracted++
+		}
 	}
-	removeOldSubtitle(dir, oldPath, dst)
-	if _, err := a.pool.Exec(r.Context(),
-		`UPDATE videos SET subtitle_path=$1, updated_at=now() WHERE id=$2`, dst, id); err != nil {
-		writeErr(w, http.StatusInternalServerError, "update video failed")
-		return
-	}
-	writeJSON(w, http.StatusOK, map[string]any{"message": "embedded subtitle extracted"})
+	writeJSON(w, http.StatusOK, map[string]any{
+		"message": fmt.Sprintf("%d embedded subtitle track(s) extracted", extracted),
+		"count":   extracted,
+	})
 }
 
-// removeOldSubtitle deletes a previous generated/uploaded subtitle file, but
+// removeOldSubtitle deletes a previously generated/uploaded subtitle file, but
 // never a sidecar file next to the video (those belong to the media folder).
 func removeOldSubtitle(dir, oldPath, keep string) {
 	if oldPath == "" || oldPath == keep {

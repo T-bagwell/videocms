@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { api } from '../api.js';
 import Poster from '../components/Poster.jsx';
+import ShareModal from '../components/ShareModal.jsx';
 import { fmtDuration } from '../i18n';
 
 export default function PlaylistDetailPage() {
@@ -12,6 +13,7 @@ export default function PlaylistDetailPage() {
   const [playlist, setPlaylist] = useState(null);
   const [items, setItems] = useState([]);
   const [err, setErr] = useState('');
+  const [showShare, setShowShare] = useState(false);
 
   useEffect(() => {
     api(`/playlists/${id}`)
@@ -43,15 +45,21 @@ export default function PlaylistDetailPage() {
           <h1>{playlist.name}</h1>
           {playlist.description && <p className="muted">{playlist.description}</p>}
         </div>
-        {items.length > 0 && (
-          <button
-            className="btn primary"
-            onClick={() => navigate(`/player/${items[0].video.id}?playlist=${id}`)}
-          >
-            {t('playlists.playAll')}
+        <div className="detail-actions">
+          {items.length > 0 && (
+            <button
+              className="btn primary"
+              onClick={() => navigate(`/player/${items[0].video.id}?playlist=${id}`)}
+            >
+              {t('playlists.playAll')}
+            </button>
+          )}
+          <button className="btn" onClick={() => setShowShare(true)}>
+            {t('video.share')}
           </button>
-        )}
+        </div>
       </div>
+      {showShare && <ShareModal kind="playlists" id={playlist.id} onClose={() => setShowShare(false)} />}
 
       {items.length === 0 ? (
         <div className="empty">{t('playlists.detailEmpty')}</div>
