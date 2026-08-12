@@ -3,6 +3,8 @@ package config
 import (
 	"log"
 	"os"
+	"strconv"
+	"time"
 )
 
 type Config struct {
@@ -14,6 +16,7 @@ type Config struct {
 	AdminPassword string
 	TMDBAPIKey    string
 	WebRoot       string
+	WatchInterval time.Duration
 }
 
 func Load() Config {
@@ -26,6 +29,7 @@ func Load() Config {
 		AdminPassword: os.Getenv("ADMIN_PASSWORD"),
 		TMDBAPIKey:    os.Getenv("TMDB_API_KEY"),
 		WebRoot:       os.Getenv("WEB_ROOT"),
+		WatchInterval: envDuration("WATCH_INTERVAL", 30*time.Second),
 	}
 	if cfg.Addr != "" && cfg.Addr[0] != ':' {
 		cfg.Addr = ":" + cfg.Addr
@@ -39,6 +43,15 @@ func Load() Config {
 func envOr(key, fallback string) string {
 	if v := os.Getenv(key); v != "" {
 		return v
+	}
+	return fallback
+}
+
+func envDuration(key string, fallback time.Duration) time.Duration {
+	if v := os.Getenv(key); v != "" {
+		if secs, err := strconv.Atoi(v); err == nil && secs >= 0 {
+			return time.Duration(secs) * time.Second
+		}
 	}
 	return fallback
 }

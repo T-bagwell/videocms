@@ -156,6 +156,7 @@ make serve                              # http://<LAN IP>:8080
 | `JWT_SECRET` | 開発用値 | **本番では強力なシークレットを設定** |
 | `TMDB_API_KEY` | 空 | メタデータスクレイピングを有効化 |
 | `SCAN_WORKERS` | `4` | 並列スキャンワーカー数 |
+| `WATCH_INTERVAL` | `30` | 自動インクリメンタルスキャンの間隔（秒）。`0` で無効 |
 
 ## 7. FAQ
 

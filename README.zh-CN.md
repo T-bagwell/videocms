@@ -129,6 +129,7 @@ make serve                                 # 构建前端并统一在 :8080 提�
 | `FFPROBE_BIN` / `FFMPEG_BIN` | 自动探测 | 工具路径（含 Homebrew 回退） |
 | `TMDB_API_KEY` / `TMDB_LANGUAGE` | 空 / zh-CN | 元数据刮削 |
 | `SCAN_WORKERS` | `4` | 并行扫描工作数（1-16） |
+| `WATCH_INTERVAL` | `30` | 自动增量扫描间隔（秒），`0` 关闭 |
 | `WEB_ROOT` | 自动（`frontend/dist`） | 生产模式的前端目录 |
 
 ## 项目结构
@@ -178,7 +179,7 @@ scripts/                 演示素材生成器
 - [x] 收藏（视频与剧集）、播放列表、继续观看
 - [x] 内容管控：标题屏蔽、媒体库屏蔽、按用户路径过滤
 - [x] i18n（en/zh/fr/ja/de）
-- [ ] 文件系统监听增量入库
+- [x] 文件系统监听增量入库
 - [ ] 自适应码率（多档 HLS）
 - [ ] 内嵌字幕提取 / 上传
 - [ ] 签名短时 URL 公开分享

@@ -37,6 +37,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("init api: %v", err)
 	}
+	app.StartFileWatcher(ctx)
 
 	srv := &http.Server{
 		Addr:              cfg.Addr,
@@ -59,4 +60,3 @@ func main() {
 		log.Printf("shutdown: %v", err)
 	}
 }
-

@@ -163,6 +163,7 @@ most important ones:
 | `JWT_SECRET` | dev value | **Set a strong secret in production** |
 | `TMDB_API_KEY` | empty | Enables metadata scraping |
 | `SCAN_WORKERS` | `4` | Parallel scanning workers |
+| `WATCH_INTERVAL` | `30` | Seconds between automatic incremental scans; `0` disables |
 
 ## 7. FAQ
 

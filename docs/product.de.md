@@ -161,6 +161,7 @@ Alles wird über Umgebungsvariablen konfiguriert (vollständige Tabelle im READM
 | `JWT_SECRET` | Dev-Wert | **In Produktion starkes Geheimnis setzen** |
 | `TMDB_API_KEY` | leer | Aktiviert Metadaten-Scraping |
 | `SCAN_WORKERS` | `4` | Parallele Scan-Worker |
+| `WATCH_INTERVAL` | `30` | Sekunden zwischen automatischen Inkrement-Scans; `0` deaktiviert |
 
 ## 7. FAQ
 

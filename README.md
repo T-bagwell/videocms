@@ -134,6 +134,7 @@ All settings are environment variables:
 | `FFPROBE_BIN` / `FFMPEG_BIN` | auto-detect | Tool paths (Homebrew fallback) |
 | `TMDB_API_KEY` / `TMDB_LANGUAGE` | empty / zh-CN | Metadata scraping |
 | `SCAN_WORKERS` | `4` | Parallel scan workers (1–16) |
+| `WATCH_INTERVAL` | `30` | Seconds between automatic incremental scans; `0` disables |
 | `WEB_ROOT` | auto (`frontend/dist`) | Built frontend for production mode |
 
 ## Project Structure
@@ -183,7 +184,7 @@ See also [SECURITY.md](SECURITY.md).
 - [x] Favorites (videos & series), playlists, continue watching
 - [x] Content controls: title blocking, library blocking, per-user path filters
 - [x] i18n (en/zh/fr/ja/de)
-- [ ] Filesystem watching for incremental indexing
+- [x] Filesystem watching for incremental indexing
 - [ ] Adaptive-bitrate (multi-quality) HLS
 - [ ] Embedded subtitle extraction / upload
 - [ ] Public sharing with signed short-lived URLs

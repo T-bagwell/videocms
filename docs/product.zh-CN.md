@@ -151,6 +151,7 @@ make serve                              # http://<局域网IP>:8080
 | `JWT_SECRET` | 开发用值 | **生产必须设置强密钥** |
 | `TMDB_API_KEY` | 空 | 启用元数据刮削 |
 | `SCAN_WORKERS` | `4` | 并行扫描工作数 |
+| `WATCH_INTERVAL` | `30` | 自动增量扫描间隔（秒），`0` 关闭 |
 
 ## 7. 常见问题
 

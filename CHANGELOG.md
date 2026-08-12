@@ -6,11 +6,17 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Filesystem watching for incremental indexing: new, changed, and removed
+  files are picked up automatically (default every 30s, `WATCH_INTERVAL`),
+  without a full rescan
 - Admin content blocking by title: block media without deleting files/records,
   hidden for everyone, unblock anytime (`blocked_titles` table)
 - Library-level blocking: block/unblock an entire library from the admin panel,
   hidden for everyone, nothing deleted (`libraries.blocked` column)
 - Open a library folder on the server with the system file manager (one click)
+- TV Shows: files named with only an episode number (e.g. `01.mkv`) are grouped
+  under the containing directory name (or the library name for root-level
+  files), so a series folder scans directly into the series list
 - Project-level Codex skill (`.codex/skills/videocms/`) with environment
   wrapper, commands and conventions
 
@@ -39,6 +45,8 @@ All notable changes to VideoCMS are documented here.
 
 ### Fixed
 
+- Sidecar subtitle selection is now deterministic when several subtitle files
+  exist next to a video (`.srt` preferred) instead of a random one each scan
 - ffprobe/ffmpeg resolution preferring the Homebrew build when the system copy
   is broken (missing libx265)
 - Scan cancellation no longer marks untouched videos as missing

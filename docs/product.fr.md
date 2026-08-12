@@ -163,6 +163,7 @@ Tout se configure par variables d’environnement (table complète dans le READM
 | `JWT_SECRET` | valeur dev | **Secret fort obligatoire en production** |
 | `TMDB_API_KEY` | vide | Active le scraping de métadonnées |
 | `SCAN_WORKERS` | `4` | Workers d’analyse parallèles |
+| `WATCH_INTERVAL` | `30` | Secondes entre analyses incrémentales automatiques ; `0` désactive |
 
 ## 7. FAQ
 
