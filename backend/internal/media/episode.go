@@ -1,6 +1,7 @@
 package media
 
 import (
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
@@ -15,6 +16,7 @@ var (
 	midNumberRe   = regexp.MustCompile(`^(.+?[^\d])(\d{2,3})([^\d]|$)`)
 	trailingRe    = regexp.MustCompile(`^(.*?)[\s]*[\(\[](\d{1,3})[\)\]]\s*$`)
 	bareTrailing  = regexp.MustCompile(`^(.*?)[\s\-_.]+(\d{1,3})\s*$`)
+	bareNumberRe  = regexp.MustCompile(`^(\d{1,3})$`)
 )
 
 // parseEpisode extracts a (series name, season, episode) tuple from a cleaned
@@ -76,4 +78,24 @@ func cleanSeriesName(name string) string {
 	// drop trailing separators/punctuation that preceded the episode number
 	name = strings.TrimRight(name, " \t._-–—:：|")
 	return name
+}
+
+// fallbackSeriesName derives a series name for a video whose filename is a bare
+// episode number (e.g. "01.mkv") with no other marker: the top-level directory
+// under the library root, or the library name when the file sits directly in
+// the library root. Returns "" when the file is outside the library root.
+func fallbackSeriesName(libName, libPath, filePath string) string {
+	rel, err := filepath.Rel(libPath, filepath.Dir(filePath))
+	if err != nil {
+		return ""
+	}
+	rel = filepath.Clean(rel)
+	if rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+		return ""
+	}
+	if rel == "." {
+		return libName
+	}
+	parts := strings.Split(rel, string(filepath.Separator))
+	return cleanSeriesName(parts[0])
 }

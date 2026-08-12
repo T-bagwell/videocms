@@ -16,6 +16,22 @@ The number guard in rule 5 excludes date-like titles such as
 `2024 2 12 利哥探花 黑丝` (prefix has no letter) and `星际穿越 Interstellar 2014`
 (year is 4 digits, not 2-3).
 
+## Directory fallback (bare episode numbers)
+
+When no rule above matches and the filename is exactly a bare 1-3 digit number
+(`^(\d{1,3})$`, e.g. `01.mkv`), `rebuildSeries` falls back to the containing
+directory for the series name:
+
+- File directly in the library root -> the library name (e.g. library
+  `胜者为王2` with `01.mkv`..`30.mkv` groups as series `胜者为王2`).
+- File in a subdirectory -> the top-level directory under the library root
+  (e.g. `/mnt/库/胜者为王2/01.mkv` -> series `胜者为王2`; nested season folders
+  still resolve to the top-level series directory).
+- File outside the library root -> no group (skipped).
+
+Grouping still requires >=2 episodes, and the same `>=2` cleanup applies after
+rescans.
+
 ## Grouping rules (rebuildSeries)
 
 - Key = `lower(seriesName) + "\x00" + season`.
