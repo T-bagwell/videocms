@@ -332,6 +332,8 @@ func (s *Scanner) watchEvents(ctx context.Context, watcher *fsnotify.Watcher) {
 		}
 		if err := watcher.Add(dir); err == nil {
 			dirToLib[dir] = libID
+		} else if !os.IsNotExist(err) {
+			log.Printf("watcher: cannot watch %s: %v", dir, err)
 		}
 	}
 	libForPath := func(path string) (uuid.UUID, bool) {
@@ -368,6 +370,17 @@ func (s *Scanner) watchEvents(ctx context.Context, watcher *fsnotify.Watcher) {
 	for _, lib := range libs {
 		if st, err := os.Stat(lib.Path); err == nil && st.IsDir() {
 			addWatch(lib.Path, lib.ID)
+			// fsnotify watches are not recursive: register every existing
+			// subdirectory so events in nested folders are seen too.
+			filepath.WalkDir(lib.Path, func(p string, d fs.DirEntry, err error) error {
+				if err != nil {
+					return nil
+				}
+				if d.IsDir() && p != lib.Path {
+					addWatch(p, lib.ID)
+				}
+				return nil
+			})
 		}
 	}
 
@@ -459,6 +472,34 @@ func (s *Scanner) applyEventBatch(ctx context.Context, libID uuid.UUID, videos m
 
 	var candidates []string
 	for p := range videos {
+		base := filepath.Base(p)
+		// subtitle sidecar events must not be probed as videos: resync the
+		// sibling video's track list instead.
+		if isSubtitleFile(base) {
+			videoBase := strings.TrimSuffix(p, filepath.Ext(p))
+			var vid uuid.UUID
+			var videoPath string
+			err := s.pool.QueryRow(ctx, `
+				SELECT id, file_path FROM videos
+				WHERE file_path LIKE $1 || '.%' ORDER BY length(file_path) LIMIT 1`,
+				videoBase).Scan(&vid, &videoPath)
+			if err == nil {
+				active, err := s.syncSubtitleTracks(ctx, vid, videoPath, findSidecarSubtitles(videoPath), nil)
+				if err != nil {
+					log.Printf("watcher: resync subtitle tracks: %v", err)
+				}
+				var current string
+				if err := s.pool.QueryRow(ctx,
+					`SELECT subtitle_path FROM videos WHERE id=$1`, vid).Scan(&current); err == nil && active != "" && active != current {
+					s.pool.Exec(ctx,
+						`UPDATE videos SET subtitle_path=$1, updated_at=now() WHERE id=$2`, active, vid)
+				}
+			}
+			continue
+		}
+		if !isVideoFile(base) {
+			continue // not media; ignore other events
+		}
 		if st, err := os.Stat(p); err == nil && !st.IsDir() {
 			candidates = append(candidates, p)
 			continue

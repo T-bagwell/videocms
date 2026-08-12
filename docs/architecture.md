@@ -241,11 +241,12 @@ Series with fewer than 2 available episodes are cleaned up.
 On probe failure the file is still indexed with empty technical metadata so the
 owner can see it and decide what to do.
 
-### 3.8 Metadata scraping (TMDB / TVMaze / AniList)
+### 3.8 Metadata scraping (TMDB / TVMaze / AniList / Wikipedia)
 
 Optional. With `TMDB_API_KEY` set the scraper uses TMDB; without a key it falls
-back to the keyless TVMaze API and then AniList (`TVMAZE_ENABLED=0` /
-`ANILIST_ENABLED=0` disable them). `Scraper`:
+back to the keyless TVMaze API, then AniList, then Wikipedia
+(`TVMAZE_ENABLED=0` / `ANILIST_ENABLED=0` / `WIKIPEDIA_ENABLED=0` disable them).
+`Scraper`:
 
 - Searches TMDB (`language` configurable, default `zh-CN`), then fetches movie
   details for localized genre names
@@ -443,4 +444,5 @@ The backend binds all interfaces (`:8080`), so LAN clients reach the UI directly
 
 ## 9. Extension Points
 
-- **Online metadata providers** beyond TMDB/TVMaze/AniList (JAV database, etc.)
+- **JAV DB metadata provider** (requires an API key; TMDB/TVMaze/AniList/Wikipedia
+  cover keyless scraping today)

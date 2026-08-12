@@ -10,6 +10,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -55,9 +56,9 @@ func NewScraper(pool *pgxpool.Pool, dataDir, apiKey string) *Scraper {
 }
 
 func (s *Scraper) Enabled() bool {
-	// TMDB needs a key; without one we fall back to the keyless TVMaze and
-	// AniList APIs (disable individually with TVMAZE_ENABLED=0 / ANILIST_ENABLED=0).
-	return s.apiKey != "" || tvmazeEnabled() || anilistEnabled()
+	// TMDB needs a key; without one we fall back to the keyless TVMaze, AniList
+	// and Wikipedia APIs (disable individually with the *_ENABLED vars).
+	return s.apiKey != "" || tvmazeEnabled() || anilistEnabled() || wikipediaEnabled()
 }
 
 func tvmazeEnabled() bool {
@@ -66,6 +67,17 @@ func tvmazeEnabled() bool {
 
 func anilistEnabled() bool {
 	return os.Getenv("ANILIST_ENABLED") != "0"
+}
+
+func wikipediaEnabled() bool {
+	return os.Getenv("WIKIPEDIA_ENABLED") != "0"
+}
+
+func wikipediaLang() string {
+	if l := os.Getenv("WIKIPEDIA_LANG"); l != "" {
+		return l
+	}
+	return "en"
 }
 
 type roundTripperFunc func(*http.Request) (*http.Response, error)
@@ -99,7 +111,7 @@ func (s *Scraper) MaybeScrape(ctx context.Context, videoID uuid.UUID) error {
 	if err != nil {
 		return err
 	}
-	if info.TmdbID == 0 {
+	if info.Title == "" {
 		return nil
 	}
 	return s.apply(ctx, videoID, info)
@@ -124,7 +136,7 @@ func (s *Scraper) Scrape(ctx context.Context, videoID uuid.UUID) error {
 	if err != nil {
 		return err
 	}
-	if info.TmdbID == 0 {
+	if info.Title == "" {
 		return fmt.Errorf("no metadata match found for %q", title)
 	}
 	return s.apply(ctx, videoID, info)
@@ -153,7 +165,16 @@ func (s *Scraper) search(ctx context.Context, title string, year int) (*tmdbInfo
 		}
 	}
 	if anilistEnabled() {
-		return s.searchAniList(ctx, title, year)
+		info, err := s.searchAniList(ctx, title, year)
+		if err != nil {
+			return nil, err
+		}
+		if info.TmdbID != 0 {
+			return info, nil
+		}
+	}
+	if wikipediaEnabled() {
+		return s.searchWikipedia(ctx, title, year)
 	}
 	return &tmdbInfo{}, nil
 }
@@ -303,6 +324,82 @@ func (s *Scraper) searchAniList(ctx context.Context, title string, year int) (*t
 		Genres:   m.Genres,
 		Poster:   m.Cover.Medium,
 	}, nil
+}
+
+// searchWikipedia is the generic keyless last-resort provider: it finds
+// candidate pages via the MediaWiki search API and picks the first summary
+// matching the release year (when known).
+func (s *Scraper) searchWikipedia(ctx context.Context, title string, year int) (*tmdbInfo, error) {
+	lang := wikipediaLang()
+	su := fmt.Sprintf("https://%s.wikipedia.org/w/api.php?action=query&format=json&list=search&srsearch=%s&srlimit=5",
+		lang, urlQueryEscape(title))
+	var sr struct {
+		Query struct {
+			Search []struct {
+				Title string `json:"title"`
+			} `json:"search"`
+		} `json:"query"`
+	}
+	if err := s.getJSON(ctx, su, &sr); err != nil {
+		return nil, err
+	}
+	if len(sr.Query.Search) == 0 {
+		return &tmdbInfo{}, nil
+	}
+	var best *tmdbInfo
+	for _, cand := range sr.Query.Search {
+		info, err := s.wikipediaSummary(ctx, lang, cand.Title)
+		if err != nil {
+			continue
+		}
+		if best == nil {
+			best = info
+		}
+		if year == 0 || info.Year == year {
+			return info, nil
+		}
+	}
+	if best != nil {
+		return best, nil
+	}
+	return &tmdbInfo{}, nil
+}
+
+func (s *Scraper) wikipediaSummary(ctx context.Context, lang, pageTitle string) (*tmdbInfo, error) {
+	u := fmt.Sprintf("https://%s.wikipedia.org/api/rest_v1/page/summary/%s",
+		lang, url.PathEscape(pageTitle))
+	var out struct {
+		Title   string `json:"title"`
+		Extract string `json:"extract"`
+		Thumb   struct {
+			Source string `json:"source"`
+		} `json:"thumbnail"`
+		Description string `json:"description"`
+	}
+	if err := s.getJSON(ctx, u, &out); err != nil {
+		return nil, err
+	}
+	if out.Title == "" && out.Extract == "" {
+		return &tmdbInfo{}, nil
+	}
+	info := &tmdbInfo{
+		Title:    out.Title,
+		Synopsis: out.Extract,
+		Poster:   out.Thumb.Source,
+		Year:     yearFromText(out.Description + " " + out.Extract),
+	}
+	return info, nil
+}
+
+var yearTextRe = regexp.MustCompile(`\b(1[89]\d{2}|20\d{2})\b`)
+
+func yearFromText(s string) int {
+	if m := yearTextRe.FindString(s); m != "" {
+		if y, err := strconv.Atoi(m); err == nil {
+			return y
+		}
+	}
+	return 0
 }
 
 func (s *Scraper) apply(ctx context.Context, videoID uuid.UUID, info *tmdbInfo) error {

@@ -233,10 +233,11 @@ erDiagram
 
 プローブ失敗のファイルも空の技術メタデータで登録されるため、所有者は内容を確認して判断できます。
 
-### 3.8 メタデータスクレイピング（TMDB / TVMaze / AniList）
+### 3.8 メタデータスクレイピング（TMDB / TVMaze / AniList / Wikipedia）
 
-任意。`TMDB_API_KEY` 設定時は TMDB、未設定時は免キーの TVMaze、続いて AniList に
-自動フォールバック（`TVMAZE_ENABLED=0` / `ANILIST_ENABLED=0` で個別に無効化）。`Scraper`：
+任意。`TMDB_API_KEY` 設定時は TMDB、未設定時は免キーの TVMaze、AniList、
+Wikipedia の順に自動フォールバック（`TVMAZE_ENABLED=0` / `ANILIST_ENABLED=0` /
+`WIKIPEDIA_ENABLED=0` で個別に無効化）。`Scraper`：
 
 - プロバイダを検索（TMDB の言語は設定可能、デフォルト `zh-CN`）。TMDB ではさらに
   詳細を取得してローカライズ済みジャンル名を取得
@@ -428,4 +429,5 @@ sequenceDiagram
 
 ## 9. 拡張ポイント
 
-- **TMDB/TVMaze/AniList 以外のオンラインメタデータソース**（JAV DB など）
+- **JAV DB メタデータプロバイダ**（API キーが必要。免キーの TMDB/TVMaze/
+  AniList/Wikipedia で一般的なニーズはカバー済み）

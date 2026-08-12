@@ -134,9 +134,10 @@ make serve                                 # UI をビルドし :8080 で一括�
 | `DATA_DIR` | `data` | ポスター + HLS セグメント |
 | `ADMIN_USERNAME` / `ADMIN_PASSWORD` | admin / admin123 | 初期管理者 |
 | `FFPROBE_BIN` / `FFMPEG_BIN` | 自動検出 | ツールパス（Homebrew フォールバック） |
-| `TMDB_API_KEY` / `TMDB_LANGUAGE` | 空 / zh-CN | メタデータスクレイピング。キー未設定時は無料の TVMaze と AniList を使用 |
+| `TMDB_API_KEY` / `TMDB_LANGUAGE` | 空 / zh-CN | メタデータスクレイピング。キー未設定時は無料の TVMaze・AniList・Wikipedia を使用 |
 | `TVMAZE_ENABLED` | `1` | `0` で免キー TVMaze フォールバックを無効化 |
 | `ANILIST_ENABLED` | `1` | `0` で免キー AniList フォールバックを無効化 |
+| `WIKIPEDIA_LANG` / `WIKIPEDIA_ENABLED` | `en` / `1` | 免キー Wikipedia フォールバックの言語版とスイッチ |
 | `SCAN_WORKERS` | `4` | 並列スキャンワーカー数（1-16） |
 | `WATCH_INTERVAL` | `30` | 増分スキャンの保険間隔（fsnotify イベントは即時反映）。`0` で監視無効 |
 | `WEB_ROOT` | 自動（`frontend/dist`） | 本番モードのフロントエンドディレクトリ |

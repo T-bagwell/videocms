@@ -46,6 +46,10 @@ All notable changes to VideoCMS are documented here.
 - Expired share tokens are deleted automatically every hour
 - Third keyless metadata provider: AniList (anime/animation) is tried after
   TVMaze when `TMDB_API_KEY` is empty (`ANILIST_ENABLED=0` disables it)
+- Fourth keyless metadata provider: Wikipedia (generic last-resort fallback,
+  `WIKIPEDIA_LANG` selects the language edition, `WIKIPEDIA_ENABLED=0` disables)
+- Watcher fix: subtitle sidecar changes now resync the sibling video's subtitle
+  tracks instead of being probed as video files
 - Backup restore: admins can import a backup exported by the admin export
   endpoint (libraries/videos/series upserted by path/name; personal data
   restored for existing users)

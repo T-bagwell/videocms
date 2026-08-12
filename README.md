@@ -136,9 +136,10 @@ All settings are environment variables:
 | `DATA_DIR` | `data` | Posters + HLS segments |
 | `ADMIN_USERNAME` / `ADMIN_PASSWORD` | admin / admin123 | Initial admin |
 | `FFPROBE_BIN` / `FFMPEG_BIN` | auto-detect | Tool paths (Homebrew fallback) |
-| `TMDB_API_KEY` / `TMDB_LANGUAGE` | empty / zh-CN | Metadata scraping; without a key the free TVMaze and AniList APIs are used |
+| `TMDB_API_KEY` / `TMDB_LANGUAGE` | empty / zh-CN | Metadata scraping; without a key the free TVMaze, AniList and Wikipedia APIs are used |
 | `TVMAZE_ENABLED` | `1` | Set `0` to disable the keyless TVMaze metadata fallback |
 | `ANILIST_ENABLED` | `1` | Set `0` to disable the keyless AniList metadata fallback |
+| `WIKIPEDIA_LANG` / `WIKIPEDIA_ENABLED` | `en` / `1` | Language edition and switch for the keyless Wikipedia fallback |
 | `SCAN_WORKERS` | `4` | Parallel scan workers (1–16) |
 | `WATCH_INTERVAL` | `30` | Fallback interval for incremental scans (fsnotify events index immediately); `0` disables watching |
 | `WEB_ROOT` | auto (`frontend/dist`) | Built frontend for production mode |
