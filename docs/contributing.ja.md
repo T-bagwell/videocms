@@ -52,7 +52,7 @@ Go・React・PostgreSQL で構築されたセルフホスト型のビデオリ�
 ### 前提条件
 
 - Go — バージョンは `backend/go.mod` に固定
-- Node.js 18+、20+、または 22+（CI では 3 バージョンすべてを実行）
+- Node.js 20+、22+、または 24+（CI では 3 バージョンすべてを実行）
 - PostgreSQL 14+
 - ffmpeg/ffprobe（MKV/HEVC のトランスコードには libx265 が必要）
 
@@ -217,7 +217,7 @@ GitHub Actions は `main` へのプッシュと pull request で 2 つのワー�
 | ワークフロー | ファイル | 実行内容 |
 | --- | --- | --- |
 | Backend CI | `.github/workflows/backend.yml` | `backend/` で `go build`、`go vet`、golangci-lint、`go test`（ユニット + PostgreSQL 統合テスト） |
-| Frontend CI | `.github/workflows/webpack.yml` | `frontend/` で `npm ci`、ESLint、Vitest、`npm run build`（Node 18/20/22） |
+| Frontend CI | `.github/workflows/webpack.yml` | `frontend/` で `npm ci`、ESLint、Vitest、`npm run build`（Node 20/22/24） |
 | CodeQL | `.github/workflows/codeql.yml` | Go と JavaScript のセキュリティスキャン（push・PR・毎週） |
 | Release | `.github/workflows/release.yml` | `v*` タグでクロスプラットフォームバイナリをビルドし GitHub Release を公開 |
 
