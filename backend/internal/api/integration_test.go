@@ -156,7 +156,7 @@ func (e *integrationEnv) doJSON(t *testing.T, method, path string, body any, tok
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	data, _ := io.ReadAll(resp.Body)
 	if out != nil && len(data) > 0 {
 		if err := json.Unmarshal(data, out); err != nil {
@@ -186,7 +186,7 @@ func (e *integrationEnv) insertVideo(t *testing.T, libID uuid.UUID, title, ext s
 	if err := os.WriteFile(fp, []byte("video"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	t.Cleanup(func() { os.Remove(fp) })
+	t.Cleanup(func() { _ = os.Remove(fp) })
 	err := e.pool.QueryRow(context.Background(), `
 		INSERT INTO videos (library_id, title, filename, file_path, size_bytes, duration_sec, width, height, available)
 		VALUES ($1,$2,$3,$4,1234,60,1280,720,true) RETURNING id`,
@@ -409,7 +409,7 @@ func TestExportEndpoints(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	data, _ := io.ReadAll(resp.Body)
 	if resp.StatusCode != http.StatusOK {
 		t.Fatalf("admin export: got %d", resp.StatusCode)
@@ -428,7 +428,7 @@ func TestExportEndpoints(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusOK {
 		t.Fatalf("user export: got %d", resp.StatusCode)
 	}
@@ -519,7 +519,7 @@ func TestSharePassword(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	bad.Body.Close()
+	_ = bad.Body.Close()
 	if bad.StatusCode != http.StatusForbidden {
 		t.Fatalf("wrong password: got %d, want 403", bad.StatusCode)
 	}
@@ -532,7 +532,7 @@ func TestSharePassword(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	good.Body.Close()
+	_ = good.Body.Close()
 	if good.StatusCode != http.StatusOK {
 		t.Fatalf("correct password: got %d, want 200", good.StatusCode)
 	}
@@ -563,7 +563,7 @@ func TestBackupImport(t *testing.T) {
 		t.Fatal(err)
 	}
 	exportBody, _ := io.ReadAll(resp.Body)
-	resp.Body.Close()
+	_ = resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
 		t.Fatalf("export: got %d", resp.StatusCode)
 	}
@@ -595,7 +595,7 @@ func TestBackupImport(t *testing.T) {
 	mw := multipart.NewWriter(&buf)
 	fw, _ := mw.CreateFormFile("backup", "backup.json")
 	_, _ = fw.Write(exportBody)
-	mw.Close()
+	_ = mw.Close()
 
 	req, _ = http.NewRequest(http.MethodPost, e.server.URL+"/api/admin/import", &buf)
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -604,7 +604,7 @@ func TestBackupImport(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	var imported struct {
 		Counts map[string]int `json:"counts"`
 	}
@@ -641,7 +641,7 @@ func TestShareDomainRestriction(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer bad.Body.Close()
+	defer func() { _ = bad.Body.Close() }()
 	var denied map[string]any
 	_ = json.NewDecoder(bad.Body).Decode(&denied)
 	if bad.StatusCode != http.StatusForbidden || denied["domain_required"] != true {
@@ -655,7 +655,7 @@ func TestShareDomainRestriction(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer good.Body.Close()
+	defer func() { _ = good.Body.Close() }()
 	if good.StatusCode != http.StatusOK {
 		t.Fatalf("allowed host: got %d, want 200", good.StatusCode)
 	}

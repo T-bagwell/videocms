@@ -87,7 +87,7 @@ All documentation is multi-language. Start at the **[docs index](docs/INDEX.md)*
 - Go 1.26+ (to build) or a prebuilt binary
 - PostgreSQL 14+
 - ffmpeg + ffprobe (metadata, posters, transcoding)
-- Node.js 18+ (frontend development only — the built UI is served by the backend)
+- Node.js 20+ (frontend development only — the built UI is served by the backend)
 
 ### Install
 
