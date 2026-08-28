@@ -1,4 +1,4 @@
-name: NodeJS with Webpack
+name: Frontend Build
 
 on:
   push:
@@ -21,8 +21,13 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
+        cache: npm
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: Install dependencies
+      working-directory: frontend
+      run: npm ci
 
     - name: Build
-      run: |
-        npm install
-        npx webpack
+      working-directory: frontend
+      run: npm run build
