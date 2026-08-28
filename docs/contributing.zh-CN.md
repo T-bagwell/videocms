@@ -41,7 +41,7 @@
 ### 前置条件
 
 - Go —— 版本以 `backend/go.mod` 为准
-- Node.js 18+、20+ 或 22+（CI 会跑全部三个版本）
+- Node.js 20+、22+ 或 24+（CI 会跑全部三个版本）
 - PostgreSQL 14+
 - ffmpeg/ffprobe（转码 MKV/HEVC 需要 libx265）
 
@@ -189,7 +189,7 @@ GitHub Actions 在推送到 `main` 和 pull request 时运行两个 workflow：
 | Workflow | 文件 | 运行内容 |
 | --- | --- | --- |
 | Backend CI | `.github/workflows/backend.yml` | 在 `backend/` 执行 `go build`、`go vet`、golangci-lint、`go test`（单元 + PostgreSQL 集成测试） |
-| Frontend CI | `.github/workflows/webpack.yml` | 在 `frontend/` 执行 `npm ci`、ESLint、Vitest、`npm run build`（Node 18/20/22） |
+| Frontend CI | `.github/workflows/webpack.yml` | 在 `frontend/` 执行 `npm ci`、ESLint、Vitest、`npm run build`（Node 20/22/24） |
 | CodeQL | `.github/workflows/codeql.yml` | Go 与 JavaScript 安全扫描（push、PR、每周） |
 | Release | `.github/workflows/release.yml` | 打 `v*` tag 时构建跨平台二进制并发布 GitHub Release |
 
