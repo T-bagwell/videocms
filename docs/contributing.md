@@ -51,7 +51,7 @@ everything you need to get started.
 ### Prerequisites
 
 - Go — version pinned in `backend/go.mod`
-- Node.js 18+, 20+ or 22+ (CI runs all three)
+- Node.js 20+, 22+ or 24+ (CI runs all three)
 - PostgreSQL 14+
 - ffmpeg/ffprobe (with libx265 for MKV/HEVC transcoding)
 
@@ -208,7 +208,7 @@ GitHub Actions runs two workflows on push to `main` and on pull requests:
 | Workflow | File | What it runs |
 | --- | --- | --- |
 | Backend CI | `.github/workflows/backend.yml` | `go build`, `go vet`, golangci-lint, and `go test` (unit + PostgreSQL integration) in `backend/` |
-| Frontend CI | `.github/workflows/webpack.yml` | `npm ci`, ESLint, Vitest, and `npm run build` in `frontend/` (Node 18/20/22) |
+| Frontend CI | `.github/workflows/webpack.yml` | `npm ci`, ESLint, Vitest, and `npm run build` in `frontend/` (Node 20/22/24) |
 | CodeQL | `.github/workflows/codeql.yml` | Security scanning for Go and JavaScript (push, PR, weekly) |
 | Release | `.github/workflows/release.yml` | Cross-platform binaries + GitHub Release on `v*` tags |
 
