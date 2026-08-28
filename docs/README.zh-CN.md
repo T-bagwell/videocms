@@ -2,7 +2,7 @@
 
 > **自托管的视频资源管理系统** — Go · React · PostgreSQL
 
-[![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](../LICENSE)
 ![Go](https://img.shields.io/badge/Go-1.22+-00ADD8?logo=go&logoColor=white)
 ![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14-4169E1?logo=postgresql&logoColor=white)
@@ -62,20 +62,20 @@
 
 ## 截图
 
-![首页](docs/screenshots/home.png)
-![剧集](docs/screenshots/series.png)
-![视频详情](docs/screenshots/detail.png)
-![播放器](docs/screenshots/player.png)
+![首页](screenshots/home.png)
+![剧集](screenshots/series.png)
+![视频详情](screenshots/detail.png)
+![播放器](screenshots/player.png)
 
 ## 文档
 
-所有文档均为多语言版本，从 **[文档索引](docs/README.md)** 开始：
+所有文档均为多语言版本，从 **[文档索引](INDEX.md)** 开始：
 
 | 文档 | 语言 | 读者 |
 | --- | --- | --- |
-| [产品文档](docs/product.zh-CN.md) | EN · 中文 · FR · JA · DE | 终端用户 |
-| [系统架构](docs/architecture.zh-CN.md) | EN · 中文 · JA | 开发者 |
-| [README](README.md) / [日本語](README.ja.md) | English · 日本語 | 所有人 |
+| [产品文档](product.zh-CN.md) | EN · 中文 · FR · JA · DE | 终端用户 |
+| [系统架构](architecture.zh-CN.md) | EN · 中文 · JA | 开发者 |
+| [README](README.md) / [中文](README.zh-CN.md) / [日本語](README.ja.md) | English · 中文 · 日本語 | 所有人 |
 
 ## 快速开始
 
@@ -152,7 +152,7 @@ backend/                 Go 服务（net/http + pgx）
 frontend/                React 18 SPA（Vite）
   src/i18n/locales/      en / zh / fr / ja / de
   src/pages/             浏览、播放、剧集、播放列表、管理…
-docs/                    产品 + 架构文档（多语言）
+docs/                    全部文档（多语言）
 scripts/                 演示素材生成器
 ```
 
@@ -175,7 +175,7 @@ scripts/                 演示素材生成器
 - **生产环境**：设置强 `JWT_SECRET`、前置 HTTPS 反向代理、
   用 `ADMIN_USERNAME/ADMIN_PASSWORD` 指定初始账号
 
-另见 [SECURITY.md](SECURITY.md)。
+另见 [security.md](security.md)。
 
 ## 路线图
 
@@ -195,10 +195,10 @@ scripts/                 演示素材生成器
 
 欢迎参与贡献！参见贡献指南：
 
-- 中文：[CONTRIBUTING.zh-CN.md](CONTRIBUTING.zh-CN.md)
-- English：[CONTRIBUTING.md](CONTRIBUTING.md)
-- 日本語：[CONTRIBUTING.ja.md](CONTRIBUTING.ja.md)
+- 中文：[contributing.zh-CN.md](contributing.zh-CN.md)
+- English：[contributing.md](contributing.md)
+- 日本語：[contributing.ja.md](contributing.ja.md)
 
 ## 许可证
 
-[Apache License 2.0](LICENSE)
+[Apache License 2.0](../LICENSE)

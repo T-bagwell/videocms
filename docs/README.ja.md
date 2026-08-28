@@ -2,7 +2,7 @@
 
 > **セルフホスト型ビデオリソース管理システム** — Go · React · PostgreSQL
 
-[![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](../LICENSE)
 ![Go](https://img.shields.io/badge/Go-1.22+-00ADD8?logo=go&logoColor=white)
 ![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14-4169E1?logo=postgresql&logoColor=white)
@@ -64,20 +64,20 @@ SQL 評価され、ブロックされた項目は一斉に消え、解除する�
 
 ## スクリーンショット
 
-![ホーム](docs/screenshots/home.png)
-![ドラマ](docs/screenshots/series.png)
-![動画詳細](docs/screenshots/detail.png)
-![プレイヤー](docs/screenshots/player.png)
+![ホーム](screenshots/home.png)
+![ドラマ](screenshots/series.png)
+![動画詳細](screenshots/detail.png)
+![プレイヤー](screenshots/player.png)
 
 ## ドキュメント
 
-すべてのドキュメントは多言語です。**[ドキュメント索引](docs/README.md)** から始めてください：
+すべてのドキュメントは多言語です。**[ドキュメント索引](INDEX.md)** から始めてください：
 
 | ドキュメント | 言語 | 対象 |
 | --- | --- | --- |
-| [製品ドキュメント](docs/product.ja.md) | EN · 中文 · FR · JA · DE | エンドユーザー |
-| [システムアーキテクチャ](docs/architecture.ja.md) | EN · 中文 · JA | 開発者 |
-| [README](README.md) / [中文](README.zh-CN.md) | English · 中文 | すべて |
+| [製品ドキュメント](product.ja.md) | EN · 中文 · FR · JA · DE | エンドユーザー |
+| [システムアーキテクチャ](architecture.ja.md) | EN · 中文 · JA | 開発者 |
+| [README](README.md) / [中文](README.zh-CN.md) / [日本語](README.ja.md) | English · 中文 · 日本語 | すべて |
 
 ## クイックスタート
 
@@ -155,7 +155,7 @@ backend/                 Go サーバー（net/http + pgx）
 frontend/                React 18 SPA（Vite）
   src/i18n/locales/      en / zh / fr / ja / de
   src/pages/             ブラウズ、プレイヤー、ドラマ、プレイリスト、管理…
-docs/                    製品 + アーキテクチャ（多言語）
+docs/                    全ドキュメント（多言語）
 scripts/                 デモ素材ジェネレーター
 ```
 
@@ -178,7 +178,7 @@ scripts/                 デモ素材ジェネレーター
 - **本番**：強力な `JWT_SECRET`、HTTPS リバースプロキシ、
   `ADMIN_USERNAME/ADMIN_PASSWORD` で初期アカウントを指定
 
-[SECURITY.md](SECURITY.md) も参照してください。
+[security.md](security.md) も参照してください。
 
 ## ロードマップ
 
@@ -198,10 +198,10 @@ scripts/                 デモ素材ジェネレーター
 
 コントリビューションを歓迎します！ コントリビュートガイドを参照してください：
 
-- 日本語：[CONTRIBUTING.ja.md](CONTRIBUTING.ja.md)
-- English：[CONTRIBUTING.md](CONTRIBUTING.md)
-- 中文：[CONTRIBUTING.zh-CN.md](CONTRIBUTING.zh-CN.md)
+- 日本語：[contributing.ja.md](contributing.ja.md)
+- English：[contributing.md](contributing.md)
+- 中文：[contributing.zh-CN.md](contributing.zh-CN.md)
 
 ## ライセンス
 
-[Apache License 2.0](LICENSE)
+[Apache License 2.0](../LICENSE)

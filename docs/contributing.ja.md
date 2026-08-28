@@ -127,7 +127,7 @@ docs/             製品、アーキテクチャ、スクリーンショット
 ```
 
 ディレクトリ構成、API ルート、データモデル、主要フロー、セキュリティ、
-拡張ポイントの詳細は [docs/architecture.md](docs/architecture.md) を参照して
+拡張ポイントの詳細は [architecture.md](architecture.md) を参照して
 ください。
 
 ## リポジトリの規約
@@ -230,7 +230,7 @@ GitHub Actions は `main` へのプッシュと pull request で 2 つのワー�
    - UI の変更は PR の説明にスクリーンショットを添える
 5. PR で何を・なぜ変更したかを説明し、修正する issue を参照する
    （`Closes #123`）。
-6. ユーザーに見える変更は [CHANGELOG.md](CHANGELOG.md) を更新する。
+6. ユーザーに見える変更は [changelog.md](changelog.md) を更新する。
 7. ドキュメントに触れた場合は、すべての既存言語を更新する（下記参照）。
 
 ## ドキュメントとローカライズ
@@ -246,7 +246,7 @@ GitHub Actions は `main` へのプッシュと pull request で 2 つのワー�
 | アーキテクチャドキュメント（`docs/architecture.*.md`） | en、zh-CN、ja |
 | コントリビュートガイド | en、zh-CN、ja |
 
-- ドキュメントファイルを追加・リネームしたら `docs/README.md` の索引も同期
+- ドキュメントファイルを追加・リネームしたら `INDEX.md` の索引も同期
   する。
 - Web UI は 5 言語にローカライズされている。デフォルトは英語で、キーが
   欠落している場合は英語にフォールバックする。

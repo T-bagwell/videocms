@@ -113,7 +113,7 @@ docs/             产品、架构、截图
 ```
 
 完整的目录映射、API 路由、数据模型、关键流程、安全与扩展点参见
-[docs/architecture.md](docs/architecture.md)。
+[architecture.md](architecture.md)。
 
 ## 仓库约定
 
@@ -201,7 +201,7 @@ GitHub Actions 在推送到 `main` 和 pull request 时运行两个 workflow：
    - `npm run build` 通过
    - UI 改动在 PR 描述里附带截图
 5. 在 PR 中说明改了什么、为什么改，并引用其修复的 issue（`Closes #123`）。
-6. 用户可见的改动更新 [CHANGELOG.md](CHANGELOG.md)。
+6. 用户可见的改动更新 [changelog.md](changelog.md)。
 7. 改动文档时，同步更新所有已有语言（见下文）。
 
 ## 文档与本地化
@@ -216,7 +216,7 @@ GitHub Actions 在推送到 `main` 和 pull request 时运行两个 workflow：
 | 架构文档（`docs/architecture.*.md`） | en、zh-CN、ja |
 | 贡献指南 | en、zh-CN、ja |
 
-- 新增或重命名文档文件时，同步更新 `docs/README.md` 索引。
+- 新增或重命名文档文件时，同步更新 `INDEX.md` 索引。
 - Web UI 支持五种语言；默认是英文，缺失的 key 回退到英文。
 
 ### 为 UI 增加语言

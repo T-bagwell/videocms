@@ -125,7 +125,7 @@ frontend/
 docs/             product, architecture, screenshots
 ```
 
-See [docs/architecture.md](docs/architecture.md) for the full design: directory
+See [architecture.md](architecture.md) for the full design: directory
 map, API routes, data model, key flows, security and extension points.
 
 ## Repository conventions
@@ -221,7 +221,7 @@ Keep both green before requesting review.
    - UI changes are covered by screenshots in the PR description
 5. Describe what and why in the PR; reference the issue it fixes
    (`Closes #123`).
-6. Update [CHANGELOG.md](CHANGELOG.md) for user-visible changes.
+6. Update [changelog.md](changelog.md) for user-visible changes.
 7. Update docs in every existing language when you touch them (see below).
 
 ## Documentation & localization
@@ -236,7 +236,7 @@ update every existing language and keep code fences paired.
 | Architecture docs (`docs/architecture.*.md`) | en, zh-CN, ja |
 | Contributing guide | en, zh-CN, ja |
 
-- Keep `docs/README.md` in sync when adding or renaming documentation files.
+- Keep `INDEX.md` in sync when adding or renaming documentation files.
 - The web UI is localized in five languages; the default is English and missing
   keys fall back to English.
 

@@ -4,6 +4,12 @@ All notable changes to VideoCMS are documented here.
 
 ## [Unreleased]
 
+### Changed
+
+- Documentation restructured: all docs moved into `docs/` (READMEs,
+  contributing guides, changelog, security policy); the docs index is now
+  `docs/INDEX.md` and the root README is a short landing page
+
 ### Added
 
 - Expanded contributing guide (English, 中文, 日本語) covering development
