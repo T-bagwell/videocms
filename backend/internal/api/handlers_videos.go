@@ -279,7 +279,7 @@ func (a *App) uploadPoster(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusBadRequest, "missing poster file (multipart field 'poster')")
 		return
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	head := make([]byte, 512)
 	n, _ := io.ReadFull(file, head)
@@ -309,7 +309,7 @@ func (a *App) uploadPoster(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusInternalServerError, "cannot save poster")
 		return
 	}
-	defer out.Close()
+	defer func() { _ = out.Close() }()
 	if _, err := out.Write(head[:n]); err != nil {
 		writeErr(w, http.StatusInternalServerError, "cannot write poster")
 		return
@@ -319,7 +319,7 @@ func (a *App) uploadPoster(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if oldPath != "" && oldPath != dst {
-		os.Remove(oldPath)
+		_ = os.Remove(oldPath)
 	}
 	if _, err := a.pool.Exec(r.Context(),
 		`UPDATE videos SET poster_path=$1, updated_at=now() WHERE id=$2`, dst, id); err != nil {
@@ -498,14 +498,15 @@ func (a *App) serveHLS(w http.ResponseWriter, r *http.Request, id uuid.UUID, v h
 		if len(parts) == 3 && parts[0] == "subs" {
 			trackID, err := uuid.Parse(parts[1])
 			if err == nil {
-				if parts[2] == "playlist.m3u8" {
+				switch parts[2] {
+				case "playlist.m3u8":
 					if _, ok := a.loadSubtitleTrack(r.Context(), id, trackID); ok {
 						w.Header().Set("Content-Type", "application/vnd.apple.mpegurl")
 						w.Header().Set("Cache-Control", "no-store")
 						_, _ = w.Write(buildSubtitlePlaylist(token))
 						return
 					}
-				} else if parts[2] == "subtitle.vtt" {
+				case "subtitle.vtt":
 					t, ok := a.loadSubtitleTrack(r.Context(), id, trackID)
 					if ok {
 						if path, err := a.ensureSubtitlePath(r.Context(), id, &t); err == nil {
