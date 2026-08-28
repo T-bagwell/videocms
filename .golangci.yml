@@ -1,15 +1,13 @@
 # golangci-lint configuration
 # Docs: https://golangci-lint.run/
+version: "2"
 
 run:
   timeout: 5m
 
 linters:
+  default: standard
+
+formatters:
   enable:
-    - errcheck
     - gofmt
-    - gosimple
-    - govet
-    - ineffassign
-    - staticcheck
-    - unused
