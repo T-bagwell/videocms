@@ -46,7 +46,7 @@ func ServeVideoFile(w http.ResponseWriter, r *http.Request, path, contentType, d
 		http.Error(w, "file not found", http.StatusNotFound)
 		return
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	st, err := f.Stat()
 	if err != nil {
