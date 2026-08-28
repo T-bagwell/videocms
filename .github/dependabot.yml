@@ -12,6 +12,9 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 10
+    ignore:
+      - dependency-name: "jsdom"
+        versions: [">=28"]
 
   - package-ecosystem: "github-actions"
     directory: "/"
