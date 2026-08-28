@@ -171,7 +171,10 @@ docs/             产品、架构、截图
 ./.codex/skills/videocms/scripts/goenv.sh --in backend go vet ./...
 
 # 前端
-cd frontend && npm run build
+cd frontend
+npm run lint
+npm run test
+npm run build
 ```
 
 - 解析/扫描逻辑要配套单元测试（例如 `internal/media/episode_test.go`）。
@@ -185,8 +188,10 @@ GitHub Actions 在推送到 `main` 和 pull request 时运行两个 workflow：
 
 | Workflow | 文件 | 运行内容 |
 | --- | --- | --- |
-| Backend CI | `.github/workflows/backend.yml` | 在 `backend/` 执行 `go build`、`go vet`、`go test`（Go 版本取自 `go.mod`） |
-| Frontend Build | `.github/workflows/webpack.yml` | 在 `frontend/` 执行 `npm ci` + `npm run build`（Node 18/20/22） |
+| Backend CI | `.github/workflows/backend.yml` | 在 `backend/` 执行 `go build`、`go vet`、golangci-lint、`go test`（单元 + PostgreSQL 集成测试） |
+| Frontend CI | `.github/workflows/webpack.yml` | 在 `frontend/` 执行 `npm ci`、ESLint、Vitest、`npm run build`（Node 18/20/22） |
+| CodeQL | `.github/workflows/codeql.yml` | Go 与 JavaScript 安全扫描（push、PR、每周） |
+| Release | `.github/workflows/release.yml` | 打 `v*` tag 时构建跨平台二进制并发布 GitHub Release |
 
 请求 review 前请确保两者都为绿色。
 
@@ -197,8 +202,8 @@ GitHub Actions 在推送到 `main` 和 pull request 时运行两个 workflow：
    `refactor/` 等）。
 3. 提交保持聚焦；一个 PR 只做一项逻辑改动。
 4. 打开 PR 前：
-   - `gofmt`、`go vet`、`go test ./...` 通过
-   - `npm run build` 通过
+   - `gofmt`、`go vet`、`golangci-lint run`、`go test ./...` 通过
+   - `npm run lint`、`npm run test`、`npm run build` 通过
    - UI 改动在 PR 描述里附带截图
 5. 在 PR 中说明改了什么、为什么改，并引用其修复的 issue（`Closes #123`）。
 6. 用户可见的改动更新 [changelog.md](changelog.md)。

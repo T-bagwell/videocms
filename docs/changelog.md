@@ -12,6 +12,9 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- CI: backend tests now run against PostgreSQL (integration tests), plus
+  golangci-lint, frontend ESLint + Vitest tests, CodeQL scanning, Dependabot,
+  and a release workflow for cross-platform binaries
 - Expanded contributing guide (English, 中文, 日本語) covering development
   setup, repository conventions, testing, CI and the pull request workflow
 - Filesystem watching for incremental indexing: new, changed, and removed

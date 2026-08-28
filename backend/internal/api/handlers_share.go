@@ -302,12 +302,12 @@ func (a *App) deleteShare(w http.ResponseWriter, r *http.Request) {
 }
 
 type shareTokenRow struct {
-	Scope        string
-	ExpiresAt    time.Time
-	VideoID      uuid.UUID
-	SeriesID     uuid.UUID
-	PlaylistID   uuid.UUID
-	PasswordHash string
+	Scope          string
+	ExpiresAt      time.Time
+	VideoID        uuid.UUID
+	SeriesID       uuid.UUID
+	PlaylistID     uuid.UUID
+	PasswordHash   string
 	AllowedDomains []string
 }
 

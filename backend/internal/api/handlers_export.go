@@ -47,7 +47,7 @@ func serveJSONDownload(w http.ResponseWriter, name string, v any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Content-Disposition", "attachment; filename=\""+name+"\"")
 	w.Header().Set("Cache-Control", "no-store")
-	json.NewEncoder(w).Encode(v)
+	_ = json.NewEncoder(w).Encode(v)
 }
 
 // exportAll dumps the full metadata backup (users, libraries, videos, series,
@@ -296,7 +296,7 @@ func (a *App) importBackup(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusInternalServerError, "begin transaction failed")
 		return
 	}
-	defer tx.Rollback(ctx)
+	defer func() { _ = tx.Rollback(ctx) }()
 
 	counts := map[string]int{}
 	fail := func(msg string) {

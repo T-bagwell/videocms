@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components -- context, provider and hook intentionally live together */
 import { createContext, useContext, useEffect, useState } from 'react';
 import { api, getToken, setToken } from './api.js';
 
@@ -44,4 +45,3 @@ export function AuthProvider({ children }) {
 export function useAuth() {
   return useContext(AuthContext);
 }
-

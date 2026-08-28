@@ -69,5 +69,5 @@ func writeAuthError(w http.ResponseWriter, msg string) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(http.StatusUnauthorized)
 	b, _ := json.Marshal(map[string]string{"error": msg})
-	w.Write(b)
+	_, _ = w.Write(b)
 }

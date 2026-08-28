@@ -196,7 +196,10 @@ docs/             製品、アーキテクチャ、スクリーンショット
 ./.codex/skills/videocms/scripts/goenv.sh --in backend go vet ./...
 
 # フロントエンド
-cd frontend && npm run build
+cd frontend
+npm run lint
+npm run test
+npm run build
 ```
 
 - 解析・スキャンロジックには単体テストを併記する
@@ -213,8 +216,10 @@ GitHub Actions は `main` へのプッシュと pull request で 2 つのワー�
 
 | ワークフロー | ファイル | 実行内容 |
 | --- | --- | --- |
-| Backend CI | `.github/workflows/backend.yml` | `backend/` で `go build`、`go vet`、`go test`（Go バージョンは `go.mod` から） |
-| Frontend Build | `.github/workflows/webpack.yml` | `frontend/` で `npm ci` + `npm run build`（Node 18/20/22） |
+| Backend CI | `.github/workflows/backend.yml` | `backend/` で `go build`、`go vet`、golangci-lint、`go test`（ユニット + PostgreSQL 統合テスト） |
+| Frontend CI | `.github/workflows/webpack.yml` | `frontend/` で `npm ci`、ESLint、Vitest、`npm run build`（Node 18/20/22） |
+| CodeQL | `.github/workflows/codeql.yml` | Go と JavaScript のセキュリティスキャン（push・PR・毎週） |
+| Release | `.github/workflows/release.yml` | `v*` タグでクロスプラットフォームバイナリをビルドし GitHub Release を公開 |
 
 レビューを依頼する前に両方をグリーンにしてください。
 
@@ -225,8 +230,8 @@ GitHub Actions は `main` へのプッシュと pull request で 2 つのワー�
    `docs/`、`refactor/` など）。
 3. コミットは焦点を絞る。1 つの PR で 1 つの論理的な変更に。
 4. PR を開く前に：
-   - `gofmt`、`go vet`、`go test ./...` が通る
-   - `npm run build` が通る
+   - `gofmt`、`go vet`、`golangci-lint run`、`go test ./...` が通る
+   - `npm run lint`、`npm run test`、`npm run build` が通る
    - UI の変更は PR の説明にスクリーンショットを添える
 5. PR で何を・なぜ変更したかを説明し、修正する issue を参照する
    （`Closes #123`）。

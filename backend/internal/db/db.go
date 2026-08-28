@@ -27,4 +27,3 @@ func Connect(ctx context.Context, url string) (*pgxpool.Pool, error) {
 	}
 	return pool, nil
 }
-

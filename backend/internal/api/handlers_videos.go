@@ -405,7 +405,7 @@ func serveSubtitleFile(w http.ResponseWriter, r *http.Request, path string) {
 	}
 	w.Header().Set("Content-Type", "text/vtt; charset=utf-8")
 	w.Header().Set("Cache-Control", "public, max-age=3600")
-	w.Write(data)
+	_, _ = w.Write(data)
 }
 
 type hlsVideo struct {
@@ -489,7 +489,7 @@ func (a *App) serveHLS(w http.ResponseWriter, r *http.Request, id uuid.UUID, v h
 		}
 		w.Header().Set("Content-Type", "application/vnd.apple.mpegurl")
 		w.Header().Set("Cache-Control", "no-store")
-		w.Write(rewriteManifest(data, token))
+		_, _ = w.Write(rewriteManifest(data, token))
 		return
 	}
 
@@ -502,7 +502,7 @@ func (a *App) serveHLS(w http.ResponseWriter, r *http.Request, id uuid.UUID, v h
 					if _, ok := a.loadSubtitleTrack(r.Context(), id, trackID); ok {
 						w.Header().Set("Content-Type", "application/vnd.apple.mpegurl")
 						w.Header().Set("Cache-Control", "no-store")
-						w.Write(buildSubtitlePlaylist(token))
+						_, _ = w.Write(buildSubtitlePlaylist(token))
 						return
 					}
 				} else if parts[2] == "subtitle.vtt" {
@@ -533,7 +533,7 @@ func (a *App) serveHLS(w http.ResponseWriter, r *http.Request, id uuid.UUID, v h
 		}
 		w.Header().Set("Content-Type", "application/vnd.apple.mpegurl")
 		w.Header().Set("Cache-Control", "no-store")
-		w.Write(rewriteManifest(data, token))
+		_, _ = w.Write(rewriteManifest(data, token))
 		return
 	}
 	w.Header().Set("Content-Type", "video/mp2t")

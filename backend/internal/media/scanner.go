@@ -372,7 +372,7 @@ func (s *Scanner) watchEvents(ctx context.Context, watcher *fsnotify.Watcher) {
 			addWatch(lib.Path, lib.ID)
 			// fsnotify watches are not recursive: register every existing
 			// subdirectory so events in nested folders are seen too.
-			filepath.WalkDir(lib.Path, func(p string, d fs.DirEntry, err error) error {
+			_ = filepath.WalkDir(lib.Path, func(p string, d fs.DirEntry, err error) error {
 				if err != nil {
 					return nil
 				}
@@ -491,7 +491,7 @@ func (s *Scanner) applyEventBatch(ctx context.Context, libID uuid.UUID, videos m
 				var current string
 				if err := s.pool.QueryRow(ctx,
 					`SELECT subtitle_path FROM videos WHERE id=$1`, vid).Scan(&current); err == nil && active != "" && active != current {
-					s.pool.Exec(ctx,
+					_, _ = s.pool.Exec(ctx,
 						`UPDATE videos SET subtitle_path=$1, updated_at=now() WHERE id=$2`, active, vid)
 				}
 			}
@@ -1111,9 +1111,9 @@ func (s *Scanner) syncSubtitleTracks(ctx context.Context, videoID uuid.UUID, vid
 }
 
 var (
-	yearRe   = regexp.MustCompile(`[\(\[]\s*(\d{4})\s*[\)\]]`)
-	tagRe    = regexp.MustCompile(`(?i)(\b\d{3,4}p\b|\b\d+k\b|\bx264\b|\bx265\b|\bhevc\b|\bh\.?264\b|\bh\.?265\b|\bweb-?dl\b|\bwebrip\b|\bbluray\b|\bhdtv\b|\bremux\b|\bhdrip\b|\bbdrip\b|\bamzn?\b|\bnetflix\b|\bdisney\+?\b)`)
-	spaceRe  = regexp.MustCompile(`[\s._\-]+`)
+	yearRe  = regexp.MustCompile(`[\(\[]\s*(\d{4})\s*[\)\]]`)
+	tagRe   = regexp.MustCompile(`(?i)(\b\d{3,4}p\b|\b\d+k\b|\bx264\b|\bx265\b|\bhevc\b|\bh\.?264\b|\bh\.?265\b|\bweb-?dl\b|\bwebrip\b|\bbluray\b|\bhdtv\b|\bremux\b|\bhdrip\b|\bbdrip\b|\bamzn?\b|\bnetflix\b|\bdisney\+?\b)`)
+	spaceRe = regexp.MustCompile(`[\s._\-]+`)
 )
 
 func deriveTitle(filename string) (string, int) {

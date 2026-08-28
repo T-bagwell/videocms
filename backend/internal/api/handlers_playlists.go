@@ -208,7 +208,7 @@ func (a *App) addPlaylistItem(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusConflict, "video already in playlist")
 		return
 	}
-	a.pool.Exec(r.Context(), `UPDATE playlists SET updated_at=now() WHERE id=$1`, playlistID)
+	_, _ = a.pool.Exec(r.Context(), `UPDATE playlists SET updated_at=now() WHERE id=$1`, playlistID)
 	writeJSON(w, http.StatusCreated, map[string]any{"message": "added"})
 }
 
@@ -237,6 +237,6 @@ func (a *App) removePlaylistItem(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusNotFound, "item not found")
 		return
 	}
-	a.pool.Exec(r.Context(), `UPDATE playlists SET updated_at=now() WHERE id=$1`, playlistID)
+	_, _ = a.pool.Exec(r.Context(), `UPDATE playlists SET updated_at=now() WHERE id=$1`, playlistID)
 	writeJSON(w, http.StatusOK, map[string]any{"message": "removed"})
 }

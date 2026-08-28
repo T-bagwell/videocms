@@ -1,0 +1,15 @@
+# golangci-lint configuration
+# Docs: https://golangci-lint.run/
+
+run:
+  timeout: 5m
+
+linters:
+  enable:
+    - errcheck
+    - gofmt
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused

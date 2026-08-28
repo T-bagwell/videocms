@@ -63,7 +63,7 @@ func ServeVideoFile(w http.ResponseWriter, r *http.Request, path, contentType, d
 	if rangeHeader == "" {
 		w.Header().Set("Content-Length", strconv.FormatInt(size, 10))
 		w.WriteHeader(http.StatusOK)
-		io.CopyN(w, f, size)
+		_, _ = io.CopyN(w, f, size)
 		return
 	}
 
@@ -80,7 +80,7 @@ func ServeVideoFile(w http.ResponseWriter, r *http.Request, path, contentType, d
 	if _, err := f.Seek(start, io.SeekStart); err != nil {
 		return
 	}
-	io.CopyN(w, f, end-start+1)
+	_, _ = io.CopyN(w, f, end-start+1)
 }
 
 func parseRange(header string, size int64) (start, end int64, ok bool) {
@@ -131,4 +131,3 @@ func parseRange(header string, size int64) (start, end int64, ok bool) {
 	}
 	return start, end, true
 }
-

@@ -12,8 +12,8 @@ import (
 )
 
 type Claims struct {
-	UserID uuid.UUID     `json:"uid"`
-	Role   models.Role   `json:"role"`
+	UserID uuid.UUID   `json:"uid"`
+	Role   models.Role `json:"role"`
 	jwt.RegisteredClaims
 }
 
@@ -49,4 +49,3 @@ func Parse(secret, tokenString string) (*Claims, error) {
 	}
 	return claims, nil
 }
-

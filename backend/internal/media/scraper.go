@@ -293,12 +293,12 @@ func (s *Scraper) searchAniList(ctx context.Context, title string, year int) (*t
 	var out struct {
 		Data struct {
 			Media struct {
-				ID        int      `json:"id"`
+				ID        int                                      `json:"id"`
 				Title     struct{ Romaji, English, Native string } `json:"title"`
-				StartDate struct{ Year int } `json:"startDate"`
-				Genres    []string `json:"genres"`
-				Desc      string   `json:"description"`
-				Cover     struct{ Medium string } `json:"coverImage"`
+				StartDate struct{ Year int }                       `json:"startDate"`
+				Genres    []string                                 `json:"genres"`
+				Desc      string                                   `json:"description"`
+				Cover     struct{ Medium string }                  `json:"coverImage"`
 			} `json:"Media"`
 		} `json:"data"`
 	}
@@ -458,7 +458,7 @@ func (s *Scraper) downloadPoster(ctx context.Context, videoID uuid.UUID, path st
 		ext = ".webp"
 	}
 	dir := filepath.Join(s.dataDir, "posters")
-	os.MkdirAll(dir, 0o755)
+	_ = os.MkdirAll(dir, 0o755)
 	dst := filepath.Join(dir, videoID.String()+ext)
 	out, err := os.Create(dst)
 	if err != nil {

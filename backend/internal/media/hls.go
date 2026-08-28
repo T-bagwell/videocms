@@ -47,10 +47,10 @@ func renditionPlan(srcWidth, srcHeight int) []rendition {
 	if srcWidth <= 0 || srcHeight <= 0 {
 		// Probe failed or dimensions are unknown: fall back to a single
 		// 1280px rendition so playback still works.
-		return []rendition{{Name: "v1280", Width: 1280, Height: 720, BitrateK: 2500}}
+		return []rendition{{Name: "v1280", Width: hlsMaxWidth, Height: 720, BitrateK: 2500}}
 	}
 	targets := []struct{ width, bitrateK int }{
-		{1280, 2500},
+		{hlsMaxWidth, 2500},
 		{854, 1500},
 		{640, 900},
 		{426, 500},
@@ -131,7 +131,7 @@ func NewHLSManager(dataDir, ffmpegBin string) *HLSManager {
 		ffmpeg:   ffmpegBin,
 		sessions: make(map[uuid.UUID]*HLSSession),
 	}
-	os.MkdirAll(m.dataDir, 0o755)
+	_ = os.MkdirAll(m.dataDir, 0o755)
 	go m.cleanupLoop()
 	return m
 }
@@ -227,7 +227,7 @@ func (m *HLSManager) Playlist(ctx context.Context, videoID uuid.UUID, input stri
 		if sctx.Err() == nil {
 			for _, r := range rends {
 				if f, ferr := os.OpenFile(filepath.Join(dir, r.Name, "index.m3u8"), os.O_APPEND|os.O_WRONLY, 0o644); ferr == nil {
-					f.WriteString("#EXT-X-ENDLIST\n")
+					_, _ = f.WriteString("#EXT-X-ENDLIST\n")
 					f.Close()
 				}
 			}

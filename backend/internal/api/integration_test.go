@@ -59,7 +59,7 @@ func newIntegrationEnv(t *testing.T) *integrationEnv {
 		a, err := pgxpool.New(ctx2, adminDSN)
 		if err == nil {
 			defer a.Close()
-			a.Exec(ctx2, `DROP DATABASE IF EXISTS "`+name+`" WITH (FORCE)`)
+			_, _ = a.Exec(ctx2, `DROP DATABASE IF EXISTS "`+name+`" WITH (FORCE)`)
 		}
 	})
 
@@ -342,8 +342,8 @@ func TestSubtitleTrackSwitching(t *testing.T) {
 	dir := t.TempDir()
 	en := filepath.Join(dir, "en.srt")
 	fr := filepath.Join(dir, "fr.srt")
-	os.WriteFile(en, []byte("1\n00:00:01,000 --> 00:00:02,000\nHello\n"), 0o644)
-	os.WriteFile(fr, []byte("1\n00:00:01,000 --> 00:00:02,000\nBonjour\n"), 0o644)
+	_ = os.WriteFile(en, []byte("1\n00:00:01,000 --> 00:00:02,000\nHello\n"), 0o644)
+	_ = os.WriteFile(fr, []byte("1\n00:00:01,000 --> 00:00:02,000\nBonjour\n"), 0o644)
 
 	for i, p := range []string{en, fr} {
 		lang := "en"
@@ -384,7 +384,7 @@ func TestSubtitleTrackSwitching(t *testing.T) {
 	if resp.StatusCode != http.StatusOK {
 		t.Fatalf("activate track: got %d, want 200", resp.StatusCode)
 	}
-	resp = e.doJSON(t, http.MethodGet, "/api/videos/"+videoID.String()+"/subtitle-tracks", nil, token, &list)
+	e.doJSON(t, http.MethodGet, "/api/videos/"+videoID.String()+"/subtitle-tracks", nil, token, &list)
 	if !list.Items[1].IsActive || list.Items[0].IsActive {
 		t.Fatalf("active flag did not switch: %+v", list.Items)
 	}
@@ -443,8 +443,8 @@ func TestSubtitlePreference(t *testing.T) {
 	dir := t.TempDir()
 	a := filepath.Join(dir, "a.srt")
 	b := filepath.Join(dir, "b.srt")
-	os.WriteFile(a, []byte("1\n00:00:01,000 --> 00:00:02,000\nA\n"), 0o644)
-	os.WriteFile(b, []byte("1\n00:00:01,000 --> 00:00:02,000\nB\n"), 0o644)
+	_ = os.WriteFile(a, []byte("1\n00:00:01,000 --> 00:00:02,000\nA\n"), 0o644)
+	_ = os.WriteFile(b, []byte("1\n00:00:01,000 --> 00:00:02,000\nB\n"), 0o644)
 	trackIDs := []string{}
 	for i, p := range []string{a, b} {
 		var id uuid.UUID
@@ -594,7 +594,7 @@ func TestBackupImport(t *testing.T) {
 	var buf bytes.Buffer
 	mw := multipart.NewWriter(&buf)
 	fw, _ := mw.CreateFormFile("backup", "backup.json")
-	fw.Write(exportBody)
+	_, _ = fw.Write(exportBody)
 	mw.Close()
 
 	req, _ = http.NewRequest(http.MethodPost, e.server.URL+"/api/admin/import", &buf)
@@ -643,7 +643,7 @@ func TestShareDomainRestriction(t *testing.T) {
 	}
 	defer bad.Body.Close()
 	var denied map[string]any
-	json.NewDecoder(bad.Body).Decode(&denied)
+	_ = json.NewDecoder(bad.Body).Decode(&denied)
 	if bad.StatusCode != http.StatusForbidden || denied["domain_required"] != true {
 		t.Fatalf("disallowed host: got %d %v, want 403 domain_required", bad.StatusCode, denied)
 	}

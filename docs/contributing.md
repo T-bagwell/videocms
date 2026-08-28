@@ -189,7 +189,10 @@ map, API routes, data model, key flows, security and extension points.
 ./.codex/skills/videocms/scripts/goenv.sh --in backend go vet ./...
 
 # Frontend
-cd frontend && npm run build
+cd frontend
+npm run lint
+npm run test
+npm run build
 ```
 
 - Add unit tests alongside parsing/scanning logic
@@ -204,8 +207,10 @@ GitHub Actions runs two workflows on push to `main` and on pull requests:
 
 | Workflow | File | What it runs |
 | --- | --- | --- |
-| Backend CI | `.github/workflows/backend.yml` | `go build`, `go vet`, `go test` in `backend/` (Go version from `go.mod`) |
-| Frontend Build | `.github/workflows/webpack.yml` | `npm ci` + `npm run build` in `frontend/` (Node 18/20/22) |
+| Backend CI | `.github/workflows/backend.yml` | `go build`, `go vet`, golangci-lint, and `go test` (unit + PostgreSQL integration) in `backend/` |
+| Frontend CI | `.github/workflows/webpack.yml` | `npm ci`, ESLint, Vitest, and `npm run build` in `frontend/` (Node 18/20/22) |
+| CodeQL | `.github/workflows/codeql.yml` | Security scanning for Go and JavaScript (push, PR, weekly) |
+| Release | `.github/workflows/release.yml` | Cross-platform binaries + GitHub Release on `v*` tags |
 
 Keep both green before requesting review.
 
@@ -216,8 +221,8 @@ Keep both green before requesting review.
    `docs/`, `refactor/`...).
 3. Make focused commits; one logical change per PR.
 4. Before opening the PR:
-   - `gofmt`, `go vet`, `go test ./...` pass
-   - `npm run build` passes
+   - `gofmt`, `go vet`, `golangci-lint run`, `go test ./...` pass
+   - `npm run lint`, `npm run test`, `npm run build` pass
    - UI changes are covered by screenshots in the PR description
 5. Describe what and why in the PR; reference the issue it fixes
    (`Closes #123`).

@@ -10,6 +10,21 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:14-alpine
+        env:
+          POSTGRES_USER: videocms
+          POSTGRES_PASSWORD: videocms
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U videocms"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
     - uses: actions/checkout@v4
 
@@ -27,6 +42,26 @@ jobs:
       working-directory: backend
       run: go vet ./...
 
-    - name: Test
+    - name: Test (unit + PostgreSQL integration)
       working-directory: backend
+      env:
+        TEST_PG_DSN: postgres://videocms:videocms@localhost:5432/postgres?sslmode=disable
       run: go test ./...
+
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version-file: backend/go.mod
+        cache-dependency-path: backend/go.sum
+
+    - name: golangci-lint
+      uses: golangci/golangci-lint-action@v6
+      with:
+        version: v1.64.8
+        working-directory: backend

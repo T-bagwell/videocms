@@ -8,10 +8,10 @@ import (
 )
 
 type blockedTitle struct {
-	ID        string `json:"id"`
-	Title     string `json:"title"`
-	MatchCount int64 `json:"match_count"`
-	CreatedAt string `json:"created_at"`
+	ID         string `json:"id"`
+	Title      string `json:"title"`
+	MatchCount int64  `json:"match_count"`
+	CreatedAt  string `json:"created_at"`
 }
 
 // blockedTitlesCondition returns a SQL condition matching videos whose title

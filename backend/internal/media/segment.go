@@ -8,4 +8,3 @@ var segNameRe = regexp.MustCompile(`^seg_\d+\.ts$`)
 func SegmentNameMatch(name string) bool {
 	return segNameRe.MatchString(name)
 }
-
