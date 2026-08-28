@@ -8,7 +8,7 @@
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14-4169E1?logo=postgresql&logoColor=white)
 ![i18n](https://img.shields.io/badge/i18n-5%20languages-8A2BE2)
 
-**语言:** [English](README.md) · 中文 · [日本語](README.ja.md)
+**语言:** [English](../README.md) · 中文 · [日本語](README.ja.md)
 
 把服务器磁盘上的文件夹变成可浏览、可搜索的视频媒体库。扫描一次，所有视频就带上海报、
 元数据、观看进度、收藏与播放列表——带序号的文件还会自动归组为剧集。
@@ -75,7 +75,7 @@
 | --- | --- | --- |
 | [产品文档](product.zh-CN.md) | EN · 中文 · FR · JA · DE | 终端用户 |
 | [系统架构](architecture.zh-CN.md) | EN · 中文 · JA | 开发者 |
-| [README](README.md) / [中文](README.zh-CN.md) / [日本語](README.ja.md) | English · 中文 · 日本語 | 所有人 |
+| [English](../README.md) / [中文](README.zh-CN.md) / [日本語](README.ja.md) | English · 中文 · 日本語 | 所有人 |
 
 ## 快速开始
 

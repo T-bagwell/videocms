@@ -115,11 +115,11 @@ HLS (fragile - do not regress)
 
 ## Docs, Git, GitHub
 
-- All documentation lives in `docs/` (READMEs, contributing guides, changelog,
-  security policy); `docs/INDEX.md` indexes everything. README has en / zh-CN /
-  ja; Product docs exist in five languages (en, zh-CN, fr, ja, de); architecture
-  in three (en, zh-CN, ja). When touching docs, update every existing language
-  and keep code fences paired.
+- The English README lives at the repo root (`README.md`); the zh-CN / ja
+  READMEs and all other docs live in `docs/` (contributing guides, changelog,
+  security policy); `docs/INDEX.md` indexes everything. Product docs exist in
+  five languages (en, zh-CN, fr, ja, de); architecture in three (en, zh-CN, ja).
+  When touching docs, update every existing language and keep code fences paired.
 - Update docs/changelog.md for user-visible changes.
 - Commits: `git commit` locally, push via:
   ```bash

@@ -30,7 +30,7 @@ performance and extension points.
 
 | Language | Link |
 | --- | --- |
-| English | [README.md](README.md) |
+| English | [README.md](../README.md) |
 | 中文 | [README.zh-CN.md](README.zh-CN.md) |
 | 日本語 | [README.ja.md](README.ja.md) |
 

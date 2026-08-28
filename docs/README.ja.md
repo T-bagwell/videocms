@@ -8,7 +8,7 @@
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14-4169E1?logo=postgresql&logoColor=white)
 ![i18n](https://img.shields.io/badge/i18n-5%20languages-8A2BE2)
 
-**言語:** [English](README.md) | [中文](README.zh-CN.md) | 日本語
+**言語:** [English](../README.md) | [中文](README.zh-CN.md) | 日本語
 
 サーバーのディスク上のフォルダを、閲覧・検索可能なビデオライブラリに変えるシステムです。
 一度スキャンすれば、すべての動画にポスター・メタデータ・視聴履歴・お気に入り・プレイリストが付き、
@@ -77,7 +77,7 @@ SQL 評価され、ブロックされた項目は一斉に消え、解除する�
 | --- | --- | --- |
 | [製品ドキュメント](product.ja.md) | EN · 中文 · FR · JA · DE | エンドユーザー |
 | [システムアーキテクチャ](architecture.ja.md) | EN · 中文 · JA | 開発者 |
-| [README](README.md) / [中文](README.zh-CN.md) / [日本語](README.ja.md) | English · 中文 · 日本語 | すべて |
+| [English](../README.md) / [中文](README.zh-CN.md) / [日本語](README.ja.md) | English · 中文 · 日本語 | すべて |
 
 ## クイックスタート
 
