@@ -228,7 +228,7 @@ func (a *App) uploadSubtitle(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusBadRequest, "missing subtitle file")
 		return
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	ext := strings.ToLower(filepath.Ext(header.Filename))
 	if !uploadSubtitleExts[ext] {
@@ -247,7 +247,7 @@ func (a *App) uploadSubtitle(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusInternalServerError, "cannot save subtitle")
 		return
 	}
-	defer out.Close()
+	defer func() { _ = out.Close() }()
 	if _, err := io.Copy(out, file); err != nil {
 		writeErr(w, http.StatusInternalServerError, "cannot save subtitle")
 		return
@@ -414,7 +414,7 @@ func removeOldSubtitle(dir, oldPath, keep string) {
 	}
 	prefix := filepath.Clean(dir) + string(os.PathSeparator)
 	if strings.HasPrefix(filepath.Clean(oldPath), prefix) {
-		os.Remove(oldPath)
+		_ = os.Remove(oldPath)
 	}
 }
 
