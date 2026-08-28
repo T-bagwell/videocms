@@ -6,6 +6,8 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Expanded contributing guide (English, 中文, 日本語) covering development
+  setup, repository conventions, testing, CI and the pull request workflow
 - Filesystem watching for incremental indexing: new, changed, and removed
   files are picked up automatically (default every 30s, `WATCH_INTERVAL`),
   without a full rescan

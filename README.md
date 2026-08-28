@@ -198,7 +198,11 @@ See also [SECURITY.md](SECURITY.md).
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md).
+Contributions are welcome! See the contribution guide:
+
+- English: [CONTRIBUTING.md](CONTRIBUTING.md)
+- 中文: [CONTRIBUTING.zh-CN.md](CONTRIBUTING.zh-CN.md)
+- 日本語: [CONTRIBUTING.ja.md](CONTRIBUTING.ja.md)
 
 ## License
 

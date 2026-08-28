@@ -33,9 +33,19 @@ performance and extension points.
 | 中文 | [../README.zh-CN.md](../README.zh-CN.md) |
 | 日本語 | [../README.ja.md](../README.ja.md) |
 
+## Contributing
+
+For contributors: development setup, repository conventions, testing, CI and
+the pull request workflow.
+
+| Language | Link |
+| --- | --- |
+| English | [CONTRIBUTING.md](../CONTRIBUTING.md) |
+| 中文 | [CONTRIBUTING.zh-CN.md](../CONTRIBUTING.zh-CN.md) |
+| 日本語 | [CONTRIBUTING.ja.md](../CONTRIBUTING.ja.md) |
+
 ## Project documents
 
 - [CHANGELOG.md](../CHANGELOG.md) — version history
-- [CONTRIBUTING.md](../CONTRIBUTING.md) — development guide
 - [SECURITY.md](../SECURITY.md) — security policy & hardening
 - [LICENSE](../LICENSE) — Apache License 2.0

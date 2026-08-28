@@ -196,7 +196,11 @@ scripts/                 デモ素材ジェネレーター
 
 ## コントリビュート
 
-[CONTRIBUTING.md](CONTRIBUTING.md) を参照してください。
+コントリビューションを歓迎します！ コントリビュートガイドを参照してください：
+
+- 日本語：[CONTRIBUTING.ja.md](CONTRIBUTING.ja.md)
+- English：[CONTRIBUTING.md](CONTRIBUTING.md)
+- 中文：[CONTRIBUTING.zh-CN.md](CONTRIBUTING.zh-CN.md)
 
 ## ライセンス
 

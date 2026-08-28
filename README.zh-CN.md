@@ -193,7 +193,11 @@ scripts/                 演示素材生成器
 
 ## 贡献
 
-见 [CONTRIBUTING.md](CONTRIBUTING.md)。
+欢迎参与贡献！参见贡献指南：
+
+- 中文：[CONTRIBUTING.zh-CN.md](CONTRIBUTING.zh-CN.md)
+- English：[CONTRIBUTING.md](CONTRIBUTING.md)
+- 日本語：[CONTRIBUTING.ja.md](CONTRIBUTING.ja.md)
 
 ## 许可证
 
