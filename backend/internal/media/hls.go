@@ -160,7 +160,7 @@ func (m *HLSManager) Playlist(ctx context.Context, videoID uuid.UUID, input stri
 		delete(m.sessions, videoID)
 		m.mu.Unlock()
 		m.waitForExit(sess)
-		os.RemoveAll(dir)
+		_ = os.RemoveAll(dir)
 	} else {
 		m.mu.Unlock()
 	}
@@ -228,7 +228,7 @@ func (m *HLSManager) Playlist(ctx context.Context, videoID uuid.UUID, input stri
 			for _, r := range rends {
 				if f, ferr := os.OpenFile(filepath.Join(dir, r.Name, "index.m3u8"), os.O_APPEND|os.O_WRONLY, 0o644); ferr == nil {
 					_, _ = f.WriteString("#EXT-X-ENDLIST\n")
-					f.Close()
+					_ = f.Close()
 				}
 			}
 		}
@@ -307,7 +307,7 @@ func (m *HLSManager) Stop(videoID uuid.UUID) {
 	}
 	m.mu.Unlock()
 	if ok {
-		os.RemoveAll(m.sessionDir(videoID))
+		_ = os.RemoveAll(m.sessionDir(videoID))
 	}
 }
 
@@ -327,7 +327,7 @@ func (m *HLSManager) cleanupLoop() {
 		}
 		m.mu.Unlock()
 		for _, id := range stale {
-			os.RemoveAll(m.sessionDir(id))
+			_ = os.RemoveAll(m.sessionDir(id))
 			log.Printf("[hls] reaped idle session %s", id.String()[:8])
 		}
 	}

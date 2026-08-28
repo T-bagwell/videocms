@@ -298,7 +298,7 @@ func (s *Scanner) Watch(ctx context.Context, interval time.Duration) {
 	ticker := time.NewTicker(interval)
 	defer ticker.Stop()
 	if watcher, err := fsnotify.NewWatcher(); err == nil {
-		defer watcher.Close()
+		defer func() { _ = watcher.Close() }()
 		go s.watchEvents(ctx, watcher)
 	} else {
 		log.Printf("fsnotify unavailable (%v); falling back to periodic scans", err)
