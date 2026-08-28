@@ -283,7 +283,7 @@ func (a *App) importBackup(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusBadRequest, "missing backup file")
 		return
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 	var backup backupFile
 	if err := json.NewDecoder(io.LimitReader(file, 256<<20)).Decode(&backup); err != nil {
 		writeErr(w, http.StatusBadRequest, "invalid backup JSON: "+err.Error())

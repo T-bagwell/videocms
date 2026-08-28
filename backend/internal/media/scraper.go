@@ -424,7 +424,7 @@ func (s *Scraper) apply(ctx context.Context, videoID uuid.UUID, info *tmdbInfo) 
 	}
 	if oldPoster != "" && oldPoster != posterPath &&
 		filepath.Dir(oldPoster) == filepath.Join(s.dataDir, "posters") {
-		os.Remove(oldPoster)
+		_ = os.Remove(oldPoster)
 	}
 	return nil
 }
@@ -442,7 +442,7 @@ func (s *Scraper) downloadPoster(ctx context.Context, videoID uuid.UUID, path st
 	if err != nil {
 		return "", err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusOK {
 		return "", fmt.Errorf("poster http %d", resp.StatusCode)
 	}
@@ -464,7 +464,7 @@ func (s *Scraper) downloadPoster(ctx context.Context, videoID uuid.UUID, path st
 	if err != nil {
 		return "", err
 	}
-	defer out.Close()
+	defer func() { _ = out.Close() }()
 	if _, err := out.Write(head[:n]); err != nil {
 		return "", err
 	}
@@ -483,7 +483,7 @@ func (s *Scraper) getJSON(ctx context.Context, url string, dst any) error {
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(io.LimitReader(resp.Body, 512))
 		return fmt.Errorf("tmdb http %d: %s", resp.StatusCode, strings.TrimSpace(string(body)))
@@ -502,7 +502,7 @@ func (s *Scraper) postJSON(ctx context.Context, url string, payload []byte, dst 
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(io.LimitReader(resp.Body, 512))
 		return fmt.Errorf("provider http %d: %s", resp.StatusCode, strings.TrimSpace(string(body)))
@@ -545,7 +545,7 @@ func urlQueryEscape(s string) string {
 			r == '-', r == '_', r == '.', r == '~':
 			b.WriteRune(r)
 		default:
-			b.WriteString(fmt.Sprintf("%%%02X", r))
+			fmt.Fprintf(&b, "%%%02X", r)
 		}
 	}
 	return b.String()

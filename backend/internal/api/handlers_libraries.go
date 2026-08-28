@@ -158,7 +158,7 @@ func (a *App) deleteLibrary(w http.ResponseWriter, r *http.Request) {
 		}
 		for _, p := range paths {
 			if filepath.Dir(p) == filepath.Join(a.cfg.DataDir, "posters") {
-				os.Remove(p)
+				_ = os.Remove(p)
 			}
 		}
 	}()
