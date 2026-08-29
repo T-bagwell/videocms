@@ -67,7 +67,7 @@ flowchart LR
 
 | 部分 | 技術 | 責務 |
 | --- | --- | --- |
-| Web UI | React 18、Vite、react-router、i18next、hls.js | 閲覧・検索・再生、管理画面、言語切替 |
+| Web UI | React 19、Vite 8、react-router、i18next、hls.js | 閲覧・検索・再生、管理画面、言語切替 |
 | バックエンド | Go（net/http 標準ライブラリ、pgx/v5） | 認証、ライブラリ管理、スキャン、ストリーミング、HLS、スクレイピング |
 | ストレージ | PostgreSQL 14 + サーバーディスク | メタデータ DB。動画ファイル・生成ポスター・HLS セグメントはディスク |
 
@@ -97,7 +97,7 @@ backend/
 
 ### 3.2 HTTP レイヤー
 
-- ルーティングは Go 1.22+ の `net/http.ServeMux` パターン
+- ルーティングは Go 1.26+ の `net/http.ServeMux` パターン
   （`"GET /api/videos/{id}"`、`"GET /api/videos/{id}/hls/{file...}"`）
 - ミドルウェアチェーン：panic リカバリ → リクエストログ → CORS
 - リクエストボディはサイズ制限（`http.MaxBytesReader`）

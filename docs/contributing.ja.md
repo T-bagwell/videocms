@@ -221,6 +221,10 @@ GitHub Actions は `main` へのプッシュと pull request で 2 つのワー�
 | CodeQL | `.github/workflows/codeql.yml` | Go と JavaScript のセキュリティスキャン（push・PR・毎週） |
 | Release | `.github/workflows/release.yml` | `v*` タグでクロスプラットフォームバイナリをビルドし GitHub Release を公開 |
 
+Dependabot が Go・npm・GitHub Actions の依存更新 PR を毎週作成します。そちらも
+グリーンに保ってください——PR に `@dependabot rebase` とコメントすると `main` に
+再同期されます。
+
 レビューを依頼する前に両方をグリーンにしてください。
 
 ## Pull request の流れ

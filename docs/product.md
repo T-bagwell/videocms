@@ -37,10 +37,10 @@ hardware. Your videos never leave your network unless you choose to share them.
 
 ### Requirements
 
-- A server (macOS/Linux/Windows) with Go 1.22+ to build, or a prebuilt binary
+- A server (macOS/Linux/Windows) with Go 1.26+ to build, or a prebuilt binary
 - PostgreSQL 14+
 - ffmpeg/ffprobe (for metadata, posters and transcoding)
-- Node.js 18+ (only for frontend development; the built UI is served by the backend)
+- Node.js 20+ (only for frontend development; the built UI is served by the backend)
 
 ### Install
 

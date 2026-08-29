@@ -69,7 +69,7 @@ Three runtime parts:
 
 | Part | Technology | Responsibility |
 | --- | --- | --- |
-| Web UI | React 18, Vite, react-router, i18next, hls.js | Browse/search/play, admin console, language switching |
+| Web UI | React 19, Vite 8, react-router, i18next, hls.js | Browse/search/play, admin console, language switching |
 | Backend | Go (net/http stdlib, pgx/v5) | Auth, media library management, scanning, streaming, HLS, scraping |
 | Storage | PostgreSQL 14 + server disk | Metadata database; video files and generated posters/HLS live on disk |
 
@@ -99,7 +99,7 @@ backend/
 
 ### 3.2 HTTP layer
 
-- Routing uses Go 1.22+ `net/http.ServeMux` patterns
+- Routing uses Go 1.26+ `net/http.ServeMux` patterns
   (`"GET /api/videos/{id}"`, `"GET /api/videos/{id}/hls/{file...}"`)
 - A middleware chain wraps the mux: panic recovery → request logging → CORS
 - Request bodies are size-limited (`http.MaxBytesReader`)

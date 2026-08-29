@@ -6,7 +6,7 @@
 backend/
   cmd/server/            entrypoint (config load, db connect, migrate, seed admin)
   internal/
-    api/                 HTTP handlers + router (net/http, Go 1.22+ patterns)
+    api/                 HTTP handlers + router (net/http, Go 1.26+ patterns)
     auth/                JWT issue/verify, RequireAuth / RequireAdmin middleware
     config/              env-based config (PORT, DATABASE_URL, JWT_SECRET, ...)
     db/                  pgxpool connect, migrations (embedded), seed admin

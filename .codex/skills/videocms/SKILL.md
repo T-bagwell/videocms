@@ -52,7 +52,7 @@ Initial admin login: `admin / admin123`.
 Run backend tests with the wrapper (see above). Frontend build:
 
 ```bash
-cd frontend && npm run build
+cd frontend && npm run lint && npm run test && npm run build
 ```
 
 ## Conventions (do not violate)
@@ -128,6 +128,11 @@ HLS (fragile - do not regress)
   ```
   Never write the token into files, commit messages, or scripts. Origin is an
   SSH URL in this clone; authenticate with a PAT on the push command only.
+
+CI (`.github/workflows/`): Backend CI runs build/vet/golangci-lint and tests
+against a PostgreSQL service container; Frontend CI runs ESLint, Vitest and the
+Vite build on Node 20/22/24; CodeQL scans Go + JavaScript; Release builds
+cross-platform binaries on `v*` tags. Dependabot opens weekly dependency PRs.
 
 ## References (load only when needed)
 

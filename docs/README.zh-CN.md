@@ -3,8 +3,8 @@
 > **自托管的视频资源管理系统** — Go · React · PostgreSQL
 
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](../LICENSE)
-![Go](https://img.shields.io/badge/Go-1.22+-00ADD8?logo=go&logoColor=white)
-![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)
+![Go](https://img.shields.io/badge/Go-1.26+-00ADD8?logo=go&logoColor=white)
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14-4169E1?logo=postgresql&logoColor=white)
 ![i18n](https://img.shields.io/badge/i18n-5%20languages-8A2BE2)
 
@@ -149,7 +149,7 @@ backend/                 Go 服务（net/http + pgx）
   internal/media/        扫描器、TMDB 刮削、HLS 管理、流媒体
   internal/db/           连接池 + 内嵌 SQL 迁移
   internal/models/       领域模型
-frontend/                React 18 SPA（Vite）
+frontend/                React 19 SPA（Vite）
   src/i18n/locales/      en / zh / fr / ja / de
   src/pages/             浏览、播放、剧集、播放列表、管理…
 docs/                    全部文档（多语言）
@@ -161,10 +161,11 @@ scripts/                 演示素材生成器
 | 层 | 技术 |
 | --- | --- |
 | 后端 | Go（net/http、pgx/v5）、JWT（HS256）、bcrypt |
-| 前端 | React 18、Vite、react-router、i18next、hls.js |
+| 前端 | React 19、Vite 8、react-router、i18next、hls.js |
 | 数据库 | PostgreSQL 14（内嵌 SQL 迁移） |
 | 媒体 | ffprobe（元数据）、ffmpeg（海报、HLS 转码） |
 | 文档 | Markdown + Mermaid（GitHub 渲染） |
+| 质量 | ESLint 10、Vitest 4、golangci-lint（CI 中的 lint 与单元测试） |
 
 ## 安全
 

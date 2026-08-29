@@ -34,10 +34,10 @@ VideoCMS 是一个自托管的视频资源管理系统。把服务器磁盘上�
 
 ### 运行环境
 
-- 服务器（macOS/Linux/Windows），构建需要 Go 1.22+（或使用预编译二进制）
+- 服务器（macOS/Linux/Windows），构建需要 Go 1.26+（或使用预编译二进制）
 - PostgreSQL 14+
 - ffmpeg/ffprobe（用于元数据、海报与转码）
-- Node.js 18+（仅前端开发需要；生产界面由后端直接托管）
+- Node.js 20+（仅前端开发需要；生产界面由后端直接托管）
 
 ### 安装
 

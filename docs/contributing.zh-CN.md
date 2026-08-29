@@ -193,6 +193,9 @@ GitHub Actions 在推送到 `main` 和 pull request 时运行两个 workflow：
 | CodeQL | `.github/workflows/codeql.yml` | Go 与 JavaScript 安全扫描（push、PR、每周） |
 | Release | `.github/workflows/release.yml` | 打 `v*` tag 时构建跨平台二进制并发布 GitHub Release |
 
+Dependabot 每周自动为 Go、npm 和 GitHub Actions 打开依赖更新 PR，请同样保持其
+check 为绿——在 PR 中评论 `@dependabot rebase` 可让其与 `main` 重新同步。
+
 请求 review 前请确保两者都为绿色。
 
 ## Pull request 流程

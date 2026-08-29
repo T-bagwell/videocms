@@ -36,10 +36,10 @@ Hardware. Ihre Videos verlassen Ihr Netzwerk nie, außer Sie teilen sie bewusst.
 
 ### Voraussetzungen
 
-- Ein Server (macOS/Linux/Windows) mit Go 1.22+ zum Kompilieren (oder vorkompiliertes Binary)
+- Ein Server (macOS/Linux/Windows) mit Go 1.26+ zum Kompilieren (oder vorkompiliertes Binary)
 - PostgreSQL 14+
 - ffmpeg/ffprobe (für Metadaten, Poster und Transkodierung)
-- Node.js 18+ (nur für Frontend-Entwicklung; die UI wird vom Backend ausgeliefert)
+- Node.js 20+ (nur für Frontend-Entwicklung; die UI wird vom Backend ausgeliefert)
 
 ### Installation
 

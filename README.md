@@ -3,8 +3,8 @@
 > **Self-hosted video resource management** — Go · React · PostgreSQL
 
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
-![Go](https://img.shields.io/badge/Go-1.22+-00ADD8?logo=go&logoColor=white)
-![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)
+![Go](https://img.shields.io/badge/Go-1.26+-00ADD8?logo=go&logoColor=white)
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14-4169E1?logo=postgresql&logoColor=white)
 ![i18n](https://img.shields.io/badge/i18n-5%20languages-8A2BE2)
 
@@ -154,7 +154,7 @@ backend/                 Go server (net/http + pgx)
   internal/media/        scanner, TMDB scraper, HLS manager, streaming
   internal/db/           pool + embedded SQL migrations
   internal/models/       domain types
-frontend/                React 18 SPA (Vite)
+frontend/                React 19 SPA (Vite)
   src/i18n/locales/      en / zh / fr / ja / de
   src/pages/             browse, player, series, playlists, admin…
 docs/                    all documentation (multi-language)
@@ -166,10 +166,11 @@ scripts/                 demo media generator
 | Layer | Technology |
 | --- | --- |
 | Backend | Go (net/http, pgx/v5), JWT (HS256), bcrypt |
-| Frontend | React 18, Vite, react-router, i18next, hls.js |
+| Frontend | React 19, Vite 8, react-router, i18next, hls.js |
 | Database | PostgreSQL 14 (embedded SQL migrations) |
 | Media | ffprobe (metadata), ffmpeg (posters, HLS transcoding) |
 | Docs | Markdown + Mermaid (GitHub-rendered) |
+| Quality | ESLint 10, Vitest 4, golangci-lint (linting & tests in CI) |
 
 ## Security
 

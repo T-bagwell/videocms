@@ -3,8 +3,8 @@
 > **セルフホスト型ビデオリソース管理システム** — Go · React · PostgreSQL
 
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](../LICENSE)
-![Go](https://img.shields.io/badge/Go-1.22+-00ADD8?logo=go&logoColor=white)
-![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)
+![Go](https://img.shields.io/badge/Go-1.26+-00ADD8?logo=go&logoColor=white)
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14-4169E1?logo=postgresql&logoColor=white)
 ![i18n](https://img.shields.io/badge/i18n-5%20languages-8A2BE2)
 
@@ -152,7 +152,7 @@ backend/                 Go サーバー（net/http + pgx）
   internal/media/        スキャナー、TMDB スクレイパー、HLS 管理、ストリーミング
   internal/db/           プール + 埋め込み SQL マイグレーション
   internal/models/       ドメイン型
-frontend/                React 18 SPA（Vite）
+frontend/                React 19 SPA（Vite）
   src/i18n/locales/      en / zh / fr / ja / de
   src/pages/             ブラウズ、プレイヤー、ドラマ、プレイリスト、管理…
 docs/                    全ドキュメント（多言語）
@@ -164,10 +164,11 @@ scripts/                 デモ素材ジェネレーター
 | 層 | 技術 |
 | --- | --- |
 | バックエンド | Go（net/http、pgx/v5）、JWT（HS256）、bcrypt |
-| フロントエンド | React 18、Vite、react-router、i18next、hls.js |
+| フロントエンド | React 19、Vite 8、react-router、i18next、hls.js |
 | データベース | PostgreSQL 14（埋め込み SQL マイグレーション） |
 | メディア | ffprobe（メタデータ）、ffmpeg（ポスター、HLS トランスコード） |
 | ドキュメント | Markdown + Mermaid（GitHub レンダリング） |
+| 品質 | ESLint 10、Vitest 4、golangci-lint（CI で Lint・ユニットテスト） |
 
 ## セキュリティ
 

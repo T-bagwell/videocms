@@ -212,6 +212,10 @@ GitHub Actions runs two workflows on push to `main` and on pull requests:
 | CodeQL | `.github/workflows/codeql.yml` | Security scanning for Go and JavaScript (push, PR, weekly) |
 | Release | `.github/workflows/release.yml` | Cross-platform binaries + GitHub Release on `v*` tags |
 
+Dependabot opens weekly dependency-update PRs (Go, npm, GitHub Actions); keep
+their checks green too — comment `@dependabot rebase` to re-sync a PR with
+`main`.
+
 Keep both green before requesting review.
 
 ## Pull request workflow

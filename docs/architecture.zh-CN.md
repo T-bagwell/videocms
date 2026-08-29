@@ -67,7 +67,7 @@ flowchart LR
 
 | 部分 | 技术 | 职责 |
 | --- | --- | --- |
-| Web 界面 | React 18、Vite、react-router、i18next、hls.js | 浏览/搜索/播放、管理后台、语言切换 |
+| Web 界面 | React 19、Vite 8、react-router、i18next、hls.js | 浏览/搜索/播放、管理后台、语言切换 |
 | 后端 | Go（net/http 标准库、pgx/v5） | 认证、媒体库管理、扫描、流媒体、HLS、刮削 |
 | 存储 | PostgreSQL 14 + 服务器磁盘 | 元数据数据库；视频文件与生成的海报/HLS 分片在磁盘上 |
 
@@ -97,7 +97,7 @@ backend/
 
 ### 3.2 HTTP 层
 
-- 路由使用 Go 1.22+ `net/http.ServeMux` 模式
+- 路由使用 Go 1.26+ `net/http.ServeMux` 模式
   （`"GET /api/videos/{id}"`、`"GET /api/videos/{id}/hls/{file...}"`）
 - 中间件链包裹路由：panic 恢复 → 请求日志 → CORS
 - 请求体限制大小（`http.MaxBytesReader`）

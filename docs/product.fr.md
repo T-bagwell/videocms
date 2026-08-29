@@ -36,10 +36,10 @@ matériel. Vos vidéos ne quittent jamais votre réseau, sauf si vous choisissez
 
 ### Prérequis
 
-- Un serveur (macOS/Linux/Windows) avec Go 1.22+ pour compiler (ou un binaire précompilé)
+- Un serveur (macOS/Linux/Windows) avec Go 1.26+ pour compiler (ou un binaire précompilé)
 - PostgreSQL 14+
 - ffmpeg/ffprobe (métadonnées, affiches, transcodage)
-- Node.js 18+ (uniquement pour le développement front ; l’UI est servie par le backend)
+- Node.js 20+ (uniquement pour le développement front ; l’UI est servie par le backend)
 
 ### Installation
 
