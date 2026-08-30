@@ -148,6 +148,8 @@ subtitle_tracks -- id, video_id(外键, ON DELETE CASCADE), position, lang, titl
                 --   stream_index（多语言字幕轨道）
 user_subtitle_prefs -- 主键(user_id, video_id), track_id(外键, ON DELETE CASCADE),
                 --   updated_at（按用户的默认字幕轨）
+subtitle_offsets -- 主键(user_id, video_id), offset_ms, updated_at
+                --   （按用户的字幕同步；服务 WebVTT 时应用偏移）
 uploads         -- id, filename, target_path, total_size, chunk_size,
                 --   status(uploading|completed|failed), error, 时间戳
                 --   （分片上传会话；分片存放在 DATA_DIR/uploads/<id>/）
@@ -205,6 +207,9 @@ erDiagram
 - 多音轨源：每条音轨单独 remux 为一条 AAC HLS 音轨（`a<索引>/`），并通过
   `#EXT-X-MEDIA` AUDIO 分组对外发布，各视频档位引用该分组
   （`AUDIO="audio"`），播放器无需重启转码会话即可切换音轨
+- 字幕同步：`GET /api/videos/{id}/subtitles/{trackId}?offset_ms=…` 会平移
+  所有 cue 时间（WebVTT/SRT），并由按用户的 `subtitle_offsets` 持久化，
+  直接播放时自动记住调整值
 - 请求的 `start` 与当前会话相差超过一个分片（6 秒）时，杀掉旧会话并从新位置重启（跳转）
 - 清单在响应时重写，使每个分片 URL 都携带 `?token=`
 - 空闲会话 **15 分钟**后回收，同时删除会话目录
