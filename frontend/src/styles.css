@@ -144,6 +144,10 @@ input, textarea {
   border-radius: 8px; padding: 9px 13px; font-size: 14px; outline: none; font-family: inherit;
 }
 input:focus, textarea:focus { border-color: var(--accent); }
+input[type="checkbox"], input[type="radio"] {
+  width: auto; height: auto; margin: 0; padding: 0;
+  border: none; background: none; accent-color: var(--primary);
+}
 label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 12px; }
 label input, label textarea { margin-top: 6px; }
 
