@@ -9,6 +9,9 @@ export default function ShareModal({ kind, id, onClose }) {
   const [hours, setHours] = useState(168);
   const [password, setPassword] = useState('');
   const [domains, setDomains] = useState('');
+  const [theme, setTheme] = useState('default');
+  const [customTitle, setCustomTitle] = useState('');
+  const [hideNav, setHideNav] = useState(false);
   const [shares, setShares] = useState([]);
   const [created, setCreated] = useState('');
   const [copied, setCopied] = useState(false);
@@ -31,6 +34,9 @@ export default function ShareModal({ kind, id, onClose }) {
             .split(',')
             .map((s) => s.trim())
             .filter(Boolean),
+          theme,
+          custom_title: customTitle.trim() || undefined,
+          hide_nav: hideNav,
         },
       });
       setCreated(`${window.location.origin}${d.url}`);
@@ -85,6 +91,25 @@ export default function ShareModal({ kind, id, onClose }) {
             onChange={(e) => setPassword(e.target.value)}
             placeholder={t('video.sharePasswordPlaceholder')}
           />
+        </label>
+        <div className="field-row">
+          <span>{t('video.shareTheme')}</span>
+          <label>
+            <input type="radio" name="share-theme" checked={theme === 'default'} onChange={() => setTheme('default')} />
+            {t('video.shareThemeDefault')}
+          </label>
+          <label>
+            <input type="radio" name="share-theme" checked={theme === 'dark'} onChange={() => setTheme('dark')} />
+            {t('video.shareThemeDark')}
+          </label>
+        </div>
+        <label>
+          {t('video.shareCustomTitle')}
+          <input value={customTitle} onChange={(e) => setCustomTitle(e.target.value)} maxLength={200} />
+        </label>
+        <label className="scrape-force">
+          <input type="checkbox" checked={hideNav} onChange={(e) => setHideNav(e.target.checked)} />
+          {t('video.shareHideNav')}
         </label>
         <label className="share-password-field">
           {t('video.shareDomains')}

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { publicUrl } from '../api.js';
 import { fmtBytes, fmtDuration } from '../i18n';
@@ -8,6 +8,8 @@ const BROWSER_PLAYABLE = ['.mp4', '.m4v', '.webm', '.mov', '.ogv'];
 
 export default function SharePage() {
   const { token } = useParams();
+  const [searchParams] = useSearchParams();
+  const embed = searchParams.get('embed') === '1';
   const { t } = useTranslation();
   const [data, setData] = useState(null);
   const [err, setErr] = useState('');
@@ -222,13 +224,15 @@ export default function SharePage() {
   const streamUrl = useTranscode ? undefined : media('/stream');
 
   return (
-    <div className="container share-page">
+    <div className={`container share-page${data?.theme === 'dark' ? ' share-theme-dark' : ''}`}>
       <div className="share-head">
-        <Link className="btn ghost" to="/">
-          {t('share.backToSite')}
-        </Link>
+        {!embed && (
+          <Link className="btn ghost" to="/">
+            {t('share.backToSite')}
+          </Link>
+        )}
         <div>
-          <h1>{queueTitle || active.title}</h1>
+          <h1>{data?.custom_title || queueTitle || active.title}</h1>
           <div className="detail-facts">
             {active.year > 0 && <span>{active.year}</span>}
             <span>{fmtDuration(active.duration_sec)}</span>
