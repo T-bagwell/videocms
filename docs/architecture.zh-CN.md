@@ -336,6 +336,9 @@ AniList 与 Wikipedia（`TVMAZE_ENABLED=0` / `ANILIST_ENABLED=0` /
   视频移入回收站；`trash_records`（迁移 024）保存原始路径，
   `GET /api/admin/trash` + `POST /api/admin/trash/{id}/restore` 可移回文件并
   重新启用
+- NFO：`POST /api/libraries/{id}/export-nfo` 在每个视频旁写 Kodi 风格电影 NFO，
+  `/import-nfo` 把 title/year/plot/genres 解析回数据库
+  （media.NFOFileFor/WriteNFO/ReadNFO）
 
 ### 3.10 关键设计决策
 
