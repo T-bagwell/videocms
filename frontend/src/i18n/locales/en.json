@@ -127,7 +127,8 @@
     "subtitleSync": "Subtitle sync",
     "subtitleEarlier": "−0.5s",
     "subtitleLater": "+0.5s",
-    "subtitleReset": "Reset"
+    "subtitleReset": "Reset",
+    "assSubtitles": "Styled (ASS) subtitles"
   },
   "playlists": {
     "title": "Playlists",

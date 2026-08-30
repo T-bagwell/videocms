@@ -127,7 +127,8 @@
     "subtitleSync": "Synchro sous-titres",
     "subtitleEarlier": "−0,5 s",
     "subtitleLater": "+0,5 s",
-    "subtitleReset": "Réinitialiser"
+    "subtitleReset": "Réinitialiser",
+    "assSubtitles": "Sous-titres stylisés (ASS)"
   },
   "playlists": {
     "title": "Listes de lecture",

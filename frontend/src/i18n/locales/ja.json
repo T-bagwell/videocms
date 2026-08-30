@@ -127,7 +127,8 @@
     "subtitleSync": "字幕同期",
     "subtitleEarlier": "0.5 秒早く",
     "subtitleLater": "0.5 秒遅く",
-    "subtitleReset": "リセット"
+    "subtitleReset": "リセット",
+    "assSubtitles": "スタイル付き字幕 (ASS)"
   },
   "playlists": {
     "title": "プレイリスト",

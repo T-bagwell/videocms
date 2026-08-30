@@ -4,7 +4,9 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
+    "predev": "node scripts/copy-jassub.mjs",
     "dev": "vite",
+    "prebuild": "node scripts/copy-jassub.mjs",
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint .",
@@ -13,9 +15,10 @@
   "dependencies": {
     "hls.js": "^1.7.1",
     "i18next": "^26.3.6",
-    "react-i18next": "^17.0.12",
+    "jassub": "^2.5.14",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
+    "react-i18next": "^17.0.12",
     "react-router-dom": "^7.18.2"
   },
   "devDependencies": {

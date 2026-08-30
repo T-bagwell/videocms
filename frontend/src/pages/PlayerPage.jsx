@@ -3,6 +3,15 @@ import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next';
 import { api, mediaUrl } from '../api.js';
 import { fmtDuration } from '../i18n';
+import JASSUB from 'jassub';
+
+// jassub assets are copied from node_modules to public/jassub by
+// scripts/copy-jassub.mjs before build/dev.
+const JASS_BASE = `${import.meta.env.BASE_URL}jassub/`;
+const JASSUB_WORKER = `${JASS_BASE}jassub-worker.js`;
+const JASSUB_WASM = `${JASS_BASE}jassub-worker.wasm`;
+const JASSUB_MODERN_WASM = `${JASS_BASE}jassub-worker-modern.wasm`;
+const JASSUB_FONT = `${JASS_BASE}default.woff2`;
 
 const BROWSER_PLAYABLE = ['.mp4', '.m4v', '.webm', '.mov', '.ogv'];
 
@@ -37,10 +46,20 @@ export default function PlayerPage() {
   const [subtitleOffsetMs, setSubtitleOffsetMs] = useState(0);
   const [thumbMeta, setThumbMeta] = useState(null);
   const [hover, setHover] = useState(null);
+  const [assIdx, setAssIdx] = useState('');
+  const assRef = useRef(null);
 
   useEffect(() => {
     setActiveId(id);
   }, [id]);
+
+  useEffect(() => {
+    if (assRef.current) {
+      assRef.current.destroy().catch(() => {});
+      assRef.current = null;
+    }
+    setAssIdx('');
+  }, [activeId]);
 
   const saveProgress = useCallback(() => {
     const el = videoRef.current;
@@ -202,6 +221,7 @@ export default function PlayerPage() {
   function adjustSubtitleOffset(delta) {
     const next = Math.max(-300000, Math.min(300000, subtitleOffsetMs + delta));
     setSubtitleOffsetMs(next);
+    if (assIdx) void setAssTrack(assIdx);
     api('/users/me/subtitle-offset', {
       method: 'PUT',
       body: { video_id: activeId, offset_ms: next },
@@ -228,6 +248,40 @@ export default function PlayerPage() {
   function onStripClick() {
     if (!hover || !videoRef.current) return;
     videoRef.current.currentTime = hover.time;
+  }
+
+  async function setAssTrack(trackId) {
+    if (assRef.current) {
+      try {
+        await assRef.current.destroy();
+      } catch {
+        // instance may already be destroyed
+      }
+      assRef.current = null;
+    }
+    setAssIdx(trackId || '');
+    if (trackId && hlsRef.current) hlsRef.current.subtitleTrack = -1;
+    if (!trackId) return;
+    const tr = tracksRef.current.find((x) => x.id === trackId);
+    if (!tr) return;
+    try {
+      const res = await fetch(mediaUrl(`/videos/${activeId}/subtitles/${trackId}`));
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const content = await res.text();
+      assRef.current = new JASSUB({
+        video: videoRef.current,
+        subContent: content,
+        workerUrl: JASSUB_WORKER,
+        wasmUrl: JASSUB_WASM,
+        modernWasmUrl: JASSUB_MODERN_WASM,
+        fonts: [JASSUB_FONT],
+        defaultFont: JASSUB_FONT,
+        timeOffset: subtitleOffsetMs / 1000,
+        onDemandRender: true,
+      });
+    } catch {
+      setAssIdx('');
+    }
   }
 
   useEffect(() => {
@@ -348,43 +402,47 @@ export default function PlayerPage() {
         </div>
       </div>
 
-      <video
-        ref={videoRef}
-        className="player"
-        controls
-        autoPlay
-        src={streamUrl}
-        poster={video.has_poster ? mediaUrl(`/videos/${activeId}/poster`) : undefined}
-        onSeeking={onSeeking}
-        onTimeUpdate={() => {
-          const el = videoRef.current;
-          if (!el) return;
-          if (!savedRef.current || el.currentTime - savedRef.current > 5) {
-            savedRef.current = el.currentTime;
+      <div className="player-wrap">
+        <video
+          ref={videoRef}
+          className="player"
+          controls
+          autoPlay
+          src={streamUrl}
+          poster={video.has_poster ? mediaUrl(`/videos/${activeId}/poster`) : undefined}
+          onSeeking={onSeeking}
+          onTimeUpdate={() => {
+            const el = videoRef.current;
+            if (!el) return;
+            if (!savedRef.current || el.currentTime - savedRef.current > 5) {
+              savedRef.current = el.currentTime;
+              saveProgress();
+            }
+          }}
+          onPause={saveProgress}
+          onEnded={() => {
             saveProgress();
-          }
-        }}
-        onPause={saveProgress}
-        onEnded={() => {
-          saveProgress();
-          playNext();
-        }}
-        onError={onError}
-      >
-        {!useTranscode &&
-          tracks.map((tr) => (
-            <track
-              key={`${tr.id}-${subtitleOffsetMs}`}
-              kind="subtitles"
-              srcLang={tr.lang || undefined}
-              label={tr.title || tr.lang || t('player.subtitles')}
-              src={mediaUrl(
-                `/videos/${activeId}/subtitles/${tr.id}${subtitleOffsetMs ? `?offset_ms=${subtitleOffsetMs}` : ''}`,
-              )}
-              default={tr.is_active}
-            />
-          ))}
-      </video>
+            playNext();
+          }}
+          onError={onError}
+        >
+          {!useTranscode &&
+            tracks
+              .filter((tr) => tr.format !== 'ass' && tr.format !== 'ssa')
+              .map((tr) => (
+                <track
+                  key={`${tr.id}-${subtitleOffsetMs}`}
+                  kind="subtitles"
+                  srcLang={tr.lang || undefined}
+                  label={tr.title || tr.lang || t('player.subtitles')}
+                  src={mediaUrl(
+                    `/videos/${activeId}/subtitles/${tr.id}${subtitleOffsetMs ? `?offset_ms=${subtitleOffsetMs}` : ''}`,
+                  )}
+                  default={tr.is_active && !assIdx}
+                />
+              ))}
+        </video>
+      </div>
 
       {thumbMeta && (
         <div
@@ -427,7 +485,8 @@ export default function PlayerPage() {
         </div>
       )}
 
-      {useTranscode && (levels.length > 1 || subtitleTracks.length > 0 || audioTracks.length > 1) && (
+      {((useTranscode && (levels.length > 1 || subtitleTracks.length > 0 || audioTracks.length > 1)) ||
+        tracks.filter((tr) => tr.format === 'ass' || tr.format === 'ssa').length > 0) && (
         <div className="player-tools">
           {useTranscode && levels.length > 1 && (
             <label className="player-tool">
@@ -467,6 +526,21 @@ export default function PlayerPage() {
                     {tr.label}
                   </option>
                 ))}
+              </select>
+            </label>
+          )}
+          {tracks.filter((tr) => tr.format === 'ass' || tr.format === 'ssa').length > 0 && (
+            <label className="player-tool">
+              {t('player.assSubtitles')}
+              <select value={assIdx} onChange={(e) => setAssTrack(e.target.value)}>
+                <option value="">{t('player.subtitlesOff')}</option>
+                {tracks
+                  .filter((tr) => tr.format === 'ass' || tr.format === 'ssa')
+                  .map((tr) => (
+                    <option key={tr.id} value={tr.id}>
+                      {tr.title || tr.lang || t('player.assSubtitles')}
+                    </option>
+                  ))}
               </select>
             </label>
           )}

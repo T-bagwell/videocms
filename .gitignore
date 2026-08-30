@@ -3,6 +3,7 @@ backend/bin/
 backend/data/
 frontend/node_modules/
 frontend/dist/
+frontend/public/jassub/
 .DS_Store
 *.log
 .env

@@ -300,6 +300,15 @@ label input, label textarea { margin-top: 6px; }
   pointer-events: none;
 }
 .preview-tip img { display: block; border-radius: 4px; }
+.player-wrap { position: relative; }
+.player-wrap canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 5;
+}
 .status-cancelled { background: rgba(243,156,18,0.15); color: var(--warn); }
 .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
 .small-muted { color: var(--muted); font-size: 12px; }

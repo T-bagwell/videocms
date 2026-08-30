@@ -127,7 +127,8 @@
     "subtitleSync": "字幕同步",
     "subtitleEarlier": "提前 0.5s",
     "subtitleLater": "延后 0.5s",
-    "subtitleReset": "重置"
+    "subtitleReset": "重置",
+    "assSubtitles": "样式化字幕 (ASS)"
   },
   "playlists": {
     "title": "播放列表",

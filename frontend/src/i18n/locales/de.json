@@ -127,7 +127,8 @@
     "subtitleSync": "Untertitel-Sync",
     "subtitleEarlier": "−0,5 s",
     "subtitleLater": "+0,5 s",
-    "subtitleReset": "Zurücksetzen"
+    "subtitleReset": "Zurücksetzen",
+    "assSubtitles": "Gestylte Untertitel (ASS)"
   },
   "playlists": {
     "title": "Wiedergabelisten",
