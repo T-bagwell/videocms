@@ -147,6 +147,7 @@ make serve                                 # 构建前端并统一在 :8080 提�
 | `WIKIPEDIA_LANG` / `WIKIPEDIA_ENABLED` | `en` / `1` | 免密钥 Wikipedia 兜底的语言版本与开关 |
 | `SCAN_WORKERS` | `4` | 并行扫描工作数（1-16） |
 | `WATCH_INTERVAL` | `30` | 增量扫描的兜底间隔（fsnotify 事件即时索引）；`0` 关闭监听 |
+| `HLS_HW_ACCEL` | 空（软件 x264） | HLS 视频编码器：`videotoolbox`、`nvenc` 或 `qsv`；留空用 libx264 |
 | `YTDLP_PATH` | PATH 上的 `yt-dlp` | 「下载」队列使用的 yt-dlp 二进制 |
 | `WEB_ROOT` | 自动（`frontend/dist`） | 单服务模式托管的前端目录；不设置即纯 API 部署 |
 | `CORS_ORIGINS` | 空（`*`） | 允许调用 API 的浏览器来源（逗号分隔，用于前后端分离部署） |
