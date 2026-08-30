@@ -206,11 +206,14 @@ npm run build
 - Upload/download/yt-dlp flows are covered by integration tests in
   `internal/api`; the yt-dlp worker tests use a fake binary via
   `Downloader.SetBin` so they never hit the network.
+- SSO and casting are also covered end-to-end: the SAML test embeds a real
+  IdP (crewjam/saml/samlidp), the SMTP test uses an in-process fake SMTP
+  server, and the DLNA test exercises browse/stream/allowlist endpoints.
 - Network-dependent scraper tests skip unless `NETWORK_TEST=1`.
 
 ## Continuous integration
 
-GitHub Actions runs two workflows on push to `main` and on pull requests:
+GitHub Actions runs four workflows on push to `main` and on pull requests:
 
 | Workflow | File | What it runs |
 | --- | --- | --- |
