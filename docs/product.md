@@ -219,6 +219,8 @@ Stats: videos, libraries, users, playlists, favorites, series and storage used.
   backups
 - **Webhooks & API docs**: subscribe endpoints to signed events and browse the
   OpenAPI document at `/api/openapi.json` for third-party automation
+- **PWA & offline**: install VideoCMS as an app and save videos for offline
+  viewing from the detail page
 
 ### 5.4 Users
 
