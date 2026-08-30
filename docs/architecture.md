@@ -379,6 +379,11 @@ back to the keyless TVMaze API, then AniList, then Wikipedia
   authorization-code + userinfo (config `OIDC_*`); users are provisioned or
   linked via the unique `users.oauth_sub` column (migration 026), and the
   frontend receives a session JWT via `/login?sso_token=…`
+- Parental controls & quotas (migration 027): bcrypt `users.pin` with
+  `PUT|POST /api/users/me/pin[/verify]` issuing a 5-minute unlock token that
+  listings accept via `X-Videocms-Unlock`; `users.allowed_rating` filters
+  `videos.content_rating` unless unlocked, and `libraries.quota_bytes` is
+  enforced when uploads target that library
 
 ### 3.10 Key design decisions
 
