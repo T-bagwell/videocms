@@ -405,6 +405,10 @@ back to the keyless TVMaze API, then AniList, then Wikipedia
   health checks, and optional rescans (`MAINT_RESCAN=1`); manual trigger at
   `POST /api/admin/maintenance/run`, backups listed/downloaded at
   `GET /api/admin/backups[/{name}]`
+- Webhooks & API docs (migration 030): `webhook_subscriptions` (admin CRUD at
+  `/api/admin/webhooks`) receive signed JSON events
+  (`X-Videocms-Signature` = HMAC-SHA256) filtered by event type; the public
+  surface is described by `GET /api/openapi.json`
 
 ### 3.10 Key design decisions
 
