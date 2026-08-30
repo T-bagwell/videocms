@@ -20,6 +20,8 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Hardware-accelerated HLS transcoding: `HLS_HW_ACCEL=videotoolbox|nvenc|qsv`
+  switches the HLS video encoder from software x264 to a GPU encoder
 - Multi-audio HLS playback: videos with several audio streams get a separate
   HLS audio track per stream (`EXT-X-MEDIA` AUDIO group), and the player shows
   an audio track selector so you can switch without restarting playback
