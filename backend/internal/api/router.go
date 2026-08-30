@@ -158,6 +158,11 @@ func (a *App) Routes() http.Handler {
 	mux.HandleFunc("DELETE /api/users/me/subtitle-offset", authUser(a.clearUserSubtitleOffset))
 	mux.HandleFunc("GET /api/users/me/export", authUser(a.exportMe))
 
+	mux.HandleFunc("POST /api/watch/rooms", authUser(a.createWatchRoom))
+	mux.HandleFunc("GET /api/watch/rooms/{id}", authUser(a.getWatchRoom))
+	mux.HandleFunc("POST /api/watch/rooms/{id}/join", authUser(a.joinWatchRoom))
+	mux.HandleFunc("PUT /api/watch/rooms/{id}", authUser(a.updateWatchRoom))
+
 	mux.HandleFunc("GET /api/playlists", authUser(a.listPlaylists))
 	mux.HandleFunc("POST /api/playlists", authUser(a.createPlaylist))
 	mux.HandleFunc("GET /api/playlists/{id}", authUser(a.getPlaylist))
