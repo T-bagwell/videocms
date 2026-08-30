@@ -93,6 +93,9 @@ make serve                              # http://<LAN-IP>:8080
   Farben, Position und Effekte)
 - Admins können Untertitel von Online-Anbietern (z. B. OpenSubtitles) pro Video
   suchen und herunterladen
+- **Gemeinsam ansehen**: Erstellen oder betreten Sie einen Raum, um die
+  Wiedergabe mit Freunden zu synchronisieren; wo unterstützt, gibt es einen
+  **Cast / AirPlay**-Button
 - **Download** liefert einen MKV/MP4-Remux mit gewählter Audiospur und
   Untertiteln (ohne Re-Encoding) oder die Originaldatei
 - Fortschritt wird alle 5 Sekunden sowie bei Pause/Ende gespeichert
