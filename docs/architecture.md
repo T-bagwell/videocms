@@ -235,6 +235,11 @@ The `HLSManager`:
   `POST /api/videos/{id}/subtitles/search|download`; downloaded payloads are
   decoded from gzip/zip, stored under `DATA_DIR/subtitles/<video-id>/`, and
   registered as `upload` subtitle tracks
+- Watch together: `watch_rooms` (migration 018) store a shared token and the
+  current play/pause + position; members poll
+  `GET /api/watch/rooms/{id}?token=…` every 2.5s and publish state via PUT, so
+  playback stays loosely synchronized. Casting: the player exposes a Web
+  AirPlay button (`webkitShowPlaybackUI`) where the browser supports it
 - If the requested `start` differs from the running session by more than one
   segment (6s), the session is killed and restarted at the new position (seek)
 - The manifest is rewritten on the fly so every segment URL carries `?token=`
