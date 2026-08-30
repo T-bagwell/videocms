@@ -501,45 +501,54 @@ export default function VideoDetailPage() {
         </div>
       </div>
 
-      <div className="card social-box">
-        <h3>{t('video.rating')}</h3>
-        <div className="rating-row">
-          {[1, 2, 3, 4, 5].map((s) => (
-            <button
-              key={s}
-              className={`star${ratings.mine >= s ? ' active' : ''}`}
-              onClick={() => rate(s)}
-              aria-label={`${s}★`}
-            >
-              ★
-            </button>
-          ))}
-          <span className="muted">
+      <div className="social-grid">
+        <div className="card social-panel rating-panel">
+          <h3>{t('video.rating')}</h3>
+          <div className="rating-row">
+            {[1, 2, 3, 4, 5].map((s) => (
+              <button
+                key={s}
+                className={`star${ratings.mine >= s ? ' active' : ''}`}
+                onClick={() => rate(s)}
+                aria-label={`${s}★`}
+              >
+                ★
+              </button>
+            ))}
+          </div>
+          <div className="rating-summary muted">
             {ratings.count > 0
               ? t('video.averageRating', { avg: ratings.average.toFixed(1), count: ratings.count })
               : t('video.noRatings')}
-          </span>
-        </div>
-        <h3>{t('video.comments')}</h3>
-        {comments.length === 0 && <div className="empty">{t('video.noComments')}</div>}
-        {comments.map((c) => (
-          <div key={c.id} className="comment-row">
-            <b>{c.username || '?'}</b> <span className="muted small">{new Date(c.created_at).toLocaleString()}</span>
-            <div>{c.body}</div>
-            {(user?.role === 'admin' || c.user_id === user?.id) && (
-              <button className="btn small ghost" onClick={() => removeComment(c.id)}>{t('video.deleteComment')}</button>
-            )}
           </div>
-        ))}
-        <form className="inline-form" onSubmit={postComment}>
-          <input
-            placeholder={t('video.commentPlaceholder')}
-            value={commentInput}
-            onChange={(e) => setCommentInput(e.target.value)}
-            maxLength={1000}
-          />
-          <button className="btn primary">{t('video.postComment')}</button>
-        </form>
+        </div>
+        <div className="card social-panel comments-panel">
+          <h3>{t('video.comments')}</h3>
+          {comments.length === 0 && <div className="empty">{t('video.noComments')}</div>}
+          {comments.map((c) => (
+            <div key={c.id} className="comment-row">
+              <div className="comment-head">
+                <b>{c.username || '?'}</b>
+                <span className="muted small">{new Date(c.created_at).toLocaleString()}</span>
+              </div>
+              <div className="comment-body">{c.body}</div>
+              {(user?.role === 'admin' || c.user_id === user?.id) && (
+                <button className="btn small ghost comment-delete" onClick={() => removeComment(c.id)}>
+                  {t('video.deleteComment')}
+                </button>
+              )}
+            </div>
+          ))}
+          <form className="inline-form" onSubmit={postComment}>
+            <input
+              placeholder={t('video.commentPlaceholder')}
+              value={commentInput}
+              onChange={(e) => setCommentInput(e.target.value)}
+              maxLength={1000}
+            />
+            <button className="btn primary">{t('video.postComment')}</button>
+          </form>
+        </div>
       </div>
 
       {similar.length > 0 && (
