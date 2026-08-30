@@ -392,6 +392,11 @@ back to the keyless TVMaze API, then AniList, then Wikipedia
   Apprise API (`NOTIFY_APPRISE_URL`) for scan completed/failed, yt-dlp
   download completed/failed and upload completed events; a test event is
   available at `POST /api/admin/notify/test`
+- Storage pools (migration 029): `storage_pools` holds named local/S3/SFTP
+  pools with a local mount path and JSON config; admin CRUD at
+  `GET|POST|PATCH|DELETE /api/admin/storage-pools`, and upload/download
+  targets accept `pool://name[/sub]` which resolve to the mount path (remote
+  pools route through s3fs/sshfs-style mounts)
 
 ### 3.10 Key design decisions
 
