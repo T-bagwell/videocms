@@ -20,6 +20,9 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Notifications: webhook (`NOTIFY_WEBHOOK_URL`) and Apprise
+  (`NOTIFY_APPRISE_URL`) channels deliver scan/download/upload events; admins
+  can send a test notification
 - Share page customization: theme (default/dark), custom title and
   hide-navigation options; `?embed=1` renders a chrome-free player for iframe
   embedding
