@@ -217,6 +217,9 @@ Statistiques : vidéos, bibliothèques, utilisateurs, listes, favoris, séries e
   utilisateurs peuvent verrouiller avec un PIN et déverrouiller le contenu
   classé pendant 5 minutes. Les bibliothèques peuvent aussi porter un **quota
   de stockage** vérifié lors des téléversements
+- **Personnalisation du partage** : choisissez un thème, un titre personnalisé
+  et masquez la navigation ; ajoutez `?embed=1` pour intégrer un lecteur sans
+  chrome dans n’importe quelle page
 
 ### 5.4 Utilisateurs
 
