@@ -248,6 +248,10 @@ erDiagram
 - レコメンド：`GET /api/videos/{id}/similar` が共有ジャンル・年・シリーズ・
   タグで他の動画をランキング。`GET /api/tags` がブラウズページのタグクラウドと
   `?tag=` フィルターを支えます
+- コレクションと保存フィルター（マイグレーション 022）：`collections` が
+  ユーザーごとの名前付きフィルター JSON を保存（`GET|POST|DELETE /api/collections`）、
+  `user_filter_prefs` が直前の閲覧フィルターを保存（`GET|PUT /api/users/me/filters`）。
+  フロントエンドはどちらも同じ `/videos` フィルターパラメータで再生します
 - 要求された `start` が実行中セッションと 1 セグメント（6 秒）以上ずれている場合、
   セッションを終了して新しい位置で再開（シーク）
 - プレイリストは応答時に書き換えられ、各セグメント URL に `?token=` が付く
