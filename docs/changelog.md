@@ -6,6 +6,10 @@ All notable changes to VideoCMS are documented here.
 
 ### Changed
 
+- Video detail page layout polished: rating and comments now sit side by side
+  in compact panels on desktop (stacked on mobile), and the action buttons
+  were regrouped into a consistent toolbar with admin tools (scrape,
+  transcription, subtitles, metadata editing) in a dedicated panel
 - Frontend toolchain upgraded: React 19 / react-dom 19, Vite 8 +
   @vitejs/plugin-react 6, react-router-dom 7, hls.js 1.7.1, i18next 26.4,
   react-i18next 17.0.12, jsdom 27.3; Node.js 20+ is now required for frontend
