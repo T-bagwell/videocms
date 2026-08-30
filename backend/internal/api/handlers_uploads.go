@@ -376,6 +376,9 @@ func (a *App) completeUpload(w http.ResponseWriter, r *http.Request) {
 		"final_path":  finalPath,
 		"status":      "completed",
 	})
+	a.notify.Send(r.Context(), "upload.completed", "Upload completed",
+		u.Filename+" → "+u.TargetPath,
+		map[string]any{"filename": u.Filename, "target_path": u.TargetPath})
 }
 
 // DELETE /api/uploads/{id} — cancel the session and remove its chunks.

@@ -27,6 +27,7 @@ type App struct {
 	dl          *media.Downloader
 	subProvider media.SubtitleProvider
 	live        *media.LiveManager
+	notify      *media.Notifier
 }
 
 func New(cfg config.Config, pool *pgxpool.Pool) (*App, error) {
@@ -37,6 +38,7 @@ func New(cfg config.Config, pool *pgxpool.Pool) (*App, error) {
 		return nil, err
 	}
 	scanner := media.NewScanner(pool, cfg.DataDir)
+	notify := media.NewNotifier(cfg.NotifyWebhookURL, cfg.NotifyAppriseURL)
 	app := &App{
 		cfg:     cfg,
 		pool:    pool,
@@ -45,10 +47,27 @@ func New(cfg config.Config, pool *pgxpool.Pool) (*App, error) {
 		scraper: media.NewScraper(pool, cfg.DataDir, cfg.TMDBAPIKey, cfg.ScrapeCustomURL),
 		dl:      media.NewDownloader(pool, cfg.YtDLPPath),
 		live:    media.NewLiveManager(cfg.DataDir, media.ResolveTool("ffmpeg")),
+		notify:  notify,
 	}
 	app.hls.SetVAAPIDevice(cfg.HLSVAAPIDevice)
 	app.hls.SetToneMap(cfg.HLSToneMap)
 	scanner.SetEnricher(app.scraper)
+	scanner.SetNotify(func(name, status string) {
+		event := "scan.completed"
+		if status == "error" {
+			event = "scan.failed"
+		}
+		notify.Send(context.Background(), event, "Scan "+name, "Library "+name+" finished with status "+status,
+			map[string]any{"library": name, "status": status})
+	})
+	app.dl.SetNotify(func(url string, err error) {
+		event := "download.completed"
+		title, body := "Download completed", url
+		if err != nil {
+			event, title, body = "download.failed", "Download failed", url+": "+err.Error()
+		}
+		notify.Send(context.Background(), event, title, body, map[string]any{"url": url})
+	})
 	return app, nil
 }
 
@@ -86,6 +105,7 @@ func (a *App) Routes() http.Handler {
 	mux.HandleFunc("GET /api/admin/trash", authAdmin(a.listTrash))
 	mux.HandleFunc("POST /api/admin/trash/{id}/restore", authAdmin(a.restoreTrash))
 	mux.HandleFunc("POST /api/admin/videos/batch", authAdmin(a.batchVideos))
+	mux.HandleFunc("POST /api/admin/notify/test", authAdmin(a.testNotification))
 	mux.HandleFunc("PATCH /api/libraries/{id}", authAdmin(a.setLibraryBlocked))
 	mux.HandleFunc("DELETE /api/libraries/{id}", authAdmin(a.deleteLibrary))
 

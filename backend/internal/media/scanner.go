@@ -43,6 +43,7 @@ type Scanner struct {
 	ffprobeBin string
 	ffmpegBin  string
 	enricher   MetadataEnricher
+	onDone     func(libraryName, status string)
 	mu         sync.Mutex
 	active     map[uuid.UUID]context.CancelFunc
 	watching   bool
@@ -55,6 +56,11 @@ type MetadataEnricher interface {
 
 func (s *Scanner) SetEnricher(e MetadataEnricher) {
 	s.enricher = e
+}
+
+// SetNotify registers a completion callback (library name + final status).
+func (s *Scanner) SetNotify(fn func(libraryName, status string)) {
+	s.onDone = fn
 }
 
 func NewScanner(pool *pgxpool.Pool, dataDir string) *Scanner {
@@ -105,6 +111,12 @@ func (s *Scanner) Start(ctx context.Context, lib models.Library) bool {
 			s.mu.Lock()
 			delete(s.active, lib.ID)
 			s.mu.Unlock()
+			var st string
+			_ = s.pool.QueryRow(context.Background(),
+				`SELECT scan_status FROM libraries WHERE id=$1`, lib.ID).Scan(&st)
+			if s.onDone != nil {
+				s.onDone(lib.Name, st)
+			}
 		}()
 		s.scan(scanCtx, lib)
 	}()

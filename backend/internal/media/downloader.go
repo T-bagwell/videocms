@@ -27,10 +27,11 @@ type DownloadJob struct {
 // Downloader runs yt-dlp jobs from the downloads table one at a time and keeps
 // track of running processes so a job can be cancelled.
 type Downloader struct {
-	pool  *pgxpool.Pool
-	bin   string
-	mu    sync.Mutex
-	procs map[uuid.UUID]*exec.Cmd
+	pool   *pgxpool.Pool
+	bin    string
+	mu     sync.Mutex
+	procs  map[uuid.UUID]*exec.Cmd
+	onDone func(url string, err error)
 }
 
 func NewDownloader(pool *pgxpool.Pool, bin string) *Downloader {
@@ -40,6 +41,11 @@ func NewDownloader(pool *pgxpool.Pool, bin string) *Downloader {
 // SetBin overrides the yt-dlp binary path (used by tests and tool resolution).
 func (d *Downloader) SetBin(path string) {
 	d.bin = path
+}
+
+// SetNotify registers a completion callback (url + optional error).
+func (d *Downloader) SetNotify(fn func(url string, err error)) {
+	d.onDone = fn
 }
 
 // ResolveBin returns the configured yt-dlp binary, falling back to PATH.
@@ -160,9 +166,15 @@ func (d *Downloader) runJob(ctx context.Context, job DownloadJob) {
 			msg = runErr.Error()
 		}
 		d.fail(job, msg)
+		if d.onDone != nil {
+			d.onDone(job.URL, runErr)
+		}
 		return
 	}
 	d.complete(job)
+	if d.onDone != nil {
+		d.onDone(job.URL, nil)
+	}
 }
 
 func (d *Downloader) complete(job DownloadJob) {

@@ -35,6 +35,8 @@ type Config struct {
 	OIDCClientID       string
 	OIDCClientSecret   string
 	OIDCRedirectURL    string
+	NotifyWebhookURL   string
+	NotifyAppriseURL   string
 }
 
 func Load() Config {
@@ -65,6 +67,8 @@ func Load() Config {
 		OIDCClientID:       os.Getenv("OIDC_CLIENT_ID"),
 		OIDCClientSecret:   os.Getenv("OIDC_CLIENT_SECRET"),
 		OIDCRedirectURL:    os.Getenv("OIDC_REDIRECT_URL"),
+		NotifyWebhookURL:   os.Getenv("NOTIFY_WEBHOOK_URL"),
+		NotifyAppriseURL:   os.Getenv("NOTIFY_APPRISE_URL"),
 	}
 	if cfg.Addr != "" && cfg.Addr[0] != ':' {
 		cfg.Addr = ":" + cfg.Addr
