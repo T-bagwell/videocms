@@ -173,6 +173,8 @@ make serve                              # http://<LAN IP>:8080
   MKV/MP4 で保存（リマックス、再エンコードなし）
 - 「取得」で TMDB からメタデータ取得（`TMDB_API_KEY` と api.themoviedb.org への
   アクセスが必要）
+- 管理者は **TMDB またはカスタムプロバイダ** を選んで取得でき、既存メタデータを
+  強制的に上書きもできます
 
 ### 5.4 ユーザー
 
@@ -213,6 +215,7 @@ make serve                              # http://<LAN IP>:8080
 | `SUBTITLE_OS_USERNAME` / `SUBTITLE_OS_PASSWORD` / `SUBTITLE_OS_API_KEY` | 空 | オンライン字幕検索用の OpenSubtitles 認証情報 |
 | `RTMP_INGEST_URL` | `rtmp://localhost:1935/live` | RTMP 取り込みのベース URL（nginx-rtmp 等） |
 | `WHISPER_BIN` / `WHISPER_MODEL` | 空 | whisper.cpp のバイナリとモデル（文字起こし用） |
+| `SCRAPE_CUSTOM_URL` | 空 | カスタム JSON スクレイパー端点。`%s` は URL エスケープ済みタイトルに置換 |
 
 ## 7. FAQ
 
