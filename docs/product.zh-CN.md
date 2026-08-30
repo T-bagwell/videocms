@@ -181,6 +181,7 @@ make serve                              # http://<局域网IP>:8080
 | `SCAN_WORKERS` | `4` | 并行扫描工作数 |
 | `WATCH_INTERVAL` | `30` | 自动增量扫描间隔（秒），`0` 关闭 |
 | `YTDLP_PATH` | PATH 上的 `yt-dlp` | 「下载」队列使用的 yt-dlp 二进制 |
+| `HLS_HW_ACCEL` | 空（软件 x264） | HLS 视频编码器：videotoolbox、nvenc 或 qsv；留空用 libx264 |
 
 ## 7. 常见问题
 
