@@ -20,6 +20,10 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Chunked, resumable uploads: admins can upload files into any server folder
+  from a new Uploads tab with a queue-based manager; large files are split into
+  chunks that survive pauses and network errors, and finished files inside a
+  library are indexed automatically by the file watcher
 - CI: backend tests now run against PostgreSQL (integration tests), plus
   golangci-lint, frontend ESLint + Vitest tests, CodeQL scanning, Dependabot,
   and a release workflow for cross-platform binaries

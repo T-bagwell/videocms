@@ -66,6 +66,13 @@ func (a *App) Routes() http.Handler {
 	mux.HandleFunc("PATCH /api/libraries/{id}", authAdmin(a.setLibraryBlocked))
 	mux.HandleFunc("DELETE /api/libraries/{id}", authAdmin(a.deleteLibrary))
 
+	mux.HandleFunc("GET /api/uploads", authAdmin(a.listUploads))
+	mux.HandleFunc("POST /api/uploads", authAdmin(a.createUpload))
+	mux.HandleFunc("GET /api/uploads/{id}", authAdmin(a.getUpload))
+	mux.HandleFunc("PUT /api/uploads/{id}/chunk/{index}", authAdmin(a.putChunk))
+	mux.HandleFunc("POST /api/uploads/{id}/complete", authAdmin(a.completeUpload))
+	mux.HandleFunc("DELETE /api/uploads/{id}", authAdmin(a.deleteUpload))
+
 	mux.HandleFunc("GET /api/admin/blocked-titles", authAdmin(a.listBlockedTitles))
 	mux.HandleFunc("POST /api/admin/blocked-titles", authAdmin(a.createBlockedTitle))
 	mux.HandleFunc("DELETE /api/admin/blocked-titles/{id}", authAdmin(a.deleteBlockedTitle))

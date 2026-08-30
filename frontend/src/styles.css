@@ -256,6 +256,16 @@ label input, label textarea { margin-top: 6px; }
 .stat-num { font-size: 26px; font-weight: 800; margin-bottom: 4px; }
 .stat.warn .stat-num { color: var(--warn); }
 .status-badge { margin-left: 10px; font-size: 11px; font-weight: 400; border-radius: 6px; padding: 2px 8px; vertical-align: middle; }
+.dropzone {
+  border: 2px dashed var(--border);
+  border-radius: 10px;
+  padding: 28px 16px;
+  margin-bottom: 16px;
+  text-align: center;
+  cursor: pointer;
+  color: var(--muted);
+}
+.dropzone:hover { border-color: var(--primary); color: var(--text); }
 .status-idle { background: var(--bg-soft); color: var(--muted); }
 .status-scanning { background: rgba(46,204,113,0.15); color: var(--ok); }
 .status-error { background: rgba(231,76,60,0.15); color: var(--danger); }

@@ -5,6 +5,7 @@ import { useAuth } from '../auth.jsx';
 import PathPicker from '../components/PathPicker.jsx';
 import { fmtBytes } from '../i18n';
 import BlockedAdmin from './BlockedAdmin.jsx';
+import UploadsAdmin from './UploadsAdmin.jsx';
 
 export default function AdminPage() {
   const [tab, setTab] = useState('overview');
@@ -29,12 +30,16 @@ export default function AdminPage() {
         <button className={tab === 'users' ? 'tab active' : 'tab'} onClick={() => setTab('users')}>
           {t('admin.tabUsers')}
         </button>
+        <button className={tab === 'uploads' ? 'tab active' : 'tab'} onClick={() => setTab('uploads')}>
+          {t('admin.tabUploads')}
+        </button>
       </div>
       {tab === 'overview' && <Overview />}
       {tab === 'libraries' && <Libraries />}
       {tab === 'videos' && <VideoAdmin />}
       {tab === 'blocked' && <BlockedAdmin />}
       {tab === 'users' && <Users />}
+      {tab === 'uploads' && <UploadsAdmin />}
     </div>
   );
 }
