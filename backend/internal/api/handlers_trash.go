@@ -27,6 +27,9 @@ func (a *App) moveToTrash(ctx context.Context, videoID uuid.UUID, path string) (
 	if err := os.MkdirAll(trashDir, 0o755); err != nil {
 		return "", err
 	}
+	if !strings.HasPrefix(path, string(filepath.Separator)) {
+		return "", fmt.Errorf("invalid media path")
+	}
 	base := filepath.Base(path)
 	if base == "." || base == ".." {
 		return "", fmt.Errorf("invalid media path")
