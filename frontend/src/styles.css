@@ -165,6 +165,7 @@ label input, label textarea { margin-top: 6px; }
 .btn.big { padding: 11px 22px; font-size: 15px; }
 .btn.danger-ghost { color: var(--danger); background: transparent; }
 .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.btn .icon { width: 16px; height: 16px; flex: none; }
 .link-btn { background: none; border: none; color: var(--accent); cursor: pointer; font-size: 13px; margin-top: 8px; }
 
 .login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }

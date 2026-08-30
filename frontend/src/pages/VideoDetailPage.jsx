@@ -6,6 +6,7 @@ import Poster from '../components/Poster.jsx';
 import DownloadDialog from '../components/DownloadDialog.jsx';
 import ShareModal from '../components/ShareModal.jsx';
 import SubtitleSearchModal from '../components/SubtitleSearchModal.jsx';
+import { DownloadIcon, OfflineIcon, PlayIcon, PlusIcon, ShareIcon, StarFilledIcon, StarIcon } from '../components/Icons.jsx';
 import { useAuth } from '../auth.jsx';
 import { fmtBytes, fmtDuration } from '../i18n';
 
@@ -374,21 +375,27 @@ export default function VideoDetailPage() {
           )}
           <div className="detail-actions">
             <button className="btn primary big" onClick={() => navigate(`/player/${video.id}`)}>
-              ▶ {video.progress_sec > 5 ? t('video.resume') : t('video.play')}
+              <PlayIcon />
+              {video.progress_sec > 5 ? t('video.resume') : t('video.play')}
             </button>
             <button className="btn" onClick={toggleFavorite}>
+              {video.is_favorite ? <StarFilledIcon /> : <StarIcon />}
               {video.is_favorite ? t('video.unfavorite') : t('video.favorite')}
             </button>
             <button className="btn" onClick={() => setShowPlaylistPicker((v) => !v)}>
+              <PlusIcon />
               {t('video.addToPlaylist')}
             </button>
             <button className="btn" onClick={() => setShowDownload(true)}>
+              <DownloadIcon />
               {t('common.download')}
             </button>
             <button className="btn" onClick={() => setShowShare(true)}>
+              <ShareIcon />
               {t('video.share')}
             </button>
             <button className="btn" onClick={saveOffline} disabled={offlineBusy}>
+              <OfflineIcon />
               {offlineBusy ? t('video.offlineSaving') : t('video.saveOffline')}
             </button>
           </div>
