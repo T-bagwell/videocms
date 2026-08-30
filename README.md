@@ -164,6 +164,7 @@ All settings are environment variables:
 | `SCRAPE_CUSTOM_URL` | empty | Custom JSON scraper endpoint; `%s` is replaced with the URL-escaped title |
 | `AI_TAG_BIN` | empty | External AI tagging tool; receives the media path and prints one tag per line |
 | `OIDC_ISSUER` / `OIDC_CLIENT_ID` / `OIDC_CLIENT_SECRET` / `OIDC_REDIRECT_URL` | empty | OIDC single sign-on (discovery + authorization code flow) |
+| `NOTIFY_WEBHOOK_URL` / `NOTIFY_APPRISE_URL` | empty | Notification channels (JSON webhook, Apprise API) |
 | `WEB_ROOT` | auto (`frontend/dist`) | Built frontend for single-service mode; leave unset for API-only deployment |
 | `CORS_ORIGINS` | empty (`*`) | Comma-separated browser origins allowed to call the API (separate frontend deployments) |
 | `VITE_API_BASE_URL` | empty | Frontend build-time API base URL for cross-origin deployments (runtime override: `window.__VIDEOCMS_API_BASE__`) |
@@ -273,7 +274,8 @@ Planned work is informed by feature sets of similar self-hosted video projects
 - [ ] SAML single sign-on
 - [x] Parental controls (PIN / content ratings) and per-user quotas
 - [x] Share page customization and embeddable players
-- [ ] Notifications (email / webhook / Apprise) for scan, upload and transcode events
+- [x] Notifications (webhook / Apprise) for scan, upload and download events
+- [ ] Email notifications
 
 **Storage & operations**
 
