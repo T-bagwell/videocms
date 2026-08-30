@@ -108,6 +108,8 @@ func (a *App) Routes() http.Handler {
 	mux.HandleFunc("DELETE /api/videos/{id}/subtitles", authAdmin(a.deleteSubtitle))
 	mux.HandleFunc("POST /api/videos/{id}/subtitles/extract", authAdmin(a.extractEmbeddedSubtitle))
 	mux.HandleFunc("GET /api/videos/{id}/poster", authUser(a.servePoster))
+	mux.HandleFunc("GET /api/videos/{id}/thumbnails", authUser(a.videoThumbnails))
+	mux.HandleFunc("GET /api/videos/{id}/thumbnails/{n}", authUser(a.videoThumbnailImage))
 	mux.HandleFunc("GET /api/videos/{id}/hls/{file...}", authUser(a.hlsHandler))
 	mux.HandleFunc("POST /api/videos/{id}/scrape", authAdmin(a.scrapeVideo))
 	mux.HandleFunc("POST /api/videos/{id}/share", authUser(a.createVideoShare))

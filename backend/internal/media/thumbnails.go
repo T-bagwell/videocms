@@ -55,7 +55,7 @@ func GenerateThumbnails(ctx context.Context, ffmpegBin, input string, durationSe
 		return ThumbnailsMeta{}, fmt.Errorf("extract thumbnails: %w: %s", err, strings.TrimSpace(string(out)))
 	}
 
-	count := countThumbnails(dir)
+	count := CountThumbnails(dir)
 	if count == 0 {
 		return ThumbnailsMeta{}, fmt.Errorf("no thumbnail frames produced")
 	}
@@ -67,7 +67,8 @@ func GenerateThumbnails(ctx context.Context, ffmpegBin, input string, durationSe
 	}, nil
 }
 
-func countThumbnails(dir string) int {
+// CountThumbnails returns how many frame_*.jpg files exist in dir.
+func CountThumbnails(dir string) int {
 	entries, err := os.ReadDir(dir)
 	if err != nil {
 		return 0
@@ -84,7 +85,7 @@ func countThumbnails(dir string) int {
 // ThumbnailPath returns the on-disk path for the n-th thumbnail frame
 // (1-based), or an empty string when out of range.
 func ThumbnailPath(dir string, n int) string {
-	if n < 1 || n > countThumbnails(dir) {
+	if n < 1 || n > CountThumbnails(dir) {
 		return ""
 	}
 	return filepath.Join(dir, fmt.Sprintf("frame_%03d.jpg", n))
