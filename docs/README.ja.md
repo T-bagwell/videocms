@@ -161,6 +161,7 @@ make serve                                 # UI をビルドし :8080 で一括�
 | `OIDC_ISSUER` / `OIDC_CLIENT_ID` / `OIDC_CLIENT_SECRET` / `OIDC_REDIRECT_URL` | 空 | OIDC シングルサインオン（ディスカバリー + 認可コードフロー） |
 | `SAML_IDP_METADATA_URL` / `SAML_SP_CERT` / `SAML_SP_KEY` / `SAML_SP_ENTITY_ID` / `SAML_ACS_URL` | 空 | SAML 2.0 シングルサインオン（IdP メタデータ URL、SP 証明書/鍵、エンティティ ID、ACS URL） |
 | `NOTIFY_WEBHOOK_URL` / `NOTIFY_APPRISE_URL` | 空 | 通知チャンネル（JSON Webhook、Apprise API） |
+| `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASSWORD` / `NOTIFY_EMAIL_FROM` / `NOTIFY_EMAIL_TO` | 空 / `587` | SMTP メール通知（465 は暗黙 TLS、それ以外は STARTTLS） |
 | `MAINT_INTERVAL_HOURS` / `MAINT_BACKUP_RETENTION` / `MAINT_RESCAN` | `24` / `7` / `0` | 定期メンテナンス：バックアップ間隔・保持数・再スキャン有無 |
 | `YTDLP_PATH` | PATH 上の `yt-dlp` | ダウンロードキューが使う yt-dlp バイナリ |
 | `WEB_ROOT` | 自動（`frontend/dist`） | 単一サービスモードで配信するフロントエンド。未設定なら API 専用デプロイ |
@@ -269,7 +270,7 @@ Stash、Kirari04/videocms、yt-dlp ツールなど）の機能セットを参考
 - [x] ペアレンタルコントロール（PIN/レーティング）とユーザーごとのクォータ
 - [x] 共有ページのカスタマイズとプレイヤー埋め込み
 - [x] 通知（Webhook/Apprise）：スキャン・アップロード・ダウンロードイベント
-- [ ] メール通知
+- [x] メール通知
 
 **ストレージと運用**
 
