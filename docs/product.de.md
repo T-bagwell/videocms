@@ -217,6 +217,9 @@ Statistiken: Videos, Bibliotheken, Benutzer, Wiedergabelisten, Favoriten, Serien
 - **Speicherpools**: lokale, S3-kompatible oder SFTP-Pools mit lokalem
   Mount-Pfad definierbar; Uploads und Downloads können `pool://name[/Unterpfad]`
   als Ziel nutzen
+- **Auftrags-Dashboard**: Scans, Uploads, Downloads und Live-Streams zentral
+  überwachen (Fortschritt, Fehler, Abbrechen/Erneut/Start/Stopp) plus
+  Speichernutzung
 
 ### 5.4 Benutzer
 
