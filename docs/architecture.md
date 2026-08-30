@@ -244,6 +244,10 @@ The `HLSManager`:
   `LiveManager` pulls an RTMP ingest (`RTMP_INGEST_URL` + per-stream key) into
   a rolling HLS playlist (`data/live/<id>/index.m3u8`); watch at
   `GET /api/live/{id}/hls/...` and chat via polling `GET|POST /api/live/{id}/chat`
+- Speech transcription: `POST /api/videos/{id}/transcribe` (admin) runs a
+  whisper.cpp CLI (`WHISPER_BIN`/`WHISPER_MODEL`) to a WebVTT file, stores it
+  in `video_transcripts` (migration 020), registers it as a subtitle track,
+  and the video search matches transcript text
 - If the requested `start` differs from the running session by more than one
   segment (6s), the session is killed and restarted at the new position (seek)
 - The manifest is rewritten on the fly so every segment URL carries `?token=`
