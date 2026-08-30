@@ -31,6 +31,8 @@ export default function PlayerPage() {
   const [tracks, setTracks] = useState([]);
   const [subtitleTracks, setSubtitleTracks] = useState([]);
   const [subtitleIdx, setSubtitleIdx] = useState(-1);
+  const [audioTracks, setAudioTracks] = useState([]);
+  const [audioIdx, setAudioIdx] = useState(-1);
 
   useEffect(() => {
     setActiveId(id);
@@ -97,6 +99,8 @@ export default function PlayerPage() {
     setTranscoding(true);
     setHlsErr('');
     setLevels([]);
+    setAudioTracks([]);
+    setAudioIdx(-1);
     const url = mediaUrl(`/videos/${activeId}/hls/playlist.m3u8`) + `&start=${start}`;
 
     hls.on(Hls.Events.MANIFEST_PARSED, () => {
@@ -136,6 +140,21 @@ export default function PlayerPage() {
     hls.on(Hls.Events.SUBTITLE_TRACK_SWITCH, (_event, d) => {
       setSubtitleIdx(d.id ?? -1);
     });
+    hls.on(Hls.Events.AUDIO_TRACKS_UPDATED, (_event, d) => {
+      const list = d.audioTracks || [];
+      setAudioTracks(
+        list.map((tr, i) => ({
+          i,
+          id: tr.id,
+          label: tr.name || tr.lang || `${t('player.audioTrack')} ${i + 1}`,
+        })),
+      );
+      if (list.length > 1 && hls.audioTrack !== 0) hls.audioTrack = 0;
+      setAudioIdx(hls.audioTrack ?? -1);
+    });
+    hls.on(Hls.Events.AUDIO_TRACK_SWITCHED, (_event, d) => {
+      setAudioIdx(d.id ?? -1);
+    });
     hls.on(Hls.Events.ERROR, (_event, data) => {
       if (!data.fatal) return;
       if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
@@ -161,6 +180,13 @@ export default function PlayerPage() {
     if (!hls) return;
     hls.subtitleTrack = i;
     setSubtitleIdx(i);
+  }
+
+  function changeAudio(i) {
+    const hls = hlsRef.current;
+    if (!hls) return;
+    hls.audioTrack = i;
+    setAudioIdx(i);
   }
 
   useEffect(() => {
@@ -317,7 +343,7 @@ export default function PlayerPage() {
           ))}
       </video>
 
-      {useTranscode && (levels.length > 1 || subtitleTracks.length > 0) && (
+      {useTranscode && (levels.length > 1 || subtitleTracks.length > 0 || audioTracks.length > 1) && (
         <div className="player-tools">
           {useTranscode && levels.length > 1 && (
             <label className="player-tool">
@@ -341,6 +367,18 @@ export default function PlayerPage() {
               >
                 <option value={-1}>{t('player.subtitlesOff')}</option>
                 {subtitleTracks.map((tr) => (
+                  <option key={tr.id} value={tr.i}>
+                    {tr.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
+          {audioTracks.length > 1 && (
+            <label className="player-tool">
+              {t('player.audioTrack')}
+              <select value={audioIdx} onChange={(e) => changeAudio(Number(e.target.value))}>
+                {audioTracks.map((tr) => (
                   <option key={tr.id} value={tr.i}>
                     {tr.label}
                   </option>

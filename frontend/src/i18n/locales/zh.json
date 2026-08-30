@@ -120,6 +120,7 @@
     "fromSeries": "来自剧集：{{name}}",
     "quality": "清晰度",
     "qualityAuto": "自动",
+    "audioTrack": "音轨",
     "subtitles": "字幕",
     "subtitlesOn": "字幕：开",
     "subtitlesOff": "字幕：关"

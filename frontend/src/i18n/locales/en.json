@@ -120,6 +120,7 @@
     "fromSeries": "From TV show: {{name}}",
     "quality": "Quality",
     "qualityAuto": "Auto",
+    "audioTrack": "Audio",
     "subtitles": "Subtitles",
     "subtitlesOn": "Subtitles: On",
     "subtitlesOff": "Subtitles: Off"

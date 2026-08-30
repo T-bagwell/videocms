@@ -120,6 +120,7 @@
     "fromSeries": "De la série : {{name}}",
     "quality": "Qualité",
     "qualityAuto": "Auto",
+    "audioTrack": "Piste audio",
     "subtitles": "Sous-titres",
     "subtitlesOn": "Sous-titres : activés",
     "subtitlesOff": "Sous-titres : désactivés"

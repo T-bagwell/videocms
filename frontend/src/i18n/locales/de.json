@@ -120,6 +120,7 @@
     "fromSeries": "Aus Serie: {{name}}",
     "quality": "Qualität",
     "qualityAuto": "Automatisch",
+    "audioTrack": "Audiospur",
     "subtitles": "Untertitel",
     "subtitlesOn": "Untertitel: an",
     "subtitlesOff": "Untertitel: aus"

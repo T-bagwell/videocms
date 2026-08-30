@@ -120,6 +120,7 @@
     "fromSeries": "ドラマ: {{name}}",
     "quality": "画質",
     "qualityAuto": "自動",
+    "audioTrack": "音声",
     "subtitles": "字幕",
     "subtitlesOn": "字幕: オン",
     "subtitlesOff": "字幕: オフ"
