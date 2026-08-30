@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/google/uuid"
@@ -22,7 +23,10 @@ func (a *App) similarVideos(w http.ResponseWriter, r *http.Request) {
 	query := fmt.Sprintf(`
 		WITH src AS (SELECT id, year, series_id, genres FROM videos WHERE id=$2)
 		SELECT %s
-		FROM videos v, src
+		FROM videos v
+		JOIN libraries l ON l.id = v.library_id
+		LEFT JOIN series s ON s.id = v.series_id
+		%s, src
 		WHERE v.id <> src.id AND %s
 		ORDER BY
 			(SELECT count(*) FROM unnest(v.genres) g WHERE g = ANY(src.genres))
@@ -32,9 +36,10 @@ func (a *App) similarVideos(w http.ResponseWriter, r *http.Request) {
 			   WHERE vt1.video_id = v.id AND vt2.video_id = src.id)
 			DESC, v.created_at DESC
 		LIMIT 8`,
-		videoColumns, visibleEpisodes(1))
+		videoColumns, blockedLateral, visibleEpisodes(1))
 	rows, err := a.pool.Query(r.Context(), query, user.ID, id)
 	if err != nil {
+		log.Printf("similar videos: %v", err)
 		writeErr(w, http.StatusInternalServerError, "similar videos failed")
 		return
 	}
