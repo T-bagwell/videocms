@@ -334,6 +334,10 @@ Wikipedia の順に自動フォールバック（`TVMAZE_ENABLED=0` / `ANILIST_E
   でライブラリ全体を非表示。フラグは同じ SQL 可視性条件で評価
 - ライブラリフォルダを開く：`POST /api/libraries/{id}/open` はサーバー上で
   システムのファイルマネージャー（`open` / `xdg-open` / `explorer`）を起動します
+- ヘルスチェック：`POST /api/libraries/{id}/health` が欠落/破損ファイルと重複候補
+  （宣言サイズが同一）を報告。`POST /api/libraries/{id}/health/keep-best` は
+  各グループの最良版（解像度、次にファイル名の長さ）を残し、他を
+  `DATA_DIR/trash/<日付>/` へ移動
 
 ### 3.10 主要な設計判断
 
