@@ -20,6 +20,9 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Parental controls: users can set a PIN and unlock rated content for
+  5 minutes; admins set an allowed-rating policy per user and a content rating
+  per video; libraries support a storage quota enforced on uploads
 - OIDC single sign-on: the login page offers SSO; `OIDC_ISSUER` /
   `OIDC_CLIENT_ID` / `OIDC_CLIENT_SECRET` / `OIDC_REDIRECT_URL` configure the
   discovery + authorization-code flow, and users are auto-provisioned or
