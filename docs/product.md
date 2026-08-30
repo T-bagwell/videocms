@@ -208,6 +208,8 @@ Stats: videos, libraries, users, playlists, favorites, series and storage used.
   uploads
 - **Share customization**: pick a theme, a custom title and hide navigation;
   appending `?embed=1` embeds a chrome-free player in any page
+- **Notifications**: webhook or Apprise channels can receive scan, upload and
+  download events; admins can send a test notification from the overview
 
 ### 5.4 Users
 
@@ -253,6 +255,7 @@ most important ones:
 | `SCRAPE_CUSTOM_URL` | empty | Custom JSON scraper endpoint; `%s` is replaced with the URL-escaped title |
 | `AI_TAG_BIN` | empty | External AI tagging tool (media path argument, one tag per line) |
 | `OIDC_ISSUER` / `OIDC_CLIENT_ID` / `OIDC_CLIENT_SECRET` / `OIDC_REDIRECT_URL` | empty | OIDC single sign-on settings |
+| `NOTIFY_WEBHOOK_URL` / `NOTIFY_APPRISE_URL` | empty | Notification channels (JSON webhook, Apprise API) |
 
 ## 7. FAQ
 
