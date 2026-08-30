@@ -220,6 +220,9 @@ Statistiques : vidéos, bibliothèques, utilisateurs, listes, favoris, séries e
 - **Personnalisation du partage** : choisissez un thème, un titre personnalisé
   et masquez la navigation ; ajoutez `?embed=1` pour intégrer un lecteur sans
   chrome dans n’importe quelle page
+- **Notifications** : des canaux webhook ou Apprise peuvent recevoir les
+  événements d’analyse, de téléversement et de téléchargement ; les admins
+  peuvent envoyer une notification de test depuis l’aperçu
 
 ### 5.4 Utilisateurs
 
@@ -265,6 +268,7 @@ Tout se configure par variables d’environnement (table complète dans le READM
 | `SCRAPE_CUSTOM_URL` | vide | Endpoint JSON de scraping personnalisé ; `%s` est remplacé par le titre encodé |
 | `AI_TAG_BIN` | vide | Outil d’étiquetage IA externe (argument : chemin média, une étiquette par ligne) |
 | `OIDC_ISSUER` / `OIDC_CLIENT_ID` / `OIDC_CLIENT_SECRET` / `OIDC_REDIRECT_URL` | vide | Paramètres de connexion unique OIDC |
+| `NOTIFY_WEBHOOK_URL` / `NOTIFY_APPRISE_URL` | vide | Canaux de notification (webhook JSON, API Apprise) |
 
 ## 7. FAQ
 
