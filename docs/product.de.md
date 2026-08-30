@@ -193,6 +193,8 @@ Statistiken: Videos, Bibliotheken, Benutzer, Wiedergabelisten, Favoriten, Serien
   filtern
 - Die Detailseite zeigt **ähnliche Videos**; die Browseseite hat eine
   **Tag-Cloud** zum Filtern mit einem Klick
+- Die Browseseite kann **Filter speichern**, erneut anwenden und aus dem
+  aktuellen Filter benannte **Smart-Sammlungen** erstellen
 
 ### 5.4 Benutzer
 
