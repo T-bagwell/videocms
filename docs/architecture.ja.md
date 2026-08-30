@@ -363,6 +363,15 @@ Wikipedia の順に自動フォールバック（`TVMAZE_ENABLED=0` / `ANILIST_E
   userinfo を実装（`OIDC_*` 設定）。ユーザーは一意の `users.oauth_sub` 列
   （マイグレーション 026）で自動作成/紐付けされ、フロントエンドは
   `/login?sso_token=…` でセッション JWT を受け取ります
+- SAML 2.0 SSO：crewjam/saml ベース。`GET /api/auth/saml/login` が
+  AuthnRequest（HTTP-Redirect/POST バインディング）で IdP へリダイレクトし、
+  `POST /api/auth/saml/acs` が署名付き SAMLResponse（署名・条件・
+  audience）を検証して消費、`/api/auth/saml/metadata` が IdP 向け SP
+  メタデータを公開します。設定は `SAML_IDP_METADATA_URL`、
+  `SAML_SP_CERT`、`SAML_SP_KEY`、`SAML_SP_ENTITY_ID`、`SAML_ACS_URL`。
+  ユーザーは同じ `users.oauth_sub`（`saml:` プレフィックス）に紐付き、
+  初回ログイン時に `roles` 属性に "admin" が含まれると管理者権限を付与。
+  `GET /api/auth/sso` がログインページに提供するプロバイダーを通知します
 - ペアレンタルコントロールとクォータ（マイグレーション 027）：bcrypt の
   `users.pin` と `PUT|POST /api/users/me/pin[/verify]` で 5 分間のロック解除
   トークンを発行し、一覧は `X-Videocms-Unlock` で受け付け。
