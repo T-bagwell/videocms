@@ -413,6 +413,13 @@ back to the keyless TVMaze API, then AniList, then Wikipedia
   app shell (never API/media); the video page can save the stream into the
   Cache API for offline viewing, and `viewport-fit=cover` + safe-area padding
   handle notched phones
+- Intro/credits skip (migration 031): `skip_intervals(video_id, kind,
+  start_sec, end_sec)` stores one optional interval per video for each of
+  `intro`/`credits`; the player exposes
+  `GET /api/videos/{id}/skip-intervals`,
+  `PUT /api/videos/{id}/skip-interval` and
+  `DELETE /api/videos/{id}/skip-interval?kind=…` for marking, updating and
+  clearing the ranges, and jumps to `end_sec` when skipping
 
 ### 3.10 Key design decisions
 
