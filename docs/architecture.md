@@ -420,6 +420,15 @@ back to the keyless TVMaze API, then AniList, then Wikipedia
   `PUT /api/videos/{id}/skip-interval` and
   `DELETE /api/videos/{id}/skip-interval?kind=…` for marking, updating and
   clearing the ranges, and jumps to `end_sec` when skipping
+- Casting: with `DLNA_ENABLED=1` the backend runs a lightweight UPnP media
+  server — SSDP responds to M-SEARCH on :1900, `/dlna/device.xml` describes
+  the device, `/dlna/content/{id}` and the SOAP endpoint at
+  `/dlna/control/ContentDirectory` serve DIDL-Lite browse results, and
+  `/dlna/video/{id}/stream|poster` serve media without JWT to LAN clients
+  (`DLNA_ALLOWED_IPS` restricts by IP/CIDR, empty = whole LAN). Chromecast is
+  a frontend sender: the player loads the Cast SDK, creates a short-lived
+  share token and casts `/api/share/{token}/video/{id}/stream` to the default
+  media receiver
 
 ### 3.10 Key design decisions
 
