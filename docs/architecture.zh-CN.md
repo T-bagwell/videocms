@@ -210,6 +210,10 @@ erDiagram
 - 字幕同步：`GET /api/videos/{id}/subtitles/{trackId}?offset_ms=…` 会平移
   所有 cue 时间（WebVTT/SRT），并由按用户的 `subtitle_offsets` 持久化，
   直接播放时自动记住调整值
+- 预览缩略图：`GET /api/videos/{id}/thumbnails` 按需抽取每 10 秒一帧
+  160×90 的缩略图（最多 120 帧）到 `DATA_DIR/thumbnails/<video-id>/`；
+  `GET /api/videos/{id}/thumbnails/{n}` 提供单帧，播放器在进度条悬停时
+  显示最近时间点的预览帧
 - 请求的 `start` 与当前会话相差超过一个分片（6 秒）时，杀掉旧会话并从新位置重启（跳转）
 - 清单在响应时重写，使每个分片 URL 都携带 `?token=`
 - 空闲会话 **15 分钟**后回收，同时删除会话目录
