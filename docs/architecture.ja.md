@@ -405,6 +405,16 @@ Wikipedia の順に自動フォールバック（`TVMAZE_ENABLED=0` / `ANILIST_E
   `PUT /api/videos/{id}/skip-interval`、
   `DELETE /api/videos/{id}/skip-interval?kind=…` で区間を
   マーク・更新・クリアし、スキップ時に `end_sec` へジャンプ
+- キャスト：`DLNA_ENABLED=1` でバックエンドが軽量 UPnP メディアサーバーを
+  起動します（SSDP が :1900 の M-SEARCH に応答、`/dlna/device.xml` が
+  デバイスを記述、`/dlna/content/{id}` と
+  `/dlna/control/ContentDirectory`（SOAP）が DIDL-Lite のブラウズ結果、
+  `/dlna/video/{id}/stream|poster` が JWT なしで LAN クライアントへ
+  メディアを配信。`DLNA_ALLOWED_IPS` で IP/CIDR 制限、空なら LAN 全体）。
+  Chromecast はフロントエンドの sender で実装：プレイヤーが Cast SDK を
+  読み込み、短期共有トークンを作成して
+  `/api/share/{token}/video/{id}/stream` をデフォルトメディアレシーバーへ
+  キャストします
 
 ### 3.10 主要な設計判断
 
