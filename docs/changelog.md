@@ -20,6 +20,9 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- PWA: installable web app (manifest + service worker caching the app shell),
+  offline saving of videos to the Cache API from the detail page, and
+  safe-area mobile layout
 - Webhooks + API docs: admin-managed webhook subscriptions deliver signed
   events (`X-Videocms-Signature` HMAC) with per-subscription event filters;
   `GET /api/openapi.json` exposes a lightweight OpenAPI 3 document
