@@ -368,6 +368,9 @@ back to the keyless TVMaze API, then AniList, then Wikipedia
   or moves selected videos to trash; `trash_records` (migration 024) keeps the
   original path so `GET /api/admin/trash` + `POST /api/admin/trash/{id}/restore`
   can move files back and re-enable them
+- NFO: `POST /api/libraries/{id}/export-nfo` writes a Kodi-style movie NFO next
+  to each video and `/import-nfo` parses title/year/plot/genres back into the
+  database (media.NFOFileFor/WriteNFO/ReadNFO)
 
 ### 3.10 Key design decisions
 
