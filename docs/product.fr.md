@@ -203,6 +203,9 @@ Statistiques : vidéos, bibliothèques, utilisateurs, listes, favoris, séries e
   créer des **collections intelligentes** nommées à partir du filtre courant
 - La recherche propose un **tri par pertinence floue** qui tolère les fautes
   de frappe (titre / synopsis / nom de fichier)
+- La liste vidéo admin supporte les **actions groupées** (étiqueter, effacer
+  les étiquettes, mettre à la corbeille) et une **corbeille** avec restauration
+  en un clic
 
 ### 5.4 Utilisateurs
 
