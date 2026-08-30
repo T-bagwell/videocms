@@ -192,6 +192,8 @@ Stats: videos, libraries, users, playlists, favorites, series and storage used.
   for one-click filtering
 - The browse page can **save filters**, re-apply them, and create named
   **smart collections** from the current filter set
+- Search offers a **fuzzy relevance sort** that tolerates typos
+  (title / synopsis / filename)
 
 ### 5.4 Users
 
