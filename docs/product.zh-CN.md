@@ -156,6 +156,7 @@ make serve                              # http://<局域网IP>:8080
 - 上传自定义海报
 - 「下载」对话框可选择音轨与内嵌/上传字幕，输出 MKV 或 MP4（转封装、无需重编码）
 - 「刮削」从 TMDB 拉取元数据（需 `TMDB_API_KEY` 且能访问 api.themoviedb.org）
+- 管理员可选择 **TMDB 或自定义刮削源**，并可强制覆盖已有元数据
 
 ### 5.4 用户
 
@@ -195,6 +196,7 @@ make serve                              # http://<局域网IP>:8080
 | `SUBTITLE_OS_USERNAME` / `SUBTITLE_OS_PASSWORD` / `SUBTITLE_OS_API_KEY` | 空 | 在线字幕搜索用的 OpenSubtitles 凭证 |
 | `RTMP_INGEST_URL` | `rtmp://localhost:1935/live` | RTMP 推流基础地址（nginx-rtmp 或等价服务） |
 | `WHISPER_BIN` / `WHISPER_MODEL` | 空 | whisper.cpp 可执行文件与模型（语音转写用） |
+| `SCRAPE_CUSTOM_URL` | 空 | 自定义 JSON 刮削端点；`%s` 会被替换为 URL 转义后的标题 |
 
 ## 7. 常见问题
 
