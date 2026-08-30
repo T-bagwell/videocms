@@ -270,6 +270,19 @@
     "retry": "Réessayer",
     "cancel": "Annuler"
   },
+  "download": {
+    "title": "Télécharger {{title}}",
+    "container": "Conteneur",
+    "audio": "Piste audio",
+    "noAudio": "Aucune piste audio trouvée.",
+    "audioTrack": "Piste audio",
+    "subtitles": "Sous-titres",
+    "noSubtitles": "Aucun sous-titre.",
+    "embeddedSub": "Sous-titre intégré",
+    "sidecarSub": "Fichier de sous-titres",
+    "download": "Télécharger",
+    "original": "Fichier original"
+  },
   "share": {
     "invalid": "Ce lien de partage est invalide ou a expiré.",
     "backToSite": "← Retour à VideoCMS",

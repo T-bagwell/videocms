@@ -266,6 +266,9 @@ label input, label textarea { margin-top: 6px; }
   color: var(--muted);
 }
 .dropzone:hover { border-color: var(--primary); color: var(--text); }
+.field-row { display: flex; align-items: center; gap: 14px; margin: 10px 0; }
+.field-row > span { margin-right: auto; }
+.track-option { display: block; padding: 4px 0; cursor: pointer; }
 .status-idle { background: var(--bg-soft); color: var(--muted); }
 .status-scanning { background: rgba(46,204,113,0.15); color: var(--ok); }
 .status-error { background: rgba(231,76,60,0.15); color: var(--danger); }

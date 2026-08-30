@@ -270,6 +270,19 @@
     "retry": "重试",
     "cancel": "取消"
   },
+  "download": {
+    "title": "下载 {{title}}",
+    "container": "封装格式",
+    "audio": "音轨",
+    "noAudio": "未找到音轨。",
+    "audioTrack": "音轨",
+    "subtitles": "字幕",
+    "noSubtitles": "无字幕。",
+    "embeddedSub": "内嵌字幕",
+    "sidecarSub": "字幕文件",
+    "download": "下载",
+    "original": "原文件"
+  },
   "share": {
     "invalid": "这个分享链接无效或已过期。",
     "backToSite": "← 返回 VideoCMS",

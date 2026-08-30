@@ -270,6 +270,19 @@
     "retry": "Retry",
     "cancel": "Cancel"
   },
+  "download": {
+    "title": "Download {{title}}",
+    "container": "Container",
+    "audio": "Audio track",
+    "noAudio": "No audio track found.",
+    "audioTrack": "Audio track",
+    "subtitles": "Subtitles",
+    "noSubtitles": "No subtitles.",
+    "embeddedSub": "Embedded subtitle",
+    "sidecarSub": "Subtitle file",
+    "download": "Download",
+    "original": "Original file"
+  },
   "share": {
     "invalid": "This share link is invalid or has expired.",
     "backToSite": "← Back to VideoCMS",

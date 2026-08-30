@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { api, mediaUrl } from '../api.js';
+import { api } from '../api.js';
 import Poster from '../components/Poster.jsx';
+import DownloadDialog from '../components/DownloadDialog.jsx';
 import ShareModal from '../components/ShareModal.jsx';
 import { useAuth } from '../auth.jsx';
 import { fmtBytes, fmtDuration } from '../i18n';
@@ -22,6 +23,7 @@ export default function VideoDetailPage() {
   const [msg, setMsg] = useState('');
   const [err, setErr] = useState('');
   const [showShare, setShowShare] = useState(false);
+  const [showDownload, setShowDownload] = useState(false);
   const [subtitleBusy, setSubtitleBusy] = useState(false);
   const [tracks, setTracks] = useState([]);
   const [setGlobal, setSetGlobal] = useState(false);
@@ -230,9 +232,9 @@ export default function VideoDetailPage() {
             <button className="btn" onClick={() => setShowPlaylistPicker((v) => !v)}>
               {t('video.addToPlaylist')}
             </button>
-            <a className="btn" href={mediaUrl(`/videos/${video.id}/download`)}>
+            <button className="btn" onClick={() => setShowDownload(true)}>
               {t('common.download')}
-            </a>
+            </button>
             <button className="btn" onClick={() => setShowShare(true)}>
               {t('video.share')}
             </button>
@@ -384,6 +386,7 @@ export default function VideoDetailPage() {
       )}
 
       {showShare && <ShareModal kind="videos" id={video.id} onClose={() => setShowShare(false)} />}
+      {showDownload && <DownloadDialog video={video} onClose={() => setShowDownload(false)} />}
 
       <div className="back-link">
         <Link to="/">← {t('nav.home')}</Link>

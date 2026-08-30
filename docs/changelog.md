@@ -20,6 +20,9 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Configurable downloads: videos can be downloaded as **MP4 or MKV** with a
+  chosen audio track plus any embedded or uploaded subtitles — remuxed on the
+  fly with no re-encoding from the video page's Download dialog
 - Chunked, resumable uploads: admins can upload files into any server folder
   from a new Uploads tab with a queue-based manager; large files are split into
   chunks that survive pauses and network errors, and finished files inside a

@@ -270,6 +270,19 @@
     "retry": "Erneut",
     "cancel": "Abbrechen"
   },
+  "download": {
+    "title": "{{title}} herunterladen",
+    "container": "Container",
+    "audio": "Audiospur",
+    "noAudio": "Keine Audiospur gefunden.",
+    "audioTrack": "Audiospur",
+    "subtitles": "Untertitel",
+    "noSubtitles": "Keine Untertitel.",
+    "embeddedSub": "Eingebetteter Untertitel",
+    "sidecarSub": "Untertiteldatei",
+    "download": "Herunterladen",
+    "original": "Originaldatei"
+  },
   "share": {
     "invalid": "Dieser Teilen-Link ist ungültig oder abgelaufen.",
     "backToSite": "← Zurück zu VideoCMS",

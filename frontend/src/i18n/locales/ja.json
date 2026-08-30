@@ -270,6 +270,19 @@
     "retry": "再試行",
     "cancel": "キャンセル"
   },
+  "download": {
+    "title": "{{title}} をダウンロード",
+    "container": "コンテナ",
+    "audio": "音声トラック",
+    "noAudio": "音声トラックが見つかりません。",
+    "audioTrack": "音声トラック",
+    "subtitles": "字幕",
+    "noSubtitles": "字幕はありません。",
+    "embeddedSub": "内蔵字幕",
+    "sidecarSub": "字幕ファイル",
+    "download": "ダウンロード",
+    "original": "元ファイル"
+  },
   "share": {
     "invalid": "この共有リンクは無効か期限切れです。",
     "backToSite": "← VideoCMS に戻る",
