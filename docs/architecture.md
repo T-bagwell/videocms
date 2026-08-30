@@ -384,6 +384,10 @@ back to the keyless TVMaze API, then AniList, then Wikipedia
   listings accept via `X-Videocms-Unlock`; `users.allowed_rating` filters
   `videos.content_rating` unless unlocked, and `libraries.quota_bytes` is
   enforced when uploads target that library
+- Share customization (migration 028): share creation accepts
+  `theme`/`custom_title`/`hide_nav`, stored on `share_tokens` and returned by
+  the public info endpoint; the share page applies them and `?embed=1` hides
+  chrome for iframe embedding
 
 ### 3.10 Key design decisions
 
