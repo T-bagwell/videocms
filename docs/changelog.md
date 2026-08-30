@@ -13,6 +13,9 @@ All notable changes to VideoCMS are documented here.
 - Video action buttons now use a consistent inline SVG icon set (play,
   favorite, playlist, download, share, offline) instead of mixed unicode
   symbols; button labels were cleaned up across all five locales
+- The player page gained a Download button in its toolbar that opens the
+  same track-picker dialog as the detail page (container, audio, subtitles,
+  original file), so media can be downloaded without leaving playback
 - Frontend toolchain upgraded: React 19 / react-dom 19, Vite 8 +
   @vitejs/plugin-react 6, react-router-dom 7, hls.js 1.7.1, i18next 26.4,
   react-i18next 17.0.12, jsdom 27.3; Node.js 20+ is now required for frontend
