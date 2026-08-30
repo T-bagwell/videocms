@@ -211,6 +211,9 @@ Statistiken: Videos, Bibliotheken, Benutzer, Wiedergabelisten, Favoriten, Serien
   tragen, das beim Upload geprüft wird
 - **Teilen anpassen**: Design, eigener Titel und ausgeblendete Navigation
   wählbar; `?embed=1` bettet einen chrome-freien Player in beliebige Seiten ein
+- **Benachrichtigungen**: Webhook- oder Apprise-Kanäle können Scan-, Upload-
+  und Download-Ereignisse empfangen; Admins können aus der Übersicht eine
+  Testbenachrichtigung senden
 
 ### 5.4 Benutzer
 
@@ -256,6 +259,7 @@ Alles wird über Umgebungsvariablen konfiguriert (vollständige Tabelle im READM
 | `SCRAPE_CUSTOM_URL` | leer | Benutzerdefinierter JSON-Scraper-Endpoint; `%s` wird durch den URL-codierten Titel ersetzt |
 | `AI_TAG_BIN` | leer | Externes KI-Tagging-Tool (Medienpfad als Argument, ein Tag pro Zeile) |
 | `OIDC_ISSUER` / `OIDC_CLIENT_ID` / `OIDC_CLIENT_SECRET` / `OIDC_REDIRECT_URL` | leer | OIDC-Single-Sign-on-Einstellungen |
+| `NOTIFY_WEBHOOK_URL` / `NOTIFY_APPRISE_URL` | leer | Benachrichtigungskanäle (JSON-Webhook, Apprise-API) |
 
 ## 7. FAQ
 
