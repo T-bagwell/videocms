@@ -227,6 +227,11 @@ The `HLSManager`:
   from the hls.js subtitle group, and are rendered by the player with a libass
   WASM overlay (jassub) that preserves fonts, colors, positioning and effects
   and follows the per-user subtitle offset
+- Online subtitles: a `SubtitleProvider` abstraction (OpenSubtitles.com by
+  default, configured via `SUBTITLE_OS_*`) backs
+  `POST /api/videos/{id}/subtitles/search|download`; downloaded payloads are
+  decoded from gzip/zip, stored under `DATA_DIR/subtitles/<video-id>/`, and
+  registered as `upload` subtitle tracks
 - If the requested `start` differs from the running session by more than one
   segment (6s), the session is killed and restarted at the new position (seek)
 - The manifest is rewritten on the fly so every segment URL carries `?token=`
