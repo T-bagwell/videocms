@@ -20,6 +20,10 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Intro/credits skip: mark the start and end of the intro or credits in the
+  player (two clicks each), then skip them with one tap; intervals are stored
+  per video (`skip_intervals`) and exposed via
+  `GET|PUT|DELETE /api/videos/{id}/skip-interval(s)`
 - PWA: installable web app (manifest + service worker caching the app shell),
   offline saving of videos to the Cache API from the detail page, and
   safe-area mobile layout
