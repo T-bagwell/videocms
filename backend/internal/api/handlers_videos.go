@@ -152,6 +152,7 @@ func (a *App) listVideos(w http.ResponseWriter, r *http.Request) {
 	}
 
 	orderBy := "lower(v.title), v.year DESC"
+	fuzzyTerm := ""
 	switch q.Get("sort") {
 	case "year_desc":
 		orderBy = "v.year DESC, lower(v.title)"
@@ -165,6 +166,13 @@ func (a *App) listVideos(w http.ResponseWriter, r *http.Request) {
 		orderBy = "v.updated_at DESC"
 	case "favorites_desc":
 		orderBy = "(SELECT count(*) FROM favorites fc WHERE fc.video_id=v.id) DESC"
+	case "fuzzy":
+		fuzzyTerm = strings.TrimSpace(q.Get("q"))
+		if fuzzyTerm != "" {
+			orderBy = fmt.Sprintf(
+				"GREATEST(similarity(lower(v.title), lower($%d)), similarity(lower(v.synopsis), lower($%d)), similarity(lower(v.filename), lower($%d))) DESC, lower(v.title)",
+				argIdx, argIdx, argIdx)
+		}
 	}
 
 	whereSQL := strings.Join(where, " AND ")
@@ -176,6 +184,10 @@ func (a *App) listVideos(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if fuzzyTerm != "" {
+		args = append(args, fuzzyTerm)
+		argIdx++
+	}
 	args = append(args, pageSize, (page-1)*pageSize)
 	sql := fmt.Sprintf(`SELECT %s
 		FROM videos v JOIN libraries l ON l.id=v.library_id
