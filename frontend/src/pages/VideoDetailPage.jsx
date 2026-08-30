@@ -28,6 +28,8 @@ export default function VideoDetailPage() {
   const [showSubSearch, setShowSubSearch] = useState(false);
   const [transcript, setTranscript] = useState(null);
   const [transcribing, setTranscribing] = useState(false);
+  const [scrapeProvider, setScrapeProvider] = useState('tmdb');
+  const [scrapeForce, setScrapeForce] = useState(false);
   const [subtitleBusy, setSubtitleBusy] = useState(false);
   const [tracks, setTracks] = useState([]);
   const [setGlobal, setSetGlobal] = useState(false);
@@ -129,7 +131,10 @@ export default function VideoDetailPage() {
     setScraping(true);
     setErr('');
     try {
-      await api(`/videos/${video.id}/scrape`, { method: 'POST' });
+      await api(
+        `/videos/${video.id}/scrape?provider=${scrapeProvider}&force=${scrapeForce ? 1 : 0}`,
+        { method: 'POST' },
+      );
       const fresh = await api(`/videos/${video.id}`);
       setVideo(fresh);
       setMsg(t('video.scrapeDone'));
@@ -262,6 +267,14 @@ export default function VideoDetailPage() {
                 <button className="btn ghost" onClick={scrape} disabled={scraping}>
                   {scraping ? t('video.scraping') : t('video.scrape')}
                 </button>
+                <select value={scrapeProvider} onChange={(e) => setScrapeProvider(e.target.value)}>
+                  <option value="tmdb">{t('video.scrapeProviderTmdb')}</option>
+                  <option value="custom">{t('video.scrapeProviderCustom')}</option>
+                </select>
+                <label className="scrape-force">
+                  <input type="checkbox" checked={scrapeForce} onChange={(e) => setScrapeForce(e.target.checked)} />
+                  {t('video.scrapeForce')}
+                </label>
                 <button className="btn ghost" onClick={transcribe} disabled={transcribing}>
                   {transcribing ? t('video.transcribing') : t('video.transcribe')}
                 </button>
