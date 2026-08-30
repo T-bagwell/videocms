@@ -229,7 +229,7 @@ Planned work is informed by feature sets of similar self-hosted video projects
 
 **Playback & subtitles**
 
-- [ ] Multiple audio tracks with in-player switching (tracks stored outside the video)
+- [x] Multiple audio tracks with in-player switching (separate HLS audio tracks)
 - [ ] Styled (ASS) soft subtitles and subtitle sync/offset controls
 - [ ] Automatic subtitle download & matching
 - [ ] Hardware-accelerated transcoding (VAAPI/NVENC/QSV) + HDR tone mapping
