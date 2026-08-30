@@ -294,6 +294,10 @@ Wikipedia の順に自動フォールバック（`TVMAZE_ENABLED=0` / `ANILIST_E
 
 - プロバイダを検索（TMDB の言語は設定可能、デフォルト `zh-CN`）。TMDB ではさらに
   詳細を取得してローカライズ済みジャンル名を取得
+- `SCRAPE_CUSTOM_URL` でカスタムソースを利用可能（JSON 端点、`%s` はタイトル
+  プレースホルダー）。`POST /api/videos/{id}/scrape?provider=custom` で使用し、
+  `?force=1` で既存メタデータを上書き。force なしで既に取得済みの場合は 409
+  （個別上書き）
 - `w500` ポスターを `data/posters/<video-id>.<ext>` にダウンロード
 - `title, year, synopsis, genres, poster_path, tmdb_id, scraped_at` を更新
 - レート制限：400ms に 1 リクエスト
