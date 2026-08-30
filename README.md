@@ -254,7 +254,7 @@ Planned work is informed by feature sets of similar self-hosted video projects
 - [x] Local speech transcription (Whisper) → searchable transcripts and captions
 - [x] Pluggable metadata sources / custom scrapers with per-item override
 - [x] AI tagging, scene detection and image analysis for smarter search
-- [ ] Media health checks: duplicate detection, corrupt-file checks,
+- [x] Media health checks: duplicate detection, corrupt-file checks,
   keep-best-version cleanup
 - [ ] Similar-video recommendations and tag cloud
 
