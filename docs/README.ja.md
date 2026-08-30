@@ -242,7 +242,7 @@ Stash、Kirari04/videocms、yt-dlp ツールなど）の機能セットを参考
 - [x] イントロ・クレジットスキップ
 - [x] 一緒に見る（同期再生セッション）
 - [x] キャスト（Web AirPlay）
-- [ ] キャスト（Chromecast / DLNA）
+- [x] キャスト（Chromecast / DLNA）
 - [x] RTMP ライブ取り込みと内蔵チャット
 
 **メタデータと AI**
