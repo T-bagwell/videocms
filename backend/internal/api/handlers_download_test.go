@@ -76,7 +76,7 @@ func TestVideoTracksAndRemux(t *testing.T) {
 	if err != nil {
 		t.Fatalf("remux request: %v", err)
 	}
-	defer res.Body.Close()
+	defer func() { _ = res.Body.Close() }()
 	if res.StatusCode != http.StatusOK {
 		b, _ := io.ReadAll(res.Body)
 		t.Fatalf("remux status = %d: %s", res.StatusCode, b)

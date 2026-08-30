@@ -18,7 +18,7 @@ func loginAdmin(t *testing.T, env *integrationEnv) string {
 	if err != nil {
 		t.Fatalf("login request: %v", err)
 	}
-	defer res.Body.Close()
+	defer func() { _ = res.Body.Close() }()
 	if res.StatusCode != http.StatusOK {
 		b, _ := io.ReadAll(res.Body)
 		t.Fatalf("login status %d: %s", res.StatusCode, b)
@@ -56,7 +56,7 @@ func doJSON(t *testing.T, method, url, token string, body any) (int, map[string]
 	if err != nil {
 		t.Fatalf("%s %s: %v", method, url, err)
 	}
-	defer res.Body.Close()
+	defer func() { _ = res.Body.Close() }()
 	var d map[string]any
 	_ = json.NewDecoder(res.Body).Decode(&d)
 	return res.StatusCode, d
