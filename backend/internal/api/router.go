@@ -127,6 +127,8 @@ func (a *App) Routes() http.Handler {
 	mux.HandleFunc("POST /api/videos/{id}/tags", authUser(a.addVideoTag))
 	mux.HandleFunc("DELETE /api/videos/{id}/tags/{tagId}", authUser(a.removeVideoTag))
 	mux.HandleFunc("POST /api/videos/{id}/analyze", authAdmin(a.analyzeVideo))
+	mux.HandleFunc("GET /api/videos/{id}/similar", authUser(a.similarVideos))
+	mux.HandleFunc("GET /api/tags", authUser(a.tagCloud))
 	mux.HandleFunc("POST /api/videos/{id}/share", authUser(a.createVideoShare))
 	mux.HandleFunc("GET /api/videos/{id}/shares", authUser(a.listVideoShares))
 	mux.HandleFunc("POST /api/series/{id}/share", authUser(a.createSeriesShare))
