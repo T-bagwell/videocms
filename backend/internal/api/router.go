@@ -9,8 +9,10 @@ import (
 	"runtime/debug"
 	"slices"
 	"strings"
+	"sync"
 	"time"
 
+	"github.com/crewjam/saml"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"videocms/backend/internal/auth"
@@ -29,6 +31,8 @@ type App struct {
 	live        *media.LiveManager
 	notify      *media.Notifier
 	dlna        *media.DLNAManager
+	samlMu      sync.Mutex
+	samlSP      *saml.ServiceProvider
 }
 
 func New(cfg config.Config, pool *pgxpool.Pool) (*App, error) {
@@ -103,9 +107,13 @@ func (a *App) Routes() http.Handler {
 
 	mux.HandleFunc("POST /api/auth/register", a.register)
 	mux.HandleFunc("POST /api/auth/login", a.login)
+	mux.HandleFunc("GET /api/auth/sso", a.ssoStatus)
 	mux.HandleFunc("GET /api/auth/me", authUser(a.me))
 	mux.HandleFunc("GET /api/auth/oidc/start", a.oidcStart)
 	mux.HandleFunc("GET /api/auth/oidc/callback", a.oidcCallback)
+	mux.HandleFunc("GET /api/auth/saml/login", a.samlLogin)
+	mux.HandleFunc("POST /api/auth/saml/acs", a.samlACS)
+	mux.HandleFunc("GET /api/auth/saml/metadata", a.samlMetadata)
 
 	if a.dlna != nil {
 		mux.HandleFunc("GET /dlna/device.xml", a.dlnaGuard(a.dlnaDeviceDescription))

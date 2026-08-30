@@ -107,3 +107,11 @@ func (a *App) login(w http.ResponseWriter, r *http.Request) {
 func (a *App) me(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, auth.UserFrom(r))
 }
+
+// GET /api/auth/sso — which single sign-on providers are configured.
+func (a *App) ssoStatus(w http.ResponseWriter, r *http.Request) {
+	writeJSON(w, http.StatusOK, map[string]bool{
+		"oidc": a.oidcConfigured(),
+		"saml": a.samlConfigured(),
+	})
+}

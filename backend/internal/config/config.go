@@ -35,6 +35,11 @@ type Config struct {
 	OIDCClientID       string
 	OIDCClientSecret   string
 	OIDCRedirectURL    string
+	SAMLIDPMetadataURL string
+	SAMLSPCert         string
+	SAMLSPKey          string
+	SAMLSPEntityID     string
+	SAMLACSURL         string
 	NotifyWebhookURL   string
 	NotifyAppriseURL   string
 	MaintIntervalHours int
@@ -73,6 +78,11 @@ func Load() Config {
 		OIDCClientID:       os.Getenv("OIDC_CLIENT_ID"),
 		OIDCClientSecret:   os.Getenv("OIDC_CLIENT_SECRET"),
 		OIDCRedirectURL:    os.Getenv("OIDC_REDIRECT_URL"),
+		SAMLIDPMetadataURL: os.Getenv("SAML_IDP_METADATA_URL"),
+		SAMLSPCert:         os.Getenv("SAML_SP_CERT"),
+		SAMLSPKey:          os.Getenv("SAML_SP_KEY"),
+		SAMLSPEntityID:     os.Getenv("SAML_SP_ENTITY_ID"),
+		SAMLACSURL:         os.Getenv("SAML_ACS_URL"),
 		NotifyWebhookURL:   os.Getenv("NOTIFY_WEBHOOK_URL"),
 		NotifyAppriseURL:   os.Getenv("NOTIFY_APPRISE_URL"),
 		MaintIntervalHours: envInt("MAINT_INTERVAL_HOURS", 24),
