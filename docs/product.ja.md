@@ -205,6 +205,8 @@ make serve                              # http://<LAN IP>:8080
   を指定できます
 - **タスクダッシュボード**：スキャン・アップロード・ダウンロード・ライブを
   一括監視（進捗/エラー/キャンセル/再試行/開始/停止）し、ディスク使用量も表示
+- **定期メンテナンス**：自動 JSON バックアップとヘルスチェック（間隔・保持数
+  を設定可能）。管理者は今すぐ実行してバックアップをダウンロードできます
 
 ### 5.4 ユーザー
 
@@ -249,6 +251,7 @@ make serve                              # http://<LAN IP>:8080
 | `AI_TAG_BIN` | 空 | 外部 AI タグ付けツール（メディアパスを引数に、1 行 1 タグ） |
 | `OIDC_ISSUER` / `OIDC_CLIENT_ID` / `OIDC_CLIENT_SECRET` / `OIDC_REDIRECT_URL` | 空 | OIDC シングルサインオン設定 |
 | `NOTIFY_WEBHOOK_URL` / `NOTIFY_APPRISE_URL` | 空 | 通知チャンネル（JSON Webhook、Apprise API） |
+| `MAINT_INTERVAL_HOURS` / `MAINT_BACKUP_RETENTION` / `MAINT_RESCAN` | `24` / `7` / `0` | メンテナンス間隔・バックアップ保持数・再スキャン有無 |
 
 ## 7. FAQ
 
