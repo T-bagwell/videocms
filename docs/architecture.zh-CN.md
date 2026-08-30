@@ -282,6 +282,9 @@ AniList 与 Wikipedia（`TVMAZE_ENABLED=0` / `ANILIST_ENABLED=0` /
 `WIKIPEDIA_ENABLED=0` 可分别关闭）。`Scraper`：
 
 - 先搜索提供商（TMDB 语言可配置，默认 `zh-CN`），TMDB 再取影片详情获取本地化类型名
+- 可通过 `SCRAPE_CUSTOM_URL` 提供自定义源（JSON 端点，`%s` 为标题占位符）：
+  `POST /api/videos/{id}/scrape?provider=custom` 使用它，`?force=1` 覆盖已有
+  元数据；未带 force 时已有元数据的视频返回 409（单条覆盖）
 - 下载 `w500` 海报到 `data/posters/<video-id>.<ext>`
 - 更新 `title, year, synopsis, genres, poster_path, tmdb_id, scraped_at`
 - 限速：每 400ms 一次请求
