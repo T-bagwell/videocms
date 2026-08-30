@@ -350,6 +350,9 @@ AniList 与 Wikipedia（`TVMAZE_ENABLED=0` / `ANILIST_ENABLED=0` /
   `PUT|POST /api/users/me/pin[/verify]` 签发 5 分钟解锁令牌，列表请求通过
   `X-Videocms-Unlock` 接受；`users.allowed_rating` 过滤 `videos.content_rating`
   （未解锁时），`libraries.quota_bytes` 在上传目标指向该库时生效
+- 分享定制（迁移 028）：创建分享可携带 `theme`/`custom_title`/`hide_nav`，
+  存在 `share_tokens` 并由公开 info 端点返回；分享页应用这些设置，
+  `?embed=1` 隐藏页面装饰以便 iframe 嵌入
 
 ### 3.10 关键设计决策
 
