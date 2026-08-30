@@ -49,6 +49,7 @@ func GenerateThumbnails(ctx context.Context, ffmpegBin, input string, durationSe
 	cmd := exec.CommandContext(ctx, ffmpegBin, "-v", "error", "-y",
 		"-i", input,
 		"-vf", fmt.Sprintf("fps=1/%d,scale=%d:%d", thumbIntervalSec, thumbCellWidth, thumbCellHeight),
+		"-strict", "unofficial",
 		"-frames:v", strconv.Itoa(frames),
 		pattern)
 	if out, err := cmd.CombinedOutput(); err != nil {

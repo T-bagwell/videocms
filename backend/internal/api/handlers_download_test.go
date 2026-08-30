@@ -19,12 +19,18 @@ import (
 // makeTestVideo generates a tiny H.264/AAC mp4 with ffmpeg, skipping the test
 // when ffmpeg is not available.
 func makeTestVideo(t *testing.T) string {
+	return makeTestVideoDur(t, 1)
+}
+
+// makeTestVideoDur is like makeTestVideo but with a configurable duration in
+// seconds (thumbnail extraction needs a source longer than one interval).
+func makeTestVideoDur(t *testing.T, durSec int) string {
 	t.Helper()
 	ffmpeg := media.ResolveTool("ffmpeg")
 	src := filepath.Join(t.TempDir(), "sample.mp4")
 	cmd := exec.Command(ffmpeg, "-v", "error", "-y",
-		"-f", "lavfi", "-i", "testsrc=duration=1:size=320x240:rate=10",
-		"-f", "lavfi", "-i", "sine=frequency=1000:duration=1",
+		"-f", "lavfi", "-i", fmt.Sprintf("testsrc=duration=%d:size=320x240:rate=10", durSec),
+		"-f", "lavfi", "-i", fmt.Sprintf("sine=frequency=1000:duration=%d", durSec),
 		"-c:v", "libx264", "-c:a", "aac", "-shortest", src)
 	if out, err := cmd.CombinedOutput(); err != nil {
 		t.Skipf("ffmpeg cannot create test video (skipping): %v: %s", err, out)
