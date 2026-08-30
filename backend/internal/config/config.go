@@ -9,34 +9,40 @@ import (
 )
 
 type Config struct {
-	Addr          string
-	DatabaseURL   string
-	JWTSecret     string
-	DataDir       string
-	AdminUsername string
-	AdminPassword string
-	TMDBAPIKey    string
-	WebRoot       string
-	WatchInterval time.Duration
-	YtDLPPath     string
-	CORSOrigins   []string
-	HLSHWAccel    string
+	Addr               string
+	DatabaseURL        string
+	JWTSecret          string
+	DataDir            string
+	AdminUsername      string
+	AdminPassword      string
+	TMDBAPIKey         string
+	WebRoot            string
+	WatchInterval      time.Duration
+	YtDLPPath          string
+	CORSOrigins        []string
+	HLSHWAccel         string
+	SubtitleOSUser     string
+	SubtitleOSPassword string
+	SubtitleOSAPIKey   string
 }
 
 func Load() Config {
 	cfg := Config{
-		Addr:          envOr("PORT", "8080"),
-		DatabaseURL:   envOr("DATABASE_URL", "postgres://localhost:5432/videocms?sslmode=disable"),
-		JWTSecret:     envOr("JWT_SECRET", "videocms-dev-secret-change-me"),
-		DataDir:       envOr("DATA_DIR", "data"),
-		AdminUsername: os.Getenv("ADMIN_USERNAME"),
-		AdminPassword: os.Getenv("ADMIN_PASSWORD"),
-		TMDBAPIKey:    os.Getenv("TMDB_API_KEY"),
-		WebRoot:       os.Getenv("WEB_ROOT"),
-		WatchInterval: envDuration("WATCH_INTERVAL", 30*time.Second),
-		YtDLPPath:     os.Getenv("YTDLP_PATH"),
-		CORSOrigins:   envList("CORS_ORIGINS"),
-		HLSHWAccel:    os.Getenv("HLS_HW_ACCEL"),
+		Addr:               envOr("PORT", "8080"),
+		DatabaseURL:        envOr("DATABASE_URL", "postgres://localhost:5432/videocms?sslmode=disable"),
+		JWTSecret:          envOr("JWT_SECRET", "videocms-dev-secret-change-me"),
+		DataDir:            envOr("DATA_DIR", "data"),
+		AdminUsername:      os.Getenv("ADMIN_USERNAME"),
+		AdminPassword:      os.Getenv("ADMIN_PASSWORD"),
+		TMDBAPIKey:         os.Getenv("TMDB_API_KEY"),
+		WebRoot:            os.Getenv("WEB_ROOT"),
+		WatchInterval:      envDuration("WATCH_INTERVAL", 30*time.Second),
+		YtDLPPath:          os.Getenv("YTDLP_PATH"),
+		CORSOrigins:        envList("CORS_ORIGINS"),
+		HLSHWAccel:         os.Getenv("HLS_HW_ACCEL"),
+		SubtitleOSUser:     os.Getenv("SUBTITLE_OS_USERNAME"),
+		SubtitleOSPassword: os.Getenv("SUBTITLE_OS_PASSWORD"),
+		SubtitleOSAPIKey:   os.Getenv("SUBTITLE_OS_API_KEY"),
 	}
 	if cfg.Addr != "" && cfg.Addr[0] != ':' {
 		cfg.Addr = ":" + cfg.Addr
