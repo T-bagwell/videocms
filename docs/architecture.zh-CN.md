@@ -223,6 +223,10 @@ erDiagram
   `SUBTITLE_OS_*` 配置）支撑 `POST /api/videos/{id}/subtitles/search|download`；
   下载内容从 gzip/zip 解码后存到 `DATA_DIR/subtitles/<video-id>/`，
   并注册为 `upload` 字幕轨
+- 一起看：`watch_rooms`（迁移 018）保存共享口令与当前播放/暂停状态与位置；
+  成员每 2.5s 轮询 `GET /api/watch/rooms/{id}?token=…` 并通过 PUT 发布状态，
+  实现松同步播放。投屏：浏览器支持时播放器提供 Web AirPlay 按钮
+  （`webkitShowPlaybackUI`）
 - 请求的 `start` 与当前会话相差超过一个分片（6 秒）时，杀掉旧会话并从新位置重启（跳转）
 - 清单在响应时重写，使每个分片 URL 都携带 `?token=`
 - 空闲会话 **15 分钟**后回收，同时删除会话目录
