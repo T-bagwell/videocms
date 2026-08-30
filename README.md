@@ -88,6 +88,7 @@ All documentation is multi-language. Start at the **[docs index](docs/INDEX.md)*
 - Go 1.26+ (to build) or a prebuilt binary
 - PostgreSQL 14+
 - ffmpeg + ffprobe (metadata, posters, transcoding)
+- yt-dlp (optional — powers the admin Downloads queue)
 - Node.js 20+ (frontend development only — the built UI is served by the backend)
 
 ### Install
@@ -116,6 +117,11 @@ Log in with the initial admin **admin / admin123** and change the password
 immediately (Admin → Users → Reset password). Then add your first library under
 **Admin → Libraries → Scan** (the path must be an absolute server path, e.g.
 `/media/movies`).
+
+You can also drop files straight into a server folder from **Admin → Uploads**
+(chunked, resumable — files inside a library are indexed automatically), or
+queue videos from the web with **Admin → Downloads** (yt-dlp, optional
+scheduled repeats).
 
 ## LAN / Phone Access
 
