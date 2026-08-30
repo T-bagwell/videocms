@@ -166,6 +166,7 @@ All settings are environment variables:
 | `OIDC_ISSUER` / `OIDC_CLIENT_ID` / `OIDC_CLIENT_SECRET` / `OIDC_REDIRECT_URL` | empty | OIDC single sign-on (discovery + authorization code flow) |
 | `SAML_IDP_METADATA_URL` / `SAML_SP_CERT` / `SAML_SP_KEY` / `SAML_SP_ENTITY_ID` / `SAML_ACS_URL` | empty | SAML 2.0 single sign-on (IdP metadata URL, SP cert/key, entity ID, ACS URL) |
 | `NOTIFY_WEBHOOK_URL` / `NOTIFY_APPRISE_URL` | empty | Notification channels (JSON webhook, Apprise API) |
+| `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASSWORD` / `NOTIFY_EMAIL_FROM` / `NOTIFY_EMAIL_TO` | empty / `587` | SMTP email notifications (implicit TLS on 465, STARTTLS otherwise) |
 | `MAINT_INTERVAL_HOURS` / `MAINT_BACKUP_RETENTION` / `MAINT_RESCAN` | `24` / `7` / `0` | Scheduled maintenance: backup interval, backup retention, enable rescans |
 | `WEB_ROOT` | auto (`frontend/dist`) | Built frontend for single-service mode; leave unset for API-only deployment |
 | `CORS_ORIGINS` | empty (`*`) | Comma-separated browser origins allowed to call the API (separate frontend deployments) |
@@ -277,7 +278,7 @@ Planned work is informed by feature sets of similar self-hosted video projects
 - [x] Parental controls (PIN / content ratings) and per-user quotas
 - [x] Share page customization and embeddable players
 - [x] Notifications (webhook / Apprise) for scan, upload and download events
-- [ ] Email notifications
+- [x] Email notifications
 
 **Storage & operations**
 
