@@ -343,6 +343,9 @@ AniList 与 Wikipedia（`TVMAZE_ENABLED=0` / `ANILIST_ENABLED=0` /
   （`GET|POST /api/videos/{id}/comments`、`DELETE /api/comments/{id}`）、
   1-5 星评分（`GET /api/videos/{id}/ratings`、`PUT /api/videos/{id}/rating`），
   `GET /api/feed` 返回最近的评论与收藏
+- OIDC SSO：`GET /api/auth/oidc/start|callback` 实现发现 + 授权码 + userinfo
+  （`OIDC_*` 配置）；用户通过唯一 `users.oauth_sub` 列（迁移 026）自动创建或
+  绑定，前端经 `/login?sso_token=…` 获取会话 JWT
 
 ### 3.10 关键设计决策
 
