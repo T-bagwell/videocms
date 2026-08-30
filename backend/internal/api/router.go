@@ -57,7 +57,7 @@ func New(cfg config.Config, pool *pgxpool.Pool) (*App, error) {
 		if status == "error" {
 			event = "scan.failed"
 		}
-		notify.Send(context.Background(), event, "Scan "+name, "Library "+name+" finished with status "+status,
+		app.notifyEvent(event, "Scan "+name, "Library "+name+" finished with status "+status,
 			map[string]any{"library": name, "status": status})
 	})
 	app.dl.SetNotify(func(url string, err error) {
@@ -66,7 +66,7 @@ func New(cfg config.Config, pool *pgxpool.Pool) (*App, error) {
 		if err != nil {
 			event, title, body = "download.failed", "Download failed", url+": "+err.Error()
 		}
-		notify.Send(context.Background(), event, title, body, map[string]any{"url": url})
+		app.notifyEvent(event, title, body, map[string]any{"url": url})
 	})
 	return app, nil
 }
@@ -246,6 +246,11 @@ func (a *App) Routes() http.Handler {
 	mux.HandleFunc("POST /api/admin/maintenance/run", authAdmin(a.runMaintenanceNow))
 	mux.HandleFunc("GET /api/admin/backups", authAdmin(a.listBackups))
 	mux.HandleFunc("GET /api/admin/backups/{name}", authAdmin(a.downloadBackup))
+	mux.HandleFunc("GET /api/admin/webhooks", authAdmin(a.listWebhooks))
+	mux.HandleFunc("POST /api/admin/webhooks", authAdmin(a.createWebhook))
+	mux.HandleFunc("PATCH /api/admin/webhooks/{id}", authAdmin(a.updateWebhook))
+	mux.HandleFunc("DELETE /api/admin/webhooks/{id}", authAdmin(a.deleteWebhook))
+	mux.HandleFunc("GET /api/openapi.json", func(w http.ResponseWriter, r *http.Request) { a.openAPI(w, r) })
 	mux.HandleFunc("GET /api/admin/export", authAdmin(a.exportAll))
 	mux.HandleFunc("POST /api/admin/import", authAdmin(a.importBackup))
 	mux.HandleFunc("GET /api/admin/paths", authAdmin(a.listServerPaths))

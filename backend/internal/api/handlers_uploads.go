@@ -384,7 +384,7 @@ func (a *App) completeUpload(w http.ResponseWriter, r *http.Request) {
 		"final_path":  finalPath,
 		"status":      "completed",
 	})
-	a.notify.Send(r.Context(), "upload.completed", "Upload completed",
+	a.notifyEvent("upload.completed", "Upload completed",
 		u.Filename+" → "+u.TargetPath,
 		map[string]any{"filename": u.Filename, "target_path": u.TargetPath})
 }
