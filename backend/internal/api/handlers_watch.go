@@ -34,6 +34,10 @@ type updateWatchRoomRequest struct {
 	PositionSec float64 `json:"position_sec"`
 }
 
+type watchRoomTokenRequest struct {
+	Token string `json:"token"`
+}
+
 func newWatchRoomToken() (string, error) {
 	b := make([]byte, 16)
 	if _, err := rand.Read(b); err != nil {
@@ -120,8 +124,19 @@ func (a *App) getWatchRoom(w http.ResponseWriter, r *http.Request) {
 
 // POST /api/watch/rooms/{id}/join — validate a token and return room state.
 func (a *App) joinWatchRoom(w http.ResponseWriter, r *http.Request) {
-	room, ok := a.watchRoomFromRequest(w, r)
-	if !ok {
+	id, err := uuid.Parse(r.PathValue("id"))
+	if err != nil {
+		writeErr(w, http.StatusBadRequest, "invalid room id")
+		return
+	}
+	var req watchRoomTokenRequest
+	if err := readJSON(w, r, &req); err != nil {
+		writeErr(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	room, err := a.loadWatchRoom(id)
+	if err != nil || room.Token != req.Token {
+		writeErr(w, http.StatusForbidden, "invalid room token")
 		return
 	}
 	var title string
