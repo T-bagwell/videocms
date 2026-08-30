@@ -221,6 +221,10 @@ erDiagram
   hls.js 字幕グループから除外され、プレイヤーが libass WASM オーバーレイ
   （jassub）でレンダリング。フォント・色・位置・エフェクトを保持し、
   ユーザー別の字幕オフセットにも追従します
+- オンライン字幕：`SubtitleProvider` 抽象（既定は OpenSubtitles.com、
+  `SUBTITLE_OS_*` で設定）が `POST /api/videos/{id}/subtitles/search|download`
+  を支えます。ダウンロード内容は gzip/zip からデコードして
+  `DATA_DIR/subtitles/<video-id>/` に保存し、`upload` 字幕トラックとして登録
 - 要求された `start` が実行中セッションと 1 セグメント（6 秒）以上ずれている場合、
   セッションを終了して新しい位置で再開（シーク）
 - プレイリストは応答時に書き換えられ、各セグメント URL に `?token=` が付く
