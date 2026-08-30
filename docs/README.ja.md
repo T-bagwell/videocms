@@ -233,7 +233,9 @@ Stash、Kirari04/videocms、yt-dlp ツールなど）の機能セットを参考
 - [x] ハードウェアアクセラレーション（VAAPI/NVENC/QSV）+ HDR トーンマッピング
 - [x] プレビューサムネイル/シークバー
 - [ ] イントロ・クレジットスキップ
-- [ ] 一緒に見る（同期再生セッション）とキャスト（Chromecast/DLNA/AirPlay）
+- [x] 一緒に見る（同期再生セッション）
+- [x] キャスト（Web AirPlay）
+- [ ] キャスト（Chromecast / DLNA）
 - [ ] RTMP ライブ取り込みと内蔵チャット
 
 **メタデータと AI**
