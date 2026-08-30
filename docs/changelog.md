@@ -20,6 +20,10 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- AI tagging: an optional external tagger (`AI_TAG_BIN`, one tag per stdout
+  line) can label videos; tags live in the new `tags`/`video_tags` tables, are
+  shown on the detail page, filter search via `?tag=`, and can be managed
+  manually
 - Pluggable metadata sources: `SCRAPE_CUSTOM_URL` provides a custom JSON
   scraper (with a `%s` title placeholder) selectable per video alongside TMDB,
   and `POST /api/videos/{id}/scrape` supports `?provider=` and `?force=` for
