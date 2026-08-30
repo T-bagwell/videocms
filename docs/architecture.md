@@ -375,6 +375,10 @@ back to the keyless TVMaze API, then AniList, then Wikipedia
   CRUD (`GET|POST /api/videos/{id}/comments`, `DELETE /api/comments/{id}`),
   1-5 star ratings (`GET /api/videos/{id}/ratings`, `PUT /api/videos/{id}/rating`),
   and `GET /api/feed` returns recent comments + favorites
+- OIDC SSO: `GET /api/auth/oidc/start|callback` implement discovery +
+  authorization-code + userinfo (config `OIDC_*`); users are provisioned or
+  linked via the unique `users.oauth_sub` column (migration 026), and the
+  frontend receives a session JWT via `/login?sso_token=…`
 
 ### 3.10 Key design decisions
 
