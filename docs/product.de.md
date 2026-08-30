@@ -76,6 +76,9 @@ make serve                              # http://<LAN-IP>:8080
 - Filter nach Bibliothek und Typ (Alle / Filme / Serien), Sortierung nach Titel,
   Jahr, Dauer, Hinzugefügt oder Beliebtheit
 - „Mehr laden“ paginiert das Raster
+- Speichern Sie jeden Filtersatz mit einem Klick als benannte **Smart Collection**,
+  um ihn später wieder anzuwenden; Sammlungen lassen sich auf der Browse-Seite
+  umbenennen oder löschen
 
 ### 4.2 Videos abspielen
 
@@ -94,8 +97,8 @@ make serve                              # http://<LAN-IP>:8080
 - Admins können Untertitel von Online-Anbietern (z. B. OpenSubtitles) pro Video
   suchen und herunterladen
 - **Gemeinsam ansehen**: Erstellen oder betreten Sie einen Raum, um die
-  Wiedergabe mit Freunden zu synchronisieren; wo unterstützt, gibt es einen
-  **Cast / AirPlay**-Button
+  Wiedergabe mit Freunden zu synchronisieren; je nach Unterstützung erscheinen
+  **AirPlay**- (Safari) und **Auf TV streamen**-Buttons (Chromecast)
 - **Streaming**: Der Player kann auf einen Chromecast streamen (der Button
   „Auf TV streamen“ erstellt einen kurzlebigen Freigabelink und spielt darüber
   ab); mit `DLNA_ENABLED=1` wird die Mediathek für UPnP/DLNA-fähige Geräte im
@@ -110,6 +113,9 @@ make serve                              # http://<LAN-IP>:8080
   das Transkript ist durchsuchbar und als Untertitelspur wählbar
 - **Download** liefert einen MKV/MP4-Remux mit gewählter Audiospur und
   Untertiteln (ohne Re-Encoding) oder die Originaldatei
+- **Offline speichern**: Klicken Sie auf der Detailseite auf „Offline speichern“,
+  um den aktuellen Stream im Browser (PWA/Cache-API) zu cachen und später ohne
+  Netzverbindung anzusehen
 - Fortschritt wird alle 5 Sekunden sowie bei Pause/Ende gespeichert
 
 ### 4.3 Favoriten und Wiedergabelisten
@@ -145,6 +151,8 @@ Eine Gruppe braucht mindestens 2 Folgen, um eine Serie zu werden.
   globalen Standard)
 - Auf dem Handy lohnt sich das Querformat; nutzen Sie die Warteschlange unter dem
   Player zum Wechseln zwischen Folgen
+- **Kindersicherung**: Legen Sie im Kontomenü eine PIN fest; klassierte Videos
+  fragen sie einmal ab und bleiben danach 5 Minuten entsperrt
 
 ### 4.6 Teilen
 
@@ -318,6 +326,28 @@ ersten Start die macOS-Firewall-Abfrage.
 **Ist der öffentliche Zugriff sicher?**
 Die Standardinstallation nutzt unverschlüsseltes HTTP mit einem Entwicklungs-JWT.
 Für alles außerhalb eines vertrauenswürdigen LAN: HTTPS-Reverse-Proxy und `JWT_SECRET` setzen.
+
+**Mein DLNA-TV findet den Server nicht.**
+Setzen Sie `DLNA_ENABLED=1` (optional `DLNA_FRIENDLY_NAME`) und starten Sie das
+Backend neu; der TV muss im selben LAN wie der Server sein. Wenn Sie
+`DLNA_ALLOWED_IPS` einschränken, muss die IP/CIDR des TVs enthalten sein. Der
+Server antwortet auf SSDP über UDP 1900 und veröffentlicht die Mediathek als
+UPnP-Medienserver.
+
+**Wie richte ich SSO oder E-Mail-Benachrichtigungen ein?**
+Für **OIDC** setzen Sie `OIDC_ISSUER`/`OIDC_CLIENT_ID`/`OIDC_CLIENT_SECRET`/
+`OIDC_REDIRECT_URL`; für **SAML** zeigen Sie mit `SAML_IDP_METADATA_URL` auf die
+IdP-Metadaten und legen `SAML_SP_CERT`/`SAML_SP_KEY` fest (SP-Metadaten werden
+unter `/api/auth/saml/metadata` veröffentlicht). **E-Mail**-Benachrichtigungen
+brauchen `SMTP_HOST`/`SMTP_PORT`/`SMTP_USER`/`SMTP_PASSWORD` plus
+`NOTIFY_EMAIL_FROM`/`NOTIFY_EMAIL_TO`. Die Anmeldeseite zeigt die konfigurierten
+SSO-Buttons, und die Admin-Übersicht sendet eine Testbenachrichtigung.
+
+**Warum erscheint „Auf TV streamen“ nicht?**
+Der Chromecast-Button erscheint erst, nachdem das Google-Cast-SDK in einem
+Cast-fähigen Browser (Chrome) geladen wurde. Der Stream läuft über einen
+kurzlebigen Freigabelink, daher muss der Chromecast Ihren Server erreichen können
+(gleiches LAN oder per HTTPS freigegeben).
 
 **Wie blende ich Inhalte aus, ohne Dateien zu löschen?**
 Admins können einen Titel (Admin → Blockierte Inhalte) oder eine ganze Bibliothek
