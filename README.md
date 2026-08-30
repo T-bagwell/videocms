@@ -186,17 +186,74 @@ See also [security.md](docs/security.md).
 
 ## Roadmap
 
-- [x] Library scanning (parallel, cancelable, live progress)
-- [x] Metadata + posters + TMDB scraping
-- [x] Native playback + HLS transcoding
-- [x] TV series auto-grouping (multiple naming patterns)
+Planned work is informed by feature sets of similar self-hosted video projects
+(Jellyfin, MediaCMS, Stash, Kirari04/videocms, yt-dlp tools, …).
+
+### Done
+
+- [x] Library scanning (parallel, cancelable, live progress) + event-driven
+  filesystem watching
+- [x] Metadata + posters: TMDB scraping with keyless TVMaze fallback
+- [x] Native playback + adaptive-bitrate HLS transcoding
+- [x] TV series auto-grouping (S01E01, EP1, 第N集, number-only filenames…)
 - [x] Favorites (videos & series), playlists, continue watching
 - [x] Content controls: title blocking, library blocking, per-user path filters
+- [x] Subtitles: embedded extraction, upload, multi-language tracks, per-user
+  preference
+- [x] Public sharing: signed short-lived links for videos, series and
+  playlists, with optional password and domain allow-list
 - [x] i18n (en/zh/fr/ja/de)
-- [x] Filesystem watching for incremental indexing
-- [x] Adaptive-bitrate (multi-quality) HLS
-- [x] Embedded subtitle extraction / upload
-- [x] Public sharing with signed short-lived URLs
+- [x] Admin: data export/backup, open library folder, server directory picker
+
+### Planned
+
+**Upload & download**
+
+- [ ] Chunked, resumable browser uploads with a queue-based upload manager
+- [ ] Download as MP4/MKV with selectable audio/subtitle tracks (no re-encode)
+- [ ] yt-dlp integration: pull videos/channels from online sites on a schedule
+
+**Playback & subtitles**
+
+- [ ] Multiple audio tracks with in-player switching (tracks stored outside the video)
+- [ ] Styled (ASS) soft subtitles and subtitle sync/offset controls
+- [ ] Automatic subtitle download & matching
+- [ ] Hardware-accelerated transcoding (VAAPI/NVENC/QSV) + HDR tone mapping
+- [ ] Trick-play thumbnails / preview timeline; intro & credits skip
+- [ ] Watch together (synchronized sessions) and casting (Chromecast/DLNA/AirPlay)
+- [ ] Live streaming ingest (RTMP) with built-in chat
+
+**Metadata & AI**
+
+- [ ] Local speech transcription (Whisper) → searchable transcripts and captions
+- [ ] Pluggable metadata sources / custom scrapers with per-item override
+- [ ] AI tagging, scene detection and image analysis for smarter search
+- [ ] Media health checks: duplicate detection, corrupt-file checks,
+  keep-best-version cleanup
+- [ ] Similar-video recommendations and tag cloud
+
+**Organization & search**
+
+- [ ] User-defined tags, smart collections, saved filters
+- [ ] Full-text/fuzzy search over titles, synopsis, transcripts and tags
+- [ ] Batch edit/organize (move, rename, re-tag) with recycle bin
+- [ ] NFO metadata import/export for Plex/Jellyfin/Kodi compatibility
+
+**Users, sharing & social**
+
+- [ ] Comments, ratings and activity feeds
+- [ ] OIDC/SAML single sign-on
+- [ ] Parental controls (PIN / content ratings) and per-user quotas
+- [ ] Share page customization and embeddable players
+- [ ] Notifications (email / webhook / Apprise) for scan, upload and transcode events
+
+**Storage & operations**
+
+- [ ] Storage pools: local, S3-compatible and SFTP, routed from the admin UI
+- [ ] Background-jobs dashboard (monitor / cancel / retry) + richer system stats
+- [ ] Scheduled maintenance: re-scan, health checks, metadata backup/restore
+- [ ] Webhooks + mature public REST API for third-party automation
+- [ ] PWA with offline downloads and polished mobile UX
 
 ## Contributing
 

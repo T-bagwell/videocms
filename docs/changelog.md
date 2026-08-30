@@ -14,6 +14,9 @@ All notable changes to VideoCMS are documented here.
 - Documentation restructured: all docs moved into `docs/` (READMEs,
   contributing guides, changelog, security policy); the docs index is now
   `docs/INDEX.md` and the root README is a short landing page
+- Roadmap expanded with planned capabilities (uploads/downloads, playback &
+  subtitles, metadata & AI, organization & search, sharing & social, storage &
+  operations), benchmarked against similar self-hosted video projects
 
 ### Added
 
