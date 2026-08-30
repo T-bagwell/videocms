@@ -200,6 +200,8 @@ Stats: videos, libraries, users, playlists, favorites, series and storage used.
   trash) and a **recycle bin** with one-click restore
 - Users can **comment and rate** videos (1-5 stars); the home page shows a
   recent-activity feed of comments and favorites
+- **Single sign-on** (OIDC): the login page offers an SSO button when the
+  server is configured with an identity provider
 
 ### 5.4 Users
 
@@ -244,6 +246,7 @@ most important ones:
 | `WHISPER_BIN` / `WHISPER_MODEL` | empty | whisper.cpp CLI and model for speech transcription |
 | `SCRAPE_CUSTOM_URL` | empty | Custom JSON scraper endpoint; `%s` is replaced with the URL-escaped title |
 | `AI_TAG_BIN` | empty | External AI tagging tool (media path argument, one tag per line) |
+| `OIDC_ISSUER` / `OIDC_CLIENT_ID` / `OIDC_CLIENT_SECRET` / `OIDC_REDIRECT_URL` | empty | OIDC single sign-on settings |
 
 ## 7. FAQ
 
