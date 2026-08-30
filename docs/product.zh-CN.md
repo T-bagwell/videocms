@@ -84,6 +84,7 @@ make serve                              # http://<局域网IP>:8080
 - 直接播放时可把字幕提前/延后 0.5 秒微调同步，偏移按用户与视频保存
 - 悬停进度条可预览缩略图，点击进度条直接跳到对应位置
 - ASS/SSA 字幕按原始样式渲染（字体、颜色、位置与特效）
+- 管理员可按视频从在线字幕源（如 OpenSubtitles）搜索并下载字幕
 - 「下载」可输出所选音轨和字幕的 MKV/MP4 转封装副本（无需重编码），
   也可直接下载原文件离线播放
 - 进度每 5 秒及暂停/结束时保存，体现在「继续观看」
@@ -185,6 +186,7 @@ make serve                              # http://<局域网IP>:8080
 | `WATCH_INTERVAL` | `30` | 自动增量扫描间隔（秒），`0` 关闭 |
 | `YTDLP_PATH` | PATH 上的 `yt-dlp` | 「下载」队列使用的 yt-dlp 二进制 |
 | `HLS_HW_ACCEL` | 空（软件 x264） | HLS 视频编码器：videotoolbox、nvenc 或 qsv；留空用 libx264 |
+| `SUBTITLE_OS_USERNAME` / `SUBTITLE_OS_PASSWORD` / `SUBTITLE_OS_API_KEY` | 空 | 在线字幕搜索用的 OpenSubtitles 凭证 |
 
 ## 7. 常见问题
 
