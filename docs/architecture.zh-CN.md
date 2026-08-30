@@ -244,6 +244,8 @@ erDiagram
   （`GET|POST|DELETE /api/collections`），`user_filter_prefs` 保存最近一次
   浏览筛选（`GET|PUT /api/users/me/filters`）；前端对两者复用同一套
   `/videos` 筛选参数回放
+- 搜索：标题/简介/文件名/类型/文稿的子串匹配由 pg_trgm GIN 索引加速
+  （迁移 023）；`sort=fuzzy` 将过滤切换为三元组相似度 > 0.15 并按该分数排序
 - 请求的 `start` 与当前会话相差超过一个分片（6 秒）时，杀掉旧会话并从新位置重启（跳转）
 - 清单在响应时重写，使每个分片 URL 都携带 `?token=`
 - 空闲会话 **15 分钟**后回收，同时删除会话目录
