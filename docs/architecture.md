@@ -219,6 +219,10 @@ The `HLSManager`:
 - Subtitle sync: `GET /api/videos/{id}/subtitles/{trackId}?offset_ms=…` shifts
   every cue (WebVTT/SRT), backed by per-user `subtitle_offsets` so direct
   playback remembers the adjustment
+- Trick-play preview: `GET /api/videos/{id}/thumbnails` lazily extracts one
+  160×90 frame every 10s (max 120) into `DATA_DIR/thumbnails/<video-id>/`;
+  `GET /api/videos/{id}/thumbnails/{n}` serves a frame, and the player shows
+  the frame nearest the hovered time on a seek strip
 - If the requested `start` differs from the running session by more than one
   segment (6s), the session is killed and restarted at the new position (seek)
 - The manifest is rewritten on the fly so every segment URL carries `?token=`
