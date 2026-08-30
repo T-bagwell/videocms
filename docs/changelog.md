@@ -23,7 +23,8 @@ All notable changes to VideoCMS are documented here.
   parental PIN, smart collections and FAQ entries; the deployment guide now
   documents the expanded REST API surface plus DLNA, SAML and SMTP setups; the
   security policy covers DLNA allowlists, SAML keys, SMTP TLS and webhook
-  signatures
+  signatures. The product manuals now ship real UI screenshots (browse, series,
+  detail, player, share page, admin console) instead of placeholders
 
 ### Added
 
