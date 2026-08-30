@@ -194,6 +194,8 @@ Stats: videos, libraries, users, playlists, favorites, series and storage used.
   **smart collections** from the current filter set
 - Search offers a **fuzzy relevance sort** that tolerates typos
   (title / synopsis / filename)
+- The admin video list supports **batch actions** (tag, clear tags, move to
+  trash) and a **recycle bin** with one-click restore
 
 ### 5.4 Users
 
