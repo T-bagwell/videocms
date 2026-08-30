@@ -240,6 +240,10 @@ The `HLSManager`:
   `GET /api/watch/rooms/{id}?token=…` every 2.5s and publish state via PUT, so
   playback stays loosely synchronized. Casting: the player exposes a Web
   AirPlay button (`webkitShowPlaybackUI`) where the browser supports it
+- Live streaming: `live_streams` + `chat_messages` (migration 019). The
+  `LiveManager` pulls an RTMP ingest (`RTMP_INGEST_URL` + per-stream key) into
+  a rolling HLS playlist (`data/live/<id>/index.m3u8`); watch at
+  `GET /api/live/{id}/hls/...` and chat via polling `GET|POST /api/live/{id}/chat`
 - If the requested `start` differs from the running session by more than one
   segment (6s), the session is killed and restarted at the new position (seek)
 - The manifest is rewritten on the fly so every segment URL carries `?token=`
