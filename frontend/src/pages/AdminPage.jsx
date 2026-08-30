@@ -10,6 +10,7 @@ import DownloadsAdmin from './DownloadsAdmin.jsx';
 import LiveAdmin from './LiveAdmin.jsx';
 import StorageAdmin from './StorageAdmin.jsx';
 import JobsAdmin from './JobsAdmin.jsx';
+import WebhooksAdmin from './WebhooksAdmin.jsx';
 
 export default function AdminPage() {
   const [tab, setTab] = useState('overview');
@@ -49,6 +50,9 @@ export default function AdminPage() {
         <button className={tab === 'jobs' ? 'tab active' : 'tab'} onClick={() => setTab('jobs')}>
           {t('admin.tabJobs')}
         </button>
+        <button className={tab === 'webhooks' ? 'tab active' : 'tab'} onClick={() => setTab('webhooks')}>
+          {t('admin.tabWebhooks')}
+        </button>
       </div>
       {tab === 'overview' && <Overview />}
       {tab === 'libraries' && <Libraries />}
@@ -60,6 +64,7 @@ export default function AdminPage() {
       {tab === 'live' && <LiveAdmin />}
       {tab === 'storage' && <StorageAdmin />}
       {tab === 'jobs' && <JobsAdmin />}
+      {tab === 'webhooks' && <WebhooksAdmin />}
     </div>
   );
 }
@@ -140,6 +145,9 @@ function Overview() {
         )}
       </div>
       <div className="detail-actions">
+        <a className="btn ghost" href={mediaUrl('/openapi.json')} target="_blank" rel="noreferrer">
+          {t('admin.apiDocs')}
+        </a>
         <button className="btn ghost" onClick={runMaintenance}>{t('admin.runMaintenance')}</button>
         <button className="btn ghost" onClick={testNotify}>{t('admin.testNotify')}</button>
         <a className="btn ghost" href={mediaUrl('/admin/export')}>

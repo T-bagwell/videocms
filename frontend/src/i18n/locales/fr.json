@@ -246,6 +246,7 @@
     "tabLive": "Direct",
     "tabStorage": "Stockage",
     "tabJobs": "Tâches",
+    "tabWebhooks": "Webhooks",
     "statsVideos": "Vidéos",
     "statsLibraries": "Bibliothèques",
     "statsUsers": "Utilisateurs",
@@ -370,7 +371,19 @@
     "jobsStop": "Arrêter",
     "runMaintenance": "Exécuter la maintenance",
     "maintenanceDone": "Maintenance terminée — sauvegarde : {{backup}}",
-    "backups": "Sauvegardes"
+    "backups": "Sauvegardes",
+    "apiDocs": "Docs API",
+    "webhookUrl": "URL du endpoint",
+    "webhookSecret": "Secret (HMAC)",
+    "webhookEvents": "Événements (séparés par des virgules, vide = tous)",
+    "webhookActive": "Actif",
+    "webhookAdd": "Ajouter un webhook",
+    "webhookSave": "Enregistrer",
+    "webhookSaved": "Webhook enregistré",
+    "webhookEmpty": "Aucun webhook configuré.",
+    "webhookHint": "Les événements sont POSTés en JSON avec un en-tête HMAC X-Videocms-Signature si un secret est défini.",
+    "webhookInactive": "Inactif",
+    "webhookAllEvents": "Tous les événements"
   },
   "picker": {
     "title": "Choisir un dossier serveur",

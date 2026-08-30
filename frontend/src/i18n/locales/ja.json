@@ -246,6 +246,7 @@
     "tabLive": "ライブ",
     "tabStorage": "ストレージ",
     "tabJobs": "タスク",
+    "tabWebhooks": "Webhook",
     "statsVideos": "動画数",
     "statsLibraries": "ライブラリ",
     "statsUsers": "ユーザー",
@@ -370,7 +371,19 @@
     "jobsStop": "停止",
     "runMaintenance": "メンテナンス実行",
     "maintenanceDone": "メンテナンス完了 — バックアップ：{{backup}}",
-    "backups": "バックアップ"
+    "backups": "バックアップ",
+    "apiDocs": "API ドキュメント",
+    "webhookUrl": "エンドポイント URL",
+    "webhookSecret": "シークレット（HMAC）",
+    "webhookEvents": "イベント（カンマ区切り、空=すべて）",
+    "webhookActive": "有効",
+    "webhookAdd": "Webhook を追加",
+    "webhookSave": "保存",
+    "webhookSaved": "Webhook を保存しました",
+    "webhookEmpty": "Webhook は未設定です。",
+    "webhookHint": "イベントは JSON で POST され、シークレット設定時は X-Videocms-Signature HMAC ヘッダーが付与されます。",
+    "webhookInactive": "無効",
+    "webhookAllEvents": "すべてのイベント"
   },
   "picker": {
     "title": "サーバーフォルダを選択",

@@ -246,6 +246,7 @@
     "tabLive": "Live",
     "tabStorage": "Storage",
     "tabJobs": "Jobs",
+    "tabWebhooks": "Webhooks",
     "statsVideos": "Videos",
     "statsLibraries": "Libraries",
     "statsUsers": "Users",
@@ -370,7 +371,19 @@
     "jobsStop": "Stop",
     "runMaintenance": "Run maintenance",
     "maintenanceDone": "Maintenance complete — backup: {{backup}}",
-    "backups": "Backups"
+    "backups": "Backups",
+    "apiDocs": "API docs",
+    "webhookUrl": "Endpoint URL",
+    "webhookSecret": "Secret (HMAC)",
+    "webhookEvents": "Events (comma separated, empty = all)",
+    "webhookActive": "Active",
+    "webhookAdd": "Add webhook",
+    "webhookSave": "Save",
+    "webhookSaved": "Webhook saved",
+    "webhookEmpty": "No webhooks configured.",
+    "webhookHint": "Events are POSTed as JSON with an X-Videocms-Signature HMAC header when a secret is set.",
+    "webhookInactive": "Inactive",
+    "webhookAllEvents": "All events"
   },
   "picker": {
     "title": "Select server folder",

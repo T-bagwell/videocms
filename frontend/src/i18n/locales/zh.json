@@ -246,6 +246,7 @@
     "tabLive": "直播",
     "tabStorage": "存储池",
     "tabJobs": "任务",
+    "tabWebhooks": "Webhook",
     "statsVideos": "视频总数",
     "statsLibraries": "媒体库",
     "statsUsers": "用户",
@@ -370,7 +371,19 @@
     "jobsStop": "停止",
     "runMaintenance": "运行维护",
     "maintenanceDone": "维护完成——备份：{{backup}}",
-    "backups": "备份"
+    "backups": "备份",
+    "apiDocs": "API 文档",
+    "webhookUrl": "端点 URL",
+    "webhookSecret": "密钥（HMAC）",
+    "webhookEvents": "事件（逗号分隔，留空=全部）",
+    "webhookActive": "启用",
+    "webhookAdd": "添加 Webhook",
+    "webhookSave": "保存",
+    "webhookSaved": "Webhook 已保存",
+    "webhookEmpty": "未配置 Webhook。",
+    "webhookHint": "事件以 JSON POST，设置密钥后带 X-Videocms-Signature HMAC 头。",
+    "webhookInactive": "停用",
+    "webhookAllEvents": "全部事件"
   },
   "picker": {
     "title": "选择服务器文件夹",
