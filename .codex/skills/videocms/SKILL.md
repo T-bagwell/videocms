@@ -10,8 +10,10 @@ VideoCMS is a self-hosted video resource manager: a Go media server
 (`backend/`) that scans server folders, groups numbered files into TV series,
 transcodes to HLS, and serves a React SPA (`frontend/`) with per-user
 favorites, playlists, watch progress, and hidden-path filters. Metadata lives
-in PostgreSQL. Repository is public, Apache-2.0, on GitHub
-(`T-bagwell/videocms`).
+in PostgreSQL. Admins can also upload files into server folders in resumable
+chunks, download videos as MKV/MP4 with selectable tracks, and queue yt-dlp
+downloads (with optional schedules). Repository is public, Apache-2.0, on
+GitHub (`T-bagwell/videocms`).
 
 ## Development environment (this machine)
 
@@ -78,6 +80,10 @@ Backend
   `PATCH /api/libraries/{id}` with `{"blocked": true|false}`.
 - Media endpoints (`/stream`, `/download`, `/poster`, `/hls/*`) keep accepting
   `?token=` so `<video>`/`<img>` tags work without headers.
+- Anything that writes to server folders (library creation, uploads, yt-dlp
+  downloads) must require an existing absolute directory and reject `..`;
+  uploaded filenames are reduced with `filepath.Base`. Upload/yt-dlp tests use
+  fake binaries (`Downloader.SetBin`) so they never hit the network.
 - API/error messages stay English; only the web UI is localized.
 
 Frontend
