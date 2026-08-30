@@ -370,6 +370,9 @@ AniList 与 Wikipedia（`TVMAZE_ENABLED=0` / `ANILIST_ENABLED=0` /
   `/api/admin/webhooks` CRUD）接收按事件过滤、带
   `X-Videocms-Signature`（HMAC-SHA256）签名的 JSON 事件；
   公开接口由 `GET /api/openapi.json` 描述
+- PWA：前端提供 web manifest 与 service worker（只缓存应用壳，绝不缓存
+  API/媒体）；详情页可把流保存进 Cache API 供离线观看；
+  `viewport-fit=cover` + 安全区 padding 适配刘海屏
 
 ### 3.10 关键设计决策
 
