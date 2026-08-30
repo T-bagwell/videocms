@@ -202,6 +202,10 @@ Stats: videos, libraries, users, playlists, favorites, series and storage used.
   recent-activity feed of comments and favorites
 - **Single sign-on** (OIDC): the login page offers an SSO button when the
   server is configured with an identity provider
+- **Parental controls**: admins set an allowed-rating policy per user and a
+  content rating per video; users can lock with a PIN and unlock rated content
+  for 5 minutes. Libraries can also carry a **storage quota** enforced on
+  uploads
 
 ### 5.4 Users
 
