@@ -159,6 +159,7 @@ make serve                                 # UI をビルドし :8080 で一括�
 | `SCRAPE_CUSTOM_URL` | 空 | カスタム JSON スクレイパー端点。`%s` は URL エスケープ済みタイトルに置換 |
 | `AI_TAG_BIN` | 空 | 外部 AI タグ付けツール。メディアパスを受け取り、1 行に 1 タグを出力 |
 | `OIDC_ISSUER` / `OIDC_CLIENT_ID` / `OIDC_CLIENT_SECRET` / `OIDC_REDIRECT_URL` | 空 | OIDC シングルサインオン（ディスカバリー + 認可コードフロー） |
+| `SAML_IDP_METADATA_URL` / `SAML_SP_CERT` / `SAML_SP_KEY` / `SAML_SP_ENTITY_ID` / `SAML_ACS_URL` | 空 | SAML 2.0 シングルサインオン（IdP メタデータ URL、SP 証明書/鍵、エンティティ ID、ACS URL） |
 | `NOTIFY_WEBHOOK_URL` / `NOTIFY_APPRISE_URL` | 空 | 通知チャンネル（JSON Webhook、Apprise API） |
 | `MAINT_INTERVAL_HOURS` / `MAINT_BACKUP_RETENTION` / `MAINT_RESCAN` | `24` / `7` / `0` | 定期メンテナンス：バックアップ間隔・保持数・再スキャン有無 |
 | `YTDLP_PATH` | PATH 上の `yt-dlp` | ダウンロードキューが使う yt-dlp バイナリ |
@@ -264,7 +265,7 @@ Stash、Kirari04/videocms、yt-dlp ツールなど）の機能セットを参考
 
 - [x] コメント、評価、アクティビティフィード
 - [x] OIDC シングルサインオン
-- [ ] SAML シングルサインオン
+- [x] SAML シングルサインオン
 - [x] ペアレンタルコントロール（PIN/レーティング）とユーザーごとのクォータ
 - [x] 共有ページのカスタマイズとプレイヤー埋め込み
 - [x] 通知（Webhook/Apprise）：スキャン・アップロード・ダウンロードイベント
