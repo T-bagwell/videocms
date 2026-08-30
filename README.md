@@ -235,7 +235,8 @@ Planned work is informed by feature sets of similar self-hosted video projects
 - [x] Subtitle sync / offset controls (direct playback)
 - [ ] Automatic subtitle download & matching
 - [ ] Hardware-accelerated transcoding (VAAPI/NVENC/QSV) + HDR tone mapping
-- [ ] Trick-play thumbnails / preview timeline; intro & credits skip
+- [x] Trick-play thumbnails / preview timeline
+- [ ] Intro & credits skip
 - [ ] Watch together (synchronized sessions) and casting (Chromecast/DLNA/AirPlay)
 - [ ] Live streaming ingest (RTMP) with built-in chat
 
