@@ -115,13 +115,17 @@ func (a *App) deleteDownload(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusBadRequest, "invalid download id")
 		return
 	}
-	a.dl.Cancel(id)
-	_, err = a.pool.Exec(r.Context(), `
+	// Mark the job canceled first so the worker's post-start re-check always
+	// sees the canceled status; only then kill the running process.
+	tag, err := a.pool.Exec(r.Context(), `
 		UPDATE downloads SET status='canceled', updated_at=now()
 		WHERE id=$1 AND status IN ('queued', 'downloading')`, id)
 	if err != nil {
 		writeErr(w, http.StatusInternalServerError, "cancel download failed")
 		return
+	}
+	if tag.RowsAffected() == 1 {
+		a.dl.Cancel(id)
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"canceled": true})
 }
