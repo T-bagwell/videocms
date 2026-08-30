@@ -385,6 +385,11 @@ Wikipedia の順に自動フォールバック（`TVMAZE_ENABLED=0` / `ANILIST_E
 - ジョブダッシュボード：`GET /api/admin/jobs` がスキャン・アップロード・
   ダウンロード・ライブを 1 つのリストに集約し、`GET /api/admin/system` が
   ディスクの空き/合計を報告。管理 UI はジョブごとの操作を提供します
+- メンテナンス：`StartMaintenance` が `MAINT_INTERVAL_HOURS` ごとに実行 —
+  完全 JSON バックアップ（`DATA_DIR/backups`、保持 `MAINT_BACKUP_RETENTION`）、
+  ライブラリごとのヘルスチェック、任意の再スキャン（`MAINT_RESCAN=1`）。
+  手動実行は `POST /api/admin/maintenance/run`、一覧/ダウンロードは
+  `GET /api/admin/backups[/{name}]`
 
 ### 3.10 主要な設計判断
 
