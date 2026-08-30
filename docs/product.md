@@ -77,6 +77,8 @@ Open the web UI and sign in with the initial administrator **admin / admin123**
 - Filter by library and type (All / Movies / TV Shows), sort by title, year,
   duration, date added or popularity
 - “Load more” paginates the grid
+- Save any filter set as a named **smart collection** (one click) to re-apply
+  it later; collections can be renamed or deleted from the browse page
 
 ### 4.2 Playing videos
 
@@ -95,7 +97,8 @@ Open the web UI and sign in with the initial administrator **admin / admin123**
 - Admins can search and download subtitles from online providers (e.g.
   OpenSubtitles) per video
 - **Watch together**: create or join a room to keep playback synchronized with
-  friends; a **Cast / AirPlay** button is available where the browser supports it
+  friends; **AirPlay** (Safari) and **Cast to TV** (Chromecast) buttons appear
+  where supported
 - **Casting**: the player can cast to a Chromecast (Cast button creates a
   short-lived share and streams over it); enable `DLNA_ENABLED=1` to expose
   the library to UPnP/DLNA TVs and players on your LAN
@@ -108,6 +111,9 @@ Open the web UI and sign in with the initial administrator **admin / admin123**
   is searchable and selectable as a subtitle track
 - **Download** a remuxed copy as MKV or MP4 with a chosen audio track and
   subtitles (no re-encode), or grab the original file for offline playback
+- **Save for offline**: on the detail page, press **Save offline** to cache the
+  current stream in the browser (PWA/Cache API) and watch it later without a
+  network connection
 - Progress is saved every 5 seconds and on pause/end — visible in Continue Watching
 
 ### 4.3 Favorites & playlists
@@ -142,6 +148,8 @@ as `1 (4)` or `-535`. A group needs at least 2 episodes to become a series.
   their own default per video (admins can set the global default)
 - On a phone, rotate to landscape for the best playback experience; use the
   queue below the player to jump between episodes
+- **Parental controls**: set a PIN in the account menu; rated videos then ask
+  for it once and stay unlocked for 5 minutes
 
 ### 4.6 Sharing
 
@@ -310,6 +318,27 @@ firewall prompt on first run.
 **Is it safe for public access?**
 The default deployment is plain HTTP with a development JWT secret. For anything
 exposed beyond a trusted LAN, use an HTTPS reverse proxy and set `JWT_SECRET`.
+
+**My DLNA TV does not find the server.**
+Set `DLNA_ENABLED=1` (optionally `DLNA_FRIENDLY_NAME`) and restart the backend;
+the TV must be on the same LAN as the server. If you restrict
+`DLNA_ALLOWED_IPS`, make sure the TV's IP/CIDR is included. The server answers
+SSDP on UDP 1900 and exposes the library as a UPnP media server.
+
+**How do I set up SSO or email notifications?**
+For **OIDC** set `OIDC_ISSUER`/`OIDC_CLIENT_ID`/`OIDC_CLIENT_SECRET`/
+`OIDC_REDIRECT_URL`; for **SAML** point `SAML_IDP_METADATA_URL` at your IdP's
+metadata and provide `SAML_SP_CERT`/`SAML_SP_KEY` (SP metadata is published at
+`/api/auth/saml/metadata`). **Email** notifications need `SMTP_HOST`/
+`SMTP_PORT`/`SMTP_USER`/`SMTP_PASSWORD` plus `NOTIFY_EMAIL_FROM`/
+`NOTIFY_EMAIL_TO`; the login page shows the configured SSO buttons and the
+admin overview sends a test notification.
+
+**Why does Cast to TV not appear?**
+The Chromecast button is only shown after the Google Cast SDK loads in a
+Chromecast-enabled browser (Chrome). The stream is cast through a short-lived
+share link, so the Chromecast must be able to reach your server (same LAN or
+exposed via HTTPS).
 
 **How do I hide content without deleting files?**
 Admins can block a media title (**Admin → Blocked**) or an entire library
