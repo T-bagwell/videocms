@@ -379,6 +379,14 @@ AniList 与 Wikipedia（`TVMAZE_ENABLED=0` / `ANILIST_ENABLED=0` /
   `PUT /api/videos/{id}/skip-interval` 与
   `DELETE /api/videos/{id}/skip-interval?kind=…` 标记、更新与清除区间，
   点击跳过时跳转到 `end_sec`
+- 投屏：`DLNA_ENABLED=1` 时后端运行轻量 UPnP 媒体服务器——SSDP 响应
+  :1900 的 M-SEARCH，`/dlna/device.xml` 描述设备，
+  `/dlna/content/{id}` 与 `/dlna/control/ContentDirectory`（SOAP）
+  提供 DIDL-Lite 浏览结果，`/dlna/video/{id}/stream|poster`
+  对局域网客户端免 JWT 提供媒体（`DLNA_ALLOWED_IPS` 按 IP/CIDR
+  限制，留空表示整个局域网）。Chromecast 由前端 sender 实现：播放器
+  加载 Cast SDK、创建短期分享 token，并将
+  `/api/share/{token}/video/{id}/stream` 投放到默认媒体接收器
 
 ### 3.10 关键设计决策
 
