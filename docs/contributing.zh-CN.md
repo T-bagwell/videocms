@@ -44,6 +44,7 @@
 - Node.js 20+、22+ 或 24+（CI 会跑全部三个版本）
 - PostgreSQL 14+
 - ffmpeg/ffprobe（转码 MKV/HEVC 需要 libx265）
+- yt-dlp（可选——本地跑「下载」队列功能时需要）
 
 ### 一次性初始化
 
@@ -133,6 +134,9 @@ docs/             产品、架构、截图
   即使在不 join `libraries` 的子查询中也能生效。
 - 媒体端点（`/stream`、`/download`、`/poster`、`/hls/*`）继续接受
   `?token=`，这样 `<video>`/`<img>` 标签无需请求头即可工作。
+- 任何写入服务器目录的逻辑（创建媒体库、上传、yt-dlp 下载）都必须要求
+  目标为已存在的绝对目录并拒绝 `..`；上传文件名在落盘前必须用
+  `filepath.Base` 净化。
 - API/错误消息保持英文；只有 Web UI 做本地化。
 
 ### 前端
@@ -180,6 +184,8 @@ npm run build
 - 解析/扫描逻辑要配套单元测试（例如 `internal/media/episode_test.go`）。
 - 集成测试（`internal/api/integration_test.go`）在无法连接 PostgreSQL 时
   自动跳过；设置 `TEST_PG_DSN` 可运行它们。
+- 上传/下载/yt-dlp 流程由 `internal/api` 中的集成测试覆盖；yt-dlp worker
+  测试通过 `Downloader.SetBin` 使用假二进制，不会访问网络。
 - 依赖网络的刮削测试在未设置 `NETWORK_TEST=1` 时跳过。
 
 ## 持续集成
