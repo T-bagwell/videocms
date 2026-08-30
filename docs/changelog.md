@@ -20,6 +20,9 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- NFO metadata import/export: per-library export writes Kodi-style movie NFO
+  files next to videos, and import applies title/year/plot/genres back into
+  the database (Plex/Jellyfin/Kodi compatible)
 - Batch edit/organize: admins select videos in the admin list to bulk-tag,
   clear tags or move to trash; the recycle bin lists trashed files (with
   original paths) and supports one-click restore
