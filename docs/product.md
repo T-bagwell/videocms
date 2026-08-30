@@ -184,6 +184,8 @@ Stats: videos, libraries, users, playlists, favorites, series and storage used.
   access to api.themoviedb.org)
 - Admins can pick **TMDB or a custom provider** for scraping and force an
   overwrite of existing metadata
+- Videos can carry **tags** (manual or from an optional AI analysis tool);
+  tags are shown on the detail page and can filter search
 
 ### 5.4 Users
 
@@ -227,6 +229,7 @@ most important ones:
 | `RTMP_INGEST_URL` | `rtmp://localhost:1935/live` | Base RTMP ingest URL (nginx-rtmp or equivalent) |
 | `WHISPER_BIN` / `WHISPER_MODEL` | empty | whisper.cpp CLI and model for speech transcription |
 | `SCRAPE_CUSTOM_URL` | empty | Custom JSON scraper endpoint; `%s` is replaced with the URL-escaped title |
+| `AI_TAG_BIN` | empty | External AI tagging tool (media path argument, one tag per line) |
 
 ## 7. FAQ
 
