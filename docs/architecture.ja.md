@@ -377,6 +377,11 @@ Wikipedia の順に自動フォールバック（`TVMAZE_ENABLED=0` / `ANILIST_E
   （`NOTIFY_APPRISE_URL`）へ JSON を送信。スキャン完了/失敗、yt-dlp ダウンロード
   完了/失敗、アップロード完了イベントをカバー。
   `POST /api/admin/notify/test` でテストイベントを送信できます
+- ストレージプール（マイグレーション 029）：`storage_pools` が名前付きの
+  ローカル/S3/SFTP プール（ローカルマウントパス + JSON 設定）を保持。
+  管理は `GET|POST|PATCH|DELETE /api/admin/storage-pools` で行い、アップロード/
+  ダウンロード先は `pool://名前[/サブパス]` を受け付け、マウントパスに解決
+  （リモートは s3fs/sshfs 的なマウント経由）
 
 ### 3.10 主要な設計判断
 
