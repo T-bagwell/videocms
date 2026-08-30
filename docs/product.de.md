@@ -98,6 +98,8 @@ make serve                              # http://<LAN-IP>:8080
   **Cast / AirPlay**-Button
 - **Live-Streaming**: Admins erstellen RTMP-Streams (OBS-kompatible
   Ingest-URL); Zuschauer haben einen integrierten Chat
+- Admins können die **Sprachtranskription** (Whisper) eines Videos ausführen;
+  das Transkript ist durchsuchbar und als Untertitelspur wählbar
 - **Download** liefert einen MKV/MP4-Remux mit gewählter Audiospur und
   Untertiteln (ohne Re-Encoding) oder die Originaldatei
 - Fortschritt wird alle 5 Sekunden sowie bei Pause/Ende gespeichert
@@ -223,6 +225,7 @@ Alles wird über Umgebungsvariablen konfiguriert (vollständige Tabelle im READM
 | `HLS_TONE_MAP` | `0` | `1` aktiviert HDR→SDR-Tonemapping im HLS-Transcoding |
 | `SUBTITLE_OS_USERNAME` / `SUBTITLE_OS_PASSWORD` / `SUBTITLE_OS_API_KEY` | leer | OpenSubtitles-Anmeldedaten für die Untertitelsuche |
 | `RTMP_INGEST_URL` | `rtmp://localhost:1935/live` | Basis-RTMP-Ingest-URL (nginx-rtmp oder Äquivalent) |
+| `WHISPER_BIN` / `WHISPER_MODEL` | leer | whisper.cpp-Binary und Modell für Sprachtranskription |
 
 ## 7. FAQ
 
