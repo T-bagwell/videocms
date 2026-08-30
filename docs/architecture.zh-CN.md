@@ -362,6 +362,10 @@ AniList 与 Wikipedia（`TVMAZE_ENABLED=0` / `ANILIST_ENABLED=0` /
   （远端池通过 s3fs/sshfs 式挂载路由）
 - 任务看板：`GET /api/admin/jobs` 把扫描、上传、下载与直播聚合为统一列表，
   `GET /api/admin/system` 报告磁盘剩余/总量；管理 UI 提供按任务的上下文操作
+- 维护：`StartMaintenance` 每隔 `MAINT_INTERVAL_HOURS` 执行——完整 JSON 备份到
+  `DATA_DIR/backups`（保留 `MAINT_BACKUP_RETENTION` 份）、每库健康检查，
+  可选重扫（`MAINT_RESCAN=1`）；手动触发
+  `POST /api/admin/maintenance/run`，备份列表/下载见 `GET /api/admin/backups[/{name}]`
 
 ### 3.10 关键设计决策
 
