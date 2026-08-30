@@ -398,6 +398,13 @@ Wikipedia の順に自動フォールバック（`TVMAZE_ENABLED=0` / `ANILIST_E
   キャッシュし、API/メディアは絶対にキャッシュしない）を提供。詳細ページで
   ストリームを Cache API に保存してオフライン視聴可能。
   `viewport-fit=cover` とセーフエリア padding でノッチ付き端末に対応
+- イントロ/クレジットスキップ（マイグレーション 031）：`skip_intervals(
+  video_id, kind, start_sec, end_sec)` は動画ごとに `intro`/`credits` の
+  区間を最大 1 つ保存。プレイヤーは
+  `GET /api/videos/{id}/skip-intervals`、
+  `PUT /api/videos/{id}/skip-interval`、
+  `DELETE /api/videos/{id}/skip-interval?kind=…` で区間を
+  マーク・更新・クリアし、スキップ時に `end_sec` へジャンプ
 
 ### 3.10 主要な設計判断
 
