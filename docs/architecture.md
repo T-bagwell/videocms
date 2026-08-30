@@ -397,6 +397,9 @@ back to the keyless TVMaze API, then AniList, then Wikipedia
   `GET|POST|PATCH|DELETE /api/admin/storage-pools`, and upload/download
   targets accept `pool://name[/sub]` which resolve to the mount path (remote
   pools route through s3fs/sshfs-style mounts)
+- Jobs dashboard: `GET /api/admin/jobs` aggregates scans, uploads, downloads
+  and live streams into one list, and `GET /api/admin/system` reports
+  free/total disk bytes; the admin UI offers contextual actions per job
 
 ### 3.10 Key design decisions
 
