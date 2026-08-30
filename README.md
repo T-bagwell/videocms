@@ -217,8 +217,8 @@ See also [security.md](docs/security.md).
 
 ## Roadmap
 
-Planned work is informed by feature sets of similar self-hosted video projects
-(Jellyfin, MediaCMS, Stash, Kirari04/videocms, yt-dlp tools, …).
+The backlog below is organized by capability area and describes each item
+from the product's own perspective.
 
 ### Done
 
@@ -236,7 +236,7 @@ Planned work is informed by feature sets of similar self-hosted video projects
 - [x] i18n (en/zh/fr/ja/de)
 - [x] Admin: data export/backup, open library folder, server directory picker
 
-### Planned
+### Implemented
 
 **Upload & download**
 
@@ -291,6 +291,83 @@ Planned work is informed by feature sets of similar self-hosted video projects
 - [x] Scheduled maintenance: re-scan, health checks, metadata backup/restore
 - [x] Webhooks + mature public REST API for third-party automation
 - [x] PWA with offline downloads and polished mobile UX
+
+### Backlog
+
+**Playback & subtitles**
+
+- [ ] Multi-version movies: files of the same film (1080p / 4K / extended cut)
+      are grouped automatically; the best version is chosen for playback and
+      the detail page lets you switch manually
+- [ ] Trailers & featurettes: official trailers fetched during scraping and
+      stored with the movie; self-hosted featurettes can be attached as well
+- [ ] Theme songs for movies and TV shows, with a preview entry on the detail
+      page
+- [ ] Chapters: read from ffprobe/chapter files and shown on the player
+      timeline, backed by a generic media-segment API
+- [ ] More transcode profiles (AV1/VP9) and HDR passthrough for Dolby Vision /
+      HDR10+ content
+- [ ] Player enhancements: playback speed, picture-in-picture and full keyboard
+      shortcuts
+- [ ] Per-device direct-play policy: each device/network can prefer direct
+      play or transcoding, with automatic fallback
+
+**Media types & libraries**
+
+- [ ] Music library: audio files scanned and organized by artist/album, with
+      embedded cover art and gapless playback
+- [ ] Audiobooks: chapter navigation and remembered playback speed
+- [ ] Books & comics: EPUB reader and CBZ comic viewer
+- [ ] Photo library: albums, EXIF metadata and slideshows
+- [ ] Audio, image and PDF treated as first-class library items
+- [ ] Per-item visibility: public / private / unlisted / password-protected
+
+**Live TV & IPTV**
+
+- [ ] IPTV channels: scheduled channels generated from M3U sources or the
+      library, with M3U and EPG (XMLTV) output
+- [ ] Tuner-based live TV (DVB/ATSC/HDHomeRun) with guide data and recording
+      schedules
+- [ ] Channel logos, catch-up and time-shifted playback
+
+**Discovery, requests & automation**
+
+- [ ] Request workflow: users search and request titles; admins approve and
+      the request feeds the download queue
+- [ ] Quality profiles & automatic upgrades: the best matching file is
+      preferred and new releases auto-upgrade; imports are moved/renamed into
+      place
+- [ ] More pluggable metadata sources (TVDB, AniDB, Fanart.tv, OMDb, Trakt, …)
+      with per-library provider priority
+- [ ] Backdrops/fanart/season artwork alongside posters
+- [ ] Watch-history sync to external tracking services (Trakt, SIMKL)
+- [ ] More subtitle providers, with fuzzy matching and manual override
+
+**Users, social & analytics**
+
+- [ ] Watch-statistics dashboard: plays, users, devices, time watched, charts
+      and export
+- [ ] Channels & subscriptions: per-user channel pages, follow buttons and a
+      "new uploads" feed
+- [ ] Moderation toolset: content reports, account muting, global allow/block
+      lists and bulk user actions
+- [ ] Registration policies: open / invite-only / closed, with invite codes
+- [ ] Likes/dislikes and per-item policy toggles (download, comments, reports)
+- [ ] Filterable activity feed and per-user notification preferences
+
+**Extensibility & operations**
+
+- [ ] Plugin/extension system with a community directory
+- [ ] Scraper SDK and an installable scraper/task marketplace
+- [ ] OpenAPI/Swagger documentation for the REST API
+- [ ] Metrics endpoint with Prometheus/Grafana dashboards and OpenTelemetry
+      traces
+- [ ] Official Docker images, compose stack and a multi-replica Helm chart
+- [ ] Distributed transcoding queue with priorities and worker scaling
+- [ ] yt-dlp enhancements: quality presets, proxy/cookies/login support,
+      channel/playlist subscription pulls
+- [ ] Remote-access helpers: TURN/WebRTC fallback and automatic TLS
+      certificates
 
 ## Contributing
 
