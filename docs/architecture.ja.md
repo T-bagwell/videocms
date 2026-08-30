@@ -102,6 +102,7 @@ backend/
 - ルーティングは Go 1.26+ の `net/http.ServeMux` パターン
   （`"GET /api/videos/{id}"`、`"GET /api/videos/{id}/hls/{file...}"`）
 - ミドルウェアチェーン：panic リカバリ → リクエストログ → CORS
+  （既定はワイルドカード。フロント分離デプロイでは `CORS_ORIGINS` で制限可能）
 - リクエストボディはサイズ制限（`http.MaxBytesReader`）
 - API レスポンスはすべて JSON。エラーは `{"error": "..."}`、一覧は
   `{"items": [...], "total", "page", "page_size"}`
