@@ -149,6 +149,8 @@ subtitle_tracks -- id, video_id(FK, ON DELETE CASCADE), position, lang, title,
                 --   stream_index（多言語字幕トラック）
 user_subtitle_prefs -- PK(user_id, video_id), track_id(FK, ON DELETE CASCADE),
                 --   updated_at（ユーザー別の既定字幕トラック）
+subtitle_offsets -- PK(user_id, video_id), offset_ms, updated_at
+                --   （ユーザー別の字幕同期。WebVTT 配信時に適用）
 uploads         -- id, filename, target_path, total_size, chunk_size,
                 --   status(uploading|completed|failed), error, タイムスタンプ
                 --   （チャンクアップロードセッション。チャンクは DATA_DIR/uploads/<id>/）
@@ -208,6 +210,9 @@ erDiagram
   としてリマックスされ、`#EXT-X-MEDIA` AUDIO グループ（各ビデオレンディションが
   `AUDIO="audio"` で参照）で公開。プレイヤーはトランスコードセッションを再起動せずに
   音声を切り替えられます
+- 字幕同期：`GET /api/videos/{id}/subtitles/{trackId}?offset_ms=…` で全キューの
+  タイミングを移動（WebVTT/SRT）。ユーザー別の `subtitle_offsets` に保存され、
+  ダイレクト再生時に調整が記憶されます
 - 要求された `start` が実行中セッションと 1 セグメント（6 秒）以上ずれている場合、
   セッションを終了して新しい位置で再開（シーク）
 - プレイリストは応答時に書き換えられ、各セグメント URL に `?token=` が付く
