@@ -34,7 +34,7 @@ type integrationEnv struct {
 	app    *App
 }
 
-func newIntegrationEnv(t *testing.T) *integrationEnv {
+func newIntegrationEnv(t *testing.T, overrides ...func(*config.Config)) *integrationEnv {
 	t.Helper()
 	adminDSN := testAdminDSN(t)
 	if adminDSN == "" {
@@ -80,6 +80,9 @@ func newIntegrationEnv(t *testing.T) *integrationEnv {
 		Addr:      ":0",
 		DataDir:   t.TempDir(),
 		JWTSecret: "integration-test-secret",
+	}
+	for _, o := range overrides {
+		o(&cfg)
 	}
 	app, err := New(cfg, env.pool)
 	if err != nil {
