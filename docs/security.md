@@ -37,6 +37,13 @@ directly. Include:
   rejected
 - The admin directory browser normalizes paths to a clean absolute path, so
   relative input and `..` segments resolve below the filesystem root
+- Upload and yt-dlp download target folders must be existing absolute server
+  directories; paths containing `..` are rejected, and uploaded filenames are
+  reduced to their base name before anything touches disk
+- Remux downloads (`GET /api/videos/{id}/download/remux`) only read the video
+  and its subtitle files and never write to the server
+- The yt-dlp background worker is admin-only and runs jobs sequentially, one
+  URL at a time
 - `POST /api/libraries/{id}/open` launches the system file manager on the
   server; it is admin-only and requires the library path to exist
 - Passwords are stored as bcrypt hashes only
