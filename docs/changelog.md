@@ -20,6 +20,8 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Frontend API base URL is configurable for separate deployments: build with
+  `VITE_API_BASE_URL` or inject `window.__VIDEOCMS_API_BASE__` at runtime
 - Configurable CORS: `CORS_ORIGINS` (comma-separated) restricts which browser
   origins may call the API for separate frontend deployments; empty defaults
   to `*` (token auth). Range streaming now also exposes `Accept-Ranges`,
