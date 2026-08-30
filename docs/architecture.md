@@ -260,6 +260,9 @@ The `HLSManager`:
   `user_filter_prefs` stores the last saved browse filters
   (`GET|PUT /api/users/me/filters`); the frontend replays the same `/videos`
   filter parameters for both
+- Search: substring matching over title/synopsis/filename/genres/transcripts
+  is accelerated by pg_trgm GIN indexes (migration 023); `sort=fuzzy` switches
+  the filter to trigram similarity > 0.15 and orders by that score
 - If the requested `start` differs from the running session by more than one
   segment (6s), the session is killed and restarted at the new position (seek)
 - The manifest is rewritten on the fly so every segment URL carries `?token=`
