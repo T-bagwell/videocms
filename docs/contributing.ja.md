@@ -214,12 +214,15 @@ npm run build
 - アップロード/ダウンロード/yt-dlp の流れは `internal/api` の統合テストで
   カバーされる。yt-dlp ワーカーのテストは `Downloader.SetBin` で偽バイナリを
   使い、ネットワークにアクセスしない。
+- SSO とキャストもエンドツーエンドでカバー：SAML テストは実 IdP
+  （crewjam/saml/samlidp）を内蔵、SMTP テストはプロセス内の偽 SMTP サーバー、
+  DLNA テストは browse/stream/許可リストを検証します。
 - ネットワーク依存のスクレイパーテストは `NETWORK_TEST=1` が設定されていない
   限りスキップされる。
 
 ## 継続的インテグレーション
 
-GitHub Actions は `main` へのプッシュと pull request で 2 つのワークフローを
+GitHub Actions は `main` へのプッシュと pull request で 4 つのワークフローを
 実行します：
 
 | ワークフロー | ファイル | 実行内容 |
@@ -233,7 +236,7 @@ Dependabot が Go・npm・GitHub Actions の依存更新 PR を毎週作成し�
 グリーンに保ってください——PR に `@dependabot rebase` とコメントすると `main` に
 再同期されます。
 
-レビューを依頼する前に両方をグリーンにしてください。
+レビューを依頼する前にすべてのチェックをグリーンにしてください。
 
 ## Pull request の流れ
 
