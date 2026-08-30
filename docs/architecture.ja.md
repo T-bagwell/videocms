@@ -382,6 +382,9 @@ Wikipedia の順に自動フォールバック（`TVMAZE_ENABLED=0` / `ANILIST_E
   管理は `GET|POST|PATCH|DELETE /api/admin/storage-pools` で行い、アップロード/
   ダウンロード先は `pool://名前[/サブパス]` を受け付け、マウントパスに解決
   （リモートは s3fs/sshfs 的なマウント経由）
+- ジョブダッシュボード：`GET /api/admin/jobs` がスキャン・アップロード・
+  ダウンロード・ライブを 1 つのリストに集約し、`GET /api/admin/system` が
+  ディスクの空き/合計を報告。管理 UI はジョブごとの操作を提供します
 
 ### 3.10 主要な設計判断
 
