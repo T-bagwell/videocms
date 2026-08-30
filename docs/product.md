@@ -92,6 +92,8 @@ Open the web UI and sign in with the initial administrator **admin / admin123**
   clicking the strip jumps to that position
 - ASS/SSA subtitles render with their original styling (fonts, colors,
   positioning and effects)
+- Admins can search and download subtitles from online providers (e.g.
+  OpenSubtitles) per video
 - **Download** a remuxed copy as MKV or MP4 with a chosen audio track and
   subtitles (no re-encode), or grab the original file for offline playback
 - Progress is saved every 5 seconds and on pause/end — visible in Continue Watching
@@ -211,6 +213,7 @@ most important ones:
 | `WATCH_INTERVAL` | `30` | Seconds between automatic incremental scans; `0` disables |
 | `YTDLP_PATH` | `yt-dlp` on PATH | yt-dlp binary used by the Downloads queue |
 | `HLS_HW_ACCEL` | empty (software x264) | HLS video encoder: videotoolbox, nvenc or qsv; empty uses libx264 |
+| `SUBTITLE_OS_USERNAME` / `SUBTITLE_OS_PASSWORD` / `SUBTITLE_OS_API_KEY` | empty | OpenSubtitles credentials for the online subtitle search |
 
 ## 7. FAQ
 
