@@ -366,6 +366,10 @@ AniList 与 Wikipedia（`TVMAZE_ENABLED=0` / `ANILIST_ENABLED=0` /
   `DATA_DIR/backups`（保留 `MAINT_BACKUP_RETENTION` 份）、每库健康检查，
   可选重扫（`MAINT_RESCAN=1`）；手动触发
   `POST /api/admin/maintenance/run`，备份列表/下载见 `GET /api/admin/backups[/{name}]`
+- Webhook 与 API 文档（迁移 030）：`webhook_subscriptions`（管理端
+  `/api/admin/webhooks` CRUD）接收按事件过滤、带
+  `X-Videocms-Signature`（HMAC-SHA256）签名的 JSON 事件；
+  公开接口由 `GET /api/openapi.json` 描述
 
 ### 3.10 关键设计决策
 
