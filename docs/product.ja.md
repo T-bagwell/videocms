@@ -92,6 +92,10 @@ make serve                              # http://<LAN IP>:8080
   字幕をダウンロードできます
 - **一緒に見る**：ルームを作成・参加して友人と再生を同期できます。
   ブラウザが対応していれば **キャスト / AirPlay** ボタンも利用可能
+- **キャスト**：プレイヤーから Chromecast にキャストできます
+  （「テレビにキャスト」で短期共有リンクを作成して再生）。
+  `DLNA_ENABLED=1` を設定すると、LAN 内の UPnP/DLNA 対応テレビや
+  プレイヤーにライブラリを公開できます
 - **イントロ/クレジットスキップ**：イントロまたはクレジットの開始と終了を
   それぞれ 2 回クリックでマークし、ワンタップでスキップできます。
   区間は動画ごとに保存され、いつでもクリア可能
@@ -257,6 +261,7 @@ make serve                              # http://<LAN IP>:8080
 | `SCRAPE_CUSTOM_URL` | 空 | カスタム JSON スクレイパー端点。`%s` は URL エスケープ済みタイトルに置換 |
 | `AI_TAG_BIN` | 空 | 外部 AI タグ付けツール（メディアパスを引数に、1 行 1 タグ） |
 | `OIDC_ISSUER` / `OIDC_CLIENT_ID` / `OIDC_CLIENT_SECRET` / `OIDC_REDIRECT_URL` | 空 | OIDC シングルサインオン設定 |
+| `DLNA_ENABLED` / `DLNA_FRIENDLY_NAME` / `DLNA_ALLOWED_IPS` | `0` / `VideoCMS` / 空（LAN 全体） | UPnP/DLNA メディアサーバーの有効化、表示名、カンマ区切りの IP/CIDR 許可リスト |
 | `NOTIFY_WEBHOOK_URL` / `NOTIFY_APPRISE_URL` | 空 | 通知チャンネル（JSON Webhook、Apprise API） |
 | `MAINT_INTERVAL_HOURS` / `MAINT_BACKUP_RETENTION` / `MAINT_RESCAN` | `24` / `7` / `0` | メンテナンス間隔・バックアップ保持数・再スキャン有無 |
 
