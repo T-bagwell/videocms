@@ -26,16 +26,21 @@ import (
 const tmdbMinInterval = 400 * time.Millisecond
 
 type Scraper struct {
-	pool    *pgxpool.Pool
-	dataDir string
-	apiKey  string
-	lang    string
-	client  *http.Client
-	mu      sync.Mutex
-	last    time.Time
+	pool      *pgxpool.Pool
+	dataDir   string
+	apiKey    string
+	lang      string
+	customURL string
+	client    *http.Client
+	mu        sync.Mutex
+	last      time.Time
 }
 
-func NewScraper(pool *pgxpool.Pool, dataDir, apiKey string) *Scraper {
+func NewScraper(pool *pgxpool.Pool, dataDir, apiKey string, customURL ...string) *Scraper {
+	custom := ""
+	if len(customURL) > 0 {
+		custom = customURL[0]
+	}
 	lang := os.Getenv("TMDB_LANGUAGE")
 	if lang == "" {
 		lang = "zh-CN"
@@ -47,11 +52,12 @@ func NewScraper(pool *pgxpool.Pool, dataDir, apiKey string) *Scraper {
 		return http.DefaultTransport.RoundTrip(req)
 	})
 	return &Scraper{
-		pool:    pool,
-		dataDir: dataDir,
-		apiKey:  apiKey,
-		lang:    lang,
-		client:  client,
+		pool:      pool,
+		dataDir:   dataDir,
+		apiKey:    apiKey,
+		lang:      lang,
+		customURL: custom,
+		client:    client,
 	}
 }
 
@@ -119,15 +125,41 @@ func (s *Scraper) MaybeScrape(ctx context.Context, videoID uuid.UUID) error {
 
 // Scrape performs a manual scrape and always overwrites the existing metadata.
 func (s *Scraper) Scrape(ctx context.Context, videoID uuid.UUID) error {
-	if !s.Enabled() {
-		return errors.New("no metadata provider configured (set TMDB_API_KEY or keep TVMAZE_ENABLED/ANILIST_ENABLED=1)")
-	}
+	return s.ScrapeWith(ctx, videoID, "", false)
+}
+
+// ScrapeWith enriches a video using a named provider ("custom" or the default
+// TMDB/TVMaze chain). force=true overwrites existing metadata.
+func (s *Scraper) ScrapeWith(ctx context.Context, videoID uuid.UUID, provider string, force bool) error {
 	var title string
 	var year int
 	if err := s.pool.QueryRow(ctx,
 		`SELECT title, year FROM videos WHERE id=$1`, videoID).
 		Scan(&title, &year); err != nil {
 		return errors.New("video not found")
+	}
+	if !force {
+		var synopsis string
+		if err := s.pool.QueryRow(ctx,
+			`SELECT synopsis FROM videos WHERE id=$1`, videoID).Scan(&synopsis); err == nil && synopsis != "" {
+			return errors.New("video already has metadata; use force=1 to overwrite")
+		}
+	}
+	if strings.EqualFold(provider, "custom") {
+		if s.customURL == "" {
+			return errors.New("custom scraper not configured (set SCRAPE_CUSTOM_URL with a %s placeholder)")
+		}
+		info, err := s.searchCustom(ctx, title, year)
+		if err != nil {
+			return err
+		}
+		if info.Title == "" {
+			return fmt.Errorf("no metadata match found for %q", title)
+		}
+		return s.apply(ctx, videoID, info)
+	}
+	if !s.Enabled() {
+		return errors.New("no metadata provider configured (set TMDB_API_KEY or keep TVMAZE_ENABLED/ANILIST_ENABLED=1)")
 	}
 	if err := s.rateLimit(ctx); err != nil {
 		return err
@@ -140,6 +172,39 @@ func (s *Scraper) Scrape(ctx context.Context, videoID uuid.UUID) error {
 		return fmt.Errorf("no metadata match found for %q", title)
 	}
 	return s.apply(ctx, videoID, info)
+}
+
+// searchCustom queries the configured SCRAPE_CUSTOM_URL template (with %s
+// replaced by the URL-escaped title) and parses a JSON metadata object.
+func (s *Scraper) searchCustom(ctx context.Context, title string, year int) (*tmdbInfo, error) {
+	u := strings.ReplaceAll(s.customURL, "%s", url.QueryEscape(title))
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := s.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = resp.Body.Close() }()
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		return nil, fmt.Errorf("custom scraper: HTTP %d", resp.StatusCode)
+	}
+	var d struct {
+		Title     string   `json:"title"`
+		Year      int      `json:"year"`
+		Synopsis  string   `json:"synopsis"`
+		Genres    []string `json:"genres"`
+		PosterURL string   `json:"poster_url"`
+	}
+	if err := json.NewDecoder(io.LimitReader(resp.Body, 2<<20)).Decode(&d); err != nil {
+		return nil, fmt.Errorf("custom scraper: parse response: %w", err)
+	}
+	info := &tmdbInfo{Title: d.Title, Year: d.Year, Synopsis: d.Synopsis, Genres: d.Genres, Poster: d.PosterURL}
+	if info.Year == 0 {
+		info.Year = year
+	}
+	return info, nil
 }
 
 type tmdbInfo struct {

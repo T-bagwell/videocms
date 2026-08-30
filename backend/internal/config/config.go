@@ -29,6 +29,7 @@ type Config struct {
 	RTMPIngestURL      string
 	WhisperBin         string
 	WhisperModel       string
+	ScrapeCustomURL    string
 }
 
 func Load() Config {
@@ -53,6 +54,7 @@ func Load() Config {
 		RTMPIngestURL:      envOr("RTMP_INGEST_URL", "rtmp://localhost:1935/live"),
 		WhisperBin:         os.Getenv("WHISPER_BIN"),
 		WhisperModel:       os.Getenv("WHISPER_MODEL"),
+		ScrapeCustomURL:    os.Getenv("SCRAPE_CUSTOM_URL"),
 	}
 	if cfg.Addr != "" && cfg.Addr[0] != ':' {
 		cfg.Addr = ":" + cfg.Addr

@@ -589,7 +589,13 @@ func (a *App) scrapeVideo(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusBadRequest, "invalid video id")
 		return
 	}
-	if err := a.scraper.Scrape(r.Context(), id); err != nil {
+	provider := r.URL.Query().Get("provider")
+	force := r.URL.Query().Get("force") == "1"
+	if err := a.scraper.ScrapeWith(r.Context(), id, provider, force); err != nil {
+		if strings.Contains(err.Error(), "already has metadata") {
+			writeErr(w, http.StatusConflict, err.Error())
+			return
+		}
 		writeErr(w, http.StatusBadGateway, err.Error())
 		return
 	}
