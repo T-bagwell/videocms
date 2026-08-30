@@ -214,6 +214,9 @@ Stats: videos, libraries, users, playlists, favorites, series and storage used.
   mount path; uploads and downloads can target `pool://name[/sub]`
 - **Jobs dashboard**: one place to watch scans, uploads, downloads and live
   streams (progress, errors, cancel/retry/start/stop) plus disk usage
+- **Scheduled maintenance**: automatic JSON backups and health checks
+  (interval and retention configurable); admins can run it now and download
+  backups
 
 ### 5.4 Users
 
@@ -260,6 +263,7 @@ most important ones:
 | `AI_TAG_BIN` | empty | External AI tagging tool (media path argument, one tag per line) |
 | `OIDC_ISSUER` / `OIDC_CLIENT_ID` / `OIDC_CLIENT_SECRET` / `OIDC_REDIRECT_URL` | empty | OIDC single sign-on settings |
 | `NOTIFY_WEBHOOK_URL` / `NOTIFY_APPRISE_URL` | empty | Notification channels (JSON webhook, Apprise API) |
+| `MAINT_INTERVAL_HOURS` / `MAINT_BACKUP_RETENTION` / `MAINT_RESCAN` | `24` / `7` / `0` | Maintenance schedule, backup retention, rescan flag |
 
 ## 7. FAQ
 
