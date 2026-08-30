@@ -346,6 +346,14 @@ AniList 与 Wikipedia（`TVMAZE_ENABLED=0` / `ANILIST_ENABLED=0` /
 - OIDC SSO：`GET /api/auth/oidc/start|callback` 实现发现 + 授权码 + userinfo
   （`OIDC_*` 配置）；用户通过唯一 `users.oauth_sub` 列（迁移 026）自动创建或
   绑定，前端经 `/login?sso_token=…` 获取会话 JWT
+- SAML 2.0 SSO：基于 crewjam/saml——`GET /api/auth/saml/login` 以
+  AuthnRequest（HTTP-Redirect/POST 绑定）重定向到 IdP，
+  `POST /api/auth/saml/acs` 消费并校验签名的 SAMLResponse（签名、条件、
+  audience），`/api/auth/saml/metadata` 向 IdP 发布 SP 元数据。配置：
+  `SAML_IDP_METADATA_URL`、`SAML_SP_CERT`、`SAML_SP_KEY`、
+  `SAML_SP_ENTITY_ID`、`SAML_ACS_URL`。用户绑定到同一 `users.oauth_sub`
+  （前缀 `saml:`），首次登录时 `roles` 属性包含 "admin" 即授予管理员；
+  `GET /api/auth/sso` 告知登录页提供哪些提供方
 - 家长控制与配额（迁移 027）：bcrypt 的 `users.pin` 配合
   `PUT|POST /api/users/me/pin[/verify]` 签发 5 分钟解锁令牌，列表请求通过
   `X-Videocms-Unlock` 接受；`users.allowed_rating` 过滤 `videos.content_rating`
