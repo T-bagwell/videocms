@@ -20,6 +20,9 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- User-defined tags (manual + AI), smart collections (named saved filter
+  sets) and saved browse filters; collections and filters are stored per user
+  and replay the same `/videos` filter parameters
 - Similar-video recommendations (shared genres, year, series and tags) on the
   detail page, plus a tag cloud with `?tag=` filtering on the browse page
 - Media health checks: admins run a per-library check that reports
