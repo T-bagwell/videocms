@@ -40,6 +40,13 @@ type HLSSubtitle struct {
 	Active bool
 }
 
+// HLSAudio describes one audio track advertised in the master playlist as an
+// HLS audio group, so players can switch audio without restarting.
+type HLSAudio struct {
+	Index int    // absolute stream index inside the source file
+	Name  string // display name (language/title)
+}
+
 // renditionPlan builds a downward ladder from the source resolution, capped at
 // hlsMaxWidth. Renditions wider than the source are skipped; for unknown source
 // dimensions it falls back to a single 1280px rendition.
@@ -84,9 +91,10 @@ func renditionPlan(srcWidth, srcHeight int) []rendition {
 	return out
 }
 
-// buildMaster returns the master playlist referencing every rendition and the
-// video's subtitle tracks (if any) as an HLS subtitle group.
-func buildMaster(rends []rendition, subs []HLSSubtitle) []byte {
+// buildMaster returns the master playlist referencing every rendition plus
+// the video's subtitle tracks (if any) as an HLS subtitle group and its audio
+// tracks (if any) as an HLS audio group.
+func buildMaster(rends []rendition, subs []HLSSubtitle, audios ...HLSAudio) []byte {
 	var b strings.Builder
 	b.WriteString("#EXTM3U\n")
 	b.WriteString("#EXT-X-VERSION:3\n")
@@ -102,15 +110,33 @@ func buildMaster(rends []rendition, subs []HLSSubtitle) []byte {
 		fmt.Fprintf(&b, "#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID=\"subs\",NAME=\"%s\",DEFAULT=%s,AUTOSELECT=YES,URI=\"subs/%s/playlist.m3u8\"\n",
 			name, def, s.ID)
 	}
+	for i, au := range audios {
+		def := "NO"
+		if i == 0 {
+			def = "YES"
+		}
+		name := strings.ReplaceAll(au.Name, `"`, "'")
+		if name == "" {
+			name = fmt.Sprintf("Audio %d", i+1)
+		}
+		fmt.Fprintf(&b, "#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID=\"audio\",NAME=\"%s\",DEFAULT=%s,AUTOSELECT=YES,URI=\"a%d/index.m3u8\"\n",
+			name, def, au.Index)
+	}
 	for _, r := range rends {
-		fmt.Fprintf(&b, "#EXT-X-STREAM-INF:BANDWIDTH=%d,AVERAGE-BANDWIDTH=%d,RESOLUTION=%dx%d\n",
-			r.BitrateK*1000, r.BitrateK*800, r.Width, r.Height)
+		audioAttr := ""
+		if len(audios) > 0 {
+			audioAttr = ",AUDIO=\"audio\""
+		}
+		fmt.Fprintf(&b, "#EXT-X-STREAM-INF:BANDWIDTH=%d,AVERAGE-BANDWIDTH=%d,RESOLUTION=%dx%d%s\n",
+			r.BitrateK*1000, r.BitrateK*800, r.Width, r.Height, audioAttr)
 		b.WriteString(r.Name + "/index.m3u8\n")
 	}
 	return []byte(b.String())
 }
 
-var variantDirRe = regexp.MustCompile(`^v\d+$`)
+// hlsSubdirRe matches both video rendition directories (v1280) and audio-only
+// track directories (a1) inside an HLS session.
+var hlsSubdirRe = regexp.MustCompile(`^(v\d+|a\d+)$`)
 
 type HLSSession struct {
 	cancel     context.CancelFunc
@@ -143,7 +169,7 @@ func (m *HLSManager) sessionDir(videoID uuid.UUID) string {
 // Playlist ensures a transcode session exists for the video and returns the
 // path of its master manifest. If startSec differs from the running session's
 // offset by more than one segment, the session is restarted at that position.
-func (m *HLSManager) Playlist(ctx context.Context, videoID uuid.UUID, input string, startSec float64, srcWidth, srcHeight int, subs []HLSSubtitle) (string, error) {
+func (m *HLSManager) Playlist(ctx context.Context, videoID uuid.UUID, input string, startSec float64, srcWidth, srcHeight int, subs []HLSSubtitle, audios ...HLSAudio) (string, error) {
 	if startSec < 0 {
 		startSec = 0
 	}
@@ -171,7 +197,7 @@ func (m *HLSManager) Playlist(ctx context.Context, videoID uuid.UUID, input stri
 
 	rends := renditionPlan(srcWidth, srcHeight)
 	masterPath := filepath.Join(dir, "master.m3u8")
-	if err := os.WriteFile(masterPath, buildMaster(rends, subs), 0o644); err != nil {
+	if err := os.WriteFile(masterPath, buildMaster(rends, subs, audios...), 0o644); err != nil {
 		return "", err
 	}
 
@@ -183,12 +209,38 @@ func (m *HLSManager) Playlist(ctx context.Context, videoID uuid.UUID, input stri
 		}
 		segPattern := filepath.Join(outDir, "seg_%05d.ts")
 		manifest := filepath.Join(outDir, "index.m3u8")
+		audioOpts := []string{"-map", "0:a:0?", "-c:a", "aac", "-b:a", "96k"}
+		if len(audios) > 0 {
+			// Audio is produced as separate HLS tracks below; video renditions
+			// carry no audio to avoid duplicating it.
+			audioOpts = []string{"-an"}
+		}
 		args = append(args,
-			"-map", "0:v:0", "-map", "0:a:0?",
+			"-map", "0:v:0",
+		)
+		args = append(args, audioOpts...)
+		args = append(args,
 			"-c:v", "libx264", "-preset", "veryfast", "-crf", "23",
 			"-vf", "scale="+fmt.Sprint(r.Width)+":-2",
 			"-force_key_frames", "expr:gte(t,n_forced*6)",
-			"-c:a", "aac", "-b:a", "96k",
+			"-f", "hls",
+			"-hls_time", fmt.Sprint(hlsSegmentDur),
+			"-hls_list_size", "0",
+			"-hls_flags", "independent_segments",
+			"-hls_segment_filename", segPattern,
+			manifest,
+		)
+	}
+	for _, au := range audios {
+		outDir := filepath.Join(dir, fmt.Sprintf("a%d", au.Index))
+		if err := os.MkdirAll(outDir, 0o755); err != nil {
+			return "", err
+		}
+		segPattern := filepath.Join(outDir, "seg_%05d.ts")
+		manifest := filepath.Join(outDir, "index.m3u8")
+		args = append(args,
+			"-map", fmt.Sprintf("0:%d", au.Index),
+			"-c:a", "aac", "-b:a", "128k",
 			"-f", "hls",
 			"-hls_time", fmt.Sprint(hlsSegmentDur),
 			"-hls_list_size", "0",
@@ -231,6 +283,12 @@ func (m *HLSManager) Playlist(ctx context.Context, videoID uuid.UUID, input stri
 					_ = f.Close()
 				}
 			}
+			for _, au := range audios {
+				if f, ferr := os.OpenFile(filepath.Join(dir, fmt.Sprintf("a%d", au.Index), "index.m3u8"), os.O_APPEND|os.O_WRONLY, 0o644); ferr == nil {
+					_, _ = f.WriteString("#EXT-X-ENDLIST\n")
+					_ = f.Close()
+				}
+			}
 		}
 	}()
 
@@ -253,7 +311,7 @@ func (m *HLSManager) waitManifest(ctx context.Context, dir string) (string, erro
 		entries, err := os.ReadDir(dir)
 		if err == nil {
 			for _, e := range entries {
-				if !e.IsDir() || !variantDirRe.MatchString(e.Name()) {
+				if !e.IsDir() || !hlsSubdirRe.MatchString(e.Name()) {
 					continue
 				}
 				if st, err := os.Stat(filepath.Join(dir, e.Name(), "index.m3u8")); err == nil && st.Size() > 0 {
@@ -276,7 +334,7 @@ func (m *HLSManager) waitForExit(sess *HLSSession) {
 // requests can never escape the session.
 func (m *HLSManager) SessionFile(videoID uuid.UUID, name string) (string, bool) {
 	parts := strings.Split(name, "/")
-	if len(parts) != 2 || !variantDirRe.MatchString(parts[0]) {
+	if len(parts) != 2 || !hlsSubdirRe.MatchString(parts[0]) {
 		return "", false
 	}
 	if parts[1] != "index.m3u8" && !SegmentNameMatch(parts[1]) {
