@@ -213,7 +213,9 @@ Alles wird über Umgebungsvariablen konfiguriert (vollständige Tabelle im READM
 | `SCAN_WORKERS` | `4` | Parallele Scan-Worker |
 | `WATCH_INTERVAL` | `30` | Sekunden zwischen automatischen Inkrement-Scans; `0` deaktiviert |
 | `YTDLP_PATH` | `yt-dlp` im PATH | yt-dlp-Binary für die Download-Warteschlange |
-| `HLS_HW_ACCEL` | leer (Software-x264) | HLS-Videoencoder: videotoolbox, nvenc oder qsv; leer = libx264 |
+| `HLS_HW_ACCEL` | leer (Software-x264) | HLS-Videoencoder: videotoolbox, nvenc, qsv oder vaapi; leer = libx264 |
+| `HLS_VAAPI_DEVICE` | `/dev/dri/renderD128` | VAAPI-Renderdevice (mit `HLS_HW_ACCEL=vaapi`) |
+| `HLS_TONE_MAP` | `0` | `1` aktiviert HDR→SDR-Tonemapping im HLS-Transcoding |
 | `SUBTITLE_OS_USERNAME` / `SUBTITLE_OS_PASSWORD` / `SUBTITLE_OS_API_KEY` | leer | OpenSubtitles-Anmeldedaten für die Untertitelsuche |
 
 ## 7. FAQ
