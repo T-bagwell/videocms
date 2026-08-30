@@ -191,6 +191,8 @@ Statistiken: Videos, Bibliotheken, Benutzer, Wiedergabelisten, Favoriten, Serien
 - Videos können **Tags** tragen (manuell oder von einem optionalen
   KI-Analysetool); Tags erscheinen auf der Detailseite und können die Suche
   filtern
+- Die Detailseite zeigt **ähnliche Videos**; die Browseseite hat eine
+  **Tag-Cloud** zum Filtern mit einem Klick
 
 ### 5.4 Benutzer
 
