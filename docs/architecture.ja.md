@@ -352,6 +352,9 @@ Wikipedia の順に自動フォールバック（`TVMAZE_ENABLED=0` / `ANILIST_E
   選択動画のゴミ箱移動。`trash_records`（マイグレーション 024）が元パスを保持し、
   `GET /api/admin/trash` + `POST /api/admin/trash/{id}/restore` でファイルを
   戻して再有効化できます
+- NFO：`POST /api/libraries/{id}/export-nfo` が各動画の隣に Kodi 形式の映画 NFO
+  を書き出し、`/import-nfo` が title/year/plot/genres を DB に戻します
+  （media.NFOFileFor/WriteNFO/ReadNFO）
 
 ### 3.10 主要な設計判断
 
