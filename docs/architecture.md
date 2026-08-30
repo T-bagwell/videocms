@@ -409,6 +409,10 @@ back to the keyless TVMaze API, then AniList, then Wikipedia
   `/api/admin/webhooks`) receive signed JSON events
   (`X-Videocms-Signature` = HMAC-SHA256) filtered by event type; the public
   surface is described by `GET /api/openapi.json`
+- PWA: the frontend ships a web manifest and a service worker that caches the
+  app shell (never API/media); the video page can save the stream into the
+  Cache API for offline viewing, and `viewport-fit=cover` + safe-area padding
+  handle notched phones
 
 ### 3.10 Key design decisions
 
