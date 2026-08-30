@@ -19,12 +19,13 @@ import (
 )
 
 type App struct {
-	cfg     config.Config
-	pool    *pgxpool.Pool
-	scanner *media.Scanner
-	hls     *media.HLSManager
-	scraper *media.Scraper
-	dl      *media.Downloader
+	cfg         config.Config
+	pool        *pgxpool.Pool
+	scanner     *media.Scanner
+	hls         *media.HLSManager
+	scraper     *media.Scraper
+	dl          *media.Downloader
+	subProvider media.SubtitleProvider
 }
 
 func New(cfg config.Config, pool *pgxpool.Pool) (*App, error) {
@@ -107,6 +108,8 @@ func (a *App) Routes() http.Handler {
 	mux.HandleFunc("POST /api/videos/{id}/subtitles", authAdmin(a.uploadSubtitle))
 	mux.HandleFunc("DELETE /api/videos/{id}/subtitles", authAdmin(a.deleteSubtitle))
 	mux.HandleFunc("POST /api/videos/{id}/subtitles/extract", authAdmin(a.extractEmbeddedSubtitle))
+	mux.HandleFunc("POST /api/videos/{id}/subtitles/search", authAdmin(a.searchSubtitles))
+	mux.HandleFunc("POST /api/videos/{id}/subtitles/download", authAdmin(a.downloadSubtitle))
 	mux.HandleFunc("GET /api/videos/{id}/poster", authUser(a.servePoster))
 	mux.HandleFunc("GET /api/videos/{id}/thumbnails", authUser(a.videoThumbnails))
 	mux.HandleFunc("GET /api/videos/{id}/thumbnails/{n}", authUser(a.videoThumbnailImage))
