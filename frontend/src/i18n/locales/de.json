@@ -197,7 +197,17 @@
     "watchJoinToken": "Raum-Token",
     "watchLeave": "Raum verlassen",
     "watchSyncing": "Wiedergabe wird synchronisiert…",
-    "cast": "Cast / AirPlay"
+    "cast": "Cast / AirPlay",
+    "skipLabel": "Intro/Abspann überspringen",
+    "skipIntroStart": "Intro-Start markieren",
+    "skipIntroEnd": "Intro-Ende markieren",
+    "skipIntroRange": "Intro {{from}}–{{to}}",
+    "skipIntro": "Intro überspringen",
+    "skipCreditsStart": "Abspann-Start markieren",
+    "skipCreditsEnd": "Abspann-Ende markieren",
+    "skipCreditsRange": "Abspann {{from}}–{{to}}",
+    "skipCredits": "Abspann überspringen",
+    "skipClear": "Löschen"
   },
   "playlists": {
     "title": "Wiedergabelisten",

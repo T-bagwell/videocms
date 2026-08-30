@@ -197,7 +197,17 @@
     "watchJoinToken": "ルームトークン",
     "watchLeave": "ルーム退出",
     "watchSyncing": "再生を同期中…",
-    "cast": "キャスト / AirPlay"
+    "cast": "キャスト / AirPlay",
+    "skipLabel": "イントロ/エンドロールをスキップ",
+    "skipIntroStart": "イントロ開始をマーク",
+    "skipIntroEnd": "イントロ終了をマーク",
+    "skipIntroRange": "イントロ {{from}}–{{to}}",
+    "skipIntro": "イントロをスキップ",
+    "skipCreditsStart": "エンドロール開始をマーク",
+    "skipCreditsEnd": "エンドロール終了をマーク",
+    "skipCreditsRange": "エンドロール {{from}}–{{to}}",
+    "skipCredits": "エンドロールをスキップ",
+    "skipClear": "クリア"
   },
   "playlists": {
     "title": "プレイリスト",

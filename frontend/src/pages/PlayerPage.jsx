@@ -55,6 +55,8 @@ export default function PlayerPage() {
   const watchRoomRef = useRef(null);
   watchRoomRef.current = watchRoom;
   const [hasAirPlay, setHasAirPlay] = useState(false);
+  const [skip, setSkip] = useState({ intro: null, credits: null });
+  const [skipDraft, setSkipDraft] = useState(null);
 
   useEffect(() => {
     setActiveId(id);
@@ -100,6 +102,9 @@ export default function PlayerPage() {
     api(`/videos/${activeId}/thumbnails`)
       .then(setThumbMeta)
       .catch(() => setThumbMeta(null));
+    api(`/videos/${activeId}/skip-intervals`)
+      .then((d) => setSkip({ intro: d.intro || null, credits: d.credits || null }))
+      .catch(() => {});
 
     const playlistId = searchParams.get('playlist');
     const seriesId = searchParams.get('series');
@@ -289,6 +294,37 @@ export default function PlayerPage() {
     } catch {
       setAssIdx('');
     }
+  }
+
+  function markSkip(kind) {
+    const el = videoRef.current;
+    if (!el) return;
+    const now = el.currentTime || 0;
+    if (skipDraft?.kind === kind) {
+      const end = Math.max(now, skipDraft.start + 1);
+      api(`/videos/${activeId}/skip-interval`, {
+        method: 'PUT',
+        body: { kind, start_sec: skipDraft.start, end_sec: end },
+      })
+        .then(() => setSkip((prev) => ({ ...prev, [kind]: { start_sec: skipDraft.start, end_sec: end } })))
+        .catch(() => {});
+      setSkipDraft(null);
+    } else {
+      setSkipDraft({ kind, start: now });
+    }
+  }
+
+  function skipTo(kind) {
+    const el = videoRef.current;
+    const interval = kind === 'intro' ? skip.intro : skip.credits;
+    if (!el || !interval) return;
+    el.currentTime = interval.end_sec;
+  }
+
+  function clearSkip(kind) {
+    api(`/videos/${activeId}/skip-interval?kind=${kind}`, { method: 'DELETE' })
+      .then(() => setSkip((prev) => ({ ...prev, [kind]: null })))
+      .catch(() => {});
   }
 
   useEffect(() => {
@@ -612,6 +648,34 @@ export default function PlayerPage() {
           )}
         </div>
       )}
+
+      <div className="player-tools skip-bar">
+        <span className="muted">{t('player.skipLabel')}</span>
+        <button className="btn small ghost" onClick={() => markSkip('intro')}>
+          {skipDraft?.kind === 'intro' ? t('player.skipIntroEnd') : t('player.skipIntroStart')}
+        </button>
+        {skip.intro && (
+          <>
+            <span className="muted small">
+              {t('player.skipIntroRange', { from: fmtDuration(skip.intro.start_sec), to: fmtDuration(skip.intro.end_sec) })}
+            </span>
+            <button className="btn small ghost" onClick={() => skipTo('intro')}>{t('player.skipIntro')}</button>
+            <button className="btn small ghost" onClick={() => clearSkip('intro')}>{t('player.skipClear')}</button>
+          </>
+        )}
+        <button className="btn small ghost" onClick={() => markSkip('credits')}>
+          {skipDraft?.kind === 'credits' ? t('player.skipCreditsEnd') : t('player.skipCreditsStart')}
+        </button>
+        {skip.credits && (
+          <>
+            <span className="muted small">
+              {t('player.skipCreditsRange', { from: fmtDuration(skip.credits.start_sec), to: fmtDuration(skip.credits.end_sec) })}
+            </span>
+            <button className="btn small ghost" onClick={() => skipTo('credits')}>{t('player.skipCredits')}</button>
+            <button className="btn small ghost" onClick={() => clearSkip('credits')}>{t('player.skipClear')}</button>
+          </>
+        )}
+      </div>
 
       {((useTranscode && (levels.length > 1 || subtitleTracks.length > 0 || audioTracks.length > 1)) ||
         tracks.filter((tr) => tr.format === 'ass' || tr.format === 'ssa').length > 0) && (

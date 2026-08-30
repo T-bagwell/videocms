@@ -197,7 +197,17 @@
     "watchJoinToken": "房间口令",
     "watchLeave": "退出房间",
     "watchSyncing": "正在同步播放…",
-    "cast": "投屏 / AirPlay"
+    "cast": "投屏 / AirPlay",
+    "skipLabel": "跳过片头/片尾",
+    "skipIntroStart": "标记片头起点",
+    "skipIntroEnd": "标记片头终点",
+    "skipIntroRange": "片头 {{from}}–{{to}}",
+    "skipIntro": "跳过片头",
+    "skipCreditsStart": "标记片尾起点",
+    "skipCreditsEnd": "标记片尾终点",
+    "skipCreditsRange": "片尾 {{from}}–{{to}}",
+    "skipCredits": "跳过片尾",
+    "skipClear": "清除"
   },
   "playlists": {
     "title": "播放列表",

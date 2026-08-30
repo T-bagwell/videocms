@@ -197,7 +197,17 @@
     "watchJoinToken": "Jeton de la salle",
     "watchLeave": "Quitter la salle",
     "watchSyncing": "Synchronisation de la lecture…",
-    "cast": "Diffuser / AirPlay"
+    "cast": "Diffuser / AirPlay",
+    "skipLabel": "Sauter intro/générique",
+    "skipIntroStart": "Marquer le début de l’intro",
+    "skipIntroEnd": "Marquer la fin de l’intro",
+    "skipIntroRange": "Intro {{from}}–{{to}}",
+    "skipIntro": "Sauter l’intro",
+    "skipCreditsStart": "Marquer le début du générique",
+    "skipCreditsEnd": "Marquer la fin du générique",
+    "skipCreditsRange": "Générique {{from}}–{{to}}",
+    "skipCredits": "Sauter le générique",
+    "skipClear": "Effacer"
   },
   "playlists": {
     "title": "Listes de lecture",
