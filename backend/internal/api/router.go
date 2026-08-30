@@ -43,7 +43,14 @@ func New(cfg config.Config, pool *pgxpool.Pool) (*App, error) {
 		return nil, err
 	}
 	scanner := media.NewScanner(pool, cfg.DataDir)
-	notify := media.NewNotifier(cfg.NotifyWebhookURL, cfg.NotifyAppriseURL)
+	notify := media.NewNotifier(cfg.NotifyWebhookURL, cfg.NotifyAppriseURL, media.SMTPConfig{
+		Host:     cfg.SMTPHost,
+		Port:     cfg.SMTPPort,
+		User:     cfg.SMTPUser,
+		Password: cfg.SMTPPassword,
+		From:     cfg.NotifyEmailFrom,
+		To:       cfg.NotifyEmailTo,
+	})
 	var dlnaMgr *media.DLNAManager
 	if cfg.DLNAEnabled {
 		port := cfg.Addr

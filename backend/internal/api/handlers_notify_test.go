@@ -25,7 +25,7 @@ func TestNotifications(t *testing.T) {
 		w.WriteHeader(http.StatusOK)
 	}))
 	defer hook.Close()
-	env.app.notify = media.NewNotifier(hook.URL, "")
+	env.app.notify = media.NewNotifier(hook.URL, "", media.SMTPConfig{})
 	token := loginAdmin(t, env)
 
 	status, _ := doJSON(t, "POST", env.server.URL+"/api/admin/notify/test", token, nil)

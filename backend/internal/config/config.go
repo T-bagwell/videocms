@@ -42,6 +42,12 @@ type Config struct {
 	SAMLACSURL         string
 	NotifyWebhookURL   string
 	NotifyAppriseURL   string
+	SMTPHost           string
+	SMTPPort           int
+	SMTPUser           string
+	SMTPPassword       string
+	NotifyEmailFrom    string
+	NotifyEmailTo      []string
 	MaintIntervalHours int
 	MaintRetention     int
 	MaintRescan        bool
@@ -85,6 +91,12 @@ func Load() Config {
 		SAMLACSURL:         os.Getenv("SAML_ACS_URL"),
 		NotifyWebhookURL:   os.Getenv("NOTIFY_WEBHOOK_URL"),
 		NotifyAppriseURL:   os.Getenv("NOTIFY_APPRISE_URL"),
+		SMTPHost:           os.Getenv("SMTP_HOST"),
+		SMTPPort:           envInt("SMTP_PORT", 587),
+		SMTPUser:           os.Getenv("SMTP_USER"),
+		SMTPPassword:       os.Getenv("SMTP_PASSWORD"),
+		NotifyEmailFrom:    os.Getenv("NOTIFY_EMAIL_FROM"),
+		NotifyEmailTo:      envList("NOTIFY_EMAIL_TO"),
 		MaintIntervalHours: envInt("MAINT_INTERVAL_HOURS", 24),
 		MaintRetention:     envInt("MAINT_BACKUP_RETENTION", 7),
 		MaintRescan:        envBool("MAINT_RESCAN"),
