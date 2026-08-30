@@ -20,6 +20,8 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Comments, 1-5 star ratings (with averages) and a recent-activity feed
+  (comments + favorites) on the browse page
 - NFO metadata import/export: per-library export writes Kodi-style movie NFO
   files next to videos, and import applies title/year/plot/genres back into
   the database (Plex/Jellyfin/Kodi compatible)
