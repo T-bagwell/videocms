@@ -388,15 +388,18 @@ export default function VideoDetailPage() {
             <button className="btn" onClick={() => setShowShare(true)}>
               {t('video.share')}
             </button>
-            <button className="btn ghost" onClick={saveOffline} disabled={offlineBusy}>
+            <button className="btn" onClick={saveOffline} disabled={offlineBusy}>
               {offlineBusy ? t('video.offlineSaving') : t('video.saveOffline')}
             </button>
-            {user?.role === 'admin' && (
-              <>
-                <button className="btn ghost" onClick={scrape} disabled={scraping}>
+          </div>
+          {user?.role === 'admin' && (
+            <div className="admin-tools">
+              <div className="admin-tools-head">{t('video.adminTools')}</div>
+              <div className="admin-tools-grid">
+                <button className="btn tool-btn" onClick={scrape} disabled={scraping}>
                   {scraping ? t('video.scraping') : t('video.scrape')}
                 </button>
-                <select value={scrapeProvider} onChange={(e) => setScrapeProvider(e.target.value)}>
+                <select className="tool-select" value={scrapeProvider} onChange={(e) => setScrapeProvider(e.target.value)}>
                   <option value="tmdb">{t('video.scrapeProviderTmdb')}</option>
                   <option value="custom">{t('video.scrapeProviderCustom')}</option>
                 </select>
@@ -404,10 +407,10 @@ export default function VideoDetailPage() {
                   <input type="checkbox" checked={scrapeForce} onChange={(e) => setScrapeForce(e.target.checked)} />
                   {t('video.scrapeForce')}
                 </label>
-                <button className="btn ghost" onClick={transcribe} disabled={transcribing}>
+                <button className="btn tool-btn" onClick={transcribe} disabled={transcribing}>
                   {transcribing ? t('video.transcribing') : t('video.transcribe')}
                 </button>
-                <label className="btn ghost" disabled={subtitleBusy}>
+                <label className="btn tool-btn" disabled={subtitleBusy}>
                   {t('video.subtitleUpload')}
                   <input
                     type="file"
@@ -417,22 +420,22 @@ export default function VideoDetailPage() {
                   />
                 </label>
                 <button
-                  className="btn ghost"
+                  className="btn tool-btn"
                   onClick={extractSubtitle}
                   disabled={subtitleBusy}
                 >
                   {subtitleBusy ? t('video.subtitleBusy') : t('video.subtitleExtract')}
                 </button>
-                <button className="btn ghost" onClick={() => setShowSubSearch(true)}>
+                <button className="btn tool-btn" onClick={() => setShowSubSearch(true)}>
                   {t('video.subtitleSearch')}
                 </button>
                 {video.has_subtitle && (
-                  <button className="btn ghost" onClick={removeSubtitle} disabled={subtitleBusy}>
+                  <button className="btn tool-btn" onClick={removeSubtitle} disabled={subtitleBusy}>
                     {t('video.subtitleRemove')}
                   </button>
                 )}
                 <button
-                  className="btn ghost"
+                  className="btn tool-btn"
                   onClick={() => {
                     setForm({
                       title: video.title,
@@ -445,9 +448,9 @@ export default function VideoDetailPage() {
                 >
                   {t('video.editMetadata')}
                 </button>
-              </>
-            )}
-          </div>
+              </div>
+            </div>
+          )}
           {msg && <div className="toast toast-success">{msg}</div>}
           {err && <div className="form-error">{err}</div>}
           {tracks.length > 0 && (

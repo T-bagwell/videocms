@@ -79,6 +79,7 @@
     "roleUser": "普通用户"
   },
   "video": {
+    "adminTools": "管理工具",
     "play": "播放",
     "resume": "播放（继续）",
     "favorite": "☆ 收藏",

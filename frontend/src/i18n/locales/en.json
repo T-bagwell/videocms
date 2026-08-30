@@ -79,6 +79,7 @@
     "roleUser": "Regular user"
   },
   "video": {
+    "adminTools": "Admin tools",
     "play": "Play",
     "resume": "Play (resume)",
     "favorite": "☆ Favorite",

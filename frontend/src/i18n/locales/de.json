@@ -79,6 +79,7 @@
     "roleUser": "Benutzer"
   },
   "video": {
+    "adminTools": "Admin-Werkzeuge",
     "play": "Abspielen",
     "resume": "Abspielen (fortsetzen)",
     "favorite": "☆ Favorit",

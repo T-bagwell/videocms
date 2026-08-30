@@ -79,6 +79,7 @@
     "roleUser": "Utilisateur"
   },
   "video": {
+    "adminTools": "Outils d'administration",
     "play": "Lecture",
     "resume": "Lecture (reprendre)",
     "favorite": "☆ Favori",

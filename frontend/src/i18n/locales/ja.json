@@ -79,6 +79,7 @@
     "roleUser": "一般ユーザー"
   },
   "video": {
+    "adminTools": "管理ツール",
     "play": "再生",
     "resume": "再生（続きから）",
     "favorite": "☆ お気に入り",
