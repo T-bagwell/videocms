@@ -159,6 +159,7 @@ All settings are environment variables:
 | `HLS_VAAPI_DEVICE` | `/dev/dri/renderD128` | VAAPI render device (used with `HLS_HW_ACCEL=vaapi`) |
 | `HLS_TONE_MAP` | `0` | Set `1` to enable HDR→SDR tone mapping in HLS transcoding |
 | `SUBTITLE_OS_USERNAME` / `SUBTITLE_OS_PASSWORD` / `SUBTITLE_OS_API_KEY` | empty | OpenSubtitles credentials for the online subtitle search |
+| `RTMP_INGEST_URL` | `rtmp://localhost:1935/live` | Base RTMP ingest URL (nginx-rtmp or equivalent); streams append their key |
 | `WEB_ROOT` | auto (`frontend/dist`) | Built frontend for single-service mode; leave unset for API-only deployment |
 | `CORS_ORIGINS` | empty (`*`) | Comma-separated browser origins allowed to call the API (separate frontend deployments) |
 | `VITE_API_BASE_URL` | empty | Frontend build-time API base URL for cross-origin deployments (runtime override: `window.__VIDEOCMS_API_BASE__`) |
@@ -243,7 +244,7 @@ Planned work is informed by feature sets of similar self-hosted video projects
 - [x] Watch together (synchronized sessions)
 - [x] Casting (Web AirPlay)
 - [ ] Casting (Chromecast / DLNA)
-- [ ] Live streaming ingest (RTMP) with built-in chat
+- [x] Live streaming ingest (RTMP) with built-in chat
 
 **Metadata & AI**
 
