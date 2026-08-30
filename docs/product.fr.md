@@ -76,6 +76,9 @@ Ouvrez l’interface et connectez-vous avec l’administrateur initial **admin /
 - Filtres par bibliothèque et type (Tout / Films / Séries TV), tri par titre,
   année, durée, date d’ajout ou popularité
 - « Charger plus » pagine la grille
+- Enregistrez n’importe quel jeu de filtres comme **collection intelligente**
+  nommée (un clic) pour le réappliquer plus tard ; les collections se renomment
+  ou se suppriment depuis la page de navigation
 
 ### 4.2 Lire des vidéos
 
@@ -94,8 +97,8 @@ Ouvrez l’interface et connectez-vous avec l’administrateur initial **admin /
 - Les administrateurs peuvent rechercher et télécharger des sous-titres auprès
   de fournisseurs en ligne (p. ex. OpenSubtitles) par vidéo
 - **Regarder ensemble** : créez ou rejoignez une salle pour synchroniser la
-  lecture avec vos amis ; un bouton **Diffuser / AirPlay** est disponible si
-  le navigateur le prend en charge
+  lecture avec vos amis ; les boutons **AirPlay** (Safari) et
+  **Diffuser sur la TV** (Chromecast) apparaissent selon le support
 - **Diffusion** : le lecteur peut diffuser sur un Chromecast (le bouton
   « Diffuser sur la TV » crée un lien de partage à court terme et le diffuse) ;
   activez `DLNA_ENABLED=1` pour exposer la médiathèque aux téléviseurs et
@@ -110,6 +113,9 @@ Ouvrez l’interface et connectez-vous avec l’administrateur initial **admin /
   sous-titres
 - **Télécharger** un remux MKV ou MP4 avec la piste audio et les sous-titres
   choisis (sans ré-encodage), ou récupérer le fichier original
+- **Visionnage hors ligne** : sur la page de détail, appuyez sur
+  **Enregistrer hors ligne** pour mettre le flux en cache dans le navigateur
+  (PWA/Cache API) et le regarder plus tard sans connexion
 - La progression est sauvegardée toutes les 5 secondes et à la pause/fin
 
 ### 4.3 Favoris et listes de lecture
@@ -147,6 +153,8 @@ en fin de nom (`1 (4)`, `-535`). Un groupe doit contenir au moins 2 épisodes.
   peuvent définir le défaut global)
 - Sur mobile, passez en paysage pour une meilleure expérience ; utilisez la file
   sous le lecteur pour changer d’épisode
+- **Contrôle parental** : définissez un code PIN dans le menu du compte ; les
+  vidéos classées le demandent ensuite une fois et restent déverrouillées 5 minutes
 
 ### 4.6 Partage
 
@@ -326,6 +334,27 @@ pare-feu macOS à la première exécution.
 **Est-ce sûr en accès public ?**
 Le déploiement par défaut est en HTTP non chiffré avec un secret JWT de développement.
 Pour tout accès hors LAN de confiance, utilisez un proxy inverse HTTPS et définissez `JWT_SECRET`.
+
+**Ma TV DLNA ne trouve pas le serveur.**
+Définissez `DLNA_ENABLED=1` (et éventuellement `DLNA_FRIENDLY_NAME`) puis
+redémarrez le backend ; la TV doit être sur le même LAN que le serveur. Si vous
+restreignez `DLNA_ALLOWED_IPS`, incluez l’IP/CIDR de la TV. Le serveur répond au
+SSDP sur UDP 1900 et publie la médiathèque en serveur UPnP.
+
+**Comment configurer le SSO ou les e-mails ?**
+Pour **OIDC**, définissez `OIDC_ISSUER`/`OIDC_CLIENT_ID`/`OIDC_CLIENT_SECRET`/
+`OIDC_REDIRECT_URL` ; pour **SAML**, pointez `SAML_IDP_METADATA_URL` vers les
+métadonnées de l’IdP et fournissez `SAML_SP_CERT`/`SAML_SP_KEY` (les métadonnées
+SP sont publiées sur `/api/auth/saml/metadata`). Les notifications par
+**e-mail** nécessitent `SMTP_HOST`/`SMTP_PORT`/`SMTP_USER`/`SMTP_PASSWORD` plus
+`NOTIFY_EMAIL_FROM`/`NOTIFY_EMAIL_TO`. La page de connexion affiche les boutons
+SSO configurés et l’aperçu admin envoie une notification de test.
+
+**Pourquoi « Diffuser sur la TV » n’apparaît pas ?**
+Le bouton Chromecast n’apparaît qu’après le chargement du SDK Google Cast dans un
+navigateur compatible Cast (Chrome). La diffusion passe par un lien de partage de
+courte durée, donc le Chromecast doit pouvoir joindre votre serveur (même LAN ou
+exposé en HTTPS).
 
 **Comment masquer du contenu sans supprimer de fichiers ?**
 Les administrateurs peuvent bloquer un titre (**Admin → Contenu bloqué**) ou une
