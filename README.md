@@ -249,7 +249,7 @@ Planned work is informed by feature sets of similar self-hosted video projects
 - [x] Intro & credits skip
 - [x] Watch together (synchronized sessions)
 - [x] Casting (Web AirPlay)
-- [ ] Casting (Chromecast / DLNA)
+- [x] Casting (Chromecast / DLNA)
 - [x] Live streaming ingest (RTMP) with built-in chat
 
 **Metadata & AI**
