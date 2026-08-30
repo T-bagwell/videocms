@@ -31,6 +31,10 @@ type Config struct {
 	WhisperModel       string
 	ScrapeCustomURL    string
 	AITagBin           string
+	OIDCIssuer         string
+	OIDCClientID       string
+	OIDCClientSecret   string
+	OIDCRedirectURL    string
 }
 
 func Load() Config {
@@ -57,6 +61,10 @@ func Load() Config {
 		WhisperModel:       os.Getenv("WHISPER_MODEL"),
 		ScrapeCustomURL:    os.Getenv("SCRAPE_CUSTOM_URL"),
 		AITagBin:           os.Getenv("AI_TAG_BIN"),
+		OIDCIssuer:         os.Getenv("OIDC_ISSUER"),
+		OIDCClientID:       os.Getenv("OIDC_CLIENT_ID"),
+		OIDCClientSecret:   os.Getenv("OIDC_CLIENT_SECRET"),
+		OIDCRedirectURL:    os.Getenv("OIDC_REDIRECT_URL"),
 	}
 	if cfg.Addr != "" && cfg.Addr[0] != ':' {
 		cfg.Addr = ":" + cfg.Addr
