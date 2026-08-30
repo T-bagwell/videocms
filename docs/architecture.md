@@ -152,6 +152,12 @@ subtitle_tracks -- id, video_id(fk, ON DELETE CASCADE), position, lang, title,
                 --   stream_index (multi-language subtitle tracks)
 user_subtitle_prefs -- PK(user_id, video_id), track_id(fk, ON DELETE CASCADE),
                 --   updated_at (per-user default subtitle track)
+uploads         -- id, filename, target_path, total_size, chunk_size,
+                --   status(uploading|completed|failed), error, timestamps
+                --   (chunked upload sessions; chunks live in DATA_DIR/uploads/<id>/)
+downloads       -- id, url, title, target_path, format, status(queued|downloading|
+                --   completed|failed|canceled), progress, error, interval_secs,
+                --   last_run_at, timestamps (yt-dlp jobs, optional schedule)
 ```
 
 Key indexes: `videos(lower(title))`, `videos(library_id)`, partial
@@ -232,6 +238,10 @@ The `HLSManager`:
 probed within seconds — including same-size modifications — and removed
 files/directories are marked unavailable immediately, while the full pass
 still runs every `WATCH_INTERVAL` as a safety net.
+
+Files that arrive in a library folder through other paths (finished chunked
+uploads, completed yt-dlp downloads, external copies) are picked up by the same
+watcher and indexed automatically.
 
 **TV series grouping**: after each scan, `rebuildSeries` parses episode markers
 (`S01E01`, `EP1`, `E01`, `第1集`, trailing bracketed numbers) from titles,
