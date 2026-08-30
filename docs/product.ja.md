@@ -88,6 +88,8 @@ make serve                              # http://<LAN IP>:8080
   ユーザー・動画ごとに保存）
 - シークバーをホバーするとプレビューサムネイルが表示され、クリックでその位置に移動
 - ASS/SSA 字幕は元のスタイル（フォント・色・位置・エフェクト）で表示されます
+- 管理者は動画ごとにオンライン字幕源（例: OpenSubtitles）を検索して
+  字幕をダウンロードできます
 - 「ダウンロード」で選択した音声・字幕トラック入りの MKV/MP4 リマックス
   （再エンコードなし）を取得、または元ファイルをダウンロード
 - 進捗は 5 秒ごと、および一時停止/終了時に保存され「続きを見る」に反映
@@ -200,6 +202,7 @@ make serve                              # http://<LAN IP>:8080
 | `WATCH_INTERVAL` | `30` | 自動インクリメンタルスキャンの間隔（秒）。`0` で無効 |
 | `YTDLP_PATH` | PATH 上の `yt-dlp` | ダウンロードキューが使う yt-dlp バイナリ |
 | `HLS_HW_ACCEL` | 空（ソフトウェア x264） | HLS ビデオエンコーダー：videotoolbox、nvenc または qsv。空なら libx264 |
+| `SUBTITLE_OS_USERNAME` / `SUBTITLE_OS_PASSWORD` / `SUBTITLE_OS_API_KEY` | 空 | オンライン字幕検索用の OpenSubtitles 認証情報 |
 
 ## 7. FAQ
 
