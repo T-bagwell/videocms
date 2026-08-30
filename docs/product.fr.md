@@ -96,6 +96,10 @@ Ouvrez l’interface et connectez-vous avec l’administrateur initial **admin /
 - **Regarder ensemble** : créez ou rejoignez une salle pour synchroniser la
   lecture avec vos amis ; un bouton **Diffuser / AirPlay** est disponible si
   le navigateur le prend en charge
+- **Diffusion** : le lecteur peut diffuser sur un Chromecast (le bouton
+  « Diffuser sur la TV » crée un lien de partage à court terme et le diffuse) ;
+  activez `DLNA_ENABLED=1` pour exposer la médiathèque aux téléviseurs et
+  lecteurs UPnP/DLNA du réseau local
 - **Saut de l’intro/générique** : marquez le début et la fin de l’intro ou du
   générique (deux clics chacun), puis sautez-les en un clic ; les intervalles
   sont enregistrés par vidéo et peuvent être effacés à tout moment
@@ -284,6 +288,7 @@ Tout se configure par variables d’environnement (table complète dans le READM
 | `SCRAPE_CUSTOM_URL` | vide | Endpoint JSON de scraping personnalisé ; `%s` est remplacé par le titre encodé |
 | `AI_TAG_BIN` | vide | Outil d’étiquetage IA externe (argument : chemin média, une étiquette par ligne) |
 | `OIDC_ISSUER` / `OIDC_CLIENT_ID` / `OIDC_CLIENT_SECRET` / `OIDC_REDIRECT_URL` | vide | Paramètres de connexion unique OIDC |
+| `DLNA_ENABLED` / `DLNA_FRIENDLY_NAME` / `DLNA_ALLOWED_IPS` | `0` / `VideoCMS` / vide (tout le LAN) | Activation du serveur UPnP/DLNA, nom affiché, liste blanche IP/CIDR séparée par des virgules |
 | `NOTIFY_WEBHOOK_URL` / `NOTIFY_APPRISE_URL` | vide | Canaux de notification (webhook JSON, API Apprise) |
 | `MAINT_INTERVAL_HOURS` / `MAINT_BACKUP_RETENTION` / `MAINT_RESCAN` | `24` / `7` / `0` | Planification, rétention et re-scan de maintenance |
 
