@@ -1,0 +1,17 @@
+{
+  "name": "VideoCMS",
+  "short_name": "VideoCMS",
+  "description": "Self-hosted video resource management system",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f111a",
+  "theme_color": "#0f111a",
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

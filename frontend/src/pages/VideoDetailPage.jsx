@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { api } from '../api.js';
+import { api, mediaUrl } from '../api.js';
 import Poster from '../components/Poster.jsx';
 import DownloadDialog from '../components/DownloadDialog.jsx';
 import ShareModal from '../components/ShareModal.jsx';
@@ -37,6 +37,7 @@ export default function VideoDetailPage() {
   const [comments, setComments] = useState([]);
   const [commentInput, setCommentInput] = useState('');
   const [ratings, setRatings] = useState({ average: 0, count: 0, mine: 0 });
+  const [offlineBusy, setOfflineBusy] = useState(false);
   const [subtitleBusy, setSubtitleBusy] = useState(false);
   const [tracks, setTracks] = useState([]);
   const [setGlobal, setSetGlobal] = useState(false);
@@ -81,6 +82,27 @@ export default function VideoDetailPage() {
       setRatings(d);
     } catch (e2) {
       setErr(e2.message);
+    }
+  }
+
+  async function saveOffline() {
+    if (!('caches' in window)) {
+      setErr(t('video.offlineUnavailable'));
+      return;
+    }
+    setOfflineBusy(true);
+    setErr('');
+    try {
+      const url = mediaUrl(`/videos/${video.id}/stream`);
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const cache = await caches.open('videocms-media');
+      await cache.put(url, res.clone());
+      setMsg(t('video.offlineSaved'));
+    } catch (e2) {
+      setErr(t('video.offlineFailed') + ': ' + e2.message);
+    } finally {
+      setOfflineBusy(false);
     }
   }
 
@@ -365,6 +387,9 @@ export default function VideoDetailPage() {
             </button>
             <button className="btn" onClick={() => setShowShare(true)}>
               {t('video.share')}
+            </button>
+            <button className="btn ghost" onClick={saveOffline} disabled={offlineBusy}>
+              {offlineBusy ? t('video.offlineSaving') : t('video.saveOffline')}
             </button>
             {user?.role === 'admin' && (
               <>
