@@ -212,6 +212,11 @@ Statistiques : vidéos, bibliothèques, utilisateurs, listes, favoris, séries e
   l’accueil affiche un fil d’activité récente (commentaires et favoris)
 - **Connexion unique** (OIDC) : la page de connexion propose un bouton SSO si
   le serveur est configuré avec un fournisseur d’identité
+- **Contrôle parental** : les admins définissent une politique de
+  classification par utilisateur et une classification par vidéo ; les
+  utilisateurs peuvent verrouiller avec un PIN et déverrouiller le contenu
+  classé pendant 5 minutes. Les bibliothèques peuvent aussi porter un **quota
+  de stockage** vérifié lors des téléversements
 
 ### 5.4 Utilisateurs
 
