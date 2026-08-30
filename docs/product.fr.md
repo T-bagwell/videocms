@@ -192,6 +192,9 @@ Statistiques : vidéos, bibliothèques, utilisateurs, listes, favoris, séries e
   réseau à api.themoviedb.org)
 - Les administrateurs peuvent choisir **TMDB ou un fournisseur personnalisé**
   et forcer l’écrasement des métadonnées existantes
+- Les vidéos peuvent porter des **étiquettes** (manuelles ou issues d’un outil
+  d’analyse IA optionnel) ; elles s’affichent sur la page détail et peuvent
+  filtrer la recherche
 
 ### 5.4 Utilisateurs
 
@@ -235,6 +238,7 @@ Tout se configure par variables d’environnement (table complète dans le READM
 | `RTMP_INGEST_URL` | `rtmp://localhost:1935/live` | URL d’ingestion RTMP de base (nginx-rtmp ou équivalent) |
 | `WHISPER_BIN` / `WHISPER_MODEL` | vide | CLI whisper.cpp et modèle pour la transcription vocale |
 | `SCRAPE_CUSTOM_URL` | vide | Endpoint JSON de scraping personnalisé ; `%s` est remplacé par le titre encodé |
+| `AI_TAG_BIN` | vide | Outil d’étiquetage IA externe (argument : chemin média, une étiquette par ligne) |
 
 ## 7. FAQ
 
