@@ -86,6 +86,8 @@ Open the web UI and sign in with the initial administrator **admin / admin123**
   (first playback takes a few seconds; “Transcode play” is offered as a fallback)
 - Multiple audio tracks can be switched during HLS playback (audio selector
   in the player)
+- Subtitles can be nudged ±0.5s to fix sync during direct playback; the offset
+  is saved per user and video
 - **Download** a remuxed copy as MKV or MP4 with a chosen audio track and
   subtitles (no re-encode), or grab the original file for offline playback
 - Progress is saved every 5 seconds and on pause/end — visible in Continue Watching
