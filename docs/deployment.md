@@ -86,23 +86,99 @@ Key endpoints (all admin endpoints require an admin account):
 | Method | Path | Auth | Purpose |
 | --- | --- | --- | --- |
 | POST | `/api/auth/login` | open | get a JWT |
+| GET | `/api/auth/sso` | open | which SSO providers are configured |
+| GET | `/api/auth/oidc/start` | open | start OIDC login (redirect to IdP) |
+| GET | `/api/auth/saml/login` / `POST /api/auth/saml/acs` | open | SAML login flow |
+| GET | `/api/auth/saml/metadata` | open | SP metadata for configuring the IdP |
 | GET | `/api/libraries` | user | list libraries |
 | POST | `/api/libraries` | admin | add library (absolute server path) |
 | POST | `/api/libraries/{id}/scan` | admin | start a scan |
+| POST | `/api/libraries/{id}/health` | admin | health check (missing/corrupt/duplicates) |
+| POST | `/api/libraries/{id}/health/keep-best` | admin | move duplicates to trash, keep best |
+| POST | `/api/libraries/{id}/export-nfo` / `import-nfo` | admin | Kodi-style NFO export/import |
 | GET | `/api/videos` | user | search/browse videos |
 | GET | `/api/videos/{id}` | user | video detail |
 | GET | `/api/videos/{id}/stream` | user | HTTP Range stream |
 | GET | `/api/videos/{id}/download` | user | download original file |
 | GET | `/api/videos/{id}/download/remux` | user | MP4/MKV with selected tracks |
 | GET | `/api/videos/{id}/tracks` | user | audio/subtitle track list |
+| GET/PUT/DELETE | `/api/videos/{id}/skip-interval(s)` | user | intro/credits skip intervals |
+| POST | `/api/videos/{id}/transcribe` | admin | Whisper transcription |
+| GET/POST/DELETE | `/api/videos/{id}/tags` | user | video tags |
+| POST | `/api/videos/{id}/analyze` | admin | run the AI tagger |
+| GET/POST | `/api/videos/{id}/comments`, `PUT …/rating` | user | comments and ratings |
+| GET | `/api/videos/{id}/similar` | user | similar-video recommendations |
 | POST | `/api/uploads` | admin | create a chunked upload session |
 | PUT | `/api/uploads/{id}/chunk/{index}` | admin | upload one chunk |
 | POST | `/api/uploads/{id}/complete` | admin | finish the upload |
 | POST | `/api/downloads` | admin | queue a yt-dlp download |
 | GET | `/api/downloads` | admin | list download jobs |
+| GET/PUT | `/api/watch/rooms/{id}` | user | watch-together session state |
+| GET/POST | `/api/live`, `/api/live/{id}/chat` | user/admin | live streams and chat |
 | GET/POST | `/api/admin/blocked-titles` | admin | manage title blocks |
 | GET | `/api/admin/users` | admin | manage users |
+| POST | `/api/admin/videos/batch` | admin | bulk tag / clear tags / move to trash |
+| GET | `/api/admin/trash`, `POST …/restore` | admin | recycle bin |
+| GET/POST/PATCH/DELETE | `/api/admin/storage-pools` | admin | local/S3/SFTP pools |
+| GET | `/api/admin/jobs` / `system` | admin | jobs dashboard + disk usage |
+| POST | `/api/admin/maintenance/run` | admin | run maintenance now |
+| GET | `/api/admin/backups[/{name}]` | admin | list/download backups |
+| GET/POST/PATCH/DELETE | `/api/admin/webhooks` | admin | signed webhook subscriptions |
+| POST | `/api/admin/notify/test` | admin | send a test notification |
+| GET | `/api/openapi.json` | open | OpenAPI description of the API |
 | GET | `/api/healthz` | open | health check |
 
 See [architecture.md](architecture.md) for the full route table and data
 flows.
+
+## Optional integrations
+
+### DLNA / Chromecast
+
+To expose the library to UPnP/DLNA TVs and players on your LAN:
+
+```bash
+export DLNA_ENABLED=1
+export DLNA_FRIENDLY_NAME="Home Media"        # optional
+export DLNA_ALLOWED_IPS="192.168.3.0/24"      # optional; empty = whole LAN
+```
+
+The server answers SSDP on UDP 1900 and serves `/dlna/device.xml`,
+`/dlna/content/{id}` (DIDL-Lite) and `/dlna/video/{id}/stream`. The web player
+shows a **Cast to TV** button (Chromecast) in Chromecast-enabled browsers; it
+streams through a short-lived share link, so the Chromecast must be able to
+reach the server.
+
+### SAML 2.0 single sign-on
+
+Generate an SP key pair (valid for the domain you expose), then point the
+backend at the IdP metadata:
+
+```bash
+openssl req -x509 -newkey rsa:2048 -keyout sp.key -out sp.crt \
+  -days 3650 -nodes -subj "/CN=videocms"
+export SAML_IDP_METADATA_URL=https://idp.example.com/metadata
+export SAML_SP_CERT=/etc/videocms/sp.crt
+export SAML_SP_KEY=/etc/videocms/sp.key
+export SAML_ACS_URL=https://media.example.com/api/auth/saml/acs
+export SAML_SP_ENTITY_ID=https://media.example.com/api/auth/saml/acs
+```
+
+Fetch `https://media.example.com/api/auth/saml/metadata` and register it in the
+IdP. Users bind to `users.oauth_sub` with a `saml:` prefix; a `roles` attribute
+containing "admin" grants admin on first login.
+
+### Email notifications (SMTP)
+
+```bash
+export SMTP_HOST=smtp.example.com
+export SMTP_PORT=587                 # 465 = implicit TLS
+export SMTP_USER=videocms@example.com
+export SMTP_PASSWORD='secret'
+export NOTIFY_EMAIL_FROM=videocms@example.com
+export NOTIFY_EMAIL_TO=ops@example.com,admin@example.com
+```
+
+Scan, upload and download events are delivered as plain-text email (STARTTLS on
+587/25, implicit TLS on 465). Test with the admin overview button or
+`POST /api/admin/notify/test`.
