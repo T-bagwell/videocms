@@ -256,7 +256,7 @@ Planned work is informed by feature sets of similar self-hosted video projects
 - [x] AI tagging, scene detection and image analysis for smarter search
 - [x] Media health checks: duplicate detection, corrupt-file checks,
   keep-best-version cleanup
-- [ ] Similar-video recommendations and tag cloud
+- [x] Similar-video recommendations and tag cloud
 
 **Organization & search**
 
