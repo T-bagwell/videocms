@@ -94,6 +94,8 @@ make serve                              # http://<LAN IP>:8080
   ブラウザが対応していれば **キャスト / AirPlay** ボタンも利用可能
 - **ライブ配信**：管理者が RTMP 配信（OBS 互換の取り込み URL）を作成でき、
   視聴者側には内蔵チャットがあります
+- 管理者は動画の**音声文字起こし**（Whisper）を実行でき、文字起こしは
+  検索可能で字幕トラックとしても選択できます
 - 「ダウンロード」で選択した音声・字幕トラック入りの MKV/MP4 リマックス
   （再エンコードなし）を取得、または元ファイルをダウンロード
 - 進捗は 5 秒ごと、および一時停止/終了時に保存され「続きを見る」に反映
@@ -210,6 +212,7 @@ make serve                              # http://<LAN IP>:8080
 | `HLS_TONE_MAP` | `0` | `1` で HLS トランスコードに HDR→SDR トーンマッピングを有効化 |
 | `SUBTITLE_OS_USERNAME` / `SUBTITLE_OS_PASSWORD` / `SUBTITLE_OS_API_KEY` | 空 | オンライン字幕検索用の OpenSubtitles 認証情報 |
 | `RTMP_INGEST_URL` | `rtmp://localhost:1935/live` | RTMP 取り込みのベース URL（nginx-rtmp 等） |
+| `WHISPER_BIN` / `WHISPER_MODEL` | 空 | whisper.cpp のバイナリとモデル（文字起こし用） |
 
 ## 7. FAQ
 
