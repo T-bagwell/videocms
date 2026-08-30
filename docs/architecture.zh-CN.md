@@ -231,6 +231,9 @@ erDiagram
   推流（`RTMP_INGEST_URL` + 每条流自己的 key）拉取为滚动 HLS 清单
   （`data/live/<id>/index.m3u8`）；观看走 `GET /api/live/{id}/hls/...`，
   聊天通过轮询 `GET|POST /api/live/{id}/chat`
+- 语音转写：`POST /api/videos/{id}/transcribe`（管理员）用 whisper.cpp CLI
+  （`WHISPER_BIN`/`WHISPER_MODEL`）生成 WebVTT 文稿，存入 `video_transcripts`
+  （迁移 020）并注册为字幕轨；视频搜索也会匹配文稿文本
 - 请求的 `start` 与当前会话相差超过一个分片（6 秒）时，杀掉旧会话并从新位置重启（跳转）
 - 清单在响应时重写，使每个分片 URL 都携带 `?token=`
 - 空闲会话 **15 分钟**后回收，同时删除会话目录
