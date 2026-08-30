@@ -216,7 +216,8 @@ Stats: videos, libraries, users, playlists, favorites, series and storage used.
 - **Share customization**: pick a theme, a custom title and hide navigation;
   appending `?embed=1` embeds a chrome-free player in any page
 - **Notifications**: webhook or Apprise channels can receive scan, upload and
-  download events; admins can send a test notification from the overview
+  download events, and an **email** channel (SMTP) delivers the same events;
+  admins can send a test notification from the overview
 - **Storage pools**: define local, S3-compatible or SFTP pools with a local
   mount path; uploads and downloads can target `pool://name[/sub]`
 - **Jobs dashboard**: one place to watch scans, uploads, downloads and live
@@ -276,6 +277,7 @@ most important ones:
 | `SAML_IDP_METADATA_URL` / `SAML_SP_CERT` / `SAML_SP_KEY` / `SAML_SP_ENTITY_ID` / `SAML_ACS_URL` | empty | SAML 2.0 single sign-on (IdP metadata URL, SP certificate/key paths, entity ID, ACS URL) |
 | `DLNA_ENABLED` / `DLNA_FRIENDLY_NAME` / `DLNA_ALLOWED_IPS` | `0` / `VideoCMS` / empty (whole LAN) | UPnP/DLNA media server switch, display name, comma-separated IP/CIDR allowlist |
 | `NOTIFY_WEBHOOK_URL` / `NOTIFY_APPRISE_URL` | empty | Notification channels (JSON webhook, Apprise API) |
+| `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASSWORD` / `NOTIFY_EMAIL_FROM` / `NOTIFY_EMAIL_TO` | empty / `587` | SMTP email notifications (implicit TLS on 465, STARTTLS otherwise) |
 | `MAINT_INTERVAL_HOURS` / `MAINT_BACKUP_RETENTION` / `MAINT_RESCAN` | `24` / `7` / `0` | Maintenance schedule, backup retention, rescan flag |
 
 ## 7. FAQ
