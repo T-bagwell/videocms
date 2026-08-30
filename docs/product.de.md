@@ -186,6 +186,9 @@ Statistiken: Videos, Bibliotheken, Benutzer, Wiedergabelisten, Favoriten, Serien
   api.themoviedb.org)
 - Admins können **TMDB oder einen benutzerdefinierten Anbieter** wählen und
   vorhandene Metadaten überschreiben erzwingen
+- Videos können **Tags** tragen (manuell oder von einem optionalen
+  KI-Analysetool); Tags erscheinen auf der Detailseite und können die Suche
+  filtern
 
 ### 5.4 Benutzer
 
@@ -229,6 +232,7 @@ Alles wird über Umgebungsvariablen konfiguriert (vollständige Tabelle im READM
 | `RTMP_INGEST_URL` | `rtmp://localhost:1935/live` | Basis-RTMP-Ingest-URL (nginx-rtmp oder Äquivalent) |
 | `WHISPER_BIN` / `WHISPER_MODEL` | leer | whisper.cpp-Binary und Modell für Sprachtranskription |
 | `SCRAPE_CUSTOM_URL` | leer | Benutzerdefinierter JSON-Scraper-Endpoint; `%s` wird durch den URL-codierten Titel ersetzt |
+| `AI_TAG_BIN` | leer | Externes KI-Tagging-Tool (Medienpfad als Argument, ein Tag pro Zeile) |
 
 ## 7. FAQ
 
