@@ -20,6 +20,12 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- SAML 2.0 single sign-on: `GET /api/auth/saml/login` starts an AuthnRequest
+  flow, `POST /api/auth/saml/acs` verifies the signed response (crewjam/saml)
+  and `/api/auth/saml/metadata` publishes SP metadata; users bind via
+  `users.oauth_sub` with a `saml:` prefix and can be granted admin through a
+  `roles` attribute (`SAML_IDP_METADATA_URL`, `SAML_SP_CERT`, `SAML_SP_KEY`,
+  `SAML_SP_ENTITY_ID`, `SAML_ACS_URL`)
 - Casting: the player can cast to Chromecast (Cast SDK sender + short-lived
   share token), and `DLNA_ENABLED=1` exposes a lightweight UPnP media server
   (SSDP discovery, DIDL-Lite browse via GET/SOAP, direct `/dlna/video/{id}/stream`
