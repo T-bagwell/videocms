@@ -197,6 +197,8 @@ Statistiken: Videos, Bibliotheken, Benutzer, Wiedergabelisten, Favoriten, Serien
   aktuellen Filter benannte **Smart-Sammlungen** erstellen
 - Die Suche bietet eine **fuzzy Relevanz-Sortierung**, die Tippfehler toleriert
   (Titel / Beschreibung / Dateiname)
+- Die Admin-Videoliste unterstützt **Stapelaktionen** (Taggen, Tags löschen,
+  in Papierkorb) und einen **Papierkorb** mit Wiederherstellung per Klick
 
 ### 5.4 Benutzer
 
