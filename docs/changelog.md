@@ -20,6 +20,8 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Subtitle sync: players can nudge subtitles by ±0.5s (saved per user per
+  video), and the subtitle endpoint serves shifted WebVTT for direct playback
 - Hardware-accelerated HLS transcoding: `HLS_HW_ACCEL=videotoolbox|nvenc|qsv`
   switches the HLS video encoder from software x264 to a GPU encoder
 - Multi-audio HLS playback: videos with several audio streams get a separate
