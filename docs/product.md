@@ -172,6 +172,8 @@ Stats: videos, libraries, users, playlists, favorites, series and storage used.
   file manager, so you can inspect or manage the actual media files
 - **Health check** reports missing/corrupt files and duplicates; **Keep best**
   moves the rest into the server trash
+- **Export NFO / Import NFO** reads and writes Kodi-style metadata files next
+  to the videos (Plex/Jellyfin/Kodi compatible)
 - **Block library** hides the whole library for every user (home, series,
   favorites, continue watching, playlists) without deleting anything;
   unblock restores it immediately
