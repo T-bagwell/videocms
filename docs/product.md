@@ -210,6 +210,8 @@ Stats: videos, libraries, users, playlists, favorites, series and storage used.
   appending `?embed=1` embeds a chrome-free player in any page
 - **Notifications**: webhook or Apprise channels can receive scan, upload and
   download events; admins can send a test notification from the overview
+- **Storage pools**: define local, S3-compatible or SFTP pools with a local
+  mount path; uploads and downloads can target `pool://name[/sub]`
 
 ### 5.4 Users
 
