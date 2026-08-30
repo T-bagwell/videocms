@@ -239,7 +239,7 @@ scripts/                 演示素材生成器
 - [x] 片头/片尾跳过
 - [x] 一起看（同步播放会话）
 - [x] 投屏（Web AirPlay）
-- [ ] 投屏（Chromecast / DLNA）
+- [x] 投屏（Chromecast / DLNA）
 - [x] RTMP 直播推流入库，内置聊天
 
 **元数据与 AI**
