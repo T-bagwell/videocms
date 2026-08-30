@@ -204,9 +204,12 @@ The `HLSManager`:
   `-ss <start> -i <input> -c:v libx264 -preset veryfast -crf 23
   -vf scale=<width>:-2 -force_key_frames expr:gte(t,n_forced*6) -c:a aac -b:a 96k
   -f hls -hls_time 6 -hls_list_size 0 -hls_flags independent_segments`
-- Video encoding is software x264 by default; `HLS_HW_ACCEL=videotoolbox|nvenc|qsv`
+- Video encoding is software x264 by default; `HLS_HW_ACCEL=videotoolbox|nvenc|qsv|vaapi`
   switches to a hardware encoder (`h264_videotoolbox` / `h264_nvenc` /
-  `h264_qsv`), invalid values fail the session instead of silently degrading
+  `h264_qsv` / `h264_vaapi`), with VAAPI taking its device from
+  `HLS_VAAPI_DEVICE` and running the `hwupload`/`scale_vaapi` pipeline.
+  `HLS_TONE_MAP=1` prepends a software `zscale`+`tonemap` chain for HDR→SDR
+  playback; invalid accel values fail the session instead of silently degrading
 - Each rendition is written to `data/hls/<video-id>/v<width>/`; the server
   writes a master playlist referencing every rendition and one
   `#EXT-X-MEDIA` subtitle entry per track (`subs/<track-id>/playlist.m3u8`,
