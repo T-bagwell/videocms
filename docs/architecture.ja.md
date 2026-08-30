@@ -237,6 +237,10 @@ erDiagram
   ローリング HLS プレイリスト（`data/live/<id>/index.m3u8`）に変換。
   視聴は `GET /api/live/{id}/hls/...`、チャットはポーリングの
   `GET|POST /api/live/{id}/chat`
+- 文字起こし：`POST /api/videos/{id}/transcribe`（管理者）が whisper.cpp CLI
+  （`WHISPER_BIN`/`WHISPER_MODEL`）で WebVTT を生成し、`video_transcripts`
+  （マイグレーション 020）に保存して字幕トラックとして登録。動画検索は
+  文字起こし本文にもマッチします
 - 要求された `start` が実行中セッションと 1 セグメント（6 秒）以上ずれている場合、
   セッションを終了して新しい位置で再開（シーク）
 - プレイリストは応答時に書き換えられ、各セグメント URL に `?token=` が付く
