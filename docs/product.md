@@ -198,6 +198,8 @@ Stats: videos, libraries, users, playlists, favorites, series and storage used.
   (title / synopsis / filename)
 - The admin video list supports **batch actions** (tag, clear tags, move to
   trash) and a **recycle bin** with one-click restore
+- Users can **comment and rate** videos (1-5 stars); the home page shows a
+  recent-activity feed of comments and favorites
 
 ### 5.4 Users
 
