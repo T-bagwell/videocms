@@ -162,6 +162,7 @@ All settings are environment variables:
 | `RTMP_INGEST_URL` | `rtmp://localhost:1935/live` | Base RTMP ingest URL (nginx-rtmp or equivalent); streams append their key |
 | `WHISPER_BIN` / `WHISPER_MODEL` | empty | whisper.cpp CLI and model path for speech transcription |
 | `SCRAPE_CUSTOM_URL` | empty | Custom JSON scraper endpoint; `%s` is replaced with the URL-escaped title |
+| `AI_TAG_BIN` | empty | External AI tagging tool; receives the media path and prints one tag per line |
 | `WEB_ROOT` | auto (`frontend/dist`) | Built frontend for single-service mode; leave unset for API-only deployment |
 | `CORS_ORIGINS` | empty (`*`) | Comma-separated browser origins allowed to call the API (separate frontend deployments) |
 | `VITE_API_BASE_URL` | empty | Frontend build-time API base URL for cross-origin deployments (runtime override: `window.__VIDEOCMS_API_BASE__`) |
@@ -252,7 +253,7 @@ Planned work is informed by feature sets of similar self-hosted video projects
 
 - [x] Local speech transcription (Whisper) → searchable transcripts and captions
 - [x] Pluggable metadata sources / custom scrapers with per-item override
-- [ ] AI tagging, scene detection and image analysis for smarter search
+- [x] AI tagging, scene detection and image analysis for smarter search
 - [ ] Media health checks: duplicate detection, corrupt-file checks,
   keep-best-version cleanup
 - [ ] Similar-video recommendations and tag cloud
