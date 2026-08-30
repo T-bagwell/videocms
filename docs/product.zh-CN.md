@@ -87,6 +87,9 @@ make serve                              # http://<局域网IP>:8080
 - 管理员可按视频从在线字幕源（如 OpenSubtitles）搜索并下载字幕
 - **一起看**：创建或加入房间即可与好友保持播放同步；浏览器支持时可使用
   **投屏 / AirPlay** 按钮
+- **投屏**：播放器可投放到 Chromecast（点击「投屏到电视」会创建短期分享
+  链接并以此播放）；设置 `DLNA_ENABLED=1` 可把媒体库开放给局域网内的
+  UPnP/DLNA 电视与播放器
 - **片头/片尾跳过**：分别点击两次即可标记片头或片尾的起点与终点，
   之后可一键跳过；区间按视频保存，随时可清除
 - **直播**：管理员可创建 RTMP 直播（OBS 兼容推流地址），观众端带内置聊天
@@ -227,6 +230,7 @@ make serve                              # http://<局域网IP>:8080
 | `SCRAPE_CUSTOM_URL` | 空 | 自定义 JSON 刮削端点；`%s` 会被替换为 URL 转义后的标题 |
 | `AI_TAG_BIN` | 空 | 外部 AI 打标工具（接收媒体路径参数，每行输出一个标签） |
 | `OIDC_ISSUER` / `OIDC_CLIENT_ID` / `OIDC_CLIENT_SECRET` / `OIDC_REDIRECT_URL` | 空 | OIDC 单点登录配置 |
+| `DLNA_ENABLED` / `DLNA_FRIENDLY_NAME` / `DLNA_ALLOWED_IPS` | `0` / `VideoCMS` / 空（整个局域网） | UPnP/DLNA 媒体服务器开关、显示名称、逗号分隔的 IP/CIDR 白名单 |
 | `NOTIFY_WEBHOOK_URL` / `NOTIFY_APPRISE_URL` | 空 | 通知渠道（JSON Webhook、Apprise API） |
 | `MAINT_INTERVAL_HOURS` / `MAINT_BACKUP_RETENTION` / `MAINT_RESCAN` | `24` / `7` / `0` | 维护间隔、备份保留份数、是否重扫 |
 
