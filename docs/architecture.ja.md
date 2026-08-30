@@ -29,26 +29,55 @@ flowchart LR
     subgraph Browser["ブラウザ（React SPA）"]
         UI["Vite UI · i18n en/zh/fr/ja/de"]
         HLS["hls.js プレイヤー"]
+        CAST["Chromecast sender（Cast SDK）"]
+        PWA["Service worker + Cache API"]
     end
     subgraph Server["サーバー（Go :8080）"]
         API["net/http + ミドルウェア"]
         SCAN["スキャナー（並列）"]
         HLSM["HLS マネージャ"]
-        SCR["TMDB スクレイパー"]
+        SCR["メタデータスクレイパー"]
+        DL["yt-dlp ダウンローダー"]
+        LIVE["ライブマネージャ（RTMP→HLS）"]
+        WHIS["Whisper 文字起こし"]
+        SUB["字幕プロバイダー"]
+        NOT["通知"]
+        DLNA["DLNA/UPnP サーバー（SSDP）"]
     end
     DB[("PostgreSQL 14")]
     DISK["ディスク上のメディアフォルダ"]
     TMDB[("TMDB API")]
+    META[("TVMaze / AniList / Wikipedia / カスタム")]
+    OS[("OpenSubtitles / whisper.cpp / AI タガー")]
+    IDP[("OIDC / SAML IdP")]
+    TV["DLNA テレビ / Chromecast"]
+    SMTP[("SMTP サーバー")]
 
     UI -->|"/api"| API
     HLS -->|"Range / HLS"| API
+    PWA -->|"オフライン Cache API"| API
+    CAST -->|"共有ストリーム"| TV
     API --> DB
     API --> SCAN
     API --> HLSM
     API --> SCR
+    API --> DL
+    API --> LIVE
+    API --> WHIS
+    API --> SUB
+    API --> NOT
+    API --> DLNA
     SCAN -->|"ffprobe / ffmpeg"| DISK
     HLSM -->|"ffmpeg トランスコード"| DISK
+    DL -->|"yt-dlp"| DISK
+    LIVE -->|"ffmpeg"| DISK
     SCR -->|"検索/詳細/ポスター"| TMDB
+    SCR -->|"キーレスフォールバック"| META
+    SUB -->|"検索/ダウンロード"| OS
+    WHIS -->|"文字起こし"| OS
+    DLNA -->|"SSDP + DIDL-Lite + ストリーム"| TV
+    API -->|"AuthnRequest / SAMLResponse"| IDP
+    NOT -->|"メール"| SMTP
 ```
 
 ```
@@ -86,11 +115,21 @@ backend/
     media/
       scanner.go              ライブラリスキャン（並列探索 + プローブ + 書き込み）
       scraper.go              TMDB メタデータ補完
+      episode.go              ファイル名からシーズン/エピソード判定
       hls.go                  HLS トランスコードセッション管理
       stream.go               HTTP Range ストリーミング
       segment.go              HLS セグメントファイル名検証
       tracks.go               ffprobe ストリーム一覧（リマックスDL用）
       downloader.go           yt-dlp ジョブランナー（キュー + 定期実行）
+      live.go                 RTMP 取り込み → ローリング HLS（LiveManager）
+      whisper.go              ローカル音声文字起こし（whisper.cpp）
+      subtitle_provider.go    プラグイン式オンライン字幕検索/ダウンロード
+      thumbnails.go           プレビューサムネイル抽出
+      health.go               メディアヘルスチェック（欠落/破損/重複）
+      nfo.go                  Kodi スタイル NFO インポート/エクスポート
+      analyze.go              外部 AI タグ付けツール連携
+      notify.go               webhook / Apprise / SMTP 通知の送出
+      dlna.go                 SSDP 応答 + UPnP デバイス ID
     api/
       router.go               ルーティング、CORS / ログ / リカバリミドルウェア
       json.go                 JSON ヘルパー
@@ -123,14 +162,16 @@ backend/
 埋め込み SQL マイグレーションで管理（`schema_migrations` テーブルがバージョン管理）。
 
 ```sql
-users           -- id, username(ユニーク), password_hash, display_name, role, created_at
+users           -- id, username(ユニーク), password_hash, display_name, role,
+                --   oauth_sub(ユニーク, ローカルは NULL; SSO は "oidc:…"/"saml:…"),
+                --   pin(bcrypt, ペアレンタル解除), allowed_rating, created_at
 libraries       -- id, name, path(ユニーク), scan_status(idle|scanning|error|cancelled),
                 --   scan_error, scan_started_at, scan_finished_at, video_count,
-                --   blocked
+                --   blocked, quota_bytes
 videos          -- id, library_id(FK), title, filename, file_path(ユニーク), size_bytes,
                 --   duration_sec, width, height, video_codec, container, year, synopsis,
                 --   genres(text[]), poster_path, subtitle_path, tmdb_id, scraped_at,
-                --   available, created_at, updated_at, last_scanned_at
+                --   available, content_rating, created_at, updated_at, last_scanned_at
 watch_progress  -- PK(user_id, video_id), position_sec, duration_sec, updated_at
 favorites       -- PK(user_id, video_id), created_at
 playlists       -- id, user_id(FK), name, description, タイムスタンプ
@@ -157,6 +198,28 @@ uploads         -- id, filename, target_path, total_size, chunk_size,
 downloads       -- id, url, title, target_path, format, status(queued|downloading|
                 --   completed|failed|canceled), progress, error, interval_secs,
                 --   last_run_at, タイムスタンプ（yt-dlp ジョブ、定期実行対応）
+watch_rooms     -- id, code(ユニーク), video_id, owner, playing, position_sec,
+                --   updated_at（一緒に見るセッション、2.5 秒ごとにポーリング）
+live_streams    -- id, title, stream_key(ユニーク), status(offline|starting|live|idle),
+                --   error, created_by(FK→users), タイムスタンプ（RTMP 取り込み）
+chat_messages   -- id, stream_id(FK, ON DELETE CASCADE), user_name, text, created_at
+video_transcripts -- PK(video_id, lang), transcript_path, format(webvtt|text),
+                --   updated_at（Whisper 出力、検索可能）
+tags            -- id, name(ユニーク), created_at
+video_tags      -- PK(video_id, tag_id), tagged_by(FK→users, NULL = 自動),
+                --   created_at
+collections     -- id, user_id(FK), name, filters(jsonb), created_at
+                --   （保存した検索条件から作るスマートコレクション）
+trash_records   -- id, video_id(FK), original_path, trashed_at, restored_at
+                --   （バッチ「ゴミ箱へ移動」と復元）
+comments        -- id, video_id(FK, ON DELETE CASCADE), user_id(FK),
+                --   text, created_at
+ratings         -- PK(video_id, user_id), score(1-5), updated_at
+storage_pools   -- id, name(ユニーク), type(local|s3|sftp), mount_path,
+                --   config(jsonb), read_only, created_at（アップロード/ダウンロード先）
+webhook_subscriptions -- id, url, events(text[]), secret, active, タイムスタンプ
+skip_intervals  -- PK(video_id, kind), kind(intro|credits), start_sec, end_sec,
+                --   updated_at（イントロ/クレジットスキップバー）
 ```
 
 主要インデックス：`videos(lower(title))`、`videos(library_id)`、部分インデックス
@@ -170,6 +233,13 @@ erDiagram
     users ||--o{ playlists : 所有
     users ||--o{ hidden_paths : 非表示
     users ||--o{ series_favorites : ドラマお気に入り
+    users ||--o{ share_tokens : 作成
+    users ||--o{ watch_rooms : 開催
+    users ||--o{ live_streams : 配信
+    users ||--o{ comments : コメント
+    users ||--o{ ratings : 評価
+    users ||--o{ collections : 保存
+    users ||--o{ video_tags : タグ付け
     admins ||--o{ blocked_titles : ブロック
     libraries ||--o{ videos : 包含
     libraries ||--o{ series : グループ化
@@ -178,6 +248,16 @@ erDiagram
     videos ||--o{ playlist_items : 含まれる
     videos ||--o{ watch_progress : 持つ
     videos ||--o{ favorites : 持つ
+    videos ||--o{ comments : 持つ
+    videos ||--o{ ratings : 持つ
+    videos ||--o{ video_tags : 持つ
+    videos ||--o{ video_transcripts : 文字起こし
+    videos ||--o{ skip_intervals : スキップ
+    videos ||--o{ trash_records : ゴミ箱
+    videos ||--o{ share_tokens : 共有
+    series ||--o{ share_tokens : 共有
+    playlists ||--o{ share_tokens : 共有
+    live_streams ||--o{ chat_messages : 持つ
 ```
 
 ### 3.5 ストリーミング（HTTP Range）
@@ -231,7 +311,9 @@ erDiagram
 - 一緒に見る：`watch_rooms`（マイグレーション 018）が共有トークンと再生状態
   （再生/一時停止・位置）を保持。メンバーは `GET /api/watch/rooms/{id}?token=…`
   を 2.5 秒ごとにポーリングし、PUT で状態を公開して緩く同期します。キャスト：
-  ブラウザが対応していれば Web AirPlay ボタン（`webkitShowPlaybackUI`）を表示
+  ブラウザが対応していれば Web AirPlay ボタン（`webkitShowPlaybackUI`）を表示し、
+  「テレビにキャスト」ボタンは Google Cast SDK を読み込み、短期共有 URL を
+  デフォルトメディアレシーバーへストリーミングします
 - ライブ配信：`live_streams` と `chat_messages`（マイグレーション 019）。
   `LiveManager` が RTMP 取り込み（`RTMP_INGEST_URL` + ストリームごとのキー）を
   ローリング HLS プレイリスト（`data/live/<id>/index.m3u8`）に変換。
@@ -461,9 +543,12 @@ frontend/src/
   api.js           fetch ラッパー（token、JSON、401 リダイレクト）
   auth.jsx         認証コンテキスト（ユーザー、ログイン/登録/ログアウト）
   i18n/            i18next 設定 + en/zh/fr/ja/de ロケール JSON
-  components/      Navbar、Poster、VideoCard、PathPicker、Toast
+  components/      Navbar、Poster、VideoCard、PathPicker、ShareModal、
+                   SubtitleSearchModal、DownloadDialog、UploadManager、Toast
   pages/           Login、Browse、VideoDetail、Player、Playlists、
-                   PlaylistDetail、Favorites、Admin
+                   PlaylistDetail、SeriesList、SeriesDetail、Share、Live、
+                   Favorites、Admin（+ Uploads/Downloads/Storage/Jobs/Webhooks
+                   管理タブ、Blocked タイトル）
 ```
 
 ### 4.2 ルーティングと状態
@@ -483,9 +568,14 @@ frontend/src/
 
 ### 4.4 管理 UI
 
-タブ：概要（統計）、ライブラリ（サーバーフォルダ選択 UI で追加、スキャン/停止、削除）、
-動画（検索、メタデータ編集、スクレイピング、ポスターアップロード）、
-ユーザー（ロール、パスワード再設定、削除）。
+タブ：**概要**（統計、バックアップエクスポート/インポート、メンテナンス実行、
+テスト通知）、**ライブラリ**（サーバーフォルダ選択 UI、スキャン/停止、
+ヘルスチェック/ベスト版保持、NFO インポート/エクスポート、ブロック）、
+**動画**（検索、メタデータ編集、スクレイピング、ポスター、バッチ操作、
+ゴミ箱）、**ユーザー**（ロール、パスワード再設定、削除）、**アップロード**
+（チャンクアップロード）、**ダウンロード**（yt-dlp キュー）、**ストレージ**
+（ローカル/S3/SFTP プール）、**ジョブ**（スキャン/アップロード/ダウンロード/
+ライブ + ディスク使用量）、**Webhooks**（購読 + OpenAPI）。
 
 ## 5. 主要フロー
 
@@ -574,12 +664,38 @@ sequenceDiagram
 | `FFPROBE_BIN` / `FFMPEG_BIN` | 自動検出 | ツールパス（Homebrew フォールバック） |
 | `TMDB_API_KEY` / `TMDB_LANGUAGE` | 空 / zh-CN | スクレイピング |
 | `SCAN_WORKERS` | `4` | 並列プローブ数 |
+| `CORS_ORIGINS` | 空（`*`） | API 呼び出しを許可するブラウザオリジン |
+| `WATCH_INTERVAL` | `30` | 増分スキャンのフォールバック間隔（秒）。fsnotify は即時索引 |
+| `YTDLP_PATH` | PATH 上の yt-dlp | ダウンロードキューの yt-dlp バイナリ |
 | `WEB_ROOT` | 自動（`frontend/dist`） | 本番モードのフロントエンドディレクトリ |
+| `HLS_HW_ACCEL` / `HLS_VAAPI_DEVICE` / `HLS_TONE_MAP` | 空 / `/dev/dri/renderD128` / `0` | ハードウェア HLS エンコード（videotoolbox/nvenc/qsv/vaapi）、VAAPI デバイス、HDR→SDR トーンマッピング |
+| `SUBTITLE_OS_USERNAME` / `SUBTITLE_OS_PASSWORD` / `SUBTITLE_OS_API_KEY` | 空 | OpenSubtitles オンライン字幕検索の認証情報 |
+| `RTMP_INGEST_URL` | `rtmp://localhost:1935/live` | ライブ配信の RTMP 取り込みベース URL |
+| `WHISPER_BIN` / `WHISPER_MODEL` | 空 | whisper.cpp CLI + モデル（文字起こし） |
+| `SCRAPE_CUSTOM_URL` | 空 | カスタム JSON スクレイパーエンドポイント（`%s` = URL エンコードされたタイトル） |
+| `AI_TAG_BIN` | 空 | 外部 AI タグ付けツール（メディアパス引数、1 行 1 タグ） |
+| `OIDC_ISSUER` / `OIDC_CLIENT_ID` / `OIDC_CLIENT_SECRET` / `OIDC_REDIRECT_URL` | 空 | OIDC シングルサインオン |
+| `SAML_IDP_METADATA_URL` / `SAML_SP_CERT` / `SAML_SP_KEY` / `SAML_SP_ENTITY_ID` / `SAML_ACS_URL` | 空 | SAML 2.0 シングルサインオン |
+| `NOTIFY_WEBHOOK_URL` / `NOTIFY_APPRISE_URL` | 空 | Webhook/Apprise 通知チャンネル |
+| `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASSWORD` / `NOTIFY_EMAIL_FROM` / `NOTIFY_EMAIL_TO` | 空 / `587` | SMTP メール通知 |
+| `MAINT_INTERVAL_HOURS` / `MAINT_BACKUP_RETENTION` / `MAINT_RESCAN` | `24` / `7` / `0` | 定期メンテナンス（バックアップ、ヘルスチェック、再スキャン） |
+| `DLNA_ENABLED` / `DLNA_FRIENDLY_NAME` / `DLNA_ALLOWED_IPS` | `0` / `VideoCMS` / 空（LAN 全体） | UPnP/DLNA メディアサーバー、表示名、IP/CIDR 許可リスト |
+| `VITE_API_BASE_URL` | 空 | クロスオリジンデプロイ用のフロントエンド API ベース URL |
 
 ## 7. セキュリティ考慮
 
 - 変更・閲覧系エンドポイントはすべて管理者限定
 - メディア URL にはユーザー JWT が必要（ヘッダーまたはクエリパラメータ）
+- 公開共有リンクは推測不能なトークンで、有効期限・任意のパスワード・
+  ドメイン許可リスト付き。キャストは 1 時間の動画共有を再利用するため
+  JWT がブラウザの外に出ません
+- DLNA エンドポイントは設計上未認証ですが `DLNA_ALLOWED_IPS`（IP/CIDR）で
+  制限。信頼できる LAN でのみ空にしてください
+- SAML アサーションは IdP 証明書で検証（署名・条件・audience）。
+  SP 鍵は `SAML_SP_CERT`/`SAML_SP_KEY` ファイルから
+- SMTP 通知は TLS 優先：465 は暗黙 TLS、それ以外は STARTTLS。
+  認証情報は暗号化後にのみ送信
+- Webhook 配信は HMAC-SHA256 の `X-Videocms-Signature` 付きで受信側が検証可能
 - HLS セグメント名は厳密に検証（`seg_\d+\.ts`）し、セッションディレクトリ内に制限
 - SQL は pgx で全箇所パラメータ化
 - デフォルト `JWT_SECRET` は開発専用。平文 HTTP は信頼できる LAN のみ推奨。
@@ -598,3 +714,19 @@ sequenceDiagram
 
 - **JAV DB メタデータプロバイダ**（API キーが必要。免キーの TMDB/TVMaze/
   AniList/Wikipedia で一般的なニーズはカバー済み）
+- **カスタムメタデータスクレイパー** — `SCRAPE_CUSTOM_URL` が任意の JSON
+  エンドポイントを指せ、`%s` を URL エンコードしたタイトルに置換。コード変更なしで
+  自前のスクレイパーを接続可能
+- **字幕プロバイダ** — `SubtitleProvider` インターフェース（現在は
+  OpenSubtitles.com）を拡張して新しいソースを追加できます
+- **AI タグ付け** — 外部バイナリ（`AI_TAG_BIN`）がメディアパスを受け取り
+  1 行 1 タグを出力。タグは `tags`/`video_tags` とタグクラウドに反映
+- **音声文字起こし** — whisper.cpp（`WHISPER_BIN`）が音声を検索可能な文字起こし
+  に変換。同じパイプラインで WebVTT 字幕トラックも生成
+- **通知チャンネル** — `media.Notifier` が同じイベントを webhook、Apprise、
+  SMTP に送出。新しいチャンネルは `Send` に分岐を追加するだけ
+- **SSO プロバイダ** — OIDC と SAML 2.0 はどちらも `users.oauth_sub` への
+  紐付けに集約。新しいプロバイダには start/callback のペアと upsert 経路が必要
+- **DLNA / Chromecast** — UPnP サーバー（`/dlna/*`）と Cast sender は
+  自己完結。DLNA のブラウズは新しいオブジェクトコンテナで拡張でき、
+  共有トークンフローは他のキャスト先にも応用可能
