@@ -208,6 +208,8 @@ Statistiques : vidéos, bibliothèques, utilisateurs, listes, favoris, séries e
 - La liste vidéo admin supporte les **actions groupées** (étiqueter, effacer
   les étiquettes, mettre à la corbeille) et une **corbeille** avec restauration
   en un clic
+- Les utilisateurs peuvent **commenter et noter** les vidéos (1-5 étoiles) ;
+  l’accueil affiche un fil d’activité récente (commentaires et favoris)
 
 ### 5.4 Utilisateurs
 
