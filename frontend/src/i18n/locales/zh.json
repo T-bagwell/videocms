@@ -9,6 +9,13 @@
     "favorites": "我的收藏",
     "admin": "管理",
     "logout": "退出",
+    "parentalLock": "家长锁",
+    "parentalUnlockPin": "解锁 PIN",
+    "parentalUnlock": "解锁",
+    "parentalSetPin": "设置 PIN",
+    "parentalSavePin": "保存 PIN",
+    "parentalPinSaved": "PIN 已保存",
+    "parentalUnlocked": "已解锁 5 分钟",
     "language": "语言"
   },
   "login": {
@@ -96,6 +103,7 @@
     "fieldTitle": "标题",
     "fieldYear": "年份",
     "fieldGenres": "类型（逗号分隔）",
+    "fieldContentRating": "内容分级",
     "fieldSynopsis": "简介",
     "share": "🔗 分享",
     "shareTitle": "分享这个视频",
@@ -321,7 +329,11 @@
     "exportNFO": "导出 NFO",
     "importNFO": "导入 NFO",
     "nfoExported": "已导出 {{count}} 个 NFO 文件",
-    "nfoImported": "已从 NFO 更新 {{count}} 个视频"
+    "nfoImported": "已从 NFO 更新 {{count}} 个视频",
+    "allowedRating": "允许的分级",
+    "ratingSaved": "已保存 {{name}} 的分级策略",
+    "quota": "配额（字节）",
+    "quotaSaved": "存储配额已保存"
   },
   "picker": {
     "title": "选择服务器文件夹",

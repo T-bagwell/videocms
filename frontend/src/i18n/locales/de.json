@@ -9,6 +9,13 @@
     "favorites": "Meine Favoriten",
     "admin": "Verwaltung",
     "logout": "Abmelden",
+    "parentalLock": "Kindersicherung",
+    "parentalUnlockPin": "PIN zum Entsperren",
+    "parentalUnlock": "Entsperren",
+    "parentalSetPin": "PIN festlegen",
+    "parentalSavePin": "PIN speichern",
+    "parentalPinSaved": "PIN gespeichert",
+    "parentalUnlocked": "Für 5 Minuten entsperrt",
     "language": "Sprache"
   },
   "login": {
@@ -96,6 +103,7 @@
     "fieldTitle": "Titel",
     "fieldYear": "Jahr",
     "fieldGenres": "Genres (durch Kommas getrennt)",
+    "fieldContentRating": "Einstufung",
     "fieldSynopsis": "Beschreibung",
     "share": "🔗 Teilen",
     "shareTitle": "Dieses Video teilen",
@@ -321,7 +329,11 @@
     "exportNFO": "NFO exportieren",
     "importNFO": "NFO importieren",
     "nfoExported": "{{count}} NFO-Datei(en) exportiert",
-    "nfoImported": "{{count}} Video(s) aus NFO aktualisiert"
+    "nfoImported": "{{count}} Video(s) aus NFO aktualisiert",
+    "allowedRating": "Erlaubte Einstufung",
+    "ratingSaved": "Einstufungsrichtlinie für {{name}} gespeichert",
+    "quota": "Kontingent (Bytes)",
+    "quotaSaved": "Speicherkontingent gespeichert"
   },
   "picker": {
     "title": "Serverordner auswählen",

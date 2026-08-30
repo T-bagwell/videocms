@@ -9,6 +9,13 @@
     "favorites": "Mes favoris",
     "admin": "Administration",
     "logout": "Se déconnecter",
+    "parentalLock": "Contrôle parental",
+    "parentalUnlockPin": "PIN pour déverrouiller",
+    "parentalUnlock": "Déverrouiller",
+    "parentalSetPin": "Définir un PIN",
+    "parentalSavePin": "Enregistrer le PIN",
+    "parentalPinSaved": "PIN enregistré",
+    "parentalUnlocked": "Déverrouillé pour 5 minutes",
     "language": "Langue"
   },
   "login": {
@@ -96,6 +103,7 @@
     "fieldTitle": "Titre",
     "fieldYear": "Année",
     "fieldGenres": "Genres (séparés par des virgules)",
+    "fieldContentRating": "Classification",
     "fieldSynopsis": "Synopsis",
     "share": "🔗 Partager",
     "shareTitle": "Partager cette vidéo",
@@ -321,7 +329,11 @@
     "exportNFO": "Exporter NFO",
     "importNFO": "Importer NFO",
     "nfoExported": "{{count}} fichier(s) NFO exporté(s)",
-    "nfoImported": "{{count}} vidéo(s) mise(s) à jour depuis NFO"
+    "nfoImported": "{{count}} vidéo(s) mise(s) à jour depuis NFO",
+    "allowedRating": "Classification autorisée",
+    "ratingSaved": "Politique de classification enregistrée pour {{name}}",
+    "quota": "Quota (octets)",
+    "quotaSaved": "Quota de stockage enregistré"
   },
   "picker": {
     "title": "Choisir un dossier serveur",

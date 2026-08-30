@@ -247,6 +247,18 @@ function Libraries() {
     }
   }
 
+  async function setQuota(l, val) {
+    const quota = parseInt(val, 10) || 0;
+    setErr('');
+    try {
+      await api(`/libraries/${l.id}`, { method: 'PATCH', body: { quota_bytes: quota } });
+      setMsg(t('admin.quotaSaved'));
+      refresh();
+    } catch (e) {
+      setErr(e.message);
+    }
+  }
+
   return (
     <div>
       {msg && <div className="toast toast-success">{msg}</div>}
@@ -331,6 +343,14 @@ function Libraries() {
                 </button>
                 <button className="btn small" onClick={() => nfo(l, 'export')}>{t('admin.exportNFO')}</button>
                 <button className="btn small" onClick={() => nfo(l, 'import')}>{t('admin.importNFO')}</button>
+                <input
+                  className="quota-input"
+                  type="number"
+                  min="0"
+                  placeholder={t('admin.quota')}
+                  defaultValue={l.quota_bytes || ''}
+                  onBlur={(e) => setQuota(l, e.target.value)}
+                />
                 <button className="btn small danger-ghost" onClick={() => toggleLibraryBlock(l)}>
                   {l.blocked ? t('admin.blockUnblock') : t('admin.blockLibrary')}
                 </button>
@@ -425,6 +445,7 @@ function VideoAdmin() {
             .split(',')
             .map((g) => g.trim())
             .filter(Boolean),
+          content_rating: form.content_rating,
         },
       });
       setMsg(`${form.title} — ${t('video.metaUpdated')}`);
@@ -625,6 +646,7 @@ function VideoAdmin() {
                   synopsis: v.synopsis,
                   year: v.year || '',
                   genres: (v.genres || []).join(', '),
+                  content_rating: v.content_rating || '',
                 });
               }}
             >
@@ -658,6 +680,10 @@ function VideoAdmin() {
               <label>
                 {t('video.fieldGenres')}
                 <input value={form.genres} onChange={(e) => setForm({ ...form, genres: e.target.value })} />
+              </label>
+              <label>
+                {t('video.fieldContentRating')}
+                <input value={form.content_rating} onChange={(e) => setForm({ ...form, content_rating: e.target.value })} />
               </label>
               <label>
                 {t('video.fieldSynopsis')}
@@ -723,6 +749,16 @@ function Users() {
     }
   }
 
+  async function setRating(u, val) {
+    try {
+      await api(`/admin/users/${u.id}`, { method: 'PATCH', body: { allowed_rating: val.trim() } });
+      setMsg(t('admin.ratingSaved', { name: u.username }));
+      refresh();
+    } catch (e) {
+      setErr(e.message);
+    }
+  }
+
   return (
     <div>
       {msg && <div className="toast toast-success">{msg}</div>}
@@ -743,6 +779,12 @@ function Users() {
                 <option value="user">{t('admin.roleUser')}</option>
                 <option value="admin">{t('admin.roleAdmin')}</option>
               </select>
+              <input
+                className="rating-input"
+                placeholder={t('admin.allowedRating')}
+                defaultValue={u.allowed_rating || ''}
+                onBlur={(e) => setRating(u, e.target.value)}
+              />
             </div>
             <div className="playlist-item-actions">
               <button className="btn small" onClick={() => resetPassword(u)}>

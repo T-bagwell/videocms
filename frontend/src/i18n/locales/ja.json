@@ -9,6 +9,13 @@
     "favorites": "お気に入り",
     "admin": "管理",
     "logout": "ログアウト",
+    "parentalLock": "ペアレンタルロック",
+    "parentalUnlockPin": "ロック解除 PIN",
+    "parentalUnlock": "ロック解除",
+    "parentalSetPin": "PIN を設定",
+    "parentalSavePin": "PIN を保存",
+    "parentalPinSaved": "PIN を保存しました",
+    "parentalUnlocked": "5 分間ロック解除しました",
     "language": "言語"
   },
   "login": {
@@ -96,6 +103,7 @@
     "fieldTitle": "タイトル",
     "fieldYear": "年",
     "fieldGenres": "ジャンル（カンマ区切り）",
+    "fieldContentRating": "レーティング",
     "fieldSynopsis": "あらすじ",
     "share": "🔗 共有",
     "shareTitle": "この動画を共有",
@@ -321,7 +329,11 @@
     "exportNFO": "NFO エクスポート",
     "importNFO": "NFO インポート",
     "nfoExported": "NFO を {{count}} 件エクスポートしました",
-    "nfoImported": "NFO から {{count}} 件の動画を更新しました"
+    "nfoImported": "NFO から {{count}} 件の動画を更新しました",
+    "allowedRating": "許可するレーティング",
+    "ratingSaved": "{{name}} のレーティング方針を保存しました",
+    "quota": "クォータ（バイト）",
+    "quotaSaved": "ストレージクォータを保存しました"
   },
   "picker": {
     "title": "サーバーフォルダを選択",

@@ -351,6 +351,7 @@ label input, label textarea { margin-top: 6px; }
 .comment-row { padding: 8px 0; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
 .feed-box { padding: 12px; }
 .feed-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; font-size: 14px; }
+.rating-input, .quota-input { padding: 6px 8px; border-radius: 6px; font-size: 13px; max-width: 180px; }
 .status-cancelled { background: rgba(243,156,18,0.15); color: var(--warn); }
 .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
 .small-muted { color: var(--muted); font-size: 12px; }

@@ -40,6 +40,8 @@ export async function api(path, { method = 'GET', body, form } = {}) {
   const headers = {};
   const token = getToken();
   if (token) headers.Authorization = `Bearer ${token}`;
+  const unlock = localStorage.getItem('videocms_unlock');
+  if (unlock) headers['X-Videocms-Unlock'] = unlock;
   if (body && !form) headers['Content-Type'] = 'application/json';
 
   const res = await fetch(`${API_BASE}/api${path}`, {

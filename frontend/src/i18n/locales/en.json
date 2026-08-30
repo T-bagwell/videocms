@@ -9,6 +9,13 @@
     "favorites": "My Favorites",
     "admin": "Admin",
     "logout": "Log out",
+    "parentalLock": "Parental lock",
+    "parentalUnlockPin": "PIN to unlock",
+    "parentalUnlock": "Unlock",
+    "parentalSetPin": "Set PIN",
+    "parentalSavePin": "Save PIN",
+    "parentalPinSaved": "PIN saved",
+    "parentalUnlocked": "Unlocked for 5 minutes",
     "language": "Language"
   },
   "login": {
@@ -96,6 +103,7 @@
     "fieldTitle": "Title",
     "fieldYear": "Year",
     "fieldGenres": "Genres (comma separated)",
+    "fieldContentRating": "Content rating",
     "fieldSynopsis": "Synopsis",
     "share": "🔗 Share",
     "shareTitle": "Share this video",
@@ -321,7 +329,11 @@
     "exportNFO": "Export NFO",
     "importNFO": "Import NFO",
     "nfoExported": "Exported {{count}} NFO file(s)",
-    "nfoImported": "Updated {{count}} video(s) from NFO"
+    "nfoImported": "Updated {{count}} video(s) from NFO",
+    "allowedRating": "Allowed rating",
+    "ratingSaved": "Rating policy saved for {{name}}",
+    "quota": "Quota (bytes)",
+    "quotaSaved": "Storage quota saved"
   },
   "picker": {
     "title": "Select server folder",
