@@ -96,6 +96,8 @@ Ouvrez l’interface et connectez-vous avec l’administrateur initial **admin /
 - **Regarder ensemble** : créez ou rejoignez une salle pour synchroniser la
   lecture avec vos amis ; un bouton **Diffuser / AirPlay** est disponible si
   le navigateur le prend en charge
+- **Direct** : les administrateurs créent des flux RTMP (URL d’ingestion
+  compatible OBS) et les spectateurs profitent d’un tchat intégré
 - **Télécharger** un remux MKV ou MP4 avec la piste audio et les sous-titres
   choisis (sans ré-encodage), ou récupérer le fichier original
 - La progression est sauvegardée toutes les 5 secondes et à la pause/fin
@@ -225,6 +227,7 @@ Tout se configure par variables d’environnement (table complète dans le READM
 | `HLS_VAAPI_DEVICE` | `/dev/dri/renderD128` | Périphérique VAAPI (avec `HLS_HW_ACCEL=vaapi`) |
 | `HLS_TONE_MAP` | `0` | `1` active le mappage de tons HDR→SDR dans le transcodage HLS |
 | `SUBTITLE_OS_USERNAME` / `SUBTITLE_OS_PASSWORD` / `SUBTITLE_OS_API_KEY` | vide | Identifiants OpenSubtitles pour la recherche de sous-titres |
+| `RTMP_INGEST_URL` | `rtmp://localhost:1935/live` | URL d’ingestion RTMP de base (nginx-rtmp ou équivalent) |
 
 ## 7. FAQ
 
