@@ -29,8 +29,35 @@ matériel. Vos vidéos ne quittent jamais votre réseau, sauf si vous choisissez
 
 ## Captures d’écran
 
-> *À venir — lancez `make serve` et ouvrez `http://<ip-serveur>:8080` pour voir
-> l’interface en action.*
+**Navigation et recherche** — grille filtrable, nuage de tags, recherche floue
+et collections intelligentes enregistrées :
+
+![Accueil](screenshots/home.png)
+
+**Séries TV** — les fichiers numérotés se regroupent en séries triées
+saison → épisode :
+
+![Séries](screenshots/series.png)
+
+**Détail de la vidéo** — métadonnées, tags, vidéos similaires, partage et
+enregistrement hors ligne :
+
+![Détail](screenshots/detail.png)
+
+**Lecteur** — lecture native ou HLS adaptatif avec commutation
+sous-titres/audio, sélecteur de qualité, regarder ensemble, diffusion et saut
+de l’intro/générique :
+
+![Lecteur](screenshots/player.png)
+
+**Page de partage public** — liens protégés par mot de passe et domaine :
+
+![Partage](screenshots/share.png)
+
+**Console d’administration** — aperçu, bibliothèques, vidéos, utilisateurs,
+téléversements, téléchargements, stockage, tâches et webhooks :
+
+![Admin](screenshots/admin.png)
 
 ## 3. Démarrage rapide
 
