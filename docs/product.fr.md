@@ -177,6 +177,8 @@ Statistiques : vidéos, bibliothèques, utilisateurs, listes, favoris, séries e
 - Supprimer une bibliothèque retire ses enregistrements — les fichiers restent sur le disque
 - **Ouvrir le dossier** ouvre le répertoire de la médiathèque sur le serveur
   avec le gestionnaire de fichiers système, pour inspecter ou gérer les médias
+- **Contrôle de santé** signale fichiers manquants/corrompus et doublons ;
+  **Garder la meilleure version** déplace le reste vers la corbeille du serveur
 - **Bloquer la bibliothèque** masque toute la médiathèque pour chaque utilisateur
   (accueil, séries, favoris, reprise, listes) sans rien supprimer ;
   le déblocage restaure immédiatement
