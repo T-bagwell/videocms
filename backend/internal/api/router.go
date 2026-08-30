@@ -106,6 +106,11 @@ func (a *App) Routes() http.Handler {
 	mux.HandleFunc("POST /api/admin/trash/{id}/restore", authAdmin(a.restoreTrash))
 	mux.HandleFunc("POST /api/admin/videos/batch", authAdmin(a.batchVideos))
 	mux.HandleFunc("POST /api/admin/notify/test", authAdmin(a.testNotification))
+	mux.HandleFunc("GET /api/admin/storage-pools", authAdmin(a.listStoragePoolsAdmin))
+	mux.HandleFunc("POST /api/admin/storage-pools", authAdmin(a.createStoragePool))
+	mux.HandleFunc("PATCH /api/admin/storage-pools/{id}", authAdmin(a.updateStoragePool))
+	mux.HandleFunc("DELETE /api/admin/storage-pools/{id}", authAdmin(a.deleteStoragePool))
+	mux.HandleFunc("GET /api/storage-pools", authUser(a.listStoragePoolsUser))
 	mux.HandleFunc("PATCH /api/libraries/{id}", authAdmin(a.setLibraryBlocked))
 	mux.HandleFunc("DELETE /api/libraries/{id}", authAdmin(a.deleteLibrary))
 

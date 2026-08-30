@@ -82,8 +82,15 @@ func (a *App) createDownload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if !isAbsDir(req.TargetPath) {
-		writeErr(w, http.StatusBadRequest, "target_path must be an existing absolute directory")
-		return
+		if resolved, ok := a.resolveTargetPath(req.TargetPath); !ok {
+			writeErr(w, http.StatusBadRequest, "target_path must be an existing absolute directory or pool reference")
+			return
+		} else if !isAbsDir(resolved) {
+			writeErr(w, http.StatusBadRequest, "target_path must be an existing absolute directory or pool reference")
+			return
+		} else {
+			req.TargetPath = resolved
+		}
 	}
 	format := strings.TrimSpace(req.Format)
 	if format == "" {

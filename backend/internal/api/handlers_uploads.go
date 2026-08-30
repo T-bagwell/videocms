@@ -163,8 +163,16 @@ func (a *App) createUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if !isAbsDir(req.TargetPath) {
-		writeErr(w, http.StatusBadRequest, "target_path must be an existing absolute directory")
-		return
+		// Storage pool reference (pool://name[/sub])? Resolve to its mount path.
+		if resolved, ok := a.resolveTargetPath(req.TargetPath); !ok {
+			writeErr(w, http.StatusBadRequest, "target_path must be an existing absolute directory or pool reference")
+			return
+		} else if !isAbsDir(resolved) {
+			writeErr(w, http.StatusBadRequest, "target_path must be an existing absolute directory or pool reference")
+			return
+		} else {
+			req.TargetPath = resolved
+		}
 	}
 	if req.Size < 0 {
 		writeErr(w, http.StatusBadRequest, "size must not be negative")
