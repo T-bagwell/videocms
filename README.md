@@ -156,6 +156,7 @@ All settings are environment variables:
 | `SCAN_WORKERS` | `4` | Parallel scan workers (1–16) |
 | `WATCH_INTERVAL` | `30` | Fallback interval for incremental scans (fsnotify events index immediately); `0` disables watching |
 | `HLS_HW_ACCEL` | empty (software x264) | HLS video encoder: `videotoolbox`, `nvenc` or `qsv`; empty uses libx264 |
+| `SUBTITLE_OS_USERNAME` / `SUBTITLE_OS_PASSWORD` / `SUBTITLE_OS_API_KEY` | empty | OpenSubtitles credentials for the online subtitle search |
 | `WEB_ROOT` | auto (`frontend/dist`) | Built frontend for single-service mode; leave unset for API-only deployment |
 | `CORS_ORIGINS` | empty (`*`) | Comma-separated browser origins allowed to call the API (separate frontend deployments) |
 | `VITE_API_BASE_URL` | empty | Frontend build-time API base URL for cross-origin deployments (runtime override: `window.__VIDEOCMS_API_BASE__`) |
@@ -233,7 +234,7 @@ Planned work is informed by feature sets of similar self-hosted video projects
 - [x] Multiple audio tracks with in-player switching (separate HLS audio tracks)
 - [x] Styled (ASS) soft subtitles
 - [x] Subtitle sync / offset controls (direct playback)
-- [ ] Automatic subtitle download & matching
+- [x] Automatic subtitle download & matching
 - [ ] Hardware-accelerated transcoding (VAAPI/NVENC/QSV) + HDR tone mapping
 - [x] Trick-play thumbnails / preview timeline
 - [ ] Intro & credits skip
