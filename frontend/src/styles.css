@@ -245,7 +245,7 @@ label input, label textarea { margin-top: 6px; }
 .playlist-item-main .thumb { width: 110px; height: 62px; border-radius: 8px; flex: none; }
 .playlist-item-actions { display: flex; gap: 8px; flex: none; }
 
-.tabs { display: flex; gap: 6px; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
 .tab {
   background: none; border: none; border-bottom: 2px solid transparent; color: var(--muted);
   padding: 10px 16px; font-size: 14px; cursor: pointer;
