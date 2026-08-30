@@ -47,12 +47,24 @@ scripts/                 make-demo-media.sh and similar
 | POST | /api/libraries/{id}/open | admin | open library folder on the server (open / xdg-open / explorer) |
 | PATCH | /api/libraries/{id} | admin | block/unblock entire library (`{"blocked": true|false}`) |
 | DELETE | /api/libraries/{id} | admin | remove library |
+| GET | /api/uploads | admin | list upload sessions |
+| POST | /api/uploads | admin | create chunked upload session (filename + absolute target_path) |
+| GET | /api/uploads/{id} | admin | upload status + received chunks |
+| PUT | /api/uploads/{id}/chunk/{index} | admin | store one raw chunk (resumable) |
+| POST | /api/uploads/{id}/complete | admin | verify + assemble chunks into target folder |
+| DELETE | /api/uploads/{id} | admin | cancel upload, remove chunks |
+| GET | /api/downloads | admin | list yt-dlp jobs |
+| POST | /api/downloads | admin | queue URL (target_path, optional format + interval_secs) |
+| DELETE | /api/downloads/{id} | admin | cancel job |
+| POST | /api/downloads/{id}/retry | admin | requeue failed/canceled job |
 | GET | /api/videos | user | paginated list, `?library_id=`, `?q=`, hidden-path filtered |
 | GET | /api/videos/{id} | user | video detail |
 | PATCH | /api/videos/{id} | admin | edit title/year/synopsis/genres |
 | POST | /api/videos/{id}/poster | admin | upload poster |
 | GET | /api/videos/{id}/stream | user | HTTP Range stream |
 | GET | /api/videos/{id}/download | user | download |
+| GET | /api/videos/{id}/download/remux | user | stream MKV/MP4 with selected audio/subtitle tracks (no re-encode) |
+| GET | /api/videos/{id}/tracks | user | list container, audio/subtitle streams, sidecar tracks |
 | GET | /api/videos/{id}/subtitles | user | SRT/WebVTT |
 | GET | /api/videos/{id}/poster | user | poster image |
 | GET | /api/videos/{id}/hls/{file...} | user | HLS manifest/segments |
@@ -102,6 +114,21 @@ reaps idle sessions after 15 minutes.
 `hidden_paths` stores per-user prefixes. `visibleEpisodes($N)` returns
 `v.available AND NOT EXISTS (... v.file_path = hp.path OR starts_with(v.file_path, hp.path || '/'))`
 and is concatenated into every video listing.
+
+### Uploads
+`POST /api/uploads` creates a session (chunks stored under
+`DATA_DIR/uploads/<id>/`); the client PUTs numbered raw chunks and calls
+complete, which verifies chunk count/sizes, assembles the file into the
+target folder and cleans up. Target folders must be existing absolute
+directories without `..`; filenames are reduced with `filepath.Base`. Finished
+files inside a library are indexed automatically by the file watcher.
+
+### yt-dlp downloads
+`media.Downloader` polls the `downloads` table every 2s, claims one due job
+(queued, or completed with `interval_secs` elapsed), runs yt-dlp with
+`--newline` and parses `[download] NN%` progress, then marks it completed or
+failed. Cancellation kills the running process and never lets `fail` overwrite
+a `canceled` status. Tests inject a fake binary with `Downloader.SetBin`.
 
 ### Content blocking
 `blocked_titles` stores admin title rules; `visibleEpisodes` also applies
