@@ -101,7 +101,12 @@ func (a *App) downloadSubtitle(w http.ResponseWriter, r *http.Request) {
 	if base == "" || base == "." {
 		base = "subtitle"
 	}
-	path := filepath.Join(dir, base+detectSubtitleExt(content))
+	name := base + detectSubtitleExt(content)
+	if filepath.Base(name) != name {
+		writeErr(w, http.StatusBadRequest, "invalid subtitle file name")
+		return
+	}
+	path := filepath.Join(dir, name)
 	if err := os.WriteFile(path, content, 0o644); err != nil {
 		writeErr(w, http.StatusInternalServerError, "save subtitle failed")
 		return
