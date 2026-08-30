@@ -20,6 +20,11 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Automatic subtitle download & matching: admins search online subtitle
+  providers (OpenSubtitles.com) by title + year, optionally filtered by
+  language, and download a candidate straight into the video's subtitle
+  tracks (config: `SUBTITLE_OS_USERNAME` / `SUBTITLE_OS_PASSWORD` /
+  `SUBTITLE_OS_API_KEY`)
 - Styled (ASS) soft subtitles: ASS/SSA tracks are rendered with a libass WASM
   overlay (jassub) preserving fonts, colors, positioning and effects; the
   renderer follows the per-user subtitle offset
