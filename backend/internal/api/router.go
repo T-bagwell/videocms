@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime/debug"
+	"slices"
 	"strings"
 	"time"
 
@@ -207,9 +208,17 @@ func serveSPA(w http.ResponseWriter, r *http.Request, root string) {
 
 func (a *App) cors(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
+		origin := r.Header.Get("Origin")
+		if len(a.cfg.CORSOrigins) == 0 || origin == "" {
+			// No allow-list configured: accept any origin (token auth, no cookies).
+			w.Header().Set("Access-Control-Allow-Origin", "*")
+		} else if slices.Contains(a.cfg.CORSOrigins, origin) {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+			w.Header().Add("Vary", "Origin")
+		}
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type, Range")
+		w.Header().Set("Access-Control-Expose-Headers", "Accept-Ranges, Content-Range, Content-Length")
 		if r.Method == http.MethodOptions {
 			w.WriteHeader(http.StatusNoContent)
 			return

@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -18,6 +19,7 @@ type Config struct {
 	WebRoot       string
 	WatchInterval time.Duration
 	YtDLPPath     string
+	CORSOrigins   []string
 }
 
 func Load() Config {
@@ -32,6 +34,7 @@ func Load() Config {
 		WebRoot:       os.Getenv("WEB_ROOT"),
 		WatchInterval: envDuration("WATCH_INTERVAL", 30*time.Second),
 		YtDLPPath:     os.Getenv("YTDLP_PATH"),
+		CORSOrigins:   envList("CORS_ORIGINS"),
 	}
 	if cfg.Addr != "" && cfg.Addr[0] != ':' {
 		cfg.Addr = ":" + cfg.Addr
@@ -56,4 +59,20 @@ func envDuration(key string, fallback time.Duration) time.Duration {
 		}
 	}
 	return fallback
+}
+
+// envList splits a comma-separated env value into trimmed non-empty items.
+func envList(key string) []string {
+	raw := os.Getenv(key)
+	if raw == "" {
+		return nil
+	}
+	parts := strings.Split(raw, ",")
+	out := make([]string, 0, len(parts))
+	for _, p := range parts {
+		if v := strings.TrimSpace(p); v != "" {
+			out = append(out, v)
+		}
+	}
+	return out
 }

@@ -20,6 +20,10 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Configurable CORS: `CORS_ORIGINS` (comma-separated) restricts which browser
+  origins may call the API for separate frontend deployments; empty defaults
+  to `*` (token auth). Range streaming now also exposes `Accept-Ranges`,
+  `Content-Range` and `Content-Length` headers cross-origin
 - yt-dlp integration: admins can queue video/playlist/channel URLs from a new
   Downloads tab, choose a target folder and format, repeat downloads on a
   schedule, and cancel or retry jobs; progress is live and finished files are
