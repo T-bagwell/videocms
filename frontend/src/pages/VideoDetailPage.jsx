@@ -26,6 +26,8 @@ export default function VideoDetailPage() {
   const [showShare, setShowShare] = useState(false);
   const [showDownload, setShowDownload] = useState(false);
   const [showSubSearch, setShowSubSearch] = useState(false);
+  const [transcript, setTranscript] = useState(null);
+  const [transcribing, setTranscribing] = useState(false);
   const [subtitleBusy, setSubtitleBusy] = useState(false);
   const [tracks, setTracks] = useState([]);
   const [setGlobal, setSetGlobal] = useState(false);
@@ -34,7 +36,22 @@ export default function VideoDetailPage() {
     api(`/videos/${id}`).then(setVideo).catch((e) => setErr(e.message));
     api('/playlists').then((d) => setPlaylists(d.items)).catch(() => {});
     api(`/videos/${id}/subtitle-tracks`).then((d) => setTracks(d.items)).catch(() => setTracks([]));
+    api(`/videos/${id}/transcripts`).then(setTranscript).catch(() => setTranscript(null));
   }, [id]);
+
+  async function transcribe() {
+    setTranscribing(true);
+    setErr('');
+    try {
+      const d = await api(`/videos/${id}/transcribe`, { method: 'POST' });
+      setTranscript(d);
+      setMsg(t('video.transcriptDone'));
+    } catch (e2) {
+      setErr(e2.message);
+    } finally {
+      setTranscribing(false);
+    }
+  }
 
   async function toggleFavorite() {
     try {
@@ -245,6 +262,9 @@ export default function VideoDetailPage() {
                 <button className="btn ghost" onClick={scrape} disabled={scraping}>
                   {scraping ? t('video.scraping') : t('video.scrape')}
                 </button>
+                <button className="btn ghost" onClick={transcribe} disabled={transcribing}>
+                  {transcribing ? t('video.transcribing') : t('video.transcribe')}
+                </button>
                 <label className="btn ghost" disabled={subtitleBusy}>
                   {t('video.subtitleUpload')}
                   <input
@@ -314,6 +334,26 @@ export default function VideoDetailPage() {
                   {t('video.subtitleSetGlobal')}
                 </label>
               )}
+            </div>
+          )}
+          {transcript && transcript.status !== 'none' && (
+            <div className="card transcript-box">
+              <div className="playlist-name">
+                {t('video.transcript')}
+                <span
+                  className={`status-badge status-${
+                    transcript.status === 'done' ? 'completed' : transcript.status === 'failed' ? 'error' : 'queued'
+                  }`}
+                >
+                  {transcript.status === 'done'
+                    ? t('video.transcriptReady')
+                    : transcript.status === 'failed'
+                      ? t('video.transcriptFailed')
+                      : t('video.transcribing')}
+                </span>
+              </div>
+              {transcript.error && <div className="form-error small">{transcript.error}</div>}
+              {transcript.preview && <p className="muted small">{transcript.preview}</p>}
             </div>
           )}
         </div>

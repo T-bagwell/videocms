@@ -321,6 +321,7 @@ label input, label textarea { margin-top: 6px; }
 .chat-message { padding: 3px 0; font-size: 14px; }
 .chat-message b { margin-right: 6px; color: var(--primary); }
 .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+.transcript-box { margin-top: 14px; padding: 12px; }
 .status-cancelled { background: rgba(243,156,18,0.15); color: var(--warn); }
 .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
 .small-muted { color: var(--muted); font-size: 12px; }
