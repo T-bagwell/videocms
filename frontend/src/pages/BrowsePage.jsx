@@ -256,6 +256,7 @@ export default function BrowsePage() {
             <option value="duration_desc">{t('browse.sortDuration')}</option>
             <option value="added_desc">{t('browse.sortAdded')}</option>
             <option value="favorites_desc">{t('browse.sortFavorites')}</option>
+            <option value="fuzzy">{t('browse.sortFuzzy')}</option>
           </select>
           <select value={vtype} onChange={(e) => { setVtype(e.target.value); setPage(1); }}>
             <option value="">{t('browse.typeAll')}</option>

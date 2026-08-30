@@ -56,6 +56,7 @@
     "collectionName": "Name der neuen Sammlung…",
     "createCollection": "Sammlung erstellen",
     "sortFavorites": "Nach Favoriten",
+    "sortFuzzy": "Nach Relevanz (fuzzy)",
     "typeAll": "Alle",
     "typeMovie": "Filme",
     "typeTv": "Serien",

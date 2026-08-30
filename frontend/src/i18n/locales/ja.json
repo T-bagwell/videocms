@@ -56,6 +56,7 @@
     "collectionName": "新しいコレクション名…",
     "createCollection": "コレクションを作成",
     "sortFavorites": "お気に入り順",
+    "sortFuzzy": "関連度順（あいまい）",
     "typeAll": "すべて",
     "typeMovie": "映画",
     "typeTv": "ドラマ",

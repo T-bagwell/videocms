@@ -56,6 +56,7 @@
     "collectionName": "新建合集名称…",
     "createCollection": "创建合集",
     "sortFavorites": "按收藏数",
+    "sortFuzzy": "按相关度（模糊）",
     "typeAll": "全部",
     "typeMovie": "电影",
     "typeTv": "电视剧",
