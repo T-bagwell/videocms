@@ -205,6 +205,7 @@ Alles wird über Umgebungsvariablen konfiguriert (vollständige Tabelle im READM
 | `SCAN_WORKERS` | `4` | Parallele Scan-Worker |
 | `WATCH_INTERVAL` | `30` | Sekunden zwischen automatischen Inkrement-Scans; `0` deaktiviert |
 | `YTDLP_PATH` | `yt-dlp` im PATH | yt-dlp-Binary für die Download-Warteschlange |
+| `HLS_HW_ACCEL` | leer (Software-x264) | HLS-Videoencoder: videotoolbox, nvenc oder qsv; leer = libx264 |
 
 ## 7. FAQ
 
