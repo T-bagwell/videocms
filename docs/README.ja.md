@@ -156,6 +156,7 @@ make serve                                 # UI をビルドし :8080 で一括�
 | `SUBTITLE_OS_USERNAME` / `SUBTITLE_OS_PASSWORD` / `SUBTITLE_OS_API_KEY` | 空 | オンライン字幕検索用の OpenSubtitles 認証情報 |
 | `RTMP_INGEST_URL` | `rtmp://localhost:1935/live` | RTMP 取り込みのベース URL（nginx-rtmp 等）。ストリームごとにキーが付与されます |
 | `WHISPER_BIN` / `WHISPER_MODEL` | 空 | whisper.cpp のバイナリとモデルパス（文字起こし用） |
+| `SCRAPE_CUSTOM_URL` | 空 | カスタム JSON スクレイパー端点。`%s` は URL エスケープ済みタイトルに置換 |
 | `YTDLP_PATH` | PATH 上の `yt-dlp` | ダウンロードキューが使う yt-dlp バイナリ |
 | `WEB_ROOT` | 自動（`frontend/dist`） | 単一サービスモードで配信するフロントエンド。未設定なら API 専用デプロイ |
 | `CORS_ORIGINS` | 空（`*`） | API を呼び出せるブラウザオリジン（カンマ区切り。フロント分離デプロイ用） |
@@ -243,7 +244,7 @@ Stash、Kirari04/videocms、yt-dlp ツールなど）の機能セットを参考
 **メタデータと AI**
 
 - [x] ローカル音声文字起こし（Whisper）→ 検索可能な文字起こし/字幕
-- [ ] プラグイン式メタデータソース / カスタムスクレイパー（個別上書き対応）
+- [x] プラグイン式メタデータソース / カスタムスクレイパー（個別上書き対応）
 - [ ] AI タグ付け、シーン検出、画像解析による検索向上
 - [ ] メディアヘルスチェック：重複検出、破損チェック、ベスト版を残す整理
 - [ ] 類似動画レコメンドとタグクラウド
