@@ -338,7 +338,9 @@
     "allowedRating": "允许的分级",
     "ratingSaved": "已保存 {{name}} 的分级策略",
     "quota": "配额（字节）",
-    "quotaSaved": "存储配额已保存"
+    "quotaSaved": "存储配额已保存",
+    "testNotify": "测试通知",
+    "notifySent": "测试通知已发送"
   },
   "picker": {
     "title": "选择服务器文件夹",

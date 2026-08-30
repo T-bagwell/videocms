@@ -338,7 +338,9 @@
     "allowedRating": "Classification autorisée",
     "ratingSaved": "Politique de classification enregistrée pour {{name}}",
     "quota": "Quota (octets)",
-    "quotaSaved": "Quota de stockage enregistré"
+    "quotaSaved": "Quota de stockage enregistré",
+    "testNotify": "Notification de test",
+    "notifySent": "Notification de test envoyée"
   },
   "picker": {
     "title": "Choisir un dossier serveur",

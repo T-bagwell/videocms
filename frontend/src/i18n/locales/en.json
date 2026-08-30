@@ -338,7 +338,9 @@
     "allowedRating": "Allowed rating",
     "ratingSaved": "Rating policy saved for {{name}}",
     "quota": "Quota (bytes)",
-    "quotaSaved": "Storage quota saved"
+    "quotaSaved": "Storage quota saved",
+    "testNotify": "Test notification",
+    "notifySent": "Test notification sent"
   },
   "picker": {
     "title": "Select server folder",

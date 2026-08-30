@@ -78,6 +78,15 @@ function Overview() {
       setImportErr(e2.message);
     }
   }
+
+  async function testNotify() {
+    try {
+      await api('/admin/notify/test', { method: 'POST' });
+      setImportMsg(t('admin.notifySent'));
+    } catch (e) {
+      setImportErr(e.message);
+    }
+  }
   if (!stats) return <div className="loading">{t('common.loading')}</div>;
   return (
     <>
@@ -94,6 +103,7 @@ function Overview() {
         )}
       </div>
       <div className="detail-actions">
+        <button className="btn ghost" onClick={testNotify}>{t('admin.testNotify')}</button>
         <a className="btn ghost" href={mediaUrl('/admin/export')}>
           {t('admin.export')}
         </a>

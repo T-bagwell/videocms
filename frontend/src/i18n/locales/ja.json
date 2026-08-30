@@ -338,7 +338,9 @@
     "allowedRating": "許可するレーティング",
     "ratingSaved": "{{name}} のレーティング方針を保存しました",
     "quota": "クォータ（バイト）",
-    "quotaSaved": "ストレージクォータを保存しました"
+    "quotaSaved": "ストレージクォータを保存しました",
+    "testNotify": "通知テスト",
+    "notifySent": "テスト通知を送信しました"
   },
   "picker": {
     "title": "サーバーフォルダを選択",

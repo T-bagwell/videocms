@@ -338,7 +338,9 @@
     "allowedRating": "Erlaubte Einstufung",
     "ratingSaved": "Einstufungsrichtlinie für {{name}} gespeichert",
     "quota": "Kontingent (Bytes)",
-    "quotaSaved": "Speicherkontingent gespeichert"
+    "quotaSaved": "Speicherkontingent gespeichert",
+    "testNotify": "Testbenachrichtigung",
+    "notifySent": "Testbenachrichtigung gesendet"
   },
   "picker": {
     "title": "Serverordner auswählen",
