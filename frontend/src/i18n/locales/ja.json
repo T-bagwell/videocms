@@ -194,6 +194,7 @@
     "tabUsers": "ユーザー管理",
     "tabUploads": "アップロード",
     "tabDownloads": "ダウンロード",
+    "tabLive": "ライブ",
     "statsVideos": "動画数",
     "statsLibraries": "ライブラリ",
     "statsUsers": "ユーザー",
@@ -310,6 +311,24 @@
     "retry": "再試行",
     "progress": "{{pct}}%",
     "every": "{{hours}} 時間ごと"
+  },
+  "live": {
+    "titlePlaceholder": "配信タイトル",
+    "create": "ライブを作成",
+    "empty": "ライブはまだありません。",
+    "ingest": "RTMP 取り込み URL",
+    "watch": "視聴",
+    "start": "開始",
+    "stop": "停止",
+    "statusIdle": "待機",
+    "statusStarting": "起動中",
+    "statusLive": "配信中",
+    "statusOffline": "オフライン",
+    "offlineHint": "現在配信はありません。配信者が始めるとプレイヤーは自動で復帰します。",
+    "chat": "ライブチャット",
+    "chatEmpty": "メッセージはまだありません。",
+    "chatPlaceholder": "メッセージを入力…",
+    "send": "送信"
   },
   "download": {
     "title": "{{title}} をダウンロード",

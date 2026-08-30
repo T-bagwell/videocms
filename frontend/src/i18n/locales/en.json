@@ -194,6 +194,7 @@
     "tabUsers": "Users",
     "tabUploads": "Uploads",
     "tabDownloads": "Downloads",
+    "tabLive": "Live",
     "statsVideos": "Videos",
     "statsLibraries": "Libraries",
     "statsUsers": "Users",
@@ -310,6 +311,24 @@
     "retry": "Retry",
     "progress": "{{pct}}%",
     "every": "every {{hours}}h"
+  },
+  "live": {
+    "titlePlaceholder": "Stream title",
+    "create": "Create live stream",
+    "empty": "No live streams yet.",
+    "ingest": "RTMP ingest URL",
+    "watch": "Watch",
+    "start": "Start",
+    "stop": "Stop",
+    "statusIdle": "Idle",
+    "statusStarting": "Starting",
+    "statusLive": "Live",
+    "statusOffline": "Offline",
+    "offlineHint": "This stream is not live right now — the player will recover once a broadcaster starts.",
+    "chat": "Live chat",
+    "chatEmpty": "No messages yet.",
+    "chatPlaceholder": "Type a message…",
+    "send": "Send"
   },
   "download": {
     "title": "Download {{title}}",

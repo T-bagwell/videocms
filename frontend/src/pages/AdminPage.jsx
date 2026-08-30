@@ -7,6 +7,7 @@ import { fmtBytes } from '../i18n';
 import BlockedAdmin from './BlockedAdmin.jsx';
 import UploadsAdmin from './UploadsAdmin.jsx';
 import DownloadsAdmin from './DownloadsAdmin.jsx';
+import LiveAdmin from './LiveAdmin.jsx';
 
 export default function AdminPage() {
   const [tab, setTab] = useState('overview');
@@ -37,6 +38,9 @@ export default function AdminPage() {
         <button className={tab === 'downloads' ? 'tab active' : 'tab'} onClick={() => setTab('downloads')}>
           {t('admin.tabDownloads')}
         </button>
+        <button className={tab === 'live' ? 'tab active' : 'tab'} onClick={() => setTab('live')}>
+          {t('admin.tabLive')}
+        </button>
       </div>
       {tab === 'overview' && <Overview />}
       {tab === 'libraries' && <Libraries />}
@@ -45,6 +49,7 @@ export default function AdminPage() {
       {tab === 'users' && <Users />}
       {tab === 'uploads' && <UploadsAdmin />}
       {tab === 'downloads' && <DownloadsAdmin />}
+      {tab === 'live' && <LiveAdmin />}
     </div>
   );
 }

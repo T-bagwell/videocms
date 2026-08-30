@@ -194,6 +194,7 @@
     "tabUsers": "Utilisateurs",
     "tabUploads": "Téléversements",
     "tabDownloads": "Téléchargements",
+    "tabLive": "Direct",
     "statsVideos": "Vidéos",
     "statsLibraries": "Bibliothèques",
     "statsUsers": "Utilisateurs",
@@ -310,6 +311,24 @@
     "retry": "Réessayer",
     "progress": "{{pct}}%",
     "every": "toutes les {{hours}} h"
+  },
+  "live": {
+    "titlePlaceholder": "Titre du direct",
+    "create": "Créer un direct",
+    "empty": "Aucun direct pour l’instant.",
+    "ingest": "URL d’ingestion RTMP",
+    "watch": "Regarder",
+    "start": "Démarrer",
+    "stop": "Arrêter",
+    "statusIdle": "Inactif",
+    "statusStarting": "Démarrage",
+    "statusLive": "En direct",
+    "statusOffline": "Hors ligne",
+    "offlineHint": "Ce direct n’est pas actif — le lecteur reprendra quand un diffuseur démarrera.",
+    "chat": "Tchat du direct",
+    "chatEmpty": "Aucun message pour l’instant.",
+    "chatPlaceholder": "Écrire un message…",
+    "send": "Envoyer"
   },
   "download": {
     "title": "Télécharger {{title}}",

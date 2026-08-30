@@ -194,6 +194,7 @@
     "tabUsers": "用户管理",
     "tabUploads": "上传",
     "tabDownloads": "下载",
+    "tabLive": "直播",
     "statsVideos": "视频总数",
     "statsLibraries": "媒体库",
     "statsUsers": "用户",
@@ -310,6 +311,24 @@
     "retry": "重试",
     "progress": "{{pct}}%",
     "every": "每 {{hours}} 小时"
+  },
+  "live": {
+    "titlePlaceholder": "直播标题",
+    "create": "创建直播",
+    "empty": "还没有直播。",
+    "ingest": "RTMP 推流地址",
+    "watch": "观看",
+    "start": "开始",
+    "stop": "停止",
+    "statusIdle": "空闲",
+    "statusStarting": "启动中",
+    "statusLive": "直播中",
+    "statusOffline": "离线",
+    "offlineHint": "当前没有直播信号——推流开始后播放器会自动恢复。",
+    "chat": "直播聊天",
+    "chatEmpty": "还没有消息。",
+    "chatPlaceholder": "输入消息…",
+    "send": "发送"
   },
   "download": {
     "title": "下载 {{title}}",

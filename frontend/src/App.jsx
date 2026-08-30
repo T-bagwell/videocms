@@ -10,6 +10,7 @@ import FavoritesPage from './pages/FavoritesPage.jsx';
 import SeriesListPage from './pages/SeriesListPage.jsx';
 import SeriesDetailPage from './pages/SeriesDetailPage.jsx';
 import AdminPage from './pages/AdminPage.jsx';
+import LivePage from './pages/LivePage.jsx';
 import SharePage from './pages/SharePage.jsx';
 import { useAuth } from './auth.jsx';
 import { useTranslation } from 'react-i18next';
@@ -101,6 +102,14 @@ export default function App() {
             element={
               <RequireAuth>
                 <AdminPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/live/:id"
+            element={
+              <RequireAuth>
+                <LivePage />
               </RequireAuth>
             }
           />
