@@ -96,6 +96,9 @@ Ouvrez l’interface et connectez-vous avec l’administrateur initial **admin /
 - **Regarder ensemble** : créez ou rejoignez une salle pour synchroniser la
   lecture avec vos amis ; un bouton **Diffuser / AirPlay** est disponible si
   le navigateur le prend en charge
+- **Saut de l’intro/générique** : marquez le début et la fin de l’intro ou du
+  générique (deux clics chacun), puis sautez-les en un clic ; les intervalles
+  sont enregistrés par vidéo et peuvent être effacés à tout moment
 - **Direct** : les administrateurs créent des flux RTMP (URL d’ingestion
   compatible OBS) et les spectateurs profitent d’un tchat intégré
 - Les administrateurs peuvent lancer la **transcription vocale** (Whisper)
