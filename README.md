@@ -155,7 +155,9 @@ All settings are environment variables:
 | `WIKIPEDIA_LANG` / `WIKIPEDIA_ENABLED` | `en` / `1` | Language edition and switch for the keyless Wikipedia fallback |
 | `SCAN_WORKERS` | `4` | Parallel scan workers (1–16) |
 | `WATCH_INTERVAL` | `30` | Fallback interval for incremental scans (fsnotify events index immediately); `0` disables watching |
-| `HLS_HW_ACCEL` | empty (software x264) | HLS video encoder: `videotoolbox`, `nvenc` or `qsv`; empty uses libx264 |
+| `HLS_HW_ACCEL` | empty (software x264) | HLS video encoder: `videotoolbox`, `nvenc`, `qsv` or `vaapi`; empty uses libx264 |
+| `HLS_VAAPI_DEVICE` | `/dev/dri/renderD128` | VAAPI render device (used with `HLS_HW_ACCEL=vaapi`) |
+| `HLS_TONE_MAP` | `0` | Set `1` to enable HDR→SDR tone mapping in HLS transcoding |
 | `SUBTITLE_OS_USERNAME` / `SUBTITLE_OS_PASSWORD` / `SUBTITLE_OS_API_KEY` | empty | OpenSubtitles credentials for the online subtitle search |
 | `WEB_ROOT` | auto (`frontend/dist`) | Built frontend for single-service mode; leave unset for API-only deployment |
 | `CORS_ORIGINS` | empty (`*`) | Comma-separated browser origins allowed to call the API (separate frontend deployments) |
@@ -235,7 +237,7 @@ Planned work is informed by feature sets of similar self-hosted video projects
 - [x] Styled (ASS) soft subtitles
 - [x] Subtitle sync / offset controls (direct playback)
 - [x] Automatic subtitle download & matching
-- [ ] Hardware-accelerated transcoding (VAAPI/NVENC/QSV) + HDR tone mapping
+- [x] Hardware-accelerated transcoding (VAAPI/NVENC/QSV) + HDR tone mapping
 - [x] Trick-play thumbnails / preview timeline
 - [ ] Intro & credits skip
 - [ ] Watch together (synchronized sessions) and casting (Chromecast/DLNA/AirPlay)
