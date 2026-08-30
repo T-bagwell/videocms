@@ -223,6 +223,10 @@ The `HLSManager`:
   160×90 frame every 10s (max 120) into `DATA_DIR/thumbnails/<video-id>/`;
   `GET /api/videos/{id}/thumbnails/{n}` serves a frame, and the player shows
   the frame nearest the hovered time on a seek strip
+- Styled ASS subtitles: `.ass/.ssa` tracks carry a `format` field, are excluded
+  from the hls.js subtitle group, and are rendered by the player with a libass
+  WASM overlay (jassub) that preserves fonts, colors, positioning and effects
+  and follows the per-user subtitle offset
 - If the requested `start` differs from the running session by more than one
   segment (6s), the session is killed and restarted at the new position (seek)
 - The manifest is rewritten on the fly so every segment URL carries `?token=`
