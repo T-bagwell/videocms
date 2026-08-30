@@ -359,6 +359,10 @@ Wikipedia の順に自動フォールバック（`TVMAZE_ENABLED=0` / `ANILIST_E
   コメント CRUD（`GET|POST /api/videos/{id}/comments`、`DELETE /api/comments/{id}`）、
   1〜5 星評価（`GET /api/videos/{id}/ratings`、`PUT /api/videos/{id}/rating`）を支え、
   `GET /api/feed` が最近のコメントとお気に入りを返します
+- OIDC SSO：`GET /api/auth/oidc/start|callback` がディスカバリー + 認可コード +
+  userinfo を実装（`OIDC_*` 設定）。ユーザーは一意の `users.oauth_sub` 列
+  （マイグレーション 026）で自動作成/紐付けされ、フロントエンドは
+  `/login?sso_token=…` でセッション JWT を受け取ります
 
 ### 3.10 主要な設計判断
 
