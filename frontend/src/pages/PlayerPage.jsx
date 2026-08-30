@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { api, apiBaseUrl, mediaUrl } from '../api.js';
+import DownloadDialog from '../components/DownloadDialog.jsx';
+import { DownloadIcon } from '../components/Icons.jsx';
 import { fmtDuration } from '../i18n';
 import JASSUB from 'jassub';
 
@@ -77,6 +79,7 @@ export default function PlayerPage() {
   const assRef = useRef(null);
   const [watchRoom, setWatchRoom] = useState(null);
   const [watchModal, setWatchModal] = useState(false);
+  const [showDownload, setShowDownload] = useState(false);
   const [watchJoinId, setWatchJoinId] = useState('');
   const [watchJoinToken, setWatchJoinToken] = useState('');
   const watchRoomRef = useRef(null);
@@ -602,8 +605,16 @@ export default function PlayerPage() {
               {t('player.watchLeave')}
             </button>
           )}
+          <button className="btn ghost" onClick={() => setShowDownload(true)}>
+            <DownloadIcon />
+            {t('common.download')}
+          </button>
         </div>
       </div>
+
+      {showDownload && (
+        <DownloadDialog video={video} onClose={() => setShowDownload(false)} />
+      )}
 
       {watchModal && (
         <div className="modal-backdrop" onClick={() => setWatchModal(false)}>
