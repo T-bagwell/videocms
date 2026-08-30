@@ -150,7 +150,9 @@ make serve                                 # UI をビルドし :8080 で一括�
 | `WIKIPEDIA_LANG` / `WIKIPEDIA_ENABLED` | `en` / `1` | 免キー Wikipedia フォールバックの言語版とスイッチ |
 | `SCAN_WORKERS` | `4` | 並列スキャンワーカー数（1-16） |
 | `WATCH_INTERVAL` | `30` | 増分スキャンの保険間隔（fsnotify イベントは即時反映）。`0` で監視無効 |
-| `HLS_HW_ACCEL` | 空（ソフトウェア x264） | HLS ビデオエンコーダー：`videotoolbox`、`nvenc` または `qsv`。空なら libx264 |
+| `HLS_HW_ACCEL` | 空（ソフトウェア x264） | HLS ビデオエンコーダー：`videotoolbox`、`nvenc`、`qsv` または `vaapi`。空なら libx264 |
+| `HLS_VAAPI_DEVICE` | `/dev/dri/renderD128` | VAAPI レンダーデバイス（`HLS_HW_ACCEL=vaapi` で使用） |
+| `HLS_TONE_MAP` | `0` | `1` で HLS トランスコードに HDR→SDR トーンマッピングを有効化 |
 | `SUBTITLE_OS_USERNAME` / `SUBTITLE_OS_PASSWORD` / `SUBTITLE_OS_API_KEY` | 空 | オンライン字幕検索用の OpenSubtitles 認証情報 |
 | `YTDLP_PATH` | PATH 上の `yt-dlp` | ダウンロードキューが使う yt-dlp バイナリ |
 | `WEB_ROOT` | 自動（`frontend/dist`） | 単一サービスモードで配信するフロントエンド。未設定なら API 専用デプロイ |
@@ -228,7 +230,7 @@ Stash、Kirari04/videocms、yt-dlp ツールなど）の機能セットを参考
 - [x] スタイル付き（ASS）ソフト字幕
 - [x] 字幕同期/オフセット調整（ダイレクト再生）
 - [x] 字幕の自動ダウンロードとマッチング
-- [ ] ハードウェアアクセラレーション（VAAPI/NVENC/QSV）+ HDR トーンマッピング
+- [x] ハードウェアアクセラレーション（VAAPI/NVENC/QSV）+ HDR トーンマッピング
 - [x] プレビューサムネイル/シークバー
 - [ ] イントロ・クレジットスキップ
 - [ ] 一緒に見る（同期再生セッション）とキャスト（Chromecast/DLNA/AirPlay）
