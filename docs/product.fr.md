@@ -232,6 +232,8 @@ Statistiques : vidéos, bibliothèques, utilisateurs, listes, favoris, séries e
 - **Maintenance planifiée** : sauvegardes JSON et contrôles de santé
   automatiques (intervalle et rétention configurables) ; exécution manuelle et
   téléchargement des sauvegardes
+- **Webhooks et docs API** : abonnez des endpoints à des événements signés et
+  consultez le document OpenAPI sur `/api/openapi.json` pour l’automatisation
 
 ### 5.4 Utilisateurs
 
