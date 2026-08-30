@@ -104,6 +104,8 @@ backend/
 - Routing uses Go 1.26+ `net/http.ServeMux` patterns
   (`"GET /api/videos/{id}"`, `"GET /api/videos/{id}/hls/{file...}"`)
 - A middleware chain wraps the mux: panic recovery → request logging → CORS
+  (wildcard by default; restrict with `CORS_ORIGINS` for separate frontend
+  deployments)
 - Request bodies are size-limited (`http.MaxBytesReader`)
 - All API responses are JSON; errors follow `{"error": "..."}`; success payloads
   are domain objects or `{"items": [...], "total", "page", "page_size"}` for lists
