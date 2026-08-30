@@ -20,6 +20,8 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Similar-video recommendations (shared genres, year, series and tags) on the
+  detail page, plus a tag cloud with `?tag=` filtering on the browse page
 - Media health checks: admins run a per-library check that reports
   missing/corrupt files and duplicate candidates, then keep the best version
   while moving the rest into the server trash (`DATA_DIR/trash`)
