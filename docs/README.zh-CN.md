@@ -151,6 +151,7 @@ make serve                                 # 构建前端并统一在 :8080 提�
 | `HLS_VAAPI_DEVICE` | `/dev/dri/renderD128` | VAAPI 渲染设备（配合 `HLS_HW_ACCEL=vaapi` 使用） |
 | `HLS_TONE_MAP` | `0` | 设为 `1` 在 HLS 转码中启用 HDR→SDR 色调映射 |
 | `SUBTITLE_OS_USERNAME` / `SUBTITLE_OS_PASSWORD` / `SUBTITLE_OS_API_KEY` | 空 | 在线字幕搜索用的 OpenSubtitles 凭证 |
+| `RTMP_INGEST_URL` | `rtmp://localhost:1935/live` | RTMP 推流基础地址（nginx-rtmp 或等价服务）；直播会附加自己的 key |
 | `YTDLP_PATH` | PATH 上的 `yt-dlp` | 「下载」队列使用的 yt-dlp 二进制 |
 | `WEB_ROOT` | 自动（`frontend/dist`） | 单服务模式托管的前端目录；不设置即纯 API 部署 |
 | `CORS_ORIGINS` | 空（`*`） | 允许调用 API 的浏览器来源（逗号分隔，用于前后端分离部署） |
@@ -233,7 +234,7 @@ scripts/                 演示素材生成器
 - [x] 一起看（同步播放会话）
 - [x] 投屏（Web AirPlay）
 - [ ] 投屏（Chromecast / DLNA）
-- [ ] RTMP 直播推流入库，内置聊天
+- [x] RTMP 直播推流入库，内置聊天
 
 **元数据与 AI**
 
