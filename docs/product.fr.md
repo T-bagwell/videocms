@@ -179,6 +179,8 @@ Statistiques : vidéos, bibliothèques, utilisateurs, listes, favoris, séries e
   avec le gestionnaire de fichiers système, pour inspecter ou gérer les médias
 - **Contrôle de santé** signale fichiers manquants/corrompus et doublons ;
   **Garder la meilleure version** déplace le reste vers la corbeille du serveur
+- **Exporter NFO / Importer NFO** lit et écrit les métadonnées Kodi à côté des
+  vidéos (compatible Plex/Jellyfin/Kodi)
 - **Bloquer la bibliothèque** masque toute la médiathèque pour chaque utilisateur
   (accueil, séries, favoris, reprise, listes) sans rien supprimer ;
   le déblocage restaure immédiatement
