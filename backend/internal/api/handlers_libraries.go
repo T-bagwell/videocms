@@ -19,7 +19,7 @@ import (
 func (a *App) listLibraries(w http.ResponseWriter, r *http.Request) {
 	rows, err := a.pool.Query(r.Context(), `
 		SELECT l.id, l.name, l.path, l.scan_status, l.scan_error, l.scan_started_at,
-		       l.scan_finished_at, l.video_count, l.blocked, l.created_at
+		       l.scan_finished_at, l.video_count, l.blocked, l.created_at, l.quota_bytes
 		FROM libraries l
 		ORDER BY l.created_at DESC`)
 	if err != nil {
@@ -32,7 +32,7 @@ func (a *App) listLibraries(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var lib models.Library
 		if err := rows.Scan(&lib.ID, &lib.Name, &lib.Path, &lib.ScanStatus, &lib.ScanError,
-			&lib.ScanStartedAt, &lib.ScanFinishedAt, &lib.VideoCount, &lib.Blocked, &lib.CreatedAt); err != nil {
+			&lib.ScanStartedAt, &lib.ScanFinishedAt, &lib.VideoCount, &lib.Blocked, &lib.CreatedAt, &lib.QuotaBytes); err != nil {
 			writeErr(w, http.StatusInternalServerError, "scan library row failed")
 			return
 		}

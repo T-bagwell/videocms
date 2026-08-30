@@ -14,12 +14,13 @@ const (
 )
 
 type User struct {
-	ID           uuid.UUID `json:"id"`
-	Username     string    `json:"username"`
-	PasswordHash string    `json:"-"`
-	DisplayName  string    `json:"display_name"`
-	Role         Role      `json:"role"`
-	CreatedAt    time.Time `json:"created_at"`
+	ID            uuid.UUID `json:"id"`
+	Username      string    `json:"username"`
+	PasswordHash  string    `json:"-"`
+	DisplayName   string    `json:"display_name"`
+	Role          Role      `json:"role"`
+	CreatedAt     time.Time `json:"created_at"`
+	AllowedRating string    `json:"allowed_rating,omitempty"`
 }
 
 type Library struct {
@@ -33,6 +34,7 @@ type Library struct {
 	VideoCount     int64      `json:"video_count"`
 	Blocked        bool       `json:"blocked"`
 	CreatedAt      time.Time  `json:"created_at"`
+	QuotaBytes     int64      `json:"quota_bytes"`
 }
 
 type Video struct {
