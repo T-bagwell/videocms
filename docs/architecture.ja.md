@@ -390,6 +390,10 @@ Wikipedia の順に自動フォールバック（`TVMAZE_ENABLED=0` / `ANILIST_E
   ライブラリごとのヘルスチェック、任意の再スキャン（`MAINT_RESCAN=1`）。
   手動実行は `POST /api/admin/maintenance/run`、一覧/ダウンロードは
   `GET /api/admin/backups[/{name}]`
+- Webhook と API ドキュメント（マイグレーション 030）：`webhook_subscriptions`
+  （管理 `/api/admin/webhooks` CRUD）がイベント種別でフィルターされた、
+  `X-Videocms-Signature`（HMAC-SHA256）付き JSON イベントを受信。
+  公開 API は `GET /api/openapi.json` で記述
 
 ### 3.10 主要な設計判断
 
