@@ -20,6 +20,9 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Styled (ASS) soft subtitles: ASS/SSA tracks are rendered with a libass WASM
+  overlay (jassub) preserving fonts, colors, positioning and effects; the
+  renderer follows the per-user subtitle offset
 - Trick-play previews: hovering the seek strip shows the thumbnail frame
   nearest the pointer (one 160×90 frame every 10 seconds, generated on demand
   per video) and clicking seeks to that time
