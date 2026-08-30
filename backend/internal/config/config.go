@@ -20,6 +20,7 @@ type Config struct {
 	WatchInterval time.Duration
 	YtDLPPath     string
 	CORSOrigins   []string
+	HLSHWAccel    string
 }
 
 func Load() Config {
@@ -35,6 +36,7 @@ func Load() Config {
 		WatchInterval: envDuration("WATCH_INTERVAL", 30*time.Second),
 		YtDLPPath:     os.Getenv("YTDLP_PATH"),
 		CORSOrigins:   envList("CORS_ORIGINS"),
+		HLSHWAccel:    os.Getenv("HLS_HW_ACCEL"),
 	}
 	if cfg.Addr != "" && cfg.Addr[0] != ':' {
 		cfg.Addr = ":" + cfg.Addr

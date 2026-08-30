@@ -147,19 +147,42 @@ type HLSSession struct {
 type HLSManager struct {
 	dataDir  string
 	ffmpeg   string
+	hwAccel  string
 	mu       sync.Mutex
 	sessions map[uuid.UUID]*HLSSession
 }
 
-func NewHLSManager(dataDir, ffmpegBin string) *HLSManager {
+func NewHLSManager(dataDir, ffmpegBin string, hwAccel ...string) *HLSManager {
+	accel := ""
+	if len(hwAccel) > 0 {
+		accel = hwAccel[0]
+	}
 	m := &HLSManager{
 		dataDir:  filepath.Join(dataDir, "hls"),
 		ffmpeg:   ffmpegBin,
+		hwAccel:  accel,
 		sessions: make(map[uuid.UUID]*HLSSession),
 	}
 	_ = os.MkdirAll(m.dataDir, 0o755)
 	go m.cleanupLoop()
 	return m
+}
+
+// hwEncodeOpts returns the ffmpeg video-encoding options for the configured
+// hardware accelerator. A nil slice means the default software x264 encoding.
+func hwEncodeOpts(accel string) ([]string, error) {
+	switch strings.ToLower(strings.TrimSpace(accel)) {
+	case "", "software", "libx264":
+		return nil, nil
+	case "videotoolbox":
+		return []string{"-c:v", "h264_videotoolbox", "-b:v", "3000k", "-allow_sw", "1"}, nil
+	case "nvenc":
+		return []string{"-c:v", "h264_nvenc", "-preset", "p4", "-b:v", "3000k"}, nil
+	case "qsv":
+		return []string{"-c:v", "h264_qsv", "-b:v", "3000k"}, nil
+	default:
+		return nil, fmt.Errorf("unsupported HLS_HW_ACCEL %q (use videotoolbox, nvenc, qsv or leave empty)", accel)
+	}
 }
 
 func (m *HLSManager) sessionDir(videoID uuid.UUID) string {
@@ -196,6 +219,10 @@ func (m *HLSManager) Playlist(ctx context.Context, videoID uuid.UUID, input stri
 	}
 
 	rends := renditionPlan(srcWidth, srcHeight)
+	encOpts, err := hwEncodeOpts(m.hwAccel)
+	if err != nil {
+		return "", err
+	}
 	masterPath := filepath.Join(dir, "master.m3u8")
 	if err := os.WriteFile(masterPath, buildMaster(rends, subs, audios...), 0o644); err != nil {
 		return "", err
@@ -219,8 +246,12 @@ func (m *HLSManager) Playlist(ctx context.Context, videoID uuid.UUID, input stri
 			"-map", "0:v:0",
 		)
 		args = append(args, audioOpts...)
+		if len(encOpts) == 0 {
+			args = append(args, "-c:v", "libx264", "-preset", "veryfast", "-crf", "23")
+		} else {
+			args = append(args, encOpts...)
+		}
 		args = append(args,
-			"-c:v", "libx264", "-preset", "veryfast", "-crf", "23",
 			"-vf", "scale="+fmt.Sprint(r.Width)+":-2",
 			"-force_key_frames", "expr:gte(t,n_forced*6)",
 			"-f", "hls",

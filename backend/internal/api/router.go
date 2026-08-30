@@ -39,7 +39,7 @@ func New(cfg config.Config, pool *pgxpool.Pool) (*App, error) {
 		cfg:     cfg,
 		pool:    pool,
 		scanner: scanner,
-		hls:     media.NewHLSManager(cfg.DataDir, media.ResolveTool("ffmpeg")),
+		hls:     media.NewHLSManager(cfg.DataDir, media.ResolveTool("ffmpeg"), cfg.HLSHWAccel),
 		scraper: media.NewScraper(pool, cfg.DataDir, cfg.TMDBAPIKey),
 		dl:      media.NewDownloader(pool, cfg.YtDLPPath),
 	}
