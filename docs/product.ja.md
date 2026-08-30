@@ -191,6 +191,8 @@ make serve                              # http://<LAN IP>:8080
   **ゴミ箱**（ワンクリック復元）が使えます
 - 動画に**コメントと評価**（1〜5 星）が付けられます。ホームには最近の
   コメントとお気に入りのアクティビティフィードが表示されます
+- **シングルサインオン**（OIDC）：サーバーが IdP 設定済みの場合、ログインページに
+  SSO ボタンが表示されます
 
 ### 5.4 ユーザー
 
@@ -233,6 +235,7 @@ make serve                              # http://<LAN IP>:8080
 | `WHISPER_BIN` / `WHISPER_MODEL` | 空 | whisper.cpp のバイナリとモデル（文字起こし用） |
 | `SCRAPE_CUSTOM_URL` | 空 | カスタム JSON スクレイパー端点。`%s` は URL エスケープ済みタイトルに置換 |
 | `AI_TAG_BIN` | 空 | 外部 AI タグ付けツール（メディアパスを引数に、1 行 1 タグ） |
+| `OIDC_ISSUER` / `OIDC_CLIENT_ID` / `OIDC_CLIENT_SECRET` / `OIDC_REDIRECT_URL` | 空 | OIDC シングルサインオン設定 |
 
 ## 7. FAQ
 
