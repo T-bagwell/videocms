@@ -20,6 +20,10 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Email notifications: an SMTP channel (`SMTP_HOST`/`SMTP_PORT`/`SMTP_USER`/
+  `SMTP_PASSWORD`, `NOTIFY_EMAIL_FROM`/`NOTIFY_EMAIL_TO`) delivers the same
+  scan/download/upload events as plain-text mail, with implicit TLS on 465 or
+  STARTTLS otherwise
 - SAML 2.0 single sign-on: `GET /api/auth/saml/login` starts an AuthnRequest
   flow, `POST /api/auth/saml/acs` verifies the signed response (crewjam/saml)
   and `/api/auth/saml/metadata` publishes SP metadata; users bind via
