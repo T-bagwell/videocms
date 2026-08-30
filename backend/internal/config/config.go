@@ -27,6 +27,8 @@ type Config struct {
 	SubtitleOSPassword string
 	SubtitleOSAPIKey   string
 	RTMPIngestURL      string
+	WhisperBin         string
+	WhisperModel       string
 }
 
 func Load() Config {
@@ -49,6 +51,8 @@ func Load() Config {
 		SubtitleOSPassword: os.Getenv("SUBTITLE_OS_PASSWORD"),
 		SubtitleOSAPIKey:   os.Getenv("SUBTITLE_OS_API_KEY"),
 		RTMPIngestURL:      envOr("RTMP_INGEST_URL", "rtmp://localhost:1935/live"),
+		WhisperBin:         os.Getenv("WHISPER_BIN"),
+		WhisperModel:       os.Getenv("WHISPER_MODEL"),
 	}
 	if cfg.Addr != "" && cfg.Addr[0] != ':' {
 		cfg.Addr = ":" + cfg.Addr

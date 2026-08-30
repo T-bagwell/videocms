@@ -103,6 +103,8 @@ func (a *App) Routes() http.Handler {
 	mux.HandleFunc("GET /api/videos/{id}/download", authUser(a.downloadVideo))
 	mux.HandleFunc("GET /api/videos/{id}/download/remux", authUser(a.remuxDownload))
 	mux.HandleFunc("GET /api/videos/{id}/tracks", authUser(a.videoTracks))
+	mux.HandleFunc("GET /api/videos/{id}/transcripts", authUser(a.getTranscript))
+	mux.HandleFunc("POST /api/videos/{id}/transcribe", authAdmin(a.transcribeVideo))
 	mux.HandleFunc("GET /api/videos/{id}/subtitles", authUser(a.subtitles))
 	mux.HandleFunc("GET /api/videos/{id}/subtitle-tracks", authUser(a.listSubtitleTracks))
 	mux.HandleFunc("GET /api/videos/{id}/subtitles/{trackId}", authUser(a.getSubtitleTrack))

@@ -123,8 +123,8 @@ func (a *App) listVideos(w http.ResponseWriter, r *http.Request) {
 	}
 	if search := strings.TrimSpace(q.Get("q")); search != "" {
 		where = append(where, fmt.Sprintf(
-			"(v.title ILIKE $%d OR v.synopsis ILIKE $%d OR v.filename ILIKE $%d OR EXISTS (SELECT 1 FROM unnest(v.genres) g WHERE g ILIKE $%d))",
-			argIdx, argIdx, argIdx, argIdx))
+			"(v.title ILIKE $%d OR v.synopsis ILIKE $%d OR v.filename ILIKE $%d OR EXISTS (SELECT 1 FROM unnest(v.genres) g WHERE g ILIKE $%d) OR EXISTS (SELECT 1 FROM video_transcripts vt WHERE vt.video_id = v.id AND vt.status = 'done' AND vt.text ILIKE $%d))",
+			argIdx, argIdx, argIdx, argIdx, argIdx))
 		args = append(args, "%"+search+"%")
 		argIdx++
 	}
