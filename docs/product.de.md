@@ -209,6 +209,8 @@ Statistiken: Videos, Bibliotheken, Benutzer, Wiedergabelisten, Favoriten, Serien
   eine Einstufung pro Video fest; Benutzer können mit PIN sperren und klassierte
   Inhalte 5 Minuten entsperren. Bibliotheken können auch ein **Speicherkontingent**
   tragen, das beim Upload geprüft wird
+- **Teilen anpassen**: Design, eigener Titel und ausgeblendete Navigation
+  wählbar; `?embed=1` bettet einen chrome-freien Player in beliebige Seiten ein
 
 ### 5.4 Benutzer
 
