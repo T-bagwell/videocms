@@ -167,6 +167,7 @@ make serve                              # http://<局域网IP>:8080
 - 管理端视频列表支持**批量操作**（打标、清空标签、移入回收站），并有
   **回收站**可一键恢复
 - 用户可对视频**评论与评分**（1-5 星）；首页显示最近的评论与收藏动态
+- **单点登录**（OIDC）：服务器配置身份提供方后，登录页会出现 SSO 按钮
 
 ### 5.4 用户
 
@@ -208,6 +209,7 @@ make serve                              # http://<局域网IP>:8080
 | `WHISPER_BIN` / `WHISPER_MODEL` | 空 | whisper.cpp 可执行文件与模型（语音转写用） |
 | `SCRAPE_CUSTOM_URL` | 空 | 自定义 JSON 刮削端点；`%s` 会被替换为 URL 转义后的标题 |
 | `AI_TAG_BIN` | 空 | 外部 AI 打标工具（接收媒体路径参数，每行输出一个标签） |
+| `OIDC_ISSUER` / `OIDC_CLIENT_ID` / `OIDC_CLIENT_SECRET` / `OIDC_REDIRECT_URL` | 空 | OIDC 单点登录配置 |
 
 ## 7. 常见问题
 
