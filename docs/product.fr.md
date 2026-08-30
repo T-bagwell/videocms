@@ -83,6 +83,8 @@ Ouvrez l’interface et connectez-vous avec l’administrateur initial **admin /
 - **Lecture** démarre ; si vous avez de la progression, elle reprend automatiquement
 - H.264 MP4 / WebM se lisent nativement ; MKV/HEVC sont transcodés à la volée
   (première lecture : quelques secondes ; « Lecture transcodée » en secours)
+- Les vidéos à plusieurs pistes audio permettent de changer de piste pendant
+  la lecture HLS (sélecteur audio dans le lecteur)
 - **Télécharger** un remux MKV ou MP4 avec la piste audio et les sous-titres
   choisis (sans ré-encodage), ou récupérer le fichier original
 - La progression est sauvegardée toutes les 5 secondes et à la pause/fin
