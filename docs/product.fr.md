@@ -217,8 +217,10 @@ Statistiques : vidéos, bibliothèques, utilisateurs, listes, favoris, séries e
   en un clic
 - Les utilisateurs peuvent **commenter et noter** les vidéos (1-5 étoiles) ;
   l’accueil affiche un fil d’activité récente (commentaires et favoris)
-- **Connexion unique** (OIDC) : la page de connexion propose un bouton SSO si
-  le serveur est configuré avec un fournisseur d’identité
+- **Connexion unique** : la page de connexion propose des boutons **OIDC** et
+  **SAML 2.0** lorsque le fournisseur correspondant est configuré (ADFS, Okta,
+  Keycloak…) ; les utilisateurs SAML peuvent obtenir le rôle admin via un
+  attribut `roles`
 - **Contrôle parental** : les admins définissent une politique de
   classification par utilisateur et une classification par vidéo ; les
   utilisateurs peuvent verrouiller avec un PIN et déverrouiller le contenu
@@ -288,6 +290,7 @@ Tout se configure par variables d’environnement (table complète dans le READM
 | `SCRAPE_CUSTOM_URL` | vide | Endpoint JSON de scraping personnalisé ; `%s` est remplacé par le titre encodé |
 | `AI_TAG_BIN` | vide | Outil d’étiquetage IA externe (argument : chemin média, une étiquette par ligne) |
 | `OIDC_ISSUER` / `OIDC_CLIENT_ID` / `OIDC_CLIENT_SECRET` / `OIDC_REDIRECT_URL` | vide | Paramètres de connexion unique OIDC |
+| `SAML_IDP_METADATA_URL` / `SAML_SP_CERT` / `SAML_SP_KEY` / `SAML_SP_ENTITY_ID` / `SAML_ACS_URL` | vide | Connexion unique SAML 2.0 (URL des métadonnées IdP, chemins certificat/clé SP, ID d’entité, URL ACS) |
 | `DLNA_ENABLED` / `DLNA_FRIENDLY_NAME` / `DLNA_ALLOWED_IPS` | `0` / `VideoCMS` / vide (tout le LAN) | Activation du serveur UPnP/DLNA, nom affiché, liste blanche IP/CIDR séparée par des virgules |
 | `NOTIFY_WEBHOOK_URL` / `NOTIFY_APPRISE_URL` | vide | Canaux de notification (webhook JSON, API Apprise) |
 | `MAINT_INTERVAL_HOURS` / `MAINT_BACKUP_RETENTION` / `MAINT_RESCAN` | `24` / `7` / `0` | Planification, rétention et re-scan de maintenance |
