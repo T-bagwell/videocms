@@ -339,6 +339,9 @@ label input, label textarea { margin-top: 6px; }
 .similar-section { margin-top: 26px; }
 .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
 .poster-link img { width: 100%; border-radius: 8px; display: block; }
+.browse-save { flex-wrap: wrap; align-items: center; margin-bottom: 8px; }
+.browse-group { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.collection-input { padding: 6px 10px; border-radius: 6px; font-size: 13px; }
 .status-cancelled { background: rgba(243,156,18,0.15); color: var(--warn); }
 .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
 .small-muted { color: var(--muted); font-size: 12px; }

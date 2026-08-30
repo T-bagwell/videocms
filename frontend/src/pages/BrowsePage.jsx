@@ -25,6 +25,9 @@ export default function BrowsePage() {
   const [vtype, setVtype] = useState('');
   const [tag, setTag] = useState(searchParams.get('tag') || '');
   const [cloudTags, setCloudTags] = useState([]);
+  const [collections, setCollections] = useState([]);
+  const [collectionName, setCollectionName] = useState('');
+  const [savedFilters, setSavedFilters] = useState(null);
   const [series, setSeries] = useState([]);
   const [showFilter, setShowFilter] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -35,6 +38,8 @@ export default function BrowsePage() {
     api('/libraries').then((d) => setLibraries(d.items)).catch(() => {});
     api('/users/me/continue').then((d) => setContinueWatching(d.items)).catch(() => {});
     api('/tags').then((d) => setCloudTags(d.items || [])).catch(() => setCloudTags([]));
+    api('/collections').then((d) => setCollections(d.items || [])).catch(() => setCollections([]));
+    api('/users/me/filters').then((d) => setSavedFilters(d.filters || null)).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -84,6 +89,58 @@ export default function BrowsePage() {
     else setSearchParams({});
   }
 
+  function currentFilters() {
+    const f = {};
+    if (search) f.q = search;
+    if (libraryId) f.library_id = libraryId;
+    if (tag) f.tag = tag;
+    if (vtype) f.type = vtype;
+    return f;
+  }
+
+  async function saveFilters() {
+    try {
+      const f = currentFilters();
+      const d = await api('/users/me/filters', { method: 'PUT', body: { filters: f } });
+      setSavedFilters(d.filters);
+      setError('');
+    } catch (e) {
+      setError(e.message);
+    }
+  }
+
+  function applyFilters(f) {
+    setPage(1);
+    setQ(f.q || '');
+    setSearch(f.q || '');
+    setLibraryId(f.library_id || '');
+    setTag(f.tag || '');
+    setVtype(f.type || '');
+    if (f.tag) setSearchParams({ tag: f.tag });
+    else setSearchParams({});
+  }
+
+  async function createCollection() {
+    const name = collectionName.trim();
+    if (!name) return;
+    try {
+      await api('/collections', { method: 'POST', body: { name, query: currentFilters() } });
+      setCollectionName('');
+      api('/collections').then((d) => setCollections(d.items || [])).catch(() => {});
+    } catch (e) {
+      setError(e.message);
+    }
+  }
+
+  async function deleteCollection(id) {
+    try {
+      await api(`/collections/${id}`, { method: 'DELETE' });
+      setCollections((prev) => prev.filter((c) => c.id !== id));
+    } catch (e) {
+      setError(e.message);
+    }
+  }
+
   function submitSearch(e) {
     e.preventDefault();
     loadedRef.current = false;
@@ -128,6 +185,34 @@ export default function BrowsePage() {
       )}
 
       <section className="section">
+        {(collections.length > 0 || savedFilters) && (
+          <div className="browse-toolbar browse-save">
+            {collections.length > 0 && (
+              <span className="browse-group">
+                {t('browse.collections')}:
+                {collections.map((c) => (
+                  <span key={c.id} className="tag-chip">
+                    <button className="tag-link" onClick={() => applyFilters(c.query)}>{c.name}</button>
+                    <button className="tag-remove" onClick={() => deleteCollection(c.id)} aria-label={t('common.clear')}>×</button>
+                  </span>
+                ))}
+              </span>
+            )}
+            {savedFilters && (
+              <button className="btn small ghost" onClick={() => applyFilters(savedFilters)}>
+                {t('browse.savedFilters')}
+              </button>
+            )}
+            <button className="btn small ghost" onClick={saveFilters}>{t('browse.saveFilters')}</button>
+            <input
+              className="collection-input"
+              placeholder={t('browse.collectionName')}
+              value={collectionName}
+              onChange={(e) => setCollectionName(e.target.value)}
+            />
+            <button className="btn small ghost" onClick={createCollection}>{t('browse.createCollection')}</button>
+          </div>
+        )}
         {cloudTags.length > 0 && (
           <div className="tag-cloud">
             {cloudTags.map((t) => (
