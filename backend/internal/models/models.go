@@ -78,6 +78,7 @@ type SubtitleTrack struct {
 	Lang     string    `json:"lang"`
 	Title    string    `json:"title"`
 	Kind     string    `json:"kind"`
+	Format   string    `json:"format,omitempty"`
 	IsActive bool      `json:"is_active"`
 }
 

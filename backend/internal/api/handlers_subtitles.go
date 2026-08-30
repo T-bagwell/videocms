@@ -20,6 +20,15 @@ import (
 
 var uploadSubtitleExts = map[string]bool{".srt": true, ".vtt": true, ".ass": true, ".ssa": true}
 
+// subtitleFormat derives the lowercase file extension of a subtitle path
+// (e.g. "ass"), used by the player to pick a styled renderer.
+func subtitleFormat(path string) string {
+	if path == "" {
+		return ""
+	}
+	return strings.TrimPrefix(strings.ToLower(filepath.Ext(path)), ".")
+}
+
 type subtitleTrackRow struct {
 	ID          uuid.UUID
 	Position    int

@@ -446,6 +446,12 @@ func (a *App) videoForHLS(ctx context.Context, id uuid.UUID) (hlsVideo, bool) {
 			if err := rows.Scan(&trackID, &lang, &title, &path); err != nil {
 				continue
 			}
+			if fmt := subtitleFormat(path); fmt == "ass" || fmt == "ssa" {
+				// ASS tracks are rendered by the player with libass (jassub)
+				// to preserve styling; hls.js cannot parse them, so they stay
+				// out of the HLS subtitle group.
+				continue
+			}
 			name := title
 			if name == "" {
 				name = lang

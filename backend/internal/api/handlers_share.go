@@ -593,6 +593,7 @@ func (a *App) listTracksForVideo(ctx context.Context, videoID uuid.UUID, activeP
 			return nil, err
 		}
 		t.Kind = kind
+		t.Format = subtitleFormat(path)
 		if hasPref {
 			t.IsActive = t.ID == pref
 		} else {
