@@ -87,6 +87,8 @@ Ouvrez l’interface et connectez-vous avec l’administrateur initial **admin /
   la lecture HLS (sélecteur audio dans le lecteur)
 - Les sous-titres peuvent être décalés de ±0,5 s pour corriger la synchronisation
   en lecture directe ; le décalage est enregistré par utilisateur et par vidéo
+- En survolant la barre de progression, des aperçus vidéo s’affichent pendant
+  le déplacement ; un clic saute à la position visée
 - **Télécharger** un remux MKV ou MP4 avec la piste audio et les sous-titres
   choisis (sans ré-encodage), ou récupérer le fichier original
 - La progression est sauvegardée toutes les 5 secondes et à la pause/fin
