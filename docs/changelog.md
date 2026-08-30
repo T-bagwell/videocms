@@ -20,6 +20,10 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Casting: the player can cast to Chromecast (Cast SDK sender + short-lived
+  share token), and `DLNA_ENABLED=1` exposes a lightweight UPnP media server
+  (SSDP discovery, DIDL-Lite browse via GET/SOAP, direct `/dlna/video/{id}/stream`
+  URLs; `DLNA_ALLOWED_IPS` restricts clients by IP/CIDR)
 - Intro/credits skip: mark the start and end of the intro or credits in the
   player (two clicks each), then skip them with one tap; intervals are stored
   per video (`skip_intervals`) and exposed via
