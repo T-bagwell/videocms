@@ -154,6 +154,8 @@ subtitle_tracks -- id, video_id(fk, ON DELETE CASCADE), position, lang, title,
                 --   stream_index (multi-language subtitle tracks)
 user_subtitle_prefs -- PK(user_id, video_id), track_id(fk, ON DELETE CASCADE),
                 --   updated_at (per-user default subtitle track)
+subtitle_offsets -- PK(user_id, video_id), offset_ms, updated_at
+                --   (per-user subtitle sync; applied when serving WebVTT)
 uploads         -- id, filename, target_path, total_size, chunk_size,
                 --   status(uploading|completed|failed), error, timestamps
                 --   (chunked upload sessions; chunks live in DATA_DIR/uploads/<id>/)
@@ -214,6 +216,9 @@ The `HLSManager`:
   (`a<index>/`), advertised through an `#EXT-X-MEDIA` AUDIO group that video
   renditions reference (`AUDIO="audio"`), so players can switch audio without
   restarting the transcode session
+- Subtitle sync: `GET /api/videos/{id}/subtitles/{trackId}?offset_ms=…` shifts
+  every cue (WebVTT/SRT), backed by per-user `subtitle_offsets` so direct
+  playback remembers the adjustment
 - If the requested `start` differs from the running session by more than one
   segment (6s), the session is killed and restarted at the new position (seek)
 - The manifest is rewritten on the fly so every segment URL carries `?token=`
