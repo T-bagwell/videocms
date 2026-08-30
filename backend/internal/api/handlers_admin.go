@@ -45,8 +45,9 @@ func (a *App) listUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 type updateUserRequest struct {
-	Role        *models.Role `json:"role"`
-	DisplayName *string      `json:"display_name"`
+	Role          *models.Role `json:"role"`
+	DisplayName   *string      `json:"display_name"`
+	AllowedRating *string      `json:"allowed_rating"`
 }
 
 func (a *App) updateUser(w http.ResponseWriter, r *http.Request) {
@@ -100,6 +101,13 @@ func (a *App) updateUser(w http.ResponseWriter, r *http.Request) {
 		if _, err := a.pool.Exec(r.Context(),
 			`UPDATE users SET display_name=$1 WHERE id=$2`, name, id); err != nil {
 			writeErr(w, http.StatusInternalServerError, "update display name failed")
+			return
+		}
+	}
+	if req.AllowedRating != nil {
+		if _, err := a.pool.Exec(r.Context(),
+			`UPDATE users SET allowed_rating=$1 WHERE id=$2`, strings.TrimSpace(*req.AllowedRating), id); err != nil {
+			writeErr(w, http.StatusInternalServerError, "update allowed rating failed")
 			return
 		}
 	}

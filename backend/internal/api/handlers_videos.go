@@ -36,7 +36,7 @@ const videoColumns = `
 	v.synopsis, v.genres, v.poster_path, v.subtitle_path, v.available,
 	v.series_id, v.season, v.episode, COALESCE(s.name, ''),
 	COALESCE(bl.id::text, '') AS blocked_id,
-	v.created_at, v.updated_at,
+	v.created_at, v.updated_at, v.content_rating,
 	EXISTS(SELECT 1 FROM favorites f WHERE f.user_id=$1 AND f.video_id=v.id) AS is_fav,
 	COALESCE((SELECT wp.position_sec FROM watch_progress wp WHERE wp.user_id=$1 AND wp.video_id=v.id), 0),
 	COALESCE((SELECT wp.duration_sec FROM watch_progress wp WHERE wp.user_id=$1 AND wp.video_id=v.id), 0)`
@@ -76,7 +76,7 @@ func scanVideo(row pgx.Row) (models.Video, error) {
 		&v.SizeBytes, &v.DurationSec, &v.Width, &v.Height, &v.VideoCodec, &v.Container,
 		&v.Year, &v.Synopsis, &v.Genres, &v.PosterPath, &v.SubtitlePath, &v.Available,
 		&v.SeriesID, &v.Season, &v.Episode, &v.SeriesName, &v.BlockedID,
-		&v.CreatedAt, &v.UpdatedAt, &v.IsFavorite, &v.ProgressSec, &v.ProgressDur)
+		&v.CreatedAt, &v.UpdatedAt, &v.ContentRating, &v.IsFavorite, &v.ProgressSec, &v.ProgressDur)
 	v.Blocked = v.BlockedID != ""
 	v.HasPoster = v.PosterPath != ""
 	v.HasSubtitle = v.SubtitlePath != ""
@@ -112,6 +112,17 @@ func (a *App) listVideos(w http.ResponseWriter, r *http.Request) {
 		where = append(where, visibleEpisodes(1))
 	}
 	argIdx := 2
+	// Parental rating filter: applies unless a valid unlock token is provided.
+	if !validUnlock(a.cfg.JWTSecret, r.Header.Get("X-Videocms-Unlock")) {
+		var allowedRating string
+		if err := a.pool.QueryRow(r.Context(),
+			`SELECT allowed_rating FROM users WHERE id=$1`, user.ID).Scan(&allowedRating); err == nil && allowedRating != "" {
+			where = append(where, fmt.Sprintf(
+				`(v.content_rating = '' OR v.content_rating = ANY(string_to_array($%d, ',')))`, argIdx))
+			args = append(args, allowedRating)
+			argIdx++
+		}
+	}
 
 	if libID := q.Get("library_id"); libID != "" {
 		id, err := uuid.Parse(libID)
@@ -249,10 +260,11 @@ func (a *App) getVideo(w http.ResponseWriter, r *http.Request) {
 }
 
 type updateVideoRequest struct {
-	Title    string   `json:"title"`
-	Synopsis string   `json:"synopsis"`
-	Year     int      `json:"year"`
-	Genres   []string `json:"genres"`
+	Title         string   `json:"title"`
+	Synopsis      string   `json:"synopsis"`
+	Year          int      `json:"year"`
+	Genres        []string `json:"genres"`
+	ContentRating string   `json:"content_rating"`
 }
 
 func (a *App) updateVideo(w http.ResponseWriter, r *http.Request) {
@@ -272,8 +284,8 @@ func (a *App) updateVideo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	tag, err := a.pool.Exec(r.Context(),
-		`UPDATE videos SET title=$1, synopsis=$2, year=$3, genres=$4, updated_at=now() WHERE id=$5`,
-		req.Title, req.Synopsis, req.Year, req.Genres, id)
+		`UPDATE videos SET title=$1, synopsis=$2, year=$3, genres=$4, content_rating=$5, updated_at=now() WHERE id=$6`,
+		req.Title, req.Synopsis, req.Year, req.Genres, strings.ToUpper(strings.TrimSpace(req.ContentRating)), id)
 	if err != nil {
 		writeErr(w, http.StatusInternalServerError, "update video failed")
 		return

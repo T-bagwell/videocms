@@ -218,14 +218,16 @@ func (a *App) setLibraryBlocked(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var req struct {
-		Blocked bool `json:"blocked"`
+		Blocked    bool   `json:"blocked"`
+		QuotaBytes *int64 `json:"quota_bytes"`
 	}
 	if err := readJSON(w, r, &req); err != nil {
 		writeErr(w, http.StatusBadRequest, err.Error())
 		return
 	}
 	tag, err := a.pool.Exec(r.Context(),
-		`UPDATE libraries SET blocked=$2 WHERE id=$1`, id, req.Blocked)
+		`UPDATE libraries SET blocked=$2, quota_bytes=COALESCE($3, quota_bytes) WHERE id=$1`,
+		id, req.Blocked, req.QuotaBytes)
 	if err != nil {
 		writeErr(w, http.StatusInternalServerError, "update library failed")
 		return

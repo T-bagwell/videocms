@@ -143,6 +143,8 @@ func (a *App) Routes() http.Handler {
 	mux.HandleFunc("DELETE /api/collections/{id}", authUser(a.deleteCollection))
 	mux.HandleFunc("GET /api/users/me/filters", authUser(a.getUserFilters))
 	mux.HandleFunc("PUT /api/users/me/filters", authUser(a.saveUserFilters))
+	mux.HandleFunc("PUT /api/users/me/pin", authUser(a.setPin))
+	mux.HandleFunc("POST /api/users/me/pin/verify", authUser(a.verifyPin))
 
 	mux.HandleFunc("GET /api/videos/{id}/comments", authUser(a.listComments))
 	mux.HandleFunc("POST /api/videos/{id}/comments", authUser(a.addComment))
