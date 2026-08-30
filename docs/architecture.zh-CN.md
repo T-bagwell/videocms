@@ -363,7 +363,10 @@ AniList 与 Wikipedia（`TVMAZE_ENABLED=0` / `ANILIST_ENABLED=0` /
   `?embed=1` 隐藏页面装饰以便 iframe 嵌入
 - 通知：`media.Notifier` 向 `NOTIFY_WEBHOOK_URL` 与/或 Apprise API
   （`NOTIFY_APPRISE_URL`）推送 JSON，覆盖扫描完成/失败、yt-dlp 下载完成/失败、
-  上传完成事件；`POST /api/admin/notify/test` 可发送测试事件
+  上传完成事件；`POST /api/admin/notify/test` 可发送测试事件。SMTP 通道
+  （`SMTP_HOST`/`SMTP_PORT`/`SMTP_USER`/`SMTP_PASSWORD`、
+  `NOTIFY_EMAIL_FROM`/`NOTIFY_EMAIL_TO`）经隐式 TLS（465）或 STARTTLS
+  发送纯文本邮件，复用同一批事件
 - 存储池（迁移 029）：`storage_pools` 保存命名本地/S3/SFTP 池（本地挂载路径 +
   JSON 配置）；管理端 `GET|POST|PATCH|DELETE /api/admin/storage-pools`，
   上传/下载目标支持 `pool://名称[/子路径]`，解析到挂载路径
