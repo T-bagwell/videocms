@@ -18,7 +18,7 @@ func (a *App) exportLibraryNFO(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	rows, err := a.pool.Query(r.Context(), `
-		SELECT id, title, year, synopsis, genres, file_path
+		SELECT title, year, synopsis, genres, file_path
 		FROM videos WHERE library_id=$1 AND available`, id)
 	if err != nil {
 		writeErr(w, http.StatusInternalServerError, "export nfo failed")
