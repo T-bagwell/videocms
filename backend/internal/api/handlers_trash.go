@@ -27,9 +27,13 @@ func (a *App) moveToTrash(ctx context.Context, videoID uuid.UUID, path string) (
 	if err := os.MkdirAll(trashDir, 0o755); err != nil {
 		return "", err
 	}
-	dst := filepath.Join(trashDir, filepath.Base(path))
+	base := filepath.Base(path)
+	if base == "." || base == ".." {
+		return "", fmt.Errorf("invalid media path")
+	}
+	dst := filepath.Join(trashDir, base)
 	if _, err := os.Stat(dst); err == nil {
-		dst = filepath.Join(trashDir, fmt.Sprintf("%s-%s", videoID.String()[:8], filepath.Base(path)))
+		dst = filepath.Join(trashDir, fmt.Sprintf("%s-%s", videoID.String()[:8], base))
 	}
 	if err := os.Rename(path, dst); err != nil {
 		return "", err
