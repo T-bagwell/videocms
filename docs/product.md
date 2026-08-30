@@ -96,6 +96,9 @@ Open the web UI and sign in with the initial administrator **admin / admin123**
   OpenSubtitles) per video
 - **Watch together**: create or join a room to keep playback synchronized with
   friends; a **Cast / AirPlay** button is available where the browser supports it
+- **Intro/credits skip**: mark the start and end of the intro or credits
+  (two clicks each), and one-tap buttons skip them; intervals are saved per
+  video and can be cleared anytime
 - **Live streaming**: admins create RTMP streams (OBS-compatible ingest URL)
   and viewers watch with a built-in chat
 - Admins can run **speech transcription** (Whisper) on a video; the transcript
