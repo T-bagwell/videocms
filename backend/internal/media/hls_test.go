@@ -1,8 +1,12 @@
 package media
 
 import (
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/google/uuid"
 )
 
 func TestRenditionPlanFiltersBySourceWidth(t *testing.T) {
@@ -68,6 +72,57 @@ func TestBuildMaster(t *testing.T) {
 	plain := string(buildMaster(renditionPlan(1920, 1080), nil))
 	if strings.Contains(plain, "SUBTITLES") {
 		t.Error("master playlist should not reference subtitles when none exist")
+	}
+}
+
+func TestBuildMasterWithAudio(t *testing.T) {
+	audios := []HLSAudio{
+		{Index: 1, Name: "English"},
+		{Index: 2, Name: ""},
+	}
+	master := string(buildMaster(renditionPlan(1920, 1080), nil, audios...))
+	for _, want := range []string{
+		"#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID=\"audio\",NAME=\"English\",DEFAULT=YES,AUTOSELECT=YES,URI=\"a1/index.m3u8\"",
+		"#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID=\"audio\",NAME=\"Audio 2\",DEFAULT=NO,AUTOSELECT=YES,URI=\"a2/index.m3u8\"",
+		"#EXT-X-STREAM-INF:BANDWIDTH=2500000,AVERAGE-BANDWIDTH=2000000,RESOLUTION=1280x720,AUDIO=\"audio\"",
+		"v1280/index.m3u8",
+	} {
+		if !strings.Contains(master, want) {
+			t.Errorf("master playlist missing %q:\n%s", want, master)
+		}
+	}
+
+	plain := string(buildMaster(renditionPlan(1920, 1080), nil))
+	if strings.Contains(plain, "TYPE=AUDIO") || strings.Contains(plain, "AUDIO=\"audio\"") {
+		t.Error("master playlist should not advertise an audio group when none exists")
+	}
+}
+
+func TestSessionFileAllowsAudioTracks(t *testing.T) {
+	dir := t.TempDir()
+	m := NewHLSManager(dir, "ffmpeg")
+	id := uuid.New()
+	sessionDir := m.sessionDir(id)
+	if err := os.MkdirAll(filepath.Join(sessionDir, "a1"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(sessionDir, "a1", "index.m3u8"), []byte("#EXTM3U\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(sessionDir, "a1", "seg_00001.ts"), []byte("ts"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	for _, name := range []string{"a1/index.m3u8", "a1/seg_00001.ts"} {
+		if _, ok := m.SessionFile(id, name); !ok {
+			t.Errorf("SessionFile(%q) should be allowed", name)
+		}
+	}
+	if _, ok := m.SessionFile(id, "a1/../master.m3u8"); ok {
+		t.Error("SessionFile must reject path traversal via audio dir")
+	}
+	if _, ok := m.SessionFile(id, "a1/other.ts"); ok {
+		t.Error("SessionFile must reject non-segment files")
 	}
 }
 
