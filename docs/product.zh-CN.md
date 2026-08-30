@@ -157,6 +157,8 @@ make serve                              # http://<局域网IP>:8080
 - 「下载」对话框可选择音轨与内嵌/上传字幕，输出 MKV 或 MP4（转封装、无需重编码）
 - 「刮削」从 TMDB 拉取元数据（需 `TMDB_API_KEY` 且能访问 api.themoviedb.org）
 - 管理员可选择 **TMDB 或自定义刮削源**，并可强制覆盖已有元数据
+- 视频可带**标签**（手动添加或来自可选的 AI 分析工具）；标签显示在详情页，
+  也可用于筛选搜索
 
 ### 5.4 用户
 
@@ -197,6 +199,7 @@ make serve                              # http://<局域网IP>:8080
 | `RTMP_INGEST_URL` | `rtmp://localhost:1935/live` | RTMP 推流基础地址（nginx-rtmp 或等价服务） |
 | `WHISPER_BIN` / `WHISPER_MODEL` | 空 | whisper.cpp 可执行文件与模型（语音转写用） |
 | `SCRAPE_CUSTOM_URL` | 空 | 自定义 JSON 刮削端点；`%s` 会被替换为 URL 转义后的标题 |
+| `AI_TAG_BIN` | 空 | 外部 AI 打标工具（接收媒体路径参数，每行输出一个标签） |
 
 ## 7. 常见问题
 
