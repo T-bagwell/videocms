@@ -20,6 +20,9 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- VAAPI hardware encoding (`HLS_HW_ACCEL=vaapi`, device via `HLS_VAAPI_DEVICE`)
+  and HDR→SDR tone mapping (`HLS_TONE_MAP=1`) round out hardware-accelerated
+  HLS transcoding
 - Automatic subtitle download & matching: admins search online subtitle
   providers (OpenSubtitles.com) by title + year, optionally filtered by
   language, and download a candidate straight into the video's subtitle
