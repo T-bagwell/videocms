@@ -78,6 +78,7 @@ SQL 評価され、ブロックされた項目は一斉に消え、解除する�
 | --- | --- | --- |
 | [製品ドキュメント](product.ja.md) | EN · 中文 · FR · JA · DE | エンドユーザー |
 | [システムアーキテクチャ](architecture.ja.md) | EN · 中文 · JA | 開発者 |
+| [デプロイガイド](deployment.ja.md) | EN · 中文 · JA | 運用担当者 |
 | [English](../README.md) / [中文](README.zh-CN.md) / [日本語](README.ja.md) | English · 中文 · 日本語 | すべて |
 
 ## クイックスタート
@@ -111,6 +112,9 @@ cd frontend && npm install && npm run dev  # http://localhost:5173
 ```bash
 make serve                                 # UI をビルドし :8080 で一括配信
 ```
+
+バックエンドを API 専用で実行し、フロントエンドを別途配信（nginx や任意の
+静的サーバー）する場合は [deployment.ja.md](deployment.ja.md) を参照。
 
 初期管理者 **admin / admin123** でログインし、すぐにパスワードを変更してください
 （管理 → ユーザー管理 → パスワード再設定）。その後、管理 → ライブラリ → スキャン で
@@ -147,7 +151,9 @@ make serve                                 # UI をビルドし :8080 で一括�
 | `SCAN_WORKERS` | `4` | 並列スキャンワーカー数（1-16） |
 | `WATCH_INTERVAL` | `30` | 増分スキャンの保険間隔（fsnotify イベントは即時反映）。`0` で監視無効 |
 | `YTDLP_PATH` | PATH 上の `yt-dlp` | ダウンロードキューが使う yt-dlp バイナリ |
-| `WEB_ROOT` | 自動（`frontend/dist`） | 本番モードのフロントエンドディレクトリ |
+| `WEB_ROOT` | 自動（`frontend/dist`） | 単一サービスモードで配信するフロントエンド。未設定なら API 専用デプロイ |
+| `CORS_ORIGINS` | 空（`*`） | API を呼び出せるブラウザオリジン（カンマ区切り。フロント分離デプロイ用） |
+| `VITE_API_BASE_URL` | 空 | フロントエンドのビルド時 API ベース URL（クロスオリジン用。実行時は `window.__VIDEOCMS_API_BASE__` で上書き可能） |
 
 ## プロジェクト構成
 
