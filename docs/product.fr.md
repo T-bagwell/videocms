@@ -223,6 +223,9 @@ Statistiques : vidéos, bibliothèques, utilisateurs, listes, favoris, séries e
 - **Notifications** : des canaux webhook ou Apprise peuvent recevoir les
   événements d’analyse, de téléversement et de téléchargement ; les admins
   peuvent envoyer une notification de test depuis l’aperçu
+- **Pools de stockage** : définissez des pools locaux, S3 compatibles ou SFTP
+  avec un chemin de montage local ; téléversements et téléchargements peuvent
+  cibler `pool://nom[/sous-chemin]`
 
 ### 5.4 Utilisateurs
 
