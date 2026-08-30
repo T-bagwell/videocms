@@ -294,7 +294,18 @@
     "healthDuplicates": "{{count}} mögliche Duplikate ({{size}})",
     "healthKeepBest": "Beste Version behalten (Rest in Papierkorb)",
     "healthMoved": "{{count}} Duplikat(e) in den Papierkorb verschoben",
-    "healthOk": "Keine Probleme gefunden."
+    "healthOk": "Keine Probleme gefunden.",
+    "batchSelected": "{{count}} ausgewählt",
+    "batchTagPlaceholder": "Tag für Auswahl…",
+    "batchApplyTag": "Tag anwenden",
+    "batchClearTags": "Tags löschen",
+    "batchDelete": "In Papierkorb",
+    "batchTagRequired": "Zuerst einen Tag-Namen eingeben",
+    "batchDone": "Stapeloperation abgeschlossen",
+    "trash": "Papierkorb",
+    "trashEmpty": "Der Papierkorb ist leer.",
+    "restore": "Wiederherstellen",
+    "restored": "Wiederhergestellt: {{path}}"
   },
   "picker": {
     "title": "Serverordner auswählen",

@@ -374,6 +374,11 @@ function VideoAdmin() {
   const [err, setErr] = useState('');
   const [msg, setMsg] = useState('');
   const [scrapingId, setScrapingId] = useState(null);
+  const [selected, setSelected] = useState(new Set());
+  const [batchTag, setBatchTag] = useState('');
+  const [batchBusy, setBatchBusy] = useState(false);
+  const [trashItems, setTrashItems] = useState([]);
+  const [showTrash, setShowTrash] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams({ page: String(page), page_size: '50', sort: 'added_desc', include_blocked: '1' });
@@ -464,6 +469,63 @@ function VideoAdmin() {
     }
   }
 
+  function toggleSelect(id) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  async function batchAction(action) {
+    if (selected.size === 0) return;
+    setBatchBusy(true);
+    setErr('');
+    try {
+      const body = { ids: [...selected], action };
+      if (action === 'tag') {
+        const tag = batchTag.trim().toLowerCase();
+        if (!tag) {
+          setErr(t('admin.batchTagRequired'));
+          return;
+        }
+        body.tag = tag;
+      }
+      await api('/admin/videos/batch', { method: 'POST', body });
+      setSelected(new Set());
+      setBatchTag('');
+      setMsg(t('admin.batchDone'));
+      setSearch(search);
+    } catch (e2) {
+      setErr(e2.message);
+    } finally {
+      setBatchBusy(false);
+    }
+  }
+
+  async function refreshTrash() {
+    try {
+      const d = await api('/admin/trash');
+      setTrashItems(d.items || []);
+      setShowTrash(true);
+    } catch (e2) {
+      setErr(e2.message);
+    }
+  }
+
+  async function restoreTrash(id) {
+    setErr('');
+    try {
+      const d = await api(`/admin/trash/${id}/restore`, { method: 'POST' });
+      setMsg(t('admin.restored', { path: d.restored }));
+      setTrashItems((prev) => prev.filter((t) => t.id !== id));
+      setSearch(search);
+    } catch (e2) {
+      setErr(e2.message);
+    }
+  }
+
   return (
     <div>
       {msg && <div className="toast toast-success">{msg}</div>}
@@ -474,9 +536,58 @@ function VideoAdmin() {
         <span className="muted">{t('admin.results', { count: total })}</span>
       </form>
 
+      {selected.size > 0 && (
+        <div className="browse-toolbar browse-save">
+          <span className="muted">{t('admin.batchSelected', { count: selected.size })}</span>
+          <input
+            className="collection-input"
+            placeholder={t('admin.batchTagPlaceholder')}
+            value={batchTag}
+            onChange={(e) => setBatchTag(e.target.value)}
+          />
+          <button className="btn small ghost" disabled={batchBusy} onClick={() => batchAction('tag')}>
+            {t('admin.batchApplyTag')}
+          </button>
+          <button className="btn small ghost" disabled={batchBusy} onClick={() => batchAction('clear_tags')}>
+            {t('admin.batchClearTags')}
+          </button>
+          <button className="btn small danger-ghost" disabled={batchBusy} onClick={() => batchAction('delete')}>
+            {t('admin.batchDelete')}
+          </button>
+          <button className="btn small ghost" onClick={() => setSelected(new Set())}>{t('common.clear')}</button>
+        </div>
+      )}
+      <div className="browse-toolbar browse-save">
+        <button className="btn small ghost" onClick={refreshTrash}>{t('admin.trash')}</button>
+      </div>
+
+      {showTrash && (
+        <div className="card trash-box">
+          <h3>{t('admin.trash')}</h3>
+          {trashItems.length === 0 ? (
+            <div className="empty">{t('admin.trashEmpty')}</div>
+          ) : (
+            trashItems.map((item) => (
+              <div key={item.id} className="admin-video-row trash-row">
+                <div className="mono muted" style={{ flex: 1, minWidth: 0 }}>
+                  <div className="ellipsis">{item.original_path}</div>
+                  <div className="small-muted">{new Date(item.moved_at).toLocaleString()}</div>
+                </div>
+                <button className="btn small" onClick={() => restoreTrash(item.id)}>{t('admin.restore')}</button>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+
       <div className="admin-video-list">
         {videos.map((v) => (
           <div key={v.id} className="card admin-video-row">
+            <input
+              type="checkbox"
+              checked={selected.has(v.id)}
+              onChange={() => toggleSelect(v.id)}
+            />
             <div className="mono muted" style={{ flex: 1, minWidth: 0 }}>
               <div className="ellipsis">
                 {v.title}

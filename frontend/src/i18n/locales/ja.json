@@ -294,7 +294,18 @@
     "healthDuplicates": "重複の可能性 {{count}} 件（{{size}}）",
     "healthKeepBest": "最良版を保持（他はゴミ箱へ）",
     "healthMoved": "{{count}} 件の重複をゴミ箱に移動しました",
-    "healthOk": "問題は見つかりませんでした。"
+    "healthOk": "問題は見つかりませんでした。",
+    "batchSelected": "{{count}} 件選択中",
+    "batchTagPlaceholder": "選択中にタグを追加…",
+    "batchApplyTag": "タグを適用",
+    "batchClearTags": "タグをクリア",
+    "batchDelete": "ゴミ箱へ移動",
+    "batchTagRequired": "先にタグ名を入力してください",
+    "batchDone": "一括操作が完了しました",
+    "trash": "ゴミ箱",
+    "trashEmpty": "ゴミ箱は空です。",
+    "restore": "復元",
+    "restored": "復元しました：{{path}}"
   },
   "picker": {
     "title": "サーバーフォルダを選択",

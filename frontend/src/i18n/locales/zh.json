@@ -294,7 +294,18 @@
     "healthDuplicates": "{{count}} 个疑似重复（{{size}}）",
     "healthKeepBest": "保留最佳版本（其余移入回收站）",
     "healthMoved": "已将 {{count}} 个重复文件移入回收站",
-    "healthOk": "未发现问题。"
+    "healthOk": "未发现问题。",
+    "batchSelected": "已选 {{count}} 项",
+    "batchTagPlaceholder": "为选中项添加标签…",
+    "batchApplyTag": "打标签",
+    "batchClearTags": "清空标签",
+    "batchDelete": "移入回收站",
+    "batchTagRequired": "请先输入标签名",
+    "batchDone": "批量操作完成",
+    "trash": "回收站",
+    "trashEmpty": "回收站为空。",
+    "restore": "恢复",
+    "restored": "已恢复：{{path}}"
   },
   "picker": {
     "title": "选择服务器文件夹",

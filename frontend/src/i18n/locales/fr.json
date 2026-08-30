@@ -294,7 +294,18 @@
     "healthDuplicates": "{{count}} doublons possibles ({{size}})",
     "healthKeepBest": "Garder la meilleure version (corbeille pour le reste)",
     "healthMoved": "{{count}} doublon(s) déplacé(s) vers la corbeille",
-    "healthOk": "Aucun problème détecté."
+    "healthOk": "Aucun problème détecté.",
+    "batchSelected": "{{count}} sélectionné(s)",
+    "batchTagPlaceholder": "Étiquette pour la sélection…",
+    "batchApplyTag": "Appliquer l’étiquette",
+    "batchClearTags": "Effacer les étiquettes",
+    "batchDelete": "Mettre à la corbeille",
+    "batchTagRequired": "Saisissez d’abord un nom d’étiquette",
+    "batchDone": "Opération groupée terminée",
+    "trash": "Corbeille",
+    "trashEmpty": "La corbeille est vide.",
+    "restore": "Restaurer",
+    "restored": "Restauré : {{path}}"
   },
   "picker": {
     "title": "Choisir un dossier serveur",

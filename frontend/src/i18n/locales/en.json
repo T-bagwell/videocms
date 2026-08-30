@@ -294,7 +294,18 @@
     "healthDuplicates": "{{count}} possible duplicates ({{size}})",
     "healthKeepBest": "Keep best version (move rest to trash)",
     "healthMoved": "Moved {{count}} duplicate(s) to trash",
-    "healthOk": "No issues found."
+    "healthOk": "No issues found.",
+    "batchSelected": "{{count}} selected",
+    "batchTagPlaceholder": "Tag for selected…",
+    "batchApplyTag": "Apply tag",
+    "batchClearTags": "Clear tags",
+    "batchDelete": "Move to trash",
+    "batchTagRequired": "Enter a tag name first",
+    "batchDone": "Batch operation complete",
+    "trash": "Recycle bin",
+    "trashEmpty": "The recycle bin is empty.",
+    "restore": "Restore",
+    "restored": "Restored: {{path}}"
   },
   "picker": {
     "title": "Select server folder",

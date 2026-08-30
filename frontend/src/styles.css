@@ -342,6 +342,8 @@ label input, label textarea { margin-top: 6px; }
 .browse-save { flex-wrap: wrap; align-items: center; margin-bottom: 8px; }
 .browse-group { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .collection-input { padding: 6px 10px; border-radius: 6px; font-size: 13px; }
+.trash-box { margin-bottom: 14px; padding: 14px; }
+.trash-row { align-items: center; gap: 10px; }
 .status-cancelled { background: rgba(243,156,18,0.15); color: var(--warn); }
 .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
 .small-muted { color: var(--muted); font-size: 12px; }
