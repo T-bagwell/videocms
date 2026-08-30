@@ -83,6 +83,8 @@ make serve                              # http://<LAN-IP>:8080
 - **Abspielen** startet; vorhandener Fortschritt wird automatisch fortgesetzt
 - H.264 MP4/WebM laufen nativ; MKV/HEVC werden live transkodiert
   (erste Wiedergabe dauert einige Sekunden; „Transkodiert abspielen“ als Fallback)
+- Bei Videos mit mehreren Audiospuren kann während der HLS-Wiedergabe die Spur
+  gewechselt werden (Audioselektor im Player)
 - **Download** liefert einen MKV/MP4-Remux mit gewählter Audiospur und
   Untertiteln (ohne Re-Encoding) oder die Originaldatei
 - Fortschritt wird alle 5 Sekunden sowie bei Pause/Ende gespeichert
