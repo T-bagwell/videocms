@@ -124,6 +124,16 @@ func (d *Downloader) runJob(ctx context.Context, job DownloadJob) {
 		d.fail(job, "start yt-dlp: "+err.Error())
 		return
 	}
+	// The job may have been cancelled between the claim and the process start;
+	// kill it immediately instead of letting it run to completion.
+	var startedStatus string
+	_ = d.pool.QueryRow(context.Background(),
+		`SELECT status FROM downloads WHERE id=$1`, job.ID).Scan(&startedStatus)
+	if startedStatus == "canceled" {
+		_ = cmd.Process.Kill()
+		_ = cmd.Wait()
+		return
+	}
 
 	done := make(chan struct{})
 	go func() {

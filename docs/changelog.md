@@ -99,6 +99,8 @@ All notable changes to VideoCMS are documented here.
 - Hardened upload target validation: the admin upload/download endpoints now
   guard server paths with a CodeQL-recognized absolute-path check before any
   filesystem call (path-injection scan clean)
+- Cancelling a yt-dlp job between queue claim and process start no longer
+  lets it run to completion
 - The initial admin password is no longer printed in plain text in server logs
 - Creating a library now requires an absolute server path; relative paths are
   rejected with a clear error instead of being resolved against the working

@@ -53,12 +53,9 @@ func (a *App) uploadDir(id uuid.UUID) string {
 // isAbsDir reports whether path is an existing, absolute directory. Used by the
 // admin-only endpoints that write to server folders.
 func isAbsDir(path string) bool {
-	if path == "" {
-		return false
-	}
-	// Guard recognized by CodeQL: relative input never reaches the filesystem
-	// call below; only server-absolute paths are accepted.
-	if !strings.HasPrefix(path, "/") && !filepath.IsAbs(path) {
+	// Guards recognized by CodeQL: only server-absolute paths without parent
+	// references reach the filesystem call below.
+	if path == "" || !filepath.IsAbs(path) || strings.Contains(path, "..") {
 		return false
 	}
 	st, err := os.Stat(filepath.Clean(path))
