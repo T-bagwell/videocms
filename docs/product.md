@@ -96,6 +96,9 @@ Open the web UI and sign in with the initial administrator **admin / admin123**
   OpenSubtitles) per video
 - **Watch together**: create or join a room to keep playback synchronized with
   friends; a **Cast / AirPlay** button is available where the browser supports it
+- **Casting**: the player can cast to a Chromecast (Cast button creates a
+  short-lived share and streams over it); enable `DLNA_ENABLED=1` to expose
+  the library to UPnP/DLNA TVs and players on your LAN
 - **Intro/credits skip**: mark the start and end of the intro or credits
   (two clicks each), and one-tap buttons skip them; intervals are saved per
   video and can be cleared anytime
@@ -269,6 +272,7 @@ most important ones:
 | `SCRAPE_CUSTOM_URL` | empty | Custom JSON scraper endpoint; `%s` is replaced with the URL-escaped title |
 | `AI_TAG_BIN` | empty | External AI tagging tool (media path argument, one tag per line) |
 | `OIDC_ISSUER` / `OIDC_CLIENT_ID` / `OIDC_CLIENT_SECRET` / `OIDC_REDIRECT_URL` | empty | OIDC single sign-on settings |
+| `DLNA_ENABLED` / `DLNA_FRIENDLY_NAME` / `DLNA_ALLOWED_IPS` | `0` / `VideoCMS` / empty (whole LAN) | UPnP/DLNA media server switch, display name, comma-separated IP/CIDR allowlist |
 | `NOTIFY_WEBHOOK_URL` / `NOTIFY_APPRISE_URL` | empty | Notification channels (JSON webhook, Apprise API) |
 | `MAINT_INTERVAL_HOURS` / `MAINT_BACKUP_RETENTION` / `MAINT_RESCAN` | `24` / `7` / `0` | Maintenance schedule, backup retention, rescan flag |
 
