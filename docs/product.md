@@ -90,6 +90,8 @@ Open the web UI and sign in with the initial administrator **admin / admin123**
   is saved per user and video
 - Hovering the seek strip shows thumbnail previews while scrubbing, and
   clicking the strip jumps to that position
+- ASS/SSA subtitles render with their original styling (fonts, colors,
+  positioning and effects)
 - **Download** a remuxed copy as MKV or MP4 with a chosen audio track and
   subtitles (no re-encode), or grab the original file for offline playback
 - Progress is saved every 5 seconds and on pause/end — visible in Continue Watching
