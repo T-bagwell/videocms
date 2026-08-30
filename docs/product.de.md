@@ -201,6 +201,8 @@ Statistiken: Videos, Bibliotheken, Benutzer, Wiedergabelisten, Favoriten, Serien
   (Titel / Beschreibung / Dateiname)
 - Die Admin-Videoliste unterstützt **Stapelaktionen** (Taggen, Tags löschen,
   in Papierkorb) und einen **Papierkorb** mit Wiederherstellung per Klick
+- Benutzer können Videos **kommentieren und bewerten** (1-5 Sterne); die
+  Startseite zeigt einen Aktivitätsfeed mit Kommentaren und Favoriten
 
 ### 5.4 Benutzer
 
