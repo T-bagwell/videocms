@@ -28,11 +28,26 @@ directly. Include:
 - Use admin content controls (title blocking and library blocking) to hide
   content globally without deleting files
 - Restrict media library paths to what the process actually needs to read
+- If you enable the DLNA/UPnP media server (`DLNA_ENABLED=1`), set
+  `DLNA_ALLOWED_IPS` to the LAN subnets allowed to browse/stream; leave it
+  empty only on a fully trusted network
+- For SAML SSO, keep `SAML_SP_KEY` private (readable only by the service user)
+  and make sure the IdP metadata URL is served over HTTPS
+- For SMTP notifications, prefer TLS (STARTTLS on 587/25, implicit TLS on 465)
+  so credentials are never sent in plaintext
 
 ## Notes
 
 - Media URLs require a valid user JWT (header or `?token=`)
 - All mutation endpoints are admin-only
+- Public share links use unguessable tokens with expiry, optional bcrypt
+  password and a domain allow-list; casting reuses a 1-hour video share so the
+  user JWT never leaves the browser
+- Webhook deliveries are signed with HMAC-SHA256
+  (`X-Videocms-Signature`); verify the signature before acting on events
+- SAML assertions are verified with the IdP certificate (signature, conditions,
+  audience); SSO users bind to `users.oauth_sub` (`oidc:`/`saml:` prefix) and
+  are subject to the same role checks as local users
 - Media library paths must be absolute server paths; relative paths are
   rejected
 - The admin directory browser normalizes paths to a clean absolute path, so
