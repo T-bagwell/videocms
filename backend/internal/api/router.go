@@ -78,6 +78,8 @@ func (a *App) Routes() http.Handler {
 	mux.HandleFunc("POST /api/libraries/{id}/open", authAdmin(a.openLibrary))
 	mux.HandleFunc("POST /api/libraries/{id}/health", authAdmin(a.runHealthCheck))
 	mux.HandleFunc("POST /api/libraries/{id}/health/keep-best", authAdmin(a.keepBestVersions))
+	mux.HandleFunc("POST /api/libraries/{id}/export-nfo", authAdmin(a.exportLibraryNFO))
+	mux.HandleFunc("POST /api/libraries/{id}/import-nfo", authAdmin(a.importLibraryNFO))
 
 	mux.HandleFunc("GET /api/admin/trash", authAdmin(a.listTrash))
 	mux.HandleFunc("POST /api/admin/trash/{id}/restore", authAdmin(a.restoreTrash))
