@@ -214,6 +214,9 @@ erDiagram
   160×90 的缩略图（最多 120 帧）到 `DATA_DIR/thumbnails/<video-id>/`；
   `GET /api/videos/{id}/thumbnails/{n}` 提供单帧，播放器在进度条悬停时
   显示最近时间点的预览帧
+- ASS 样式字幕：`.ass/.ssa` 轨带有 `format` 字段，不进入 hls.js 字幕组，
+  由播放器用 libass WASM 覆盖层（jassub）渲染，保留字体、颜色、位置与特效，
+  并跟随用户的字幕偏移
 - 请求的 `start` 与当前会话相差超过一个分片（6 秒）时，杀掉旧会话并从新位置重启（跳转）
 - 清单在响应时重写，使每个分片 URL 都携带 `?token=`
 - 空闲会话 **15 分钟**后回收，同时删除会话目录
