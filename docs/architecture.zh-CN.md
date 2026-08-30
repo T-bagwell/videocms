@@ -321,6 +321,9 @@ AniList 与 Wikipedia（`TVMAZE_ENABLED=0` / `ANILIST_ENABLED=0` /
   隐藏整个媒体库；该标记在同一 SQL 可见性条件中求值
 - 打开媒体库目录：`POST /api/libraries/{id}/open` 在服务器上调用系统文件管理器
   （`open` / `xdg-open` / `explorer`）打开媒体库路径
+- 健康检查：`POST /api/libraries/{id}/health` 报告缺失/损坏文件与重复候选
+  （声明大小相同）；`POST /api/libraries/{id}/health/keep-best` 保留每组最佳
+  （分辨率最高，其次文件名最长），其余移入 `DATA_DIR/trash/<日期>/`
 
 ### 3.10 关键设计决策
 
