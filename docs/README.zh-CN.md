@@ -236,7 +236,7 @@ scripts/                 演示素材生成器
 - [x] 自动字幕下载与匹配
 - [x] 硬件加速转码（VAAPI/NVENC/QSV）与 HDR 色调映射
 - [x] 预览时间轴缩略图
-- [ ] 片头/片尾跳过
+- [x] 片头/片尾跳过
 - [x] 一起看（同步播放会话）
 - [x] 投屏（Web AirPlay）
 - [ ] 投屏（Chromecast / DLNA）
