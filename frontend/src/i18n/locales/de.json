@@ -22,6 +22,7 @@
     "switchToRegister": "Noch kein Konto? Registrieren",
     "switchToLogin": "Schon ein Konto? Anmelden",
     "hint": "Erster Administrator: admin / admin123 (nach der ersten Anmeldung ändern)",
+    "sso": "Mit SSO anmelden",
     "busy": "Bitte warten…"
   },
   "common": {

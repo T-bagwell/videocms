@@ -22,6 +22,7 @@
     "switchToRegister": "No account? Sign up",
     "switchToLogin": "Already have an account? Log in",
     "hint": "Initial admin: admin / admin123 (change after first login)",
+    "sso": "Sign in with SSO",
     "busy": "Please wait…"
   },
   "common": {
