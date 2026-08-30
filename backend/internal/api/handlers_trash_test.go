@@ -119,3 +119,43 @@ func TestMoveToTrashRejectsRelativePath(t *testing.T) {
 		t.Fatal("expected error for a relative media path")
 	}
 }
+
+func TestMoveToTrashCollisionNamesAreDistinct(t *testing.T) {
+	env := newIntegrationEnv(t)
+	libID := env.insertLibrary(t, false)
+	v1 := env.insertVideo(t, libID, "One", ".mkv")
+	v2 := env.insertVideo(t, libID, "Two", ".mkv")
+
+	dirA := filepath.Join(env.app.cfg.DataDir, "dup-a")
+	dirB := filepath.Join(env.app.cfg.DataDir, "dup-b")
+	for _, dir := range []string{dirA, dirB} {
+		if err := os.MkdirAll(dir, 0o755); err != nil {
+			t.Fatal(err)
+		}
+	}
+	srcA := filepath.Join(dirA, "same.mkv")
+	srcB := filepath.Join(dirB, "same.mkv")
+	if err := os.WriteFile(srcA, []byte("a"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(srcB, []byte("b"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	dstA, err := env.app.moveToTrash(context.Background(), v1, srcA)
+	if err != nil {
+		t.Fatalf("first move: %v", err)
+	}
+	dstB, err := env.app.moveToTrash(context.Background(), v2, srcB)
+	if err != nil {
+		t.Fatalf("second move: %v", err)
+	}
+	if dstA == dstB {
+		t.Fatalf("collision produced identical trash paths: %s", dstA)
+	}
+	for _, dst := range []string{dstA, dstB} {
+		if _, err := os.Stat(dst); err != nil {
+			t.Fatalf("moved file missing at %s: %v", dst, err)
+		}
+	}
+}
