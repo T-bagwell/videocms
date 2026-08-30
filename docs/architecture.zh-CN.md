@@ -29,26 +29,55 @@ flowchart LR
     subgraph Browser["浏览器（React SPA）"]
         UI["Vite UI · i18n en/zh/fr/ja/de"]
         HLS["hls.js 播放器"]
+        CAST["Chromecast sender（Cast SDK）"]
+        PWA["Service worker + Cache API"]
     end
     subgraph Server["服务器（Go :8080）"]
         API["net/http + 中间件"]
         SCAN["扫描器（并行）"]
         HLSM["HLS 管理器"]
-        SCR["TMDB 刮削器"]
+        SCR["元数据刮削器"]
+        DL["yt-dlp 下载器"]
+        LIVE["直播管理器（RTMP→HLS）"]
+        WHIS["Whisper 转写"]
+        SUB["字幕提供方"]
+        NOT["通知器"]
+        DLNA["DLNA/UPnP 服务器（SSDP）"]
     end
     DB[("PostgreSQL 14")]
     DISK["磁盘上的媒体文件夹"]
     TMDB[("TMDB API")]
+    META[("TVMaze / AniList / Wikipedia / 自定义")]
+    OS[("OpenSubtitles / whisper.cpp / AI 打标")]
+    IDP[("OIDC / SAML IdP")]
+    TV["DLNA 电视 / Chromecast"]
+    SMTP[("SMTP 服务器")]
 
     UI -->|"/api"| API
     HLS -->|"Range / HLS"| API
+    PWA -->|"离线 Cache API"| API
+    CAST -->|"分享流"| TV
     API --> DB
     API --> SCAN
     API --> HLSM
     API --> SCR
+    API --> DL
+    API --> LIVE
+    API --> WHIS
+    API --> SUB
+    API --> NOT
+    API --> DLNA
     SCAN -->|"ffprobe / ffmpeg"| DISK
     HLSM -->|"ffmpeg 转码"| DISK
+    DL -->|"yt-dlp"| DISK
+    LIVE -->|"ffmpeg"| DISK
     SCR -->|"搜索/详情/海报"| TMDB
+    SCR -->|"无密钥回退"| META
+    SUB -->|"搜索/下载"| OS
+    WHIS -->|"转写"| OS
+    DLNA -->|"SSDP + DIDL-Lite + 流媒体"| TV
+    API -->|"AuthnRequest / SAMLResponse"| IDP
+    NOT -->|"邮件"| SMTP
 ```
 
 ```
@@ -86,11 +115,21 @@ backend/
     media/
       scanner.go              媒体库扫描（并行遍历 + 探测 + 写入）
       scraper.go              TMDB 元数据增强
+      episode.go              从文件名识别剧集/季
       hls.go                  HLS 转码会话管理
       stream.go               HTTP Range 流媒体
       segment.go              HLS 分片文件名校验
       tracks.go               ffprobe 流信息查询（转封装下载用）
       downloader.go           yt-dlp 任务执行器（队列 + 定时）
+      live.go                 RTMP 推流 → 滚动 HLS（LiveManager）
+      whisper.go              本地语音转写（whisper.cpp）
+      subtitle_provider.go    可插拔在线字幕搜索/下载
+      thumbnails.go           预览缩略图提取
+      health.go               媒体健康检查（缺失/损坏/重复）
+      nfo.go                  Kodi 风格 NFO 导入/导出
+      analyze.go              外部 AI 打标工具集成
+      notify.go               webhook / Apprise / SMTP 通知分发
+      dlna.go                 SSDP 响应 + UPnP 设备身份
     api/
       router.go               路由表、CORS/日志/恢复中间件
       json.go                 JSON 工具
@@ -122,14 +161,16 @@ backend/
 由内嵌 SQL 迁移管理（`schema_migrations` 表记录版本）。
 
 ```sql
-users           -- id, username(唯一), password_hash, display_name, role, created_at
+users           -- id, username(唯一), password_hash, display_name, role,
+                --   oauth_sub(唯一, 本地账号为 NULL；SSO 为 "oidc:…"/"saml:…"),
+                --   pin(bcrypt, 家长解锁), allowed_rating, created_at
 libraries       -- id, name, path(唯一), scan_status(idle|scanning|error|cancelled),
                 --   scan_error, scan_started_at, scan_finished_at, video_count,
-                --   blocked
+                --   blocked, quota_bytes
 videos          -- id, library_id(外键), title, filename, file_path(唯一), size_bytes,
                 --   duration_sec, width, height, video_codec, container, year, synopsis,
                 --   genres(text[]), poster_path, subtitle_path, tmdb_id, scraped_at,
-                --   available, created_at, updated_at, last_scanned_at
+                --   available, content_rating, created_at, updated_at, last_scanned_at
 watch_progress  -- 主键(user_id, video_id), position_sec, duration_sec, updated_at
 favorites       -- 主键(user_id, video_id), created_at
 playlists       -- id, user_id(外键), name, description, 时间戳
@@ -156,6 +197,28 @@ uploads         -- id, filename, target_path, total_size, chunk_size,
 downloads       -- id, url, title, target_path, format, status(queued|downloading|
                 --   completed|failed|canceled), progress, error, interval_secs,
                 --   last_run_at, 时间戳（yt-dlp 任务，支持定时重复）
+watch_rooms     -- id, code(唯一), video_id, owner, playing, position_sec,
+                --   updated_at（一起看会话，每 2.5 秒轮询）
+live_streams    -- id, title, stream_key(唯一), status(offline|starting|live|idle),
+                --   error, created_by(外键→users), 时间戳（RTMP 推流）
+chat_messages   -- id, stream_id(外键, ON DELETE CASCADE), user_name, text, created_at
+video_transcripts -- 主键(video_id, lang), transcript_path, format(webvtt|text),
+                --   updated_at（Whisper 输出，可搜索）
+tags            -- id, name(唯一), created_at
+video_tags      -- 主键(video_id, tag_id), tagged_by(外键→users, NULL = 自动),
+                --   created_at
+collections     -- id, user_id(外键), name, filters(jsonb), created_at
+                --   （由保存的搜索条件生成的智能合集）
+trash_records   -- id, video_id(外键), original_path, trashed_at, restored_at
+                --   （批量“移到回收站”与恢复）
+comments        -- id, video_id(外键, ON DELETE CASCADE), user_id(外键),
+                --   text, created_at
+ratings         -- 主键(video_id, user_id), score(1-5), updated_at
+storage_pools   -- id, name(唯一), type(local|s3|sftp), mount_path,
+                --   config(jsonb), read_only, created_at（上传/下载目标）
+webhook_subscriptions -- id, url, events(text[]), secret, active, 时间戳
+skip_intervals  -- 主键(video_id, kind), kind(intro|credits), start_sec, end_sec,
+                --   updated_at（片头/片尾跳过条）
 ```
 
 关键索引：`videos(lower(title))`、`videos(library_id)`、部分索引
@@ -169,6 +232,13 @@ erDiagram
     users ||--o{ playlists : 拥有
     users ||--o{ hidden_paths : 隐藏
     users ||--o{ series_favorites : 收藏剧集
+    users ||--o{ share_tokens : 创建
+    users ||--o{ watch_rooms : 主持
+    users ||--o{ live_streams : 推流
+    users ||--o{ comments : 评论
+    users ||--o{ ratings : 评分
+    users ||--o{ collections : 保存
+    users ||--o{ video_tags : 打标
     admins ||--o{ blocked_titles : 屏蔽
     libraries ||--o{ videos : 包含
     libraries ||--o{ series : 归组
@@ -177,6 +247,16 @@ erDiagram
     videos ||--o{ playlist_items : 被包含
     videos ||--o{ watch_progress : 有
     videos ||--o{ favorites : 有
+    videos ||--o{ comments : 有
+    videos ||--o{ ratings : 有
+    videos ||--o{ video_tags : 有
+    videos ||--o{ video_transcripts : 转写
+    videos ||--o{ skip_intervals : 跳过
+    videos ||--o{ trash_records : 回收
+    videos ||--o{ share_tokens : 分享
+    series ||--o{ share_tokens : 分享
+    playlists ||--o{ share_tokens : 分享
+    live_streams ||--o{ chat_messages : 有
 ```
 
 ### 3.5 流媒体（HTTP Range）
@@ -226,7 +306,8 @@ erDiagram
 - 一起看：`watch_rooms`（迁移 018）保存共享口令与当前播放/暂停状态与位置；
   成员每 2.5s 轮询 `GET /api/watch/rooms/{id}?token=…` 并通过 PUT 发布状态，
   实现松同步播放。投屏：浏览器支持时播放器提供 Web AirPlay 按钮
-  （`webkitShowPlaybackUI`）
+  （`webkitShowPlaybackUI`），另有「投屏到电视」按钮加载 Google Cast SDK，
+  把短期分享链接推送到默认媒体接收器
 - 直播：`live_streams` 与 `chat_messages`（迁移 019）。`LiveManager` 把 RTMP
   推流（`RTMP_INGEST_URL` + 每条流自己的 key）拉取为滚动 HLS 清单
   （`data/live/<id>/index.m3u8`）；观看走 `GET /api/live/{id}/hls/...`，
@@ -425,9 +506,12 @@ frontend/src/
   api.js           fetch 封装（token、JSON、401 跳转）
   auth.jsx         认证上下文（用户、登录/注册/退出）
   i18n/            i18next 配置 + en/zh/fr/ja/de 语言 JSON
-  components/      Navbar、Poster、VideoCard、PathPicker、Toast
+  components/      Navbar、Poster、VideoCard、PathPicker、ShareModal、
+                   SubtitleSearchModal、DownloadDialog、UploadManager、Toast
   pages/           Login、Browse、VideoDetail、Player、Playlists、
-                   PlaylistDetail、Favorites、Admin
+                   PlaylistDetail、SeriesList、SeriesDetail、Share、Live、
+                   Favorites、Admin（+ Uploads/Downloads/Storage/Jobs/Webhooks
+                   管理标签页、Blocked 标题）
 ```
 
 ### 4.2 路由与状态
@@ -447,8 +531,12 @@ frontend/src/
 
 ### 4.4 管理界面
 
-标签页：概览（统计）、媒体库（服务端目录选择器添加、扫描/停止、删除）、
-视频（搜索、编辑元数据、刮削、上传海报）、用户（角色、重置密码、删除）。
+标签页：**概览**（统计、备份导出/导入、运行维护、测试通知）、**媒体库**
+（服务端目录选择器、扫描/停止、健康检查/保留最佳、NFO 导入/导出、屏蔽）、
+**视频**（搜索、编辑元数据、刮削、海报、批量操作、回收站）、**用户**
+（角色、重置密码、删除）、**上传**（分片上传）、**下载**（yt-dlp 队列）、
+**存储**（本地/S3/SFTP 池）、**任务**（扫描/上传/下载/直播 + 磁盘用量）、
+**Webhooks**（订阅 + OpenAPI）。
 
 ## 5. 关键流程
 
@@ -537,12 +625,36 @@ sequenceDiagram
 | `FFPROBE_BIN` / `FFMPEG_BIN` | 自动探测 | 工具路径（含 Homebrew 回退） |
 | `TMDB_API_KEY` / `TMDB_LANGUAGE` | 空 / zh-CN | 刮削 |
 | `SCAN_WORKERS` | `4` | 并行探测工作数 |
+| `CORS_ORIGINS` | 空（`*`） | 允许调用 API 的浏览器来源 |
+| `WATCH_INTERVAL` | `30` | 增量扫描兜底间隔（秒）；fsnotify 事件即时索引 |
+| `YTDLP_PATH` | PATH 上的 yt-dlp | 下载队列使用的 yt-dlp 二进制 |
 | `WEB_ROOT` | 自动（`frontend/dist`） | 生产模式下内置的前端目录 |
+| `HLS_HW_ACCEL` / `HLS_VAAPI_DEVICE` / `HLS_TONE_MAP` | 空 / `/dev/dri/renderD128` / `0` | 硬件 HLS 编码（videotoolbox/nvenc/qsv/vaapi）、VAAPI 设备、HDR→SDR 色调映射 |
+| `SUBTITLE_OS_USERNAME` / `SUBTITLE_OS_PASSWORD` / `SUBTITLE_OS_API_KEY` | 空 | OpenSubtitles 在线字幕搜索凭据 |
+| `RTMP_INGEST_URL` | `rtmp://localhost:1935/live` | 直播 RTMP 推流基础地址 |
+| `WHISPER_BIN` / `WHISPER_MODEL` | 空 | whisper.cpp CLI + 模型（转写） |
+| `SCRAPE_CUSTOM_URL` | 空 | 自定义 JSON 刮削端点（`%s` = URL 编码标题） |
+| `AI_TAG_BIN` | 空 | 外部 AI 打标工具（参数为媒体路径，每行一个标签） |
+| `OIDC_ISSUER` / `OIDC_CLIENT_ID` / `OIDC_CLIENT_SECRET` / `OIDC_REDIRECT_URL` | 空 | OIDC 单点登录 |
+| `SAML_IDP_METADATA_URL` / `SAML_SP_CERT` / `SAML_SP_KEY` / `SAML_SP_ENTITY_ID` / `SAML_ACS_URL` | 空 | SAML 2.0 单点登录 |
+| `NOTIFY_WEBHOOK_URL` / `NOTIFY_APPRISE_URL` | 空 | Webhook/Apprise 通知渠道 |
+| `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASSWORD` / `NOTIFY_EMAIL_FROM` / `NOTIFY_EMAIL_TO` | 空 / `587` | SMTP 邮件通知 |
+| `MAINT_INTERVAL_HOURS` / `MAINT_BACKUP_RETENTION` / `MAINT_RESCAN` | `24` / `7` / `0` | 定时维护（备份、健康检查、重扫） |
+| `DLNA_ENABLED` / `DLNA_FRIENDLY_NAME` / `DLNA_ALLOWED_IPS` | `0` / `VideoCMS` / 空（整个局域网） | UPnP/DLNA 媒体服务器、显示名、IP/CIDR 白名单 |
+| `VITE_API_BASE_URL` | 空 | 跨域部署时前端构建期的 API 基地址 |
 
 ## 7. 安全考虑
 
 - 所有变更/浏览端点仅限管理员
 - 媒体 URL 需要用户 JWT（请求头或查询参数）
+- 公开分享链接是不可猜测的令牌，带过期时间、可选密码与域名白名单；
+  投屏复用 1 小时视频分享，JWT 不出浏览器
+- DLNA 端点设计上不鉴权，但由 `DLNA_ALLOWED_IPS`（IP/CIDR）把关；
+  仅在可信局域网留空
+- SAML 断言使用 IdP 证书校验（签名、条件、audience）；
+  SP 密钥来自 `SAML_SP_CERT`/`SAML_SP_KEY` 文件
+- SMTP 通知优先 TLS：465 隐式 TLS，其余 STARTTLS；凭据仅在加密后才发送
+- Webhook 投递带 HMAC-SHA256 `X-Videocms-Signature`，接收方可验签
 - HLS 分片名严格校验（`seg_\d+\.ts`）并限制在会话目录内
 - SQL 全程通过 pgx 参数化
 - 默认 `JWT_SECRET` 仅用于开发；明文 HTTP 只建议在可信局域网使用，
@@ -560,3 +672,17 @@ sequenceDiagram
 
 - **JAV DB 元数据源**（需要 API key；免密钥的 TMDB/TVMaze/AniList/Wikipedia
   已覆盖常见需求）
+- **自定义元数据刮削器** — `SCRAPE_CUSTOM_URL` 指向任意 JSON 端点，
+  `%s` 替换为 URL 编码标题，无需改代码即可接入自建刮削服务
+- **字幕提供方** — `SubtitleProvider` 接口（目前 OpenSubtitles.com）
+  可按视频搜索/下载并扩展新来源
+- **AI 打标** — 外部二进制（`AI_TAG_BIN`）接收媒体路径并逐行输出标签，
+  标签进入 `tags`/`video_tags` 与标签云
+- **语音转写** — whisper.cpp（`WHISPER_BIN`）把音频转为可搜索文稿，
+  同一管线还能产出 WebVTT 字幕轨
+- **通知渠道** — `media.Notifier` 把同一事件分发到 webhook、Apprise 与
+  SMTP；新增渠道就是在 `Send` 中加一个分支
+- **SSO 提供方** — OIDC 与 SAML 2.0 都归结到 `users.oauth_sub` 绑定；
+  新提供方需要一对 start/callback 端点与 upsert 路径
+- **DLNA / Chromecast** — UPnP 服务器（`/dlna/*`）与 Cast sender 自成一体；
+  DLNA 浏览可扩展新对象容器，分享令牌流程可支撑其他投屏目标
