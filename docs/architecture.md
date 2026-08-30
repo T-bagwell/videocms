@@ -305,6 +305,10 @@ back to the keyless TVMaze API, then AniList, then Wikipedia
 
 - Searches TMDB (`language` configurable, default `zh-CN`), then fetches movie
   details for localized genre names
+- A custom provider is available via `SCRAPE_CUSTOM_URL` (a JSON endpoint with
+  a `%s` title placeholder): `POST /api/videos/{id}/scrape?provider=custom`
+  uses it, `?force=1` overwrites existing metadata, and without force an
+  already-enriched video returns 409 (per-item override)
 - Downloads the `w500` poster into `data/posters/<video-id>.<ext>`
 - Updates `title, year, synopsis, genres, poster_path, tmdb_id, scraped_at`
 - Rate-limited to one request per 400ms
