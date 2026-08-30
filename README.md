@@ -279,7 +279,7 @@ Planned work is informed by feature sets of similar self-hosted video projects
 
 **Storage & operations**
 
-- [ ] Storage pools: local, S3-compatible and SFTP, routed from the admin UI
+- [x] Storage pools: local, S3-compatible and SFTP, routed from the admin UI
 - [ ] Background-jobs dashboard (monitor / cancel / retry) + richer system stats
 - [ ] Scheduled maintenance: re-scan, health checks, metadata backup/restore
 - [ ] Webhooks + mature public REST API for third-party automation
