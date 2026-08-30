@@ -190,6 +190,8 @@ Statistiques : vidéos, bibliothèques, utilisateurs, listes, favoris, séries e
   (remux sans ré-encodage)
 - **Récupérer** obtient les métadonnées de TMDB (nécessite `TMDB_API_KEY` et l’accès
   réseau à api.themoviedb.org)
+- Les administrateurs peuvent choisir **TMDB ou un fournisseur personnalisé**
+  et forcer l’écrasement des métadonnées existantes
 
 ### 5.4 Utilisateurs
 
@@ -232,6 +234,7 @@ Tout se configure par variables d’environnement (table complète dans le READM
 | `SUBTITLE_OS_USERNAME` / `SUBTITLE_OS_PASSWORD` / `SUBTITLE_OS_API_KEY` | vide | Identifiants OpenSubtitles pour la recherche de sous-titres |
 | `RTMP_INGEST_URL` | `rtmp://localhost:1935/live` | URL d’ingestion RTMP de base (nginx-rtmp ou équivalent) |
 | `WHISPER_BIN` / `WHISPER_MODEL` | vide | CLI whisper.cpp et modèle pour la transcription vocale |
+| `SCRAPE_CUSTOM_URL` | vide | Endpoint JSON de scraping personnalisé ; `%s` est remplacé par le titre encodé |
 
 ## 7. FAQ
 
