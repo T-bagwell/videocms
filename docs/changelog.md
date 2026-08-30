@@ -20,6 +20,10 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Scheduled maintenance: `MAINT_INTERVAL_HOURS` (default 24) runs JSON backups
+  (`MAINT_BACKUP_RETENTION`, default 7) plus per-library health checks, with
+  optional rescans (`MAINT_RESCAN=1`); admins can trigger it manually and
+  list/download backups (restore via the existing import)
 - Background-jobs dashboard: a unified admin Jobs tab aggregates scans,
   uploads, downloads and live streams with progress/errors and contextual
   cancel/retry/start/stop actions, plus free/total disk stats
