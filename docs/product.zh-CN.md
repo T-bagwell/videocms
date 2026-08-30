@@ -185,7 +185,9 @@ make serve                              # http://<局域网IP>:8080
 | `SCAN_WORKERS` | `4` | 并行扫描工作数 |
 | `WATCH_INTERVAL` | `30` | 自动增量扫描间隔（秒），`0` 关闭 |
 | `YTDLP_PATH` | PATH 上的 `yt-dlp` | 「下载」队列使用的 yt-dlp 二进制 |
-| `HLS_HW_ACCEL` | 空（软件 x264） | HLS 视频编码器：videotoolbox、nvenc 或 qsv；留空用 libx264 |
+| `HLS_HW_ACCEL` | 空（软件 x264） | HLS 视频编码器：videotoolbox、nvenc、qsv 或 vaapi；留空用 libx264 |
+| `HLS_VAAPI_DEVICE` | `/dev/dri/renderD128` | VAAPI 渲染设备（配合 `HLS_HW_ACCEL=vaapi`） |
+| `HLS_TONE_MAP` | `0` | `1` 在 HLS 转码中启用 HDR→SDR 色调映射 |
 | `SUBTITLE_OS_USERNAME` / `SUBTITLE_OS_PASSWORD` / `SUBTITLE_OS_API_KEY` | 空 | 在线字幕搜索用的 OpenSubtitles 凭证 |
 
 ## 7. 常见问题
