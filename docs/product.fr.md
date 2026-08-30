@@ -98,6 +98,9 @@ Ouvrez l’interface et connectez-vous avec l’administrateur initial **admin /
   le navigateur le prend en charge
 - **Direct** : les administrateurs créent des flux RTMP (URL d’ingestion
   compatible OBS) et les spectateurs profitent d’un tchat intégré
+- Les administrateurs peuvent lancer la **transcription vocale** (Whisper)
+  d’une vidéo ; le texte est recherchable et sélectionnable comme piste de
+  sous-titres
 - **Télécharger** un remux MKV ou MP4 avec la piste audio et les sous-titres
   choisis (sans ré-encodage), ou récupérer le fichier original
 - La progression est sauvegardée toutes les 5 secondes et à la pause/fin
@@ -228,6 +231,7 @@ Tout se configure par variables d’environnement (table complète dans le READM
 | `HLS_TONE_MAP` | `0` | `1` active le mappage de tons HDR→SDR dans le transcodage HLS |
 | `SUBTITLE_OS_USERNAME` / `SUBTITLE_OS_PASSWORD` / `SUBTITLE_OS_API_KEY` | vide | Identifiants OpenSubtitles pour la recherche de sous-titres |
 | `RTMP_INGEST_URL` | `rtmp://localhost:1935/live` | URL d’ingestion RTMP de base (nginx-rtmp ou équivalent) |
+| `WHISPER_BIN` / `WHISPER_MODEL` | vide | CLI whisper.cpp et modèle pour la transcription vocale |
 
 ## 7. FAQ
 
