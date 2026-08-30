@@ -240,7 +240,9 @@ Planned work is informed by feature sets of similar self-hosted video projects
 - [x] Hardware-accelerated transcoding (VAAPI/NVENC/QSV) + HDR tone mapping
 - [x] Trick-play thumbnails / preview timeline
 - [ ] Intro & credits skip
-- [ ] Watch together (synchronized sessions) and casting (Chromecast/DLNA/AirPlay)
+- [x] Watch together (synchronized sessions)
+- [x] Casting (Web AirPlay)
+- [ ] Casting (Chromecast / DLNA)
 - [ ] Live streaming ingest (RTMP) with built-in chat
 
 **Metadata & AI**
