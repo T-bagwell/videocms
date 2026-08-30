@@ -133,6 +133,13 @@ func (a *App) listVideos(w http.ResponseWriter, r *http.Request) {
 		args = append(args, genre)
 		argIdx++
 	}
+	if tag := strings.TrimSpace(q.Get("tag")); tag != "" {
+		where = append(where, fmt.Sprintf(`EXISTS (
+			SELECT 1 FROM video_tags vtag JOIN tags tg ON tg.id = vtag.tag_id
+			WHERE vtag.video_id = v.id AND lower(tg.name) = lower($%d))`, argIdx))
+		args = append(args, tag)
+		argIdx++
+	}
 	if q.Get("favorites") == "true" {
 		where = append(where, fmt.Sprintf("EXISTS (SELECT 1 FROM favorites f2 WHERE f2.user_id=$%d AND f2.video_id=v.id)", argIdx))
 		args = append(args, user.ID)

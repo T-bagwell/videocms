@@ -30,6 +30,7 @@ type Config struct {
 	WhisperBin         string
 	WhisperModel       string
 	ScrapeCustomURL    string
+	AITagBin           string
 }
 
 func Load() Config {
@@ -55,6 +56,7 @@ func Load() Config {
 		WhisperBin:         os.Getenv("WHISPER_BIN"),
 		WhisperModel:       os.Getenv("WHISPER_MODEL"),
 		ScrapeCustomURL:    os.Getenv("SCRAPE_CUSTOM_URL"),
+		AITagBin:           os.Getenv("AI_TAG_BIN"),
 	}
 	if cfg.Addr != "" && cfg.Addr[0] != ':' {
 		cfg.Addr = ":" + cfg.Addr
