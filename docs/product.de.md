@@ -214,6 +214,9 @@ Statistiken: Videos, Bibliotheken, Benutzer, Wiedergabelisten, Favoriten, Serien
 - **Benachrichtigungen**: Webhook- oder Apprise-Kanäle können Scan-, Upload-
   und Download-Ereignisse empfangen; Admins können aus der Übersicht eine
   Testbenachrichtigung senden
+- **Speicherpools**: lokale, S3-kompatible oder SFTP-Pools mit lokalem
+  Mount-Pfad definierbar; Uploads und Downloads können `pool://name[/Unterpfad]`
+  als Ziel nutzen
 
 ### 5.4 Benutzer
 
