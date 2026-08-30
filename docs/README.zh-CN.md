@@ -76,6 +76,7 @@
 | --- | --- | --- |
 | [产品文档](product.zh-CN.md) | EN · 中文 · FR · JA · DE | 终端用户 |
 | [系统架构](architecture.zh-CN.md) | EN · 中文 · JA | 开发者 |
+| [部署指南](deployment.zh-CN.md) | EN · 中文 · JA | 运维人员 |
 | [English](../README.md) / [中文](README.zh-CN.md) / [日本語](README.ja.md) | English · 中文 · 日本語 | 所有人 |
 
 ## 快速开始
@@ -109,6 +110,9 @@ cd frontend && npm install && npm run dev  # http://localhost:5173
 ```bash
 make serve                                 # 构建前端并统一在 :8080 提供服务
 ```
+
+如需把后端作为纯 API 服务、前端单独部署（nginx 或任意静态服务器），
+参见 [deployment.zh-CN.md](deployment.zh-CN.md)。
 
 用初始管理员 **admin / admin123** 登录后立即修改密码（管理 → 用户管理 → 重置密码）。
 然后在 管理 → 媒体库 → 扫描 添加第一个媒体库（路径必须是服务器绝对路径，
@@ -144,7 +148,9 @@ make serve                                 # 构建前端并统一在 :8080 提�
 | `SCAN_WORKERS` | `4` | 并行扫描工作数（1-16） |
 | `WATCH_INTERVAL` | `30` | 增量扫描的兜底间隔（fsnotify 事件即时索引）；`0` 关闭监听 |
 | `YTDLP_PATH` | PATH 上的 `yt-dlp` | 「下载」队列使用的 yt-dlp 二进制 |
-| `WEB_ROOT` | 自动（`frontend/dist`） | 生产模式的前端目录 |
+| `WEB_ROOT` | 自动（`frontend/dist`） | 单服务模式托管的前端目录；不设置即纯 API 部署 |
+| `CORS_ORIGINS` | 空（`*`） | 允许调用 API 的浏览器来源（逗号分隔，用于前后端分离部署） |
+| `VITE_API_BASE_URL` | 空 | 前端构建期 API 基地址（跨域部署用；运行时可用 `window.__VIDEOCMS_API_BASE__` 覆盖） |
 
 ## 项目结构
 
