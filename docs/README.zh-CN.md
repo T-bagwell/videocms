@@ -230,7 +230,9 @@ scripts/                 演示素材生成器
 - [x] 硬件加速转码（VAAPI/NVENC/QSV）与 HDR 色调映射
 - [x] 预览时间轴缩略图
 - [ ] 片头/片尾跳过
-- [ ] 一起看（同步播放会话）与投屏（Chromecast/DLNA/AirPlay）
+- [x] 一起看（同步播放会话）
+- [x] 投屏（Web AirPlay）
+- [ ] 投屏（Chromecast / DLNA）
 - [ ] RTMP 直播推流入库，内置聊天
 
 **元数据与 AI**
