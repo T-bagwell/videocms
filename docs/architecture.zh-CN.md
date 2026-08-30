@@ -227,6 +227,10 @@ erDiagram
   成员每 2.5s 轮询 `GET /api/watch/rooms/{id}?token=…` 并通过 PUT 发布状态，
   实现松同步播放。投屏：浏览器支持时播放器提供 Web AirPlay 按钮
   （`webkitShowPlaybackUI`）
+- 直播：`live_streams` 与 `chat_messages`（迁移 019）。`LiveManager` 把 RTMP
+  推流（`RTMP_INGEST_URL` + 每条流自己的 key）拉取为滚动 HLS 清单
+  （`data/live/<id>/index.m3u8`）；观看走 `GET /api/live/{id}/hls/...`，
+  聊天通过轮询 `GET|POST /api/live/{id}/chat`
 - 请求的 `start` 与当前会话相差超过一个分片（6 秒）时，杀掉旧会话并从新位置重启（跳转）
 - 清单在响应时重写，使每个分片 URL 都携带 `?token=`
 - 空闲会话 **15 分钟**后回收，同时删除会话目录
