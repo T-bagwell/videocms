@@ -172,7 +172,9 @@ make serve                              # http://<局域网IP>:8080
 - 管理端视频列表支持**批量操作**（打标、清空标签、移入回收站），并有
   **回收站**可一键恢复
 - 用户可对视频**评论与评分**（1-5 星）；首页显示最近的评论与收藏动态
-- **单点登录**（OIDC）：服务器配置身份提供方后，登录页会出现 SSO 按钮
+- **单点登录**：配置相应提供方后，登录页会出现 **OIDC** 与 **SAML 2.0**
+  按钮（支持 ADFS、Okta、Keycloak 等）；SAML 用户可通过 `roles` 属性
+  自动获得管理员权限
 - **家长控制**：管理员可为用户设置允许的分级、为视频设置内容分级；用户可用
   PIN 锁定，并解锁分级内容 5 分钟。媒体库还可设置**存储配额**并在上传时校验
 - **分享定制**：可选择主题、自定义标题并隐藏导航；在链接后加 `?embed=1`
@@ -230,6 +232,7 @@ make serve                              # http://<局域网IP>:8080
 | `SCRAPE_CUSTOM_URL` | 空 | 自定义 JSON 刮削端点；`%s` 会被替换为 URL 转义后的标题 |
 | `AI_TAG_BIN` | 空 | 外部 AI 打标工具（接收媒体路径参数，每行输出一个标签） |
 | `OIDC_ISSUER` / `OIDC_CLIENT_ID` / `OIDC_CLIENT_SECRET` / `OIDC_REDIRECT_URL` | 空 | OIDC 单点登录配置 |
+| `SAML_IDP_METADATA_URL` / `SAML_SP_CERT` / `SAML_SP_KEY` / `SAML_SP_ENTITY_ID` / `SAML_ACS_URL` | 空 | SAML 2.0 单点登录（IdP 元数据 URL、SP 证书/密钥路径、实体 ID、ACS URL） |
 | `DLNA_ENABLED` / `DLNA_FRIENDLY_NAME` / `DLNA_ALLOWED_IPS` | `0` / `VideoCMS` / 空（整个局域网） | UPnP/DLNA 媒体服务器开关、显示名称、逗号分隔的 IP/CIDR 白名单 |
 | `NOTIFY_WEBHOOK_URL` / `NOTIFY_APPRISE_URL` | 空 | 通知渠道（JSON Webhook、Apprise API） |
 | `MAINT_INTERVAL_HOURS` / `MAINT_BACKUP_RETENTION` / `MAINT_RESCAN` | `24` / `7` / `0` | 维护间隔、备份保留份数、是否重扫 |
