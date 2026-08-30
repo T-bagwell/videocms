@@ -84,6 +84,8 @@ Open the web UI and sign in with the initial administrator **admin / admin123**
 - **Play** starts playback; if you have progress it resumes automatically
 - H.264 MP4 / WebM play natively; MKV/HEVC are transcoded on the fly
   (first playback takes a few seconds; “Transcode play” is offered as a fallback)
+- Multiple audio tracks can be switched during HLS playback (audio selector
+  in the player)
 - **Download** a remuxed copy as MKV or MP4 with a chosen audio track and
   subtitles (no re-encode), or grab the original file for offline playback
 - Progress is saved every 5 seconds and on pause/end — visible in Continue Watching
