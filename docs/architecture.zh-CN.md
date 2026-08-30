@@ -234,6 +234,10 @@ erDiagram
 - 语音转写：`POST /api/videos/{id}/transcribe`（管理员）用 whisper.cpp CLI
   （`WHISPER_BIN`/`WHISPER_MODEL`）生成 WebVTT 文稿，存入 `video_transcripts`
   （迁移 020）并注册为字幕轨；视频搜索也会匹配文稿文本
+- 标签与 AI：`tags`/`video_tags`（迁移 021）支撑手动
+  `GET|POST|DELETE /api/videos/{id}/tags` 与 `POST /api/videos/{id}/analyze`
+  （运行外部打标工具 `AI_TAG_BIN`，每行一个标签，存为 auto 标签）；
+  `GET /api/videos?tag=` 可按标签过滤
 - 请求的 `start` 与当前会话相差超过一个分片（6 秒）时，杀掉旧会话并从新位置重启（跳转）
 - 清单在响应时重写，使每个分片 URL 都携带 `?token=`
 - 空闲会话 **15 分钟**后回收，同时删除会话目录
