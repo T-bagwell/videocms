@@ -207,6 +207,10 @@ The `HLSManager`:
   `#EXT-X-MEDIA` subtitle entry per track (`subs/<track-id>/playlist.m3u8`,
   lazy-extracting embedded tracks on first request). Playlists grow while
   transcoding and `#EXT-X-ENDLIST` is appended server-side when ffmpeg finishes
+- Multi-audio sources: each audio stream is remuxed to its own AAC HLS track
+  (`a<index>/`), advertised through an `#EXT-X-MEDIA` AUDIO group that video
+  renditions reference (`AUDIO="audio"`), so players can switch audio without
+  restarting the transcode session
 - If the requested `start` differs from the running session by more than one
   segment (6s), the session is killed and restarted at the new position (seek)
 - The manifest is rewritten on the fly so every segment URL carries `?token=`
