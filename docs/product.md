@@ -98,6 +98,8 @@ Open the web UI and sign in with the initial administrator **admin / admin123**
   friends; a **Cast / AirPlay** button is available where the browser supports it
 - **Live streaming**: admins create RTMP streams (OBS-compatible ingest URL)
   and viewers watch with a built-in chat
+- Admins can run **speech transcription** (Whisper) on a video; the transcript
+  is searchable and selectable as a subtitle track
 - **Download** a remuxed copy as MKV or MP4 with a chosen audio track and
   subtitles (no re-encode), or grab the original file for offline playback
 - Progress is saved every 5 seconds and on pause/end — visible in Continue Watching
@@ -221,6 +223,7 @@ most important ones:
 | `HLS_TONE_MAP` | `0` | `1` enables HDR→SDR tone mapping in HLS transcoding |
 | `SUBTITLE_OS_USERNAME` / `SUBTITLE_OS_PASSWORD` / `SUBTITLE_OS_API_KEY` | empty | OpenSubtitles credentials for the online subtitle search |
 | `RTMP_INGEST_URL` | `rtmp://localhost:1935/live` | Base RTMP ingest URL (nginx-rtmp or equivalent) |
+| `WHISPER_BIN` / `WHISPER_MODEL` | empty | whisper.cpp CLI and model for speech transcription |
 
 ## 7. FAQ
 
