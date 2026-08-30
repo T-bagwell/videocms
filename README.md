@@ -246,7 +246,7 @@ Planned work is informed by feature sets of similar self-hosted video projects
 - [x] Automatic subtitle download & matching
 - [x] Hardware-accelerated transcoding (VAAPI/NVENC/QSV) + HDR tone mapping
 - [x] Trick-play thumbnails / preview timeline
-- [ ] Intro & credits skip
+- [x] Intro & credits skip
 - [x] Watch together (synchronized sessions)
 - [x] Casting (Web AirPlay)
 - [ ] Casting (Chromecast / DLNA)
