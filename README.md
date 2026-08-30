@@ -271,7 +271,7 @@ Planned work is informed by feature sets of similar self-hosted video projects
 - [x] Comments, ratings and activity feeds
 - [x] OIDC single sign-on
 - [ ] SAML single sign-on
-- [ ] Parental controls (PIN / content ratings) and per-user quotas
+- [x] Parental controls (PIN / content ratings) and per-user quotas
 - [ ] Share page customization and embeddable players
 - [ ] Notifications (email / webhook / Apprise) for scan, upload and transcode events
 
