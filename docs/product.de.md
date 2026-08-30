@@ -211,8 +211,10 @@ Statistiken: Videos, Bibliotheken, Benutzer, Wiedergabelisten, Favoriten, Serien
   in Papierkorb) und einen **Papierkorb** mit Wiederherstellung per Klick
 - Benutzer können Videos **kommentieren und bewerten** (1-5 Sterne); die
   Startseite zeigt einen Aktivitätsfeed mit Kommentaren und Favoriten
-- **Single Sign-on** (OIDC): Die Anmeldeseite bietet einen SSO-Button, wenn der
-  Server mit einem Identity Provider konfiguriert ist
+- **Single Sign-on**: Die Anmeldeseite zeigt **OIDC**- und **SAML 2.0**-Buttons,
+  wenn der jeweilige Anbieter konfiguriert ist (ADFS, Okta, Keycloak …);
+  SAML-Benutzer können über ein `roles`-Attribut automatisch Admin-Rechte
+  erhalten
 - **Kindersicherung**: Admins legen eine Einstufungsrichtlinie pro Benutzer und
   eine Einstufung pro Video fest; Benutzer können mit PIN sperren und klassierte
   Inhalte 5 Minuten entsperren. Bibliotheken können auch ein **Speicherkontingent**
@@ -281,6 +283,7 @@ Alles wird über Umgebungsvariablen konfiguriert (vollständige Tabelle im READM
 | `SCRAPE_CUSTOM_URL` | leer | Benutzerdefinierter JSON-Scraper-Endpoint; `%s` wird durch den URL-codierten Titel ersetzt |
 | `AI_TAG_BIN` | leer | Externes KI-Tagging-Tool (Medienpfad als Argument, ein Tag pro Zeile) |
 | `OIDC_ISSUER` / `OIDC_CLIENT_ID` / `OIDC_CLIENT_SECRET` / `OIDC_REDIRECT_URL` | leer | OIDC-Single-Sign-on-Einstellungen |
+| `SAML_IDP_METADATA_URL` / `SAML_SP_CERT` / `SAML_SP_KEY` / `SAML_SP_ENTITY_ID` / `SAML_ACS_URL` | leer | SAML-2.0-Single-Sign-on (IdP-Metadaten-URL, SP-Zertifikat-/Schlüsselpfade, Entitäts-ID, ACS-URL) |
 | `DLNA_ENABLED` / `DLNA_FRIENDLY_NAME` / `DLNA_ALLOWED_IPS` | `0` / `VideoCMS` / leer (ganzes LAN) | UPnP/DLNA-Medienserver-Schalter, Anzeigename, kommaseparierte IP/CIDR-Allowlist |
 | `NOTIFY_WEBHOOK_URL` / `NOTIFY_APPRISE_URL` | leer | Benachrichtigungskanäle (JSON-Webhook, Apprise-API) |
 | `MAINT_INTERVAL_HOURS` / `MAINT_BACKUP_RETENTION` / `MAINT_RESCAN` | `24` / `7` / `0` | Wartungsplan, Backup-Aufbewahrung, Rescan-Flag |
