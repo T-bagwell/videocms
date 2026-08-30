@@ -5,6 +5,7 @@ import { api } from '../api.js';
 import Poster from '../components/Poster.jsx';
 import DownloadDialog from '../components/DownloadDialog.jsx';
 import ShareModal from '../components/ShareModal.jsx';
+import SubtitleSearchModal from '../components/SubtitleSearchModal.jsx';
 import { useAuth } from '../auth.jsx';
 import { fmtBytes, fmtDuration } from '../i18n';
 
@@ -24,6 +25,7 @@ export default function VideoDetailPage() {
   const [err, setErr] = useState('');
   const [showShare, setShowShare] = useState(false);
   const [showDownload, setShowDownload] = useState(false);
+  const [showSubSearch, setShowSubSearch] = useState(false);
   const [subtitleBusy, setSubtitleBusy] = useState(false);
   const [tracks, setTracks] = useState([]);
   const [setGlobal, setSetGlobal] = useState(false);
@@ -259,6 +261,9 @@ export default function VideoDetailPage() {
                 >
                   {subtitleBusy ? t('video.subtitleBusy') : t('video.subtitleExtract')}
                 </button>
+                <button className="btn ghost" onClick={() => setShowSubSearch(true)}>
+                  {t('video.subtitleSearch')}
+                </button>
                 {video.has_subtitle && (
                   <button className="btn ghost" onClick={removeSubtitle} disabled={subtitleBusy}>
                     {t('video.subtitleRemove')}
@@ -387,6 +392,18 @@ export default function VideoDetailPage() {
 
       {showShare && <ShareModal kind="videos" id={video.id} onClose={() => setShowShare(false)} />}
       {showDownload && <DownloadDialog video={video} onClose={() => setShowDownload(false)} />}
+      {showSubSearch && (
+        <SubtitleSearchModal
+          video={video}
+          onClose={() => setShowSubSearch(false)}
+          onDownloaded={() => {
+            setMsg(t('video.subtitleDownloaded'));
+            api(`/videos/${video.id}/subtitle-tracks`)
+              .then((d) => setTracks(d.items))
+              .catch(() => {});
+          }}
+        />
+      )}
 
       <div className="back-link">
         <Link to="/">← {t('nav.home')}</Link>
