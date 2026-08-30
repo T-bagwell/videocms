@@ -20,6 +20,9 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Storage pools: admins define local/S3/SFTP pools (name, type, mount path,
+  config, read-only); upload and yt-dlp targets can use `pool://name[/sub]`,
+  routed through the pool's local mount (e.g. s3fs/sshfs)
 - Notifications: webhook (`NOTIFY_WEBHOOK_URL`) and Apprise
   (`NOTIFY_APPRISE_URL`) channels deliver scan/download/upload events; admins
   can send a test notification
