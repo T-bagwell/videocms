@@ -172,6 +172,7 @@
     "tabBlocked": "ブロック",
     "tabUsers": "ユーザー管理",
     "tabUploads": "アップロード",
+    "tabDownloads": "ダウンロード",
     "statsVideos": "動画数",
     "statsLibraries": "ライブラリ",
     "statsUsers": "ユーザー",
@@ -269,6 +270,25 @@
     "resume": "再開",
     "retry": "再試行",
     "cancel": "キャンセル"
+  },
+  "downloads": {
+    "urlPlaceholder": "動画 URL（https://…）",
+    "noTarget": "フォルダ未選択",
+    "formatPlaceholder": "フォーマット（既定 bv*+ba/b）",
+    "intervalPlaceholder": "繰り返し間隔（時間）",
+    "add": "ダウンロードを追加",
+    "added": "キューに追加: {{url}}",
+    "hint": "ダウンロードはサーバー上の yt-dlp で実行されます。完了したファイルは選択したフォルダに保存され、ライブラリ内なら自動的に取り込まれます。",
+    "empty": "ダウンロードジョブはまだありません。",
+    "statusQueued": "待機中",
+    "statusDownloading": "ダウンロード中",
+    "statusCompleted": "完了",
+    "statusFailed": "失敗",
+    "statusCanceled": "キャンセル",
+    "cancel": "キャンセル",
+    "retry": "再試行",
+    "progress": "{{pct}}%",
+    "every": "{{hours}} 時間ごと"
   },
   "download": {
     "title": "{{title}} をダウンロード",

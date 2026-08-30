@@ -31,6 +31,7 @@ type integrationEnv struct {
 	pool   *pgxpool.Pool
 	server *httptest.Server
 	dbName string
+	app    *App
 }
 
 func newIntegrationEnv(t *testing.T) *integrationEnv {
@@ -84,6 +85,7 @@ func newIntegrationEnv(t *testing.T) *integrationEnv {
 	if err != nil {
 		t.Fatalf("build app: %v", err)
 	}
+	env.app = app
 	env.server = httptest.NewServer(app.Routes())
 	return env
 }

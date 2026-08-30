@@ -172,6 +172,7 @@
     "tabBlocked": "屏蔽内容",
     "tabUsers": "用户管理",
     "tabUploads": "上传",
+    "tabDownloads": "下载",
     "statsVideos": "视频总数",
     "statsLibraries": "媒体库",
     "statsUsers": "用户",
@@ -269,6 +270,25 @@
     "resume": "继续",
     "retry": "重试",
     "cancel": "取消"
+  },
+  "downloads": {
+    "urlPlaceholder": "视频链接（https://…）",
+    "noTarget": "未选择文件夹",
+    "formatPlaceholder": "格式（默认 bv*+ba/b）",
+    "intervalPlaceholder": "每隔几小时重复",
+    "add": "添加下载",
+    "added": "已加入队列：{{url}}",
+    "hint": "下载通过服务器上的 yt-dlp 执行；完成后文件会保存到所选文件夹，如果该文件夹在媒体库内会被自动收录。",
+    "empty": "还没有下载任务。",
+    "statusQueued": "排队中",
+    "statusDownloading": "下载中",
+    "statusCompleted": "已完成",
+    "statusFailed": "失败",
+    "statusCanceled": "已取消",
+    "cancel": "取消",
+    "retry": "重试",
+    "progress": "{{pct}}%",
+    "every": "每 {{hours}} 小时"
   },
   "download": {
     "title": "下载 {{title}}",

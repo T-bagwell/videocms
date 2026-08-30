@@ -172,6 +172,7 @@
     "tabBlocked": "Blocked",
     "tabUsers": "Users",
     "tabUploads": "Uploads",
+    "tabDownloads": "Downloads",
     "statsVideos": "Videos",
     "statsLibraries": "Libraries",
     "statsUsers": "Users",
@@ -269,6 +270,25 @@
     "resume": "Resume",
     "retry": "Retry",
     "cancel": "Cancel"
+  },
+  "downloads": {
+    "urlPlaceholder": "Video URL (https://…)",
+    "noTarget": "No folder selected",
+    "formatPlaceholder": "Format (default bv*+ba/b)",
+    "intervalPlaceholder": "Repeat every (hours)",
+    "add": "Add download",
+    "added": "Queued: {{url}}",
+    "hint": "Downloads run through yt-dlp on the server; finished files land in the chosen folder and are indexed automatically if it is inside a library.",
+    "empty": "No download jobs yet.",
+    "statusQueued": "Queued",
+    "statusDownloading": "Downloading",
+    "statusCompleted": "Completed",
+    "statusFailed": "Failed",
+    "statusCanceled": "Canceled",
+    "cancel": "Cancel",
+    "retry": "Retry",
+    "progress": "{{pct}}%",
+    "every": "every {{hours}}h"
   },
   "download": {
     "title": "Download {{title}}",

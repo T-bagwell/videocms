@@ -23,6 +23,7 @@ type App struct {
 	scanner *media.Scanner
 	hls     *media.HLSManager
 	scraper *media.Scraper
+	dl      *media.Downloader
 }
 
 func New(cfg config.Config, pool *pgxpool.Pool) (*App, error) {
@@ -39,9 +40,15 @@ func New(cfg config.Config, pool *pgxpool.Pool) (*App, error) {
 		scanner: scanner,
 		hls:     media.NewHLSManager(cfg.DataDir, media.ResolveTool("ffmpeg")),
 		scraper: media.NewScraper(pool, cfg.DataDir, cfg.TMDBAPIKey),
+		dl:      media.NewDownloader(pool, cfg.YtDLPPath),
 	}
 	scanner.SetEnricher(app.scraper)
 	return app, nil
+}
+
+// StartDownloadWorker runs the yt-dlp background worker until ctx is done.
+func (a *App) StartDownloadWorker(ctx context.Context) {
+	go a.dl.Run(ctx)
 }
 
 func (a *App) Routes() http.Handler {
@@ -72,6 +79,11 @@ func (a *App) Routes() http.Handler {
 	mux.HandleFunc("PUT /api/uploads/{id}/chunk/{index}", authAdmin(a.putChunk))
 	mux.HandleFunc("POST /api/uploads/{id}/complete", authAdmin(a.completeUpload))
 	mux.HandleFunc("DELETE /api/uploads/{id}", authAdmin(a.deleteUpload))
+
+	mux.HandleFunc("GET /api/downloads", authAdmin(a.listDownloads))
+	mux.HandleFunc("POST /api/downloads", authAdmin(a.createDownload))
+	mux.HandleFunc("DELETE /api/downloads/{id}", authAdmin(a.deleteDownload))
+	mux.HandleFunc("POST /api/downloads/{id}/retry", authAdmin(a.retryDownload))
 
 	mux.HandleFunc("GET /api/admin/blocked-titles", authAdmin(a.listBlockedTitles))
 	mux.HandleFunc("POST /api/admin/blocked-titles", authAdmin(a.createBlockedTitle))

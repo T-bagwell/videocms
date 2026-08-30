@@ -20,6 +20,10 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- yt-dlp integration: admins can queue video/playlist/channel URLs from a new
+  Downloads tab, choose a target folder and format, repeat downloads on a
+  schedule, and cancel or retry jobs; progress is live and finished files are
+  indexed automatically when the target is inside a library
 - Configurable downloads: videos can be downloaded as **MP4 or MKV** with a
   chosen audio track plus any embedded or uploaded subtitles — remuxed on the
   fly with no re-encoding from the video page's Download dialog

@@ -272,6 +272,12 @@ label input, label textarea { margin-top: 6px; }
 .status-idle { background: var(--bg-soft); color: var(--muted); }
 .status-scanning { background: rgba(46,204,113,0.15); color: var(--ok); }
 .status-error { background: rgba(231,76,60,0.15); color: var(--danger); }
+.status-queued { background: rgba(243,156,18,0.15); color: var(--warn); }
+.status-downloading { background: rgba(52,152,219,0.15); color: #5dade2; }
+.status-completed { background: rgba(46,204,113,0.15); color: var(--ok); }
+.status-canceled { background: var(--bg-soft); color: var(--muted); }
+.progress { background: var(--bg-soft); border-radius: 6px; height: 8px; margin: 8px 0 4px; overflow: hidden; }
+.progress-bar { background: var(--primary); height: 100%; transition: width 0.3s; }
 .status-cancelled { background: rgba(243,156,18,0.15); color: var(--warn); }
 .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
 .small-muted { color: var(--muted); font-size: 12px; }

@@ -17,6 +17,7 @@ type Config struct {
 	TMDBAPIKey    string
 	WebRoot       string
 	WatchInterval time.Duration
+	YtDLPPath     string
 }
 
 func Load() Config {
@@ -30,6 +31,7 @@ func Load() Config {
 		TMDBAPIKey:    os.Getenv("TMDB_API_KEY"),
 		WebRoot:       os.Getenv("WEB_ROOT"),
 		WatchInterval: envDuration("WATCH_INTERVAL", 30*time.Second),
+		YtDLPPath:     os.Getenv("YTDLP_PATH"),
 	}
 	if cfg.Addr != "" && cfg.Addr[0] != ':' {
 		cfg.Addr = ":" + cfg.Addr

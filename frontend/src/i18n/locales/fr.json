@@ -172,6 +172,7 @@
     "tabBlocked": "Blocage",
     "tabUsers": "Utilisateurs",
     "tabUploads": "Téléversements",
+    "tabDownloads": "Téléchargements",
     "statsVideos": "Vidéos",
     "statsLibraries": "Bibliothèques",
     "statsUsers": "Utilisateurs",
@@ -269,6 +270,25 @@
     "resume": "Reprendre",
     "retry": "Réessayer",
     "cancel": "Annuler"
+  },
+  "downloads": {
+    "urlPlaceholder": "URL de la vidéo (https://…)",
+    "noTarget": "Aucun dossier sélectionné",
+    "formatPlaceholder": "Format (défaut bv*+ba/b)",
+    "intervalPlaceholder": "Répéter toutes les (heures)",
+    "add": "Ajouter le téléchargement",
+    "added": "En file : {{url}}",
+    "hint": "Les téléchargements passent par yt-dlp sur le serveur ; les fichiers finis arrivent dans le dossier choisi et sont indexés automatiquement s’il fait partie d’une bibliothèque.",
+    "empty": "Aucun téléchargement pour l’instant.",
+    "statusQueued": "En attente",
+    "statusDownloading": "Téléchargement…",
+    "statusCompleted": "Terminé",
+    "statusFailed": "Échec",
+    "statusCanceled": "Annulé",
+    "cancel": "Annuler",
+    "retry": "Réessayer",
+    "progress": "{{pct}}%",
+    "every": "toutes les {{hours}} h"
   },
   "download": {
     "title": "Télécharger {{title}}",

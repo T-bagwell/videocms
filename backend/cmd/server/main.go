@@ -39,6 +39,7 @@ func main() {
 	}
 	app.StartFileWatcher(ctx)
 	app.StartShareCleanup(ctx)
+	app.StartDownloadWorker(ctx)
 
 	srv := &http.Server{
 		Addr:              cfg.Addr,
