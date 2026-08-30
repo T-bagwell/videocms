@@ -223,6 +223,9 @@ Statistiken: Videos, Bibliotheken, Benutzer, Wiedergabelisten, Favoriten, Serien
 - **Geplante Wartung**: automatische JSON-Backups und Gesundheitschecks
   (Intervall und Aufbewahrung konfigurierbar); Admins können sofort ausführen
   und Backups herunterladen
+- **Webhooks & API-Dokumentation**: signierte Ereignisse an Endpoints
+  abonnieren und das OpenAPI-Dokument unter `/api/openapi.json` für
+  Automatisierung einsehen
 
 ### 5.4 Benutzer
 
