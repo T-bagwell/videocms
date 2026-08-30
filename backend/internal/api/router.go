@@ -245,6 +245,7 @@ func (a *App) Routes() http.Handler {
 	mux.HandleFunc("GET /api/admin/system", authAdmin(a.system))
 	mux.HandleFunc("POST /api/admin/maintenance/run", authAdmin(a.runMaintenanceNow))
 	mux.HandleFunc("GET /api/admin/backups", authAdmin(a.listBackups))
+	mux.HandleFunc("GET /api/admin/backups/{name}", authAdmin(a.downloadBackup))
 	mux.HandleFunc("GET /api/admin/export", authAdmin(a.exportAll))
 	mux.HandleFunc("POST /api/admin/import", authAdmin(a.importBackup))
 	mux.HandleFunc("GET /api/admin/paths", authAdmin(a.listServerPaths))

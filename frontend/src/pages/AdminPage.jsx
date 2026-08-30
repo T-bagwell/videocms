@@ -69,6 +69,9 @@ function Overview() {
   const [stats, setStats] = useState(null);
   const [importMsg, setImportMsg] = useState('');
   const [importErr, setImportErr] = useState('');
+  const [backups, setBackups] = useState([]);
+  const [maintMsg, setMaintMsg] = useState('');
+  const [maintErr, setMaintErr] = useState('');
   useEffect(() => {
     api('/admin/stats').then(setStats).catch(() => {});
   }, []);
@@ -97,6 +100,30 @@ function Overview() {
       setImportErr(e.message);
     }
   }
+
+  async function refreshBackups() {
+    try {
+      const d = await api('/admin/backups');
+      setBackups(d.items || []);
+    } catch (e) {
+      setMaintErr(e.message);
+    }
+  }
+  useEffect(() => {
+    refreshBackups();
+  }, []);
+
+  async function runMaintenance() {
+    setMaintErr('');
+    setMaintMsg('');
+    try {
+      const d = await api('/admin/maintenance/run', { method: 'POST' });
+      setMaintMsg(t('admin.maintenanceDone', { backup: d.backup }));
+      refreshBackups();
+    } catch (e) {
+      setMaintErr(e.message);
+    }
+  }
   if (!stats) return <div className="loading">{t('common.loading')}</div>;
   return (
     <>
@@ -113,6 +140,7 @@ function Overview() {
         )}
       </div>
       <div className="detail-actions">
+        <button className="btn ghost" onClick={runMaintenance}>{t('admin.runMaintenance')}</button>
         <button className="btn ghost" onClick={testNotify}>{t('admin.testNotify')}</button>
         <a className="btn ghost" href={mediaUrl('/admin/export')}>
           {t('admin.export')}
@@ -122,6 +150,22 @@ function Overview() {
           <input type="file" accept=".json,application/json" hidden onChange={importBackup} />
         </label>
       </div>
+      {maintMsg && <div className="toast toast-success">{maintMsg}</div>}
+      {maintErr && <div className="form-error">{maintErr}</div>}
+      {backups.length > 0 && (
+        <div className="card backups-box">
+          <h3>{t('admin.backups')}</h3>
+          {backups.map((b) => (
+            <div key={b.name} className="admin-video-row trash-row">
+              <div className="mono muted" style={{ flex: 1, minWidth: 0 }}>
+                <div className="ellipsis">{b.name}</div>
+                <div className="small-muted">{fmtBytes(b.size)} · {new Date(b.created_at).toLocaleString()}</div>
+              </div>
+              <a className="btn small" href={mediaUrl(`/admin/backups/${encodeURIComponent(b.name)}`)}>{t('common.download')}</a>
+            </div>
+          ))}
+        </div>
+      )}
       {importMsg && <div className="toast toast-success">{importMsg}</div>}
       {importErr && <div className="form-error">{importErr}</div>}
     </>

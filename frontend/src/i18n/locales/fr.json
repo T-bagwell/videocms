@@ -367,7 +367,10 @@
     "jobsCancel": "Annuler",
     "jobsRetry": "Réessayer",
     "jobsStart": "Démarrer",
-    "jobsStop": "Arrêter"
+    "jobsStop": "Arrêter",
+    "runMaintenance": "Exécuter la maintenance",
+    "maintenanceDone": "Maintenance terminée — sauvegarde : {{backup}}",
+    "backups": "Sauvegardes"
   },
   "picker": {
     "title": "Choisir un dossier serveur",

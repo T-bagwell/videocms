@@ -367,7 +367,10 @@
     "jobsCancel": "Cancel",
     "jobsRetry": "Retry",
     "jobsStart": "Start",
-    "jobsStop": "Stop"
+    "jobsStop": "Stop",
+    "runMaintenance": "Run maintenance",
+    "maintenanceDone": "Maintenance complete — backup: {{backup}}",
+    "backups": "Backups"
   },
   "picker": {
     "title": "Select server folder",

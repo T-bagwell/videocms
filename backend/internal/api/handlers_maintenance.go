@@ -195,6 +195,26 @@ func (a *App) listBackups(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]any{"items": items})
 }
 
+// GET /api/admin/backups/{name} — download a backup file.
+func (a *App) downloadBackup(w http.ResponseWriter, r *http.Request) {
+	name := filepath.Base(r.PathValue("name"))
+	if !strings.HasPrefix(name, "videocms-backup-") || !strings.HasSuffix(name, ".json") {
+		writeErr(w, http.StatusBadRequest, "invalid backup name")
+		return
+	}
+	path := filepath.Join(a.backupsDir(), name)
+	if !strings.HasPrefix(path, a.backupsDir()+string(os.PathSeparator)) {
+		writeErr(w, http.StatusBadRequest, "invalid backup name")
+		return
+	}
+	if st, err := os.Stat(path); err != nil || st.IsDir() {
+		writeErr(w, http.StatusNotFound, "backup not found")
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	http.ServeFile(w, r, path)
+}
+
 func uuidParse(s string) (uuid.UUID, error) {
 	return uuid.Parse(s)
 }

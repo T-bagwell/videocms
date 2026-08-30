@@ -367,7 +367,10 @@
     "jobsCancel": "Abbrechen",
     "jobsRetry": "Erneut",
     "jobsStart": "Starten",
-    "jobsStop": "Stoppen"
+    "jobsStop": "Stoppen",
+    "runMaintenance": "Wartung ausführen",
+    "maintenanceDone": "Wartung abgeschlossen — Backup: {{backup}}",
+    "backups": "Backups"
   },
   "picker": {
     "title": "Serverordner auswählen",

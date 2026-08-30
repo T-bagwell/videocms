@@ -367,7 +367,10 @@
     "jobsCancel": "キャンセル",
     "jobsRetry": "再試行",
     "jobsStart": "開始",
-    "jobsStop": "停止"
+    "jobsStop": "停止",
+    "runMaintenance": "メンテナンス実行",
+    "maintenanceDone": "メンテナンス完了 — バックアップ：{{backup}}",
+    "backups": "バックアップ"
   },
   "picker": {
     "title": "サーバーフォルダを選択",

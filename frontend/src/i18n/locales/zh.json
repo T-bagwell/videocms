@@ -367,7 +367,10 @@
     "jobsCancel": "取消",
     "jobsRetry": "重试",
     "jobsStart": "开始",
-    "jobsStop": "停止"
+    "jobsStop": "停止",
+    "runMaintenance": "运行维护",
+    "maintenanceDone": "维护完成——备份：{{backup}}",
+    "backups": "备份"
   },
   "picker": {
     "title": "选择服务器文件夹",
