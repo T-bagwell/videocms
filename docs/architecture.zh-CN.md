@@ -360,6 +360,8 @@ AniList 与 Wikipedia（`TVMAZE_ENABLED=0` / `ANILIST_ENABLED=0` /
   JSON 配置）；管理端 `GET|POST|PATCH|DELETE /api/admin/storage-pools`，
   上传/下载目标支持 `pool://名称[/子路径]`，解析到挂载路径
   （远端池通过 s3fs/sshfs 式挂载路由）
+- 任务看板：`GET /api/admin/jobs` 把扫描、上传、下载与直播聚合为统一列表，
+  `GET /api/admin/system` 报告磁盘剩余/总量；管理 UI 提供按任务的上下文操作
 
 ### 3.10 关键设计决策
 
