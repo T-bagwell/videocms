@@ -172,6 +172,8 @@ Statistiken: Videos, Bibliotheken, Benutzer, Wiedergabelisten, Favoriten, Serien
 - Das Löschen einer Bibliothek entfernt ihre Videoeinträge — Dateien auf der Platte bleiben
 - **Ordner öffnen** öffnet das Mediatheks-Verzeichnis auf dem Server im
   System-Dateimanager, um die tatsächlichen Mediendateien anzusehen oder zu verwalten
+- **Gesundheitscheck** meldet fehlende/beschädigte Dateien und Duplikate;
+  **Beste Version behalten** verschiebt den Rest in den Server-Papierkorb
 - **Bibliothek blockieren** blendet die gesamte Mediathek für alle Benutzer aus
   (Startseite, Serien, Favoriten, Weiterschauen, Wiedergabelisten), ohne etwas
   zu löschen; die Freigabe stellt alles sofort wieder her
