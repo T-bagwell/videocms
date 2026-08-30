@@ -148,6 +148,7 @@ make serve                                 # 构建前端并统一在 :8080 提�
 | `SCAN_WORKERS` | `4` | 并行扫描工作数（1-16） |
 | `WATCH_INTERVAL` | `30` | 增量扫描的兜底间隔（fsnotify 事件即时索引）；`0` 关闭监听 |
 | `HLS_HW_ACCEL` | 空（软件 x264） | HLS 视频编码器：`videotoolbox`、`nvenc` 或 `qsv`；留空用 libx264 |
+| `SUBTITLE_OS_USERNAME` / `SUBTITLE_OS_PASSWORD` / `SUBTITLE_OS_API_KEY` | 空 | 在线字幕搜索用的 OpenSubtitles 凭证 |
 | `YTDLP_PATH` | PATH 上的 `yt-dlp` | 「下载」队列使用的 yt-dlp 二进制 |
 | `WEB_ROOT` | 自动（`frontend/dist`） | 单服务模式托管的前端目录；不设置即纯 API 部署 |
 | `CORS_ORIGINS` | 空（`*`） | 允许调用 API 的浏览器来源（逗号分隔，用于前后端分离部署） |
@@ -223,7 +224,7 @@ scripts/                 演示素材生成器
 - [x] 多音轨播放与切换（独立 HLS 音轨）
 - [x] ASS 样式软字幕
 - [x] 字幕同步/偏移调整（直接播放）
-- [ ] 自动字幕下载与匹配
+- [x] 自动字幕下载与匹配
 - [ ] 硬件加速转码（VAAPI/NVENC/QSV）与 HDR 色调映射
 - [x] 预览时间轴缩略图
 - [ ] 片头/片尾跳过
