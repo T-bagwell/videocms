@@ -87,6 +87,8 @@ make serve                              # http://<LAN-IP>:8080
   gewechselt werden (Audioselektor im Player)
 - Untertitel lassen sich bei der Direktwiedergabe um ±0,5 s verschieben;
   der Offset wird pro Benutzer und Video gespeichert
+- Beim Überfahren der Fortschrittsleiste erscheinen Vorschaubilder; ein Klick
+  springt an die gewünschte Position
 - **Download** liefert einen MKV/MP4-Remux mit gewählter Audiospur und
   Untertiteln (ohne Re-Encoding) oder die Originaldatei
 - Fortschritt wird alle 5 Sekunden sowie bei Pause/Ende gespeichert
