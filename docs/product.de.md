@@ -223,7 +223,8 @@ Statistiken: Videos, Bibliotheken, Benutzer, Wiedergabelisten, Favoriten, Serien
   wählbar; `?embed=1` bettet einen chrome-freien Player in beliebige Seiten ein
 - **Benachrichtigungen**: Webhook- oder Apprise-Kanäle können Scan-, Upload-
   und Download-Ereignisse empfangen; Admins können aus der Übersicht eine
-  Testbenachrichtigung senden
+  Testbenachrichtigung senden. Mit konfiguriertem SMTP-Server werden dieselben
+  Ereignisse auch per **E-Mail** zugestellt
 - **Speicherpools**: lokale, S3-kompatible oder SFTP-Pools mit lokalem
   Mount-Pfad definierbar; Uploads und Downloads können `pool://name[/Unterpfad]`
   als Ziel nutzen
@@ -286,6 +287,7 @@ Alles wird über Umgebungsvariablen konfiguriert (vollständige Tabelle im READM
 | `SAML_IDP_METADATA_URL` / `SAML_SP_CERT` / `SAML_SP_KEY` / `SAML_SP_ENTITY_ID` / `SAML_ACS_URL` | leer | SAML-2.0-Single-Sign-on (IdP-Metadaten-URL, SP-Zertifikat-/Schlüsselpfade, Entitäts-ID, ACS-URL) |
 | `DLNA_ENABLED` / `DLNA_FRIENDLY_NAME` / `DLNA_ALLOWED_IPS` | `0` / `VideoCMS` / leer (ganzes LAN) | UPnP/DLNA-Medienserver-Schalter, Anzeigename, kommaseparierte IP/CIDR-Allowlist |
 | `NOTIFY_WEBHOOK_URL` / `NOTIFY_APPRISE_URL` | leer | Benachrichtigungskanäle (JSON-Webhook, Apprise-API) |
+| `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASSWORD` / `NOTIFY_EMAIL_FROM` / `NOTIFY_EMAIL_TO` | leer / `587` | SMTP-E-Mail-Benachrichtigungen (implizites TLS auf 465, sonst STARTTLS) |
 | `MAINT_INTERVAL_HOURS` / `MAINT_BACKUP_RETENTION` / `MAINT_RESCAN` | `24` / `7` / `0` | Wartungsplan, Backup-Aufbewahrung, Rescan-Flag |
 
 ## 7. FAQ
