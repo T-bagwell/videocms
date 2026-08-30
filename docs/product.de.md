@@ -220,6 +220,9 @@ Statistiken: Videos, Bibliotheken, Benutzer, Wiedergabelisten, Favoriten, Serien
 - **Auftrags-Dashboard**: Scans, Uploads, Downloads und Live-Streams zentral
   überwachen (Fortschritt, Fehler, Abbrechen/Erneut/Start/Stopp) plus
   Speichernutzung
+- **Geplante Wartung**: automatische JSON-Backups und Gesundheitschecks
+  (Intervall und Aufbewahrung konfigurierbar); Admins können sofort ausführen
+  und Backups herunterladen
 
 ### 5.4 Benutzer
 
@@ -266,6 +269,7 @@ Alles wird über Umgebungsvariablen konfiguriert (vollständige Tabelle im READM
 | `AI_TAG_BIN` | leer | Externes KI-Tagging-Tool (Medienpfad als Argument, ein Tag pro Zeile) |
 | `OIDC_ISSUER` / `OIDC_CLIENT_ID` / `OIDC_CLIENT_SECRET` / `OIDC_REDIRECT_URL` | leer | OIDC-Single-Sign-on-Einstellungen |
 | `NOTIFY_WEBHOOK_URL` / `NOTIFY_APPRISE_URL` | leer | Benachrichtigungskanäle (JSON-Webhook, Apprise-API) |
+| `MAINT_INTERVAL_HOURS` / `MAINT_BACKUP_RETENTION` / `MAINT_RESCAN` | `24` / `7` / `0` | Wartungsplan, Backup-Aufbewahrung, Rescan-Flag |
 
 ## 7. FAQ
 
