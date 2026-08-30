@@ -349,6 +349,10 @@ back to the keyless TVMaze API, then AniList, then Wikipedia
   condition
 - Open library folder: `POST /api/libraries/{id}/open` runs the system file
   manager (`open` / `xdg-open` / `explorer`) on the server for the library path
+- Health checks: `POST /api/libraries/{id}/health` reports missing/corrupt
+  files and duplicate candidates (same declared size);
+  `POST /api/libraries/{id}/health/keep-best` moves duplicates except the best
+  (highest resolution, then longest filename) into `DATA_DIR/trash/<date>/`
 
 ### 3.10 Key design decisions
 
