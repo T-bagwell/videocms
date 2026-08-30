@@ -207,7 +207,9 @@
     "skipCreditsEnd": "标记片尾终点",
     "skipCreditsRange": "片尾 {{from}}–{{to}}",
     "skipCredits": "跳过片尾",
-    "skipClear": "清除"
+    "skipClear": "清除",
+    "castChromecast": "投屏到电视",
+    "casting": "正在投屏…"
   },
   "playlists": {
     "title": "播放列表",

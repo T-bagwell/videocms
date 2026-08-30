@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { api, mediaUrl } from '../api.js';
+import { api, apiBaseUrl, mediaUrl } from '../api.js';
 import { fmtDuration } from '../i18n';
 import JASSUB from 'jassub';
 
@@ -14,6 +14,33 @@ const JASSUB_MODERN_WASM = `${JASS_BASE}jassub-worker-modern.wasm`;
 const JASSUB_FONT = `${JASS_BASE}default.woff2`;
 
 const BROWSER_PLAYABLE = ['.mp4', '.m4v', '.webm', '.mov', '.ogv'];
+
+// Load the Google Cast sender SDK once; resolves when cast APIs are ready.
+function loadCastSDK() {
+  return new Promise((resolve, reject) => {
+    if (window.chrome?.cast?.isAvailable) {
+      resolve();
+      return;
+    }
+    if (document.querySelector('script[src*="cast_sender.js"]')) {
+      const iv = setInterval(() => {
+        if (window.chrome?.cast?.isAvailable) {
+          clearInterval(iv);
+          resolve();
+        }
+      }, 200);
+      return;
+    }
+    window.__onGCastApiAvailable = (available) => {
+      if (available) resolve();
+    };
+    const s = document.createElement('script');
+    s.src = 'https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1';
+    s.async = true;
+    s.onerror = () => reject(new Error('failed to load cast sdk'));
+    document.head.appendChild(s);
+  });
+}
 
 export default function PlayerPage() {
   const { id } = useParams();
@@ -57,10 +84,22 @@ export default function PlayerPage() {
   const [hasAirPlay, setHasAirPlay] = useState(false);
   const [skip, setSkip] = useState({ intro: null, credits: null });
   const [skipDraft, setSkipDraft] = useState(null);
+  const [hasCast, setHasCast] = useState(false);
+  const [casting, setCasting] = useState(false);
 
   useEffect(() => {
     setActiveId(id);
   }, [id]);
+
+  useEffect(() => {
+    let stopped = false;
+    loadCastSDK()
+      .then(() => {
+        if (!stopped && window.chrome?.cast?.isAvailable) setHasCast(true);
+      })
+      .catch(() => {});
+    return () => { stopped = true; };
+  }, []);
 
   useEffect(() => {
     if (assRef.current) {
@@ -495,6 +534,39 @@ export default function PlayerPage() {
     el.webkitShowPlaybackUI();
   }
 
+  async function castToChromecast() {
+    if (!window.cast?.framework) return;
+    try {
+      const ctx = window.cast.framework.CastContext.getInstance();
+      ctx.setOptions({
+        receiverApplicationId: 'CC1AD845',
+        autoJoinPolicy: window.chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED,
+      });
+      await ctx.requestSession();
+      const share = await api(`/videos/${activeId}/share`, {
+        method: 'POST',
+        body: { hours: 1 },
+      });
+      const base = `${window.location.origin}${apiBaseUrl()}`;
+      const stream = `${base}/api/share/${share.token}/video/${activeId}/stream`;
+      const mediaInfo = new window.chrome.cast.media.MediaInfo(stream, 'video/mp4');
+      mediaInfo.metadata = new window.chrome.cast.media.GenericMediaMetadata();
+      mediaInfo.metadata.title = video.title;
+      if (video.has_poster) {
+        mediaInfo.metadata.images = [{
+          url: `${base}/api/share/${share.token}/video/${activeId}/poster`,
+        }];
+      }
+      const session = ctx.getCurrentSession();
+      if (!session) throw new Error('no cast session');
+      await session.loadMedia(new window.chrome.cast.media.LoadRequest(mediaInfo));
+      setCasting(true);
+    } catch (e) {
+      console.error('cast to chromecast failed', e);
+      setCasting(false);
+    }
+  }
+
   if (err) return <div className="container"><div className="form-error">{err}</div></div>;
   if (!video) return <div className="container"><div className="loading">{t('common.loading')}</div></div>;
 
@@ -514,6 +586,11 @@ export default function PlayerPage() {
           {hasAirPlay && (
             <button className="btn ghost" onClick={castToAirPlay}>
               {t('player.cast')}
+            </button>
+          )}
+          {hasCast && (
+            <button className="btn ghost" onClick={castToChromecast}>
+              {casting ? t('player.casting') : t('player.castChromecast')}
             </button>
           )}
           {!watchRoom ? (

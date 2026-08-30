@@ -207,7 +207,9 @@
     "skipCreditsEnd": "Mark credits end",
     "skipCreditsRange": "Credits {{from}}–{{to}}",
     "skipCredits": "Skip credits",
-    "skipClear": "Clear"
+    "skipClear": "Clear",
+    "castChromecast": "Cast to TV",
+    "casting": "Casting…"
   },
   "playlists": {
     "title": "Playlists",

@@ -207,7 +207,9 @@
     "skipCreditsEnd": "Marquer la fin du générique",
     "skipCreditsRange": "Générique {{from}}–{{to}}",
     "skipCredits": "Sauter le générique",
-    "skipClear": "Effacer"
+    "skipClear": "Effacer",
+    "castChromecast": "Diffuser sur la TV",
+    "casting": "Diffusion en cours…"
   },
   "playlists": {
     "title": "Listes de lecture",

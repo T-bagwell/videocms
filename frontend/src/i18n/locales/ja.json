@@ -207,7 +207,9 @@
     "skipCreditsEnd": "エンドロール終了をマーク",
     "skipCreditsRange": "エンドロール {{from}}–{{to}}",
     "skipCredits": "エンドロールをスキップ",
-    "skipClear": "クリア"
+    "skipClear": "クリア",
+    "castChromecast": "テレビにキャスト",
+    "casting": "キャスト中…"
   },
   "playlists": {
     "title": "プレイリスト",

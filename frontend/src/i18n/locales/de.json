@@ -207,7 +207,9 @@
     "skipCreditsEnd": "Abspann-Ende markieren",
     "skipCreditsRange": "Abspann {{from}}–{{to}}",
     "skipCredits": "Abspann überspringen",
-    "skipClear": "Löschen"
+    "skipClear": "Löschen",
+    "castChromecast": "Auf TV streamen",
+    "casting": "Streaming…"
   },
   "playlists": {
     "title": "Wiedergabelisten",
