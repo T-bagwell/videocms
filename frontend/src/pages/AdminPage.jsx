@@ -8,6 +8,7 @@ import BlockedAdmin from './BlockedAdmin.jsx';
 import UploadsAdmin from './UploadsAdmin.jsx';
 import DownloadsAdmin from './DownloadsAdmin.jsx';
 import LiveAdmin from './LiveAdmin.jsx';
+import StorageAdmin from './StorageAdmin.jsx';
 
 export default function AdminPage() {
   const [tab, setTab] = useState('overview');
@@ -41,6 +42,9 @@ export default function AdminPage() {
         <button className={tab === 'live' ? 'tab active' : 'tab'} onClick={() => setTab('live')}>
           {t('admin.tabLive')}
         </button>
+        <button className={tab === 'storage' ? 'tab active' : 'tab'} onClick={() => setTab('storage')}>
+          {t('admin.tabStorage')}
+        </button>
       </div>
       {tab === 'overview' && <Overview />}
       {tab === 'libraries' && <Libraries />}
@@ -50,6 +54,7 @@ export default function AdminPage() {
       {tab === 'uploads' && <UploadsAdmin />}
       {tab === 'downloads' && <DownloadsAdmin />}
       {tab === 'live' && <LiveAdmin />}
+      {tab === 'storage' && <StorageAdmin />}
     </div>
   );
 }
