@@ -20,6 +20,9 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Share page customization: theme (default/dark), custom title and
+  hide-navigation options; `?embed=1` renders a chrome-free player for iframe
+  embedding
 - Parental controls: users can set a PIN and unlock rated content for
   5 minutes; admins set an allowed-rating policy per user and a content rating
   per video; libraries support a storage quota enforced on uploads
