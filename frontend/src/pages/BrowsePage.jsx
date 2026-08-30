@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { api } from '../api.js';
 import VideoCard from '../components/VideoCard.jsx';
 import SeriesCard from '../components/SeriesCard.jsx';
@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 const PAGE_SIZE = 24;
 
 export default function BrowsePage() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
   const { t } = useTranslation();
   const [videos, setVideos] = useState([]);
@@ -22,6 +23,8 @@ export default function BrowsePage() {
   const [libraryId, setLibraryId] = useState('');
   const [sort, setSort] = useState('title');
   const [vtype, setVtype] = useState('');
+  const [tag, setTag] = useState(searchParams.get('tag') || '');
+  const [cloudTags, setCloudTags] = useState([]);
   const [series, setSeries] = useState([]);
   const [showFilter, setShowFilter] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -31,6 +34,7 @@ export default function BrowsePage() {
   useEffect(() => {
     api('/libraries').then((d) => setLibraries(d.items)).catch(() => {});
     api('/users/me/continue').then((d) => setContinueWatching(d.items)).catch(() => {});
+    api('/tags').then((d) => setCloudTags(d.items || [])).catch(() => setCloudTags([]));
   }, []);
 
   useEffect(() => {
@@ -50,6 +54,7 @@ export default function BrowsePage() {
     if (search) params.set('q', search);
     if (libraryId) params.set('library_id', libraryId);
     if (vtype) params.set('type', vtype);
+    if (tag) params.set('tag', tag);
     api(`/videos?${params}`)
       .then((d) => {
         if (cancelled) return;
@@ -70,7 +75,14 @@ export default function BrowsePage() {
     return () => {
       cancelled = true;
     };
-  }, [page, search, libraryId, sort, vtype]);
+  }, [page, search, libraryId, sort, vtype, tag]);
+
+  function pickTag(name) {
+    setTag(name);
+    setPage(1);
+    if (name) setSearchParams({ tag: name });
+    else setSearchParams({});
+  }
 
   function submitSearch(e) {
     e.preventDefault();
@@ -116,6 +128,25 @@ export default function BrowsePage() {
       )}
 
       <section className="section">
+        {cloudTags.length > 0 && (
+          <div className="tag-cloud">
+            {cloudTags.map((t) => (
+              <button
+                key={t.id}
+                className={`tag-chip${tag === t.name ? ' active' : ''}`}
+                onClick={() => pickTag(tag === t.name ? '' : t.name)}
+              >
+                {t.name} <span className="muted">({t.count})</span>
+              </button>
+            ))}
+          </div>
+        )}
+        {tag && (
+          <p className="muted">
+            {t('browse.filteredByTag', { tag })}{' '}
+            <button className="btn small ghost" onClick={() => pickTag('')}>{t('common.clear')}</button>
+          </p>
+        )}
         <div className="browse-toolbar">
           <form onSubmit={submitSearch} className="search-form">
             <input

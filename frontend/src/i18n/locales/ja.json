@@ -37,7 +37,8 @@
     "minutesSeconds": "{{m}}分{{s}}秒",
     "hoursMinutes": "{{h}}時間{{m}}分",
     "requestFailed": "リクエストに失敗しました（{{status}}）",
-    "yes": "OK"
+    "yes": "OK",
+    "clear": "クリア"
   },
   "browse": {
     "continueWatching": "続きを見る",
@@ -48,6 +49,7 @@
     "sortYearAsc": "年順（古い順）",
     "sortDuration": "再生時間順（長い順）",
     "sortAdded": "追加日順",
+    "filteredByTag": "タグで絞り込み：{{tag}}",
     "sortFavorites": "お気に入り順",
     "typeAll": "すべて",
     "typeMovie": "映画",
@@ -115,6 +117,7 @@
     "analyze": "AI 解析",
     "analyzing": "解析中…",
     "analyzeDone": "AI 解析が完了しました — タグを追加しました",
+    "similar": "似ている動画",
     "subtitleBusy": "処理中…",
     "subtitleRemove": "字幕を削除",
     "subtitleUploaded": "字幕をアップロードしました",

@@ -33,6 +33,7 @@ export default function VideoDetailPage() {
   const [tags, setTags] = useState([]);
   const [tagInput, setTagInput] = useState('');
   const [tagBusy, setTagBusy] = useState(false);
+  const [similar, setSimilar] = useState([]);
   const [subtitleBusy, setSubtitleBusy] = useState(false);
   const [tracks, setTracks] = useState([]);
   const [setGlobal, setSetGlobal] = useState(false);
@@ -43,6 +44,7 @@ export default function VideoDetailPage() {
     api(`/videos/${id}/subtitle-tracks`).then((d) => setTracks(d.items)).catch(() => setTracks([]));
     api(`/videos/${id}/transcripts`).then(setTranscript).catch(() => setTranscript(null));
     api(`/videos/${id}/tags`).then((d) => setTags(d.items || [])).catch(() => setTags([]));
+    api(`/videos/${id}/similar`).then((d) => setSimilar(d.items || [])).catch(() => setSimilar([]));
   }, [id]);
 
   async function addTag(e) {
@@ -291,8 +293,8 @@ export default function VideoDetailPage() {
             <div className="tag-box">
               {tags.map((tg) => (
                 <span key={tg.id} className="tag-chip">
-                  {tg.name}
                   {tg.kind === 'auto' && <span className="tag-auto" title={t('video.tagAuto')}>✦</span>}
+                  <Link className="tag-link" to={`/browse?tag=${encodeURIComponent(tg.name)}`}>{tg.name}</Link>
                   <button className="tag-remove" onClick={() => removeTag(tg.id)} aria-label={t('common.remove')}>×</button>
                 </span>
               ))}
@@ -436,6 +438,19 @@ export default function VideoDetailPage() {
           )}
         </div>
       </div>
+
+      {similar.length > 0 && (
+        <div className="similar-section">
+          <h3>{t('video.similar')}</h3>
+          <div className="video-grid">
+            {similar.map((v) => (
+              <Link key={v.id} to={`/video/${v.id}`} className="poster-link">
+                <Poster video={v} />
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
 
       {showPlaylistPicker && (
         <div className="modal-backdrop" onClick={() => setShowPlaylistPicker(false)}>

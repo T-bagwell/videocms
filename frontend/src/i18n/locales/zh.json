@@ -37,7 +37,8 @@
     "minutesSeconds": "{{m}}分{{s}}秒",
     "hoursMinutes": "{{h}}小时{{m}}分",
     "requestFailed": "请求失败（{{status}}）",
-    "yes": "确定"
+    "yes": "确定",
+    "clear": "清除"
   },
   "browse": {
     "continueWatching": "继续观看",
@@ -48,6 +49,7 @@
     "sortYearAsc": "按年份（旧→新）",
     "sortDuration": "按时长（长→短）",
     "sortAdded": "按入库时间",
+    "filteredByTag": "按标签筛选：{{tag}}",
     "sortFavorites": "按收藏数",
     "typeAll": "全部",
     "typeMovie": "电影",
@@ -115,6 +117,7 @@
     "analyze": "AI 分析",
     "analyzing": "分析中…",
     "analyzeDone": "AI 分析完成——已添加标签",
+    "similar": "相似视频",
     "subtitleBusy": "处理中…",
     "subtitleRemove": "移除字幕",
     "subtitleUploaded": "字幕已上传",

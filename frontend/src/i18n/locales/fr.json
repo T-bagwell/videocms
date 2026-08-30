@@ -37,7 +37,8 @@
     "minutesSeconds": "{{m}} min {{s}} s",
     "hoursMinutes": "{{h}} h {{m}} min",
     "requestFailed": "Échec de la requête ({{status}})",
-    "yes": "OK"
+    "yes": "OK",
+    "clear": "Effacer"
   },
   "browse": {
     "continueWatching": "Reprendre la lecture",
@@ -48,6 +49,7 @@
     "sortYearAsc": "Par année (ancien → récent)",
     "sortDuration": "Par durée (long → court)",
     "sortAdded": "Par date d'ajout",
+    "filteredByTag": "Filtré par étiquette : {{tag}}",
     "sortFavorites": "Par favoris",
     "typeAll": "Tout",
     "typeMovie": "Films",
@@ -115,6 +117,7 @@
     "analyze": "Analyse IA",
     "analyzing": "Analyse…",
     "analyzeDone": "Analyse IA terminée — étiquettes ajoutées",
+    "similar": "Vidéos similaires",
     "subtitleBusy": "En cours…",
     "subtitleRemove": "Retirer les sous-titres",
     "subtitleUploaded": "Sous-titres téléversés",

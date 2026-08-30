@@ -37,7 +37,8 @@
     "minutesSeconds": "{{m}} Min. {{s}} Sek.",
     "hoursMinutes": "{{h}} Std. {{m}} Min.",
     "requestFailed": "Anfrage fehlgeschlagen ({{status}})",
-    "yes": "OK"
+    "yes": "OK",
+    "clear": "Löschen"
   },
   "browse": {
     "continueWatching": "Weiterschauen",
@@ -48,6 +49,7 @@
     "sortYearAsc": "Nach Jahr (alt → neu)",
     "sortDuration": "Nach Dauer (lang → kurz)",
     "sortAdded": "Nach Hinzugefügt",
+    "filteredByTag": "Nach Tag gefiltert: {{tag}}",
     "sortFavorites": "Nach Favoriten",
     "typeAll": "Alle",
     "typeMovie": "Filme",
@@ -115,6 +117,7 @@
     "analyze": "KI-Analyse",
     "analyzing": "Analysiere…",
     "analyzeDone": "KI-Analyse abgeschlossen — Tags hinzugefügt",
+    "similar": "Ähnliche Videos",
     "subtitleBusy": "Wird verarbeitet…",
     "subtitleRemove": "Untertitel entfernen",
     "subtitleUploaded": "Untertitel hochgeladen",

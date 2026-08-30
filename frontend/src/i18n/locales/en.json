@@ -37,7 +37,8 @@
     "minutesSeconds": "{{m}}m {{s}}s",
     "hoursMinutes": "{{h}}h {{m}}m",
     "requestFailed": "Request failed ({{status}})",
-    "yes": "OK"
+    "yes": "OK",
+    "clear": "Clear"
   },
   "browse": {
     "continueWatching": "Continue Watching",
@@ -48,6 +49,7 @@
     "sortYearAsc": "By year (old → new)",
     "sortDuration": "By duration (long → short)",
     "sortAdded": "By date added",
+    "filteredByTag": "Filtered by tag: {{tag}}",
     "sortFavorites": "By favorites",
     "typeAll": "All",
     "typeMovie": "Movies",
@@ -115,6 +117,7 @@
     "analyze": "AI analyze",
     "analyzing": "Analyzing…",
     "analyzeDone": "AI analysis complete — tags added",
+    "similar": "Similar videos",
     "subtitleBusy": "Working…",
     "subtitleRemove": "Remove subtitle",
     "subtitleUploaded": "Subtitle uploaded",
