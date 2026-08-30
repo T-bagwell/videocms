@@ -20,6 +20,9 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Local speech transcription: admins run whisper.cpp on a video
+  (`WHISPER_BIN` / `WHISPER_MODEL`) to generate a WebVTT transcript that is
+  searchable and selectable as a subtitle track
 - Live streaming: admins create RTMP streams (`RTMP_INGEST_URL` + per-stream
   key), the server pulls the ingest into a rolling HLS playlist, and a live
   watch page includes a built-in polling chat
