@@ -353,6 +353,9 @@ AniList 与 Wikipedia（`TVMAZE_ENABLED=0` / `ANILIST_ENABLED=0` /
 - 分享定制（迁移 028）：创建分享可携带 `theme`/`custom_title`/`hide_nav`，
   存在 `share_tokens` 并由公开 info 端点返回；分享页应用这些设置，
   `?embed=1` 隐藏页面装饰以便 iframe 嵌入
+- 通知：`media.Notifier` 向 `NOTIFY_WEBHOOK_URL` 与/或 Apprise API
+  （`NOTIFY_APPRISE_URL`）推送 JSON，覆盖扫描完成/失败、yt-dlp 下载完成/失败、
+  上传完成事件；`POST /api/admin/notify/test` 可发送测试事件
 
 ### 3.10 关键设计决策
 
