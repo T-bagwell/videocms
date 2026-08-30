@@ -234,6 +234,8 @@ Statistiques : vidéos, bibliothèques, utilisateurs, listes, favoris, séries e
   téléchargement des sauvegardes
 - **Webhooks et docs API** : abonnez des endpoints à des événements signés et
   consultez le document OpenAPI sur `/api/openapi.json` pour l’automatisation
+- **PWA et hors ligne** : installez VideoCMS comme application et enregistrez
+  des vidéos pour la lecture hors ligne depuis la page détail
 
 ### 5.4 Utilisateurs
 
