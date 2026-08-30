@@ -28,6 +28,7 @@ export default function BrowsePage() {
   const [collections, setCollections] = useState([]);
   const [collectionName, setCollectionName] = useState('');
   const [savedFilters, setSavedFilters] = useState(null);
+  const [feed, setFeed] = useState([]);
   const [series, setSeries] = useState([]);
   const [showFilter, setShowFilter] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -40,6 +41,7 @@ export default function BrowsePage() {
     api('/tags').then((d) => setCloudTags(d.items || [])).catch(() => setCloudTags([]));
     api('/collections').then((d) => setCollections(d.items || [])).catch(() => setCollections([]));
     api('/users/me/filters').then((d) => setSavedFilters(d.filters || null)).catch(() => {});
+    api('/feed').then((d) => setFeed(d.items || [])).catch(() => setFeed([]));
   }, []);
 
   useEffect(() => {
@@ -159,6 +161,21 @@ export default function BrowsePage() {
 
   return (
     <div className="container">
+      {feed.length > 0 && (
+        <section className="section">
+          <h2>{t('browse.recentActivity')}</h2>
+          <div className="card feed-box">
+            {feed.map((f, i) => (
+              <div key={`${f.kind}-${f.created_at}-${i}`} className="feed-row">
+                {f.kind === 'comment'
+                  ? t('browse.feedComment', { user: f.username, title: f.video_title, text: f.text })
+                  : t('browse.feedFavorite', { user: f.username, title: f.video_title })}
+                <Link className="section-more" to={`/video/${f.video_id}`}>→</Link>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
       {continueWatching.length > 0 && (
         <section className="section">
           <h2>{t('browse.continueWatching')}</h2>

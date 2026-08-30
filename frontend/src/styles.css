@@ -344,6 +344,13 @@ label input, label textarea { margin-top: 6px; }
 .collection-input { padding: 6px 10px; border-radius: 6px; font-size: 13px; }
 .trash-box { margin-bottom: 14px; padding: 14px; }
 .trash-row { align-items: center; gap: 10px; }
+.social-box { margin-top: 18px; padding: 14px; }
+.rating-row { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
+.star { background: none; border: none; font-size: 22px; color: var(--muted); cursor: pointer; }
+.star.active { color: var(--warn); }
+.comment-row { padding: 8px 0; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
+.feed-box { padding: 12px; }
+.feed-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; font-size: 14px; }
 .status-cancelled { background: rgba(243,156,18,0.15); color: var(--warn); }
 .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
 .small-muted { color: var(--muted); font-size: 12px; }

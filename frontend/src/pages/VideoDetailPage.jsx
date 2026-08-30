@@ -34,6 +34,9 @@ export default function VideoDetailPage() {
   const [tagInput, setTagInput] = useState('');
   const [tagBusy, setTagBusy] = useState(false);
   const [similar, setSimilar] = useState([]);
+  const [comments, setComments] = useState([]);
+  const [commentInput, setCommentInput] = useState('');
+  const [ratings, setRatings] = useState({ average: 0, count: 0, mine: 0 });
   const [subtitleBusy, setSubtitleBusy] = useState(false);
   const [tracks, setTracks] = useState([]);
   const [setGlobal, setSetGlobal] = useState(false);
@@ -45,7 +48,41 @@ export default function VideoDetailPage() {
     api(`/videos/${id}/transcripts`).then(setTranscript).catch(() => setTranscript(null));
     api(`/videos/${id}/tags`).then((d) => setTags(d.items || [])).catch(() => setTags([]));
     api(`/videos/${id}/similar`).then((d) => setSimilar(d.items || [])).catch(() => setSimilar([]));
+    api(`/videos/${id}/comments`).then((d) => setComments(d.items || [])).catch(() => setComments([]));
+    api(`/videos/${id}/ratings`).then(setRatings).catch(() => {});
   }, [id]);
+
+  async function postComment(e) {
+    e.preventDefault();
+    const body = commentInput.trim();
+    if (!body) return;
+    try {
+      const d = await api(`/videos/${id}/comments`, { method: 'POST', body: { body } });
+      setComments((prev) => [...prev, d]);
+      setCommentInput('');
+    } catch (e2) {
+      setErr(e2.message);
+    }
+  }
+
+  async function removeComment(cid) {
+    try {
+      await api(`/comments/${cid}`, { method: 'DELETE' });
+      setComments((prev) => prev.filter((c) => c.id !== cid));
+    } catch (e2) {
+      setErr(e2.message);
+    }
+  }
+
+  async function rate(stars) {
+    try {
+      await api(`/videos/${id}/rating`, { method: 'PUT', body: { stars } });
+      const d = await api(`/videos/${id}/ratings`);
+      setRatings(d);
+    } catch (e2) {
+      setErr(e2.message);
+    }
+  }
 
   async function addTag(e) {
     e.preventDefault();
@@ -437,6 +474,47 @@ export default function VideoDetailPage() {
             </div>
           )}
         </div>
+      </div>
+
+      <div className="card social-box">
+        <h3>{t('video.rating')}</h3>
+        <div className="rating-row">
+          {[1, 2, 3, 4, 5].map((s) => (
+            <button
+              key={s}
+              className={`star${ratings.mine >= s ? ' active' : ''}`}
+              onClick={() => rate(s)}
+              aria-label={`${s}★`}
+            >
+              ★
+            </button>
+          ))}
+          <span className="muted">
+            {ratings.count > 0
+              ? t('video.averageRating', { avg: ratings.average.toFixed(1), count: ratings.count })
+              : t('video.noRatings')}
+          </span>
+        </div>
+        <h3>{t('video.comments')}</h3>
+        {comments.length === 0 && <div className="empty">{t('video.noComments')}</div>}
+        {comments.map((c) => (
+          <div key={c.id} className="comment-row">
+            <b>{c.username || '?'}</b> <span className="muted small">{new Date(c.created_at).toLocaleString()}</span>
+            <div>{c.body}</div>
+            {(user?.role === 'admin' || c.user_id === user?.id) && (
+              <button className="btn small ghost" onClick={() => removeComment(c.id)}>{t('video.deleteComment')}</button>
+            )}
+          </div>
+        ))}
+        <form className="inline-form" onSubmit={postComment}>
+          <input
+            placeholder={t('video.commentPlaceholder')}
+            value={commentInput}
+            onChange={(e) => setCommentInput(e.target.value)}
+            maxLength={1000}
+          />
+          <button className="btn primary">{t('video.postComment')}</button>
+        </form>
       </div>
 
       {similar.length > 0 && (
