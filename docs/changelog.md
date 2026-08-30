@@ -20,6 +20,10 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Pluggable metadata sources: `SCRAPE_CUSTOM_URL` provides a custom JSON
+  scraper (with a `%s` title placeholder) selectable per video alongside TMDB,
+  and `POST /api/videos/{id}/scrape` supports `?provider=` and `?force=` for
+  per-item override
 - Local speech transcription: admins run whisper.cpp on a video
   (`WHISPER_BIN` / `WHISPER_MODEL`) to generate a WebVTT transcript that is
   searchable and selectable as a subtitle track
