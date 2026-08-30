@@ -248,6 +248,10 @@ The `HLSManager`:
   whisper.cpp CLI (`WHISPER_BIN`/`WHISPER_MODEL`) to a WebVTT file, stores it
   in `video_transcripts` (migration 020), registers it as a subtitle track,
   and the video search matches transcript text
+- Tags & AI: `tags`/`video_tags` (migration 021) back manual
+  `GET|POST|DELETE /api/videos/{id}/tags` and `POST /api/videos/{id}/analyze`,
+  which runs an external tagger (`AI_TAG_BIN`, one tag per stdout line) and
+  stores auto tags; `GET /api/videos?tag=` filters
 - If the requested `start` differs from the running session by more than one
   segment (6s), the session is killed and restarted at the new position (seek)
 - The manifest is rewritten on the fly so every segment URL carries `?token=`
