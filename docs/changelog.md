@@ -20,6 +20,10 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- OIDC single sign-on: the login page offers SSO; `OIDC_ISSUER` /
+  `OIDC_CLIENT_ID` / `OIDC_CLIENT_SECRET` / `OIDC_REDIRECT_URL` configure the
+  discovery + authorization-code flow, and users are auto-provisioned or
+  linked by `oauth_sub`
 - Comments, 1-5 star ratings (with averages) and a recent-activity feed
   (comments + favorites) on the browse page
 - NFO metadata import/export: per-library export writes Kodi-style movie NFO
