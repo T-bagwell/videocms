@@ -79,6 +79,7 @@ All documentation is multi-language. Start at the **[docs index](docs/INDEX.md)*
 | --- | --- | --- |
 | [Product documentation](docs/product.md) | EN · 中文 · FR · JA · DE | End users |
 | [System architecture](docs/architecture.md) | EN · 中文 · JA | Developers |
+| [Deployment](docs/deployment.md) | EN · 中文 · JA | Operators |
 | [README](README.md) / [中文](docs/README.zh-CN.md) / [日本語](docs/README.ja.md) | EN · 中文 · 日本語 | Everyone |
 
 ## Quick Start
@@ -112,6 +113,9 @@ For production-style single-port serving:
 ```bash
 make serve                                 # builds UI + serves everything on :8080
 ```
+
+To run the backend as an API-only service and host the frontend separately
+(nginx or any static server), see [deployment.md](docs/deployment.md).
 
 Log in with the initial admin **admin / admin123** and change the password
 immediately (Admin → Users → Reset password). Then add your first library under
@@ -151,7 +155,9 @@ All settings are environment variables:
 | `WIKIPEDIA_LANG` / `WIKIPEDIA_ENABLED` | `en` / `1` | Language edition and switch for the keyless Wikipedia fallback |
 | `SCAN_WORKERS` | `4` | Parallel scan workers (1–16) |
 | `WATCH_INTERVAL` | `30` | Fallback interval for incremental scans (fsnotify events index immediately); `0` disables watching |
-| `WEB_ROOT` | auto (`frontend/dist`) | Built frontend for production mode |
+| `WEB_ROOT` | auto (`frontend/dist`) | Built frontend for single-service mode; leave unset for API-only deployment |
+| `CORS_ORIGINS` | empty (`*`) | Comma-separated browser origins allowed to call the API (separate frontend deployments) |
+| `VITE_API_BASE_URL` | empty | Frontend build-time API base URL for cross-origin deployments (runtime override: `window.__VIDEOCMS_API_BASE__`) |
 
 ## Project Structure
 
