@@ -20,6 +20,9 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Batch edit/organize: admins select videos in the admin list to bulk-tag,
+  clear tags or move to trash; the recycle bin lists trashed files (with
+  original paths) and supports one-click restore
 - Fuzzy full-text search: pg_trgm GIN indexes accelerate substring matching,
   and a new `sort=fuzzy` mode filters and ranks by trigram similarity so typos
   still find videos (title / synopsis / filename)
