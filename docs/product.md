@@ -206,6 +206,8 @@ Stats: videos, libraries, users, playlists, favorites, series and storage used.
   content rating per video; users can lock with a PIN and unlock rated content
   for 5 minutes. Libraries can also carry a **storage quota** enforced on
   uploads
+- **Share customization**: pick a theme, a custom title and hide navigation;
+  appending `?embed=1` embeds a chrome-free player in any page
 
 ### 5.4 Users
 
