@@ -332,6 +332,10 @@ AniList 与 Wikipedia（`TVMAZE_ENABLED=0` / `ANILIST_ENABLED=0` /
 - 健康检查：`POST /api/libraries/{id}/health` 报告缺失/损坏文件与重复候选
   （声明大小相同）；`POST /api/libraries/{id}/health/keep-best` 保留每组最佳
   （分辨率最高，其次文件名最长），其余移入 `DATA_DIR/trash/<日期>/`
+- 批量与回收站：`POST /api/admin/videos/batch` 批量打标、清空标签或把选中
+  视频移入回收站；`trash_records`（迁移 024）保存原始路径，
+  `GET /api/admin/trash` + `POST /api/admin/trash/{id}/restore` 可移回文件并
+  重新启用
 
 ### 3.10 关键设计决策
 
