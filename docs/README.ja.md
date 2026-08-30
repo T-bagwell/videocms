@@ -151,6 +151,7 @@ make serve                                 # UI をビルドし :8080 で一括�
 | `SCAN_WORKERS` | `4` | 並列スキャンワーカー数（1-16） |
 | `WATCH_INTERVAL` | `30` | 増分スキャンの保険間隔（fsnotify イベントは即時反映）。`0` で監視無効 |
 | `HLS_HW_ACCEL` | 空（ソフトウェア x264） | HLS ビデオエンコーダー：`videotoolbox`、`nvenc` または `qsv`。空なら libx264 |
+| `SUBTITLE_OS_USERNAME` / `SUBTITLE_OS_PASSWORD` / `SUBTITLE_OS_API_KEY` | 空 | オンライン字幕検索用の OpenSubtitles 認証情報 |
 | `YTDLP_PATH` | PATH 上の `yt-dlp` | ダウンロードキューが使う yt-dlp バイナリ |
 | `WEB_ROOT` | 自動（`frontend/dist`） | 単一サービスモードで配信するフロントエンド。未設定なら API 専用デプロイ |
 | `CORS_ORIGINS` | 空（`*`） | API を呼び出せるブラウザオリジン（カンマ区切り。フロント分離デプロイ用） |
@@ -226,7 +227,7 @@ Stash、Kirari04/videocms、yt-dlp ツールなど）の機能セットを参考
 - [x] 複数音声トラックとプレイヤー内切り替え（独立 HLS 音声トラック）
 - [x] スタイル付き（ASS）ソフト字幕
 - [x] 字幕同期/オフセット調整（ダイレクト再生）
-- [ ] 字幕の自動ダウンロードとマッチング
+- [x] 字幕の自動ダウンロードとマッチング
 - [ ] ハードウェアアクセラレーション（VAAPI/NVENC/QSV）+ HDR トーンマッピング
 - [x] プレビューサムネイル/シークバー
 - [ ] イントロ・クレジットスキップ
