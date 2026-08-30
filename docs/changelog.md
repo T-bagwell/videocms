@@ -20,6 +20,9 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Live streaming: admins create RTMP streams (`RTMP_INGEST_URL` + per-stream
+  key), the server pulls the ingest into a rolling HLS playlist, and a live
+  watch page includes a built-in polling chat
 - Watch together: create or join a synchronized watch room (shared id +
   token) and keep play/pause/position in sync across viewers via polling; a
   Cast / AirPlay button opens the native casting UI where supported
