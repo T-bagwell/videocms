@@ -238,6 +238,8 @@ erDiagram
   `GET|POST|DELETE /api/videos/{id}/tags` 与 `POST /api/videos/{id}/analyze`
   （运行外部打标工具 `AI_TAG_BIN`，每行一个标签，存为 auto 标签）；
   `GET /api/videos?tag=` 可按标签过滤
+- 推荐：`GET /api/videos/{id}/similar` 按共享类型、年份、系列与标签给其他
+  视频排序；`GET /api/tags` 驱动浏览页标签云与 `?tag=` 过滤
 - 请求的 `start` 与当前会话相差超过一个分片（6 秒）时，杀掉旧会话并从新位置重启（跳转）
 - 清单在响应时重写，使每个分片 URL 都携带 `?token=`
 - 空闲会话 **15 分钟**后回收，同时删除会话目录
