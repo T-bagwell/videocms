@@ -267,7 +267,7 @@ Planned work is informed by feature sets of similar self-hosted video projects
 
 **Users, sharing & social**
 
-- [ ] Comments, ratings and activity feeds
+- [x] Comments, ratings and activity feeds
 - [ ] OIDC/SAML single sign-on
 - [ ] Parental controls (PIN / content ratings) and per-user quotas
 - [ ] Share page customization and embeddable players
