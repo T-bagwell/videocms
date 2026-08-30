@@ -20,6 +20,9 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Background-jobs dashboard: a unified admin Jobs tab aggregates scans,
+  uploads, downloads and live streams with progress/errors and contextual
+  cancel/retry/start/stop actions, plus free/total disk stats
 - Storage pools: admins define local/S3/SFTP pools (name, type, mount path,
   config, read-only); upload and yt-dlp targets can use `pool://name[/sub]`,
   routed through the pool's local mount (e.g. s3fs/sshfs)
