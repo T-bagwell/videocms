@@ -174,6 +174,8 @@ Statistiken: Videos, Bibliotheken, Benutzer, Wiedergabelisten, Favoriten, Serien
   System-Dateimanager, um die tatsächlichen Mediendateien anzusehen oder zu verwalten
 - **Gesundheitscheck** meldet fehlende/beschädigte Dateien und Duplikate;
   **Beste Version behalten** verschiebt den Rest in den Server-Papierkorb
+- **NFO exportieren / importieren** liest und schreibt Kodi-Metadaten neben den
+  Videos (Plex/Jellyfin/Kodi-kompatibel)
 - **Bibliothek blockieren** blendet die gesamte Mediathek für alle Benutzer aus
   (Startseite, Serien, Favoriten, Weiterschauen, Wiedergabelisten), ohne etwas
   zu löschen; die Freigabe stellt alles sofort wieder her
