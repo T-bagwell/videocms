@@ -241,6 +241,10 @@ erDiagram
   （`WHISPER_BIN`/`WHISPER_MODEL`）で WebVTT を生成し、`video_transcripts`
   （マイグレーション 020）に保存して字幕トラックとして登録。動画検索は
   文字起こし本文にもマッチします
+- タグと AI：`tags`/`video_tags`（マイグレーション 021）が手動の
+  `GET|POST|DELETE /api/videos/{id}/tags` と `POST /api/videos/{id}/analyze`
+  （外部タガー `AI_TAG_BIN` を実行、1 行 1 タグで auto タグを保存）を支えます。
+  `GET /api/videos?tag=` でフィルタリング
 - 要求された `start` が実行中セッションと 1 セグメント（6 秒）以上ずれている場合、
   セッションを終了して新しい位置で再開（シーク）
 - プレイリストは応答時に書き換えられ、各セグメント URL に `?token=` が付く
