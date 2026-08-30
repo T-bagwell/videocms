@@ -210,6 +210,8 @@ Statistiques : vidéos, bibliothèques, utilisateurs, listes, favoris, séries e
   en un clic
 - Les utilisateurs peuvent **commenter et noter** les vidéos (1-5 étoiles) ;
   l’accueil affiche un fil d’activité récente (commentaires et favoris)
+- **Connexion unique** (OIDC) : la page de connexion propose un bouton SSO si
+  le serveur est configuré avec un fournisseur d’identité
 
 ### 5.4 Utilisateurs
 
@@ -254,6 +256,7 @@ Tout se configure par variables d’environnement (table complète dans le READM
 | `WHISPER_BIN` / `WHISPER_MODEL` | vide | CLI whisper.cpp et modèle pour la transcription vocale |
 | `SCRAPE_CUSTOM_URL` | vide | Endpoint JSON de scraping personnalisé ; `%s` est remplacé par le titre encodé |
 | `AI_TAG_BIN` | vide | Outil d’étiquetage IA externe (argument : chemin média, une étiquette par ligne) |
+| `OIDC_ISSUER` / `OIDC_CLIENT_ID` / `OIDC_CLIENT_SECRET` / `OIDC_REDIRECT_URL` | vide | Paramètres de connexion unique OIDC |
 
 ## 7. FAQ
 
