@@ -91,6 +91,8 @@ make serve                              # http://<LAN-IP>:8080
   springt an die gewünschte Position
 - ASS/SSA-Untertitel werden mit ihrem Original-Styling gerendert (Schriftarten,
   Farben, Position und Effekte)
+- Admins können Untertitel von Online-Anbietern (z. B. OpenSubtitles) pro Video
+  suchen und herunterladen
 - **Download** liefert einen MKV/MP4-Remux mit gewählter Audiospur und
   Untertiteln (ohne Re-Encoding) oder die Originaldatei
 - Fortschritt wird alle 5 Sekunden sowie bei Pause/Ende gespeichert
@@ -212,6 +214,7 @@ Alles wird über Umgebungsvariablen konfiguriert (vollständige Tabelle im READM
 | `WATCH_INTERVAL` | `30` | Sekunden zwischen automatischen Inkrement-Scans; `0` deaktiviert |
 | `YTDLP_PATH` | `yt-dlp` im PATH | yt-dlp-Binary für die Download-Warteschlange |
 | `HLS_HW_ACCEL` | leer (Software-x264) | HLS-Videoencoder: videotoolbox, nvenc oder qsv; leer = libx264 |
+| `SUBTITLE_OS_USERNAME` / `SUBTITLE_OS_PASSWORD` / `SUBTITLE_OS_API_KEY` | leer | OpenSubtitles-Anmeldedaten für die Untertitelsuche |
 
 ## 7. FAQ
 
