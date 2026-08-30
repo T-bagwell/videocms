@@ -102,6 +102,7 @@ backend/
 - 路由使用 Go 1.26+ `net/http.ServeMux` 模式
   （`"GET /api/videos/{id}"`、`"GET /api/videos/{id}/hls/{file...}"`）
 - 中间件链包裹路由：panic 恢复 → 请求日志 → CORS
+  （默认通配；前后端分离部署时可用 `CORS_ORIGINS` 限制来源）
 - 请求体限制大小（`http.MaxBytesReader`）
 - 所有 API 响应为 JSON；错误格式 `{"error": "..."}`；列表返回
   `{"items": [...], "total", "page", "page_size"}`
