@@ -1,0 +1,9 @@
+ALTER TABLE users
+    ADD COLUMN IF NOT EXISTS pin text NOT NULL DEFAULT '',
+    ADD COLUMN IF NOT EXISTS allowed_rating text NOT NULL DEFAULT '';
+
+ALTER TABLE videos
+    ADD COLUMN IF NOT EXISTS content_rating text NOT NULL DEFAULT '';
+
+ALTER TABLE libraries
+    ADD COLUMN IF NOT EXISTS quota_bytes bigint NOT NULL DEFAULT 0;
