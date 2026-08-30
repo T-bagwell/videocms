@@ -175,6 +175,8 @@ make serve                              # http://<LAN IP>:8080
   アクセスが必要）
 - 管理者は **TMDB またはカスタムプロバイダ** を選んで取得でき、既存メタデータを
   強制的に上書きもできます
+- 動画には**タグ**を付けられます（手動、または任意の AI 解析ツールによる自動）。
+  タグは詳細ページに表示され、検索の絞り込みにも使えます
 
 ### 5.4 ユーザー
 
@@ -216,6 +218,7 @@ make serve                              # http://<LAN IP>:8080
 | `RTMP_INGEST_URL` | `rtmp://localhost:1935/live` | RTMP 取り込みのベース URL（nginx-rtmp 等） |
 | `WHISPER_BIN` / `WHISPER_MODEL` | 空 | whisper.cpp のバイナリとモデル（文字起こし用） |
 | `SCRAPE_CUSTOM_URL` | 空 | カスタム JSON スクレイパー端点。`%s` は URL エスケープ済みタイトルに置換 |
+| `AI_TAG_BIN` | 空 | 外部 AI タグ付けツール（メディアパスを引数に、1 行 1 タグ） |
 
 ## 7. FAQ
 
