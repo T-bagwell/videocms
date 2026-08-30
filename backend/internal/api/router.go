@@ -146,6 +146,9 @@ func (a *App) Routes() http.Handler {
 	mux.HandleFunc("GET /api/users/me/hidden-paths", authUser(a.listHiddenPaths))
 	mux.HandleFunc("POST /api/users/me/hidden-paths", authUser(a.addHiddenPath))
 	mux.HandleFunc("DELETE /api/users/me/hidden-paths/{id}", authUser(a.removeHiddenPath))
+	mux.HandleFunc("GET /api/users/me/subtitle-offset", authUser(a.getUserSubtitleOffset))
+	mux.HandleFunc("PUT /api/users/me/subtitle-offset", authUser(a.setUserSubtitleOffset))
+	mux.HandleFunc("DELETE /api/users/me/subtitle-offset", authUser(a.clearUserSubtitleOffset))
 	mux.HandleFunc("GET /api/users/me/export", authUser(a.exportMe))
 
 	mux.HandleFunc("GET /api/playlists", authUser(a.listPlaylists))

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math"
 	"mime"
 	"net/http"
 	"net/url"
@@ -395,6 +396,12 @@ func (a *App) subtitles(w http.ResponseWriter, r *http.Request) {
 }
 
 func serveSubtitleFile(w http.ResponseWriter, r *http.Request, path string) {
+	serveSubtitleFileOffset(w, r, path, 0)
+}
+
+// serveSubtitleFileOffset serves a subtitle file as WebVTT, optionally shifting
+// every cue by offsetMs so players can sync subtitles without re-encoding.
+func serveSubtitleFileOffset(w http.ResponseWriter, r *http.Request, path string, offsetMs int64) {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		writeErr(w, http.StatusNotFound, "subtitle file unreadable")
@@ -402,6 +409,9 @@ func serveSubtitleFile(w http.ResponseWriter, r *http.Request, path string) {
 	}
 	if strings.EqualFold(filepath.Ext(path), ".srt") {
 		data = srtToVTT(data)
+	}
+	if offsetMs != 0 {
+		data = shiftVTT(data, offsetMs)
 	}
 	w.Header().Set("Content-Type", "text/vtt; charset=utf-8")
 	w.Header().Set("Cache-Control", "public, max-age=3600")
@@ -595,4 +605,72 @@ func srtToVTT(data []byte) []byte {
 		b.WriteString("\n")
 	}
 	return []byte(b.String())
+}
+
+// parseVTTTime parses a WebVTT timestamp (H:MM:SS.mmm, MM:SS.mmm or SS.mmm).
+func parseVTTTime(t string) (float64, bool) {
+	t = strings.TrimSpace(t)
+	parts := strings.Split(t, ":")
+	if len(parts) == 3 {
+		h, e1 := strconv.Atoi(parts[0])
+		m, e2 := strconv.Atoi(parts[1])
+		s, e3 := strconv.ParseFloat(parts[2], 64)
+		if e1 != nil || e2 != nil || e3 != nil {
+			return 0, false
+		}
+		return float64(h)*3600 + float64(m)*60 + s, true
+	}
+	if len(parts) == 2 {
+		m, e1 := strconv.Atoi(parts[0])
+		s, e2 := strconv.ParseFloat(parts[1], 64)
+		if e1 != nil || e2 != nil {
+			return 0, false
+		}
+		return float64(m)*60 + s, true
+	}
+	if len(parts) == 1 {
+		s, err := strconv.ParseFloat(parts[0], 64)
+		if err != nil {
+			return 0, false
+		}
+		return s, true
+	}
+	return 0, false
+}
+
+func formatVTTTime(sec float64) string {
+	sec = math.Max(0, sec)
+	h := int(sec / 3600)
+	m := int(sec/60) % 60
+	s := sec - float64(h*3600+m*60)
+	return fmt.Sprintf("%02d:%02d:%06.3f", h, m, s)
+}
+
+// shiftVTT moves every cue timing in a WebVTT document by offsetMs. Non-timing
+// lines and cue settings after the arrow are preserved.
+func shiftVTT(data []byte, offsetMs int64) []byte {
+	if offsetMs == 0 {
+		return data
+	}
+	offset := float64(offsetMs) / 1000
+	lines := strings.Split(string(data), "\n")
+	for i, line := range lines {
+		if !strings.Contains(line, " --> ") {
+			continue
+		}
+		parts := strings.SplitN(line, " --> ", 2)
+		start, ok1 := parseVTTTime(parts[0])
+		rest := ""
+		endPart := parts[1]
+		if idx := strings.Index(endPart, " "); idx >= 0 {
+			rest = endPart[idx:]
+			endPart = endPart[:idx]
+		}
+		end, ok2 := parseVTTTime(endPart)
+		if !ok1 || !ok2 {
+			continue
+		}
+		lines[i] = formatVTTTime(start+offset) + " --> " + formatVTTTime(end+offset) + rest
+	}
+	return []byte(strings.Join(lines, "\n"))
 }

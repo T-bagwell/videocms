@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/google/uuid"
@@ -125,7 +126,13 @@ func (a *App) getSubtitleTrack(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusInternalServerError, "subtitle unavailable: "+err.Error())
 		return
 	}
-	serveSubtitleFile(w, r, path)
+	offsetMs := int64(0)
+	if q := r.URL.Query().Get("offset_ms"); q != "" {
+		if n, err := strconv.ParseInt(q, 10, 64); err == nil {
+			offsetMs = clampSubtitleOffset(n)
+		}
+	}
+	serveSubtitleFileOffset(w, r, path, offsetMs)
 }
 
 // setActiveSubtitleTrack saves the current user's subtitle preference for a
