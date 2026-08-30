@@ -93,6 +93,9 @@ Ouvrez l’interface et connectez-vous avec l’administrateur initial **admin /
   couleurs, position et effets)
 - Les administrateurs peuvent rechercher et télécharger des sous-titres auprès
   de fournisseurs en ligne (p. ex. OpenSubtitles) par vidéo
+- **Regarder ensemble** : créez ou rejoignez une salle pour synchroniser la
+  lecture avec vos amis ; un bouton **Diffuser / AirPlay** est disponible si
+  le navigateur le prend en charge
 - **Télécharger** un remux MKV ou MP4 avec la piste audio et les sous-titres
   choisis (sans ré-encodage), ou récupérer le fichier original
 - La progression est sauvegardée toutes les 5 secondes et à la pause/fin
