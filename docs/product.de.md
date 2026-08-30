@@ -184,6 +184,8 @@ Statistiken: Videos, Bibliotheken, Benutzer, Wiedergabelisten, Favoriten, Serien
   Audiospur und eingebetteten/hochgeladenen Untertiteln (Remux ohne Re-Encoding)
 - **Abrufen** holt Metadaten von TMDB (erfordert `TMDB_API_KEY` und Zugriff auf
   api.themoviedb.org)
+- Admins können **TMDB oder einen benutzerdefinierten Anbieter** wählen und
+  vorhandene Metadaten überschreiben erzwingen
 
 ### 5.4 Benutzer
 
@@ -226,6 +228,7 @@ Alles wird über Umgebungsvariablen konfiguriert (vollständige Tabelle im READM
 | `SUBTITLE_OS_USERNAME` / `SUBTITLE_OS_PASSWORD` / `SUBTITLE_OS_API_KEY` | leer | OpenSubtitles-Anmeldedaten für die Untertitelsuche |
 | `RTMP_INGEST_URL` | `rtmp://localhost:1935/live` | Basis-RTMP-Ingest-URL (nginx-rtmp oder Äquivalent) |
 | `WHISPER_BIN` / `WHISPER_MODEL` | leer | whisper.cpp-Binary und Modell für Sprachtranskription |
+| `SCRAPE_CUSTOM_URL` | leer | Benutzerdefinierter JSON-Scraper-Endpoint; `%s` wird durch den URL-codierten Titel ersetzt |
 
 ## 7. FAQ
 
