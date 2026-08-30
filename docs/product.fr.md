@@ -210,6 +210,7 @@ Tout se configure par variables d’environnement (table complète dans le READM
 | `SCAN_WORKERS` | `4` | Workers d’analyse parallèles |
 | `WATCH_INTERVAL` | `30` | Secondes entre analyses incrémentales automatiques ; `0` désactive |
 | `YTDLP_PATH` | `yt-dlp` dans le PATH | Binaire yt-dlp utilisé par la file de téléchargements |
+| `HLS_HW_ACCEL` | vide (x264 logiciel) | Codec vidéo HLS : videotoolbox, nvenc ou qsv ; vide = libx264 |
 
 ## 7. FAQ
 
