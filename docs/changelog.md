@@ -16,6 +16,15 @@ All notable changes to VideoCMS are documented here.
 - The player page gained a Download button in its toolbar that opens the
   same track-picker dialog as the detail page (container, audio, subtitles,
   original file), so media can be downloaded without leaving playback
+- Roadmap expanded with a new backlog organized by capability area (playback &
+  subtitles, media types & libraries, live TV & IPTV, discovery & automation,
+  users & analytics, extensibility & operations): multi-version movies,
+  trailers/featurettes, theme songs, chapters, AV1/VP9 and HDR passthrough,
+  music/audiobook/book/photo libraries, IPTV channels with EPG, request
+  workflows, quality-profile automation, watch-history sync, statistics
+  dashboards, moderation tooling, plugin/scraper systems, OpenAPI docs,
+  metrics, Docker/Helm packaging and distributed transcoding (README in
+  en/zh/ja)
 - Frontend toolchain upgraded: React 19 / react-dom 19, Vite 8 +
   @vitejs/plugin-react 6, react-router-dom 7, hls.js 1.7.1, i18next 26.4,
   react-i18next 17.0.12, jsdom 27.3; Node.js 20+ is now required for frontend
