@@ -70,6 +70,8 @@ func (a *App) Routes() http.Handler {
 	mux.HandleFunc("POST /api/auth/register", a.register)
 	mux.HandleFunc("POST /api/auth/login", a.login)
 	mux.HandleFunc("GET /api/auth/me", authUser(a.me))
+	mux.HandleFunc("GET /api/auth/oidc/start", a.oidcStart)
+	mux.HandleFunc("GET /api/auth/oidc/callback", a.oidcCallback)
 
 	mux.HandleFunc("GET /api/libraries", authUser(a.listLibraries))
 	mux.HandleFunc("POST /api/libraries", authAdmin(a.createLibrary))
