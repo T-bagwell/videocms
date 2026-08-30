@@ -54,6 +54,7 @@ everything you need to get started.
 - Node.js 20+, 22+ or 24+ (CI runs all three)
 - PostgreSQL 14+
 - ffmpeg/ffprobe (with libx265 for MKV/HEVC transcoding)
+- yt-dlp (optional — needed to exercise the Downloads queue locally)
 
 ### One-time setup
 
@@ -146,6 +147,9 @@ map, API routes, data model, key flows, security and extension points.
   on `libraries.blocked` and works even inside subqueries via `visiblePaths`.
 - Media endpoints (`/stream`, `/download`, `/poster`, `/hls/*`) keep accepting
   `?token=` so `<video>`/`<img>` tags work without headers.
+- Anything that writes to server folders (library creation, uploads, yt-dlp
+  downloads) must require an existing absolute directory and reject `..`;
+  uploaded filenames must be reduced with `filepath.Base` before use.
 - API/error messages stay English; only the web UI is localized.
 
 ### Frontend
@@ -199,6 +203,9 @@ npm run build
   (e.g. `internal/media/episode_test.go`).
 - Integration tests (`internal/api/integration_test.go`) skip automatically
   when PostgreSQL is not reachable; set `TEST_PG_DSN` to run them.
+- Upload/download/yt-dlp flows are covered by integration tests in
+  `internal/api`; the yt-dlp worker tests use a fake binary via
+  `Downloader.SetBin` so they never hit the network.
 - Network-dependent scraper tests skip unless `NETWORK_TEST=1`.
 
 ## Continuous integration
