@@ -88,6 +88,7 @@ make serve                              # http://<局域网IP>:8080
 - **一起看**：创建或加入房间即可与好友保持播放同步；浏览器支持时可使用
   **投屏 / AirPlay** 按钮
 - **直播**：管理员可创建 RTMP 直播（OBS 兼容推流地址），观众端带内置聊天
+- 管理员可对视频执行**语音转写**（Whisper），文稿可被搜索并作为字幕轨选择
 - 「下载」可输出所选音轨和字幕的 MKV/MP4 转封装副本（无需重编码），
   也可直接下载原文件离线播放
 - 进度每 5 秒及暂停/结束时保存，体现在「继续观看」
@@ -193,6 +194,7 @@ make serve                              # http://<局域网IP>:8080
 | `HLS_TONE_MAP` | `0` | `1` 在 HLS 转码中启用 HDR→SDR 色调映射 |
 | `SUBTITLE_OS_USERNAME` / `SUBTITLE_OS_PASSWORD` / `SUBTITLE_OS_API_KEY` | 空 | 在线字幕搜索用的 OpenSubtitles 凭证 |
 | `RTMP_INGEST_URL` | `rtmp://localhost:1935/live` | RTMP 推流基础地址（nginx-rtmp 或等价服务） |
+| `WHISPER_BIN` / `WHISPER_MODEL` | 空 | whisper.cpp 可执行文件与模型（语音转写用） |
 
 ## 7. 常见问题
 
