@@ -186,11 +186,13 @@ npm run build
   自动跳过；设置 `TEST_PG_DSN` 可运行它们。
 - 上传/下载/yt-dlp 流程由 `internal/api` 中的集成测试覆盖；yt-dlp worker
   测试通过 `Downloader.SetBin` 使用假二进制，不会访问网络。
+- SSO 与投屏也有端到端覆盖：SAML 测试内嵌真实 IdP（crewjam/saml/samlidp）、
+  SMTP 测试使用进程内假 SMTP 服务器、DLNA 测试覆盖 browse/stream/白名单。
 - 依赖网络的刮削测试在未设置 `NETWORK_TEST=1` 时跳过。
 
 ## 持续集成
 
-GitHub Actions 在推送到 `main` 和 pull request 时运行两个 workflow：
+GitHub Actions 在推送到 `main` 和 pull request 时运行四个 workflow：
 
 | Workflow | 文件 | 运行内容 |
 | --- | --- | --- |
@@ -202,7 +204,7 @@ GitHub Actions 在推送到 `main` 和 pull request 时运行两个 workflow：
 Dependabot 每周自动为 Go、npm 和 GitHub Actions 打开依赖更新 PR，请同样保持其
 check 为绿——在 PR 中评论 `@dependabot rebase` 可让其与 `main` 重新同步。
 
-请求 review 前请确保两者都为绿色。
+请求 review 前请确保所有 check 都为绿色。
 
 ## Pull request 流程
 
