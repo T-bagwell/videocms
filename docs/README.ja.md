@@ -154,6 +154,7 @@ make serve                                 # UI をビルドし :8080 で一括�
 | `HLS_VAAPI_DEVICE` | `/dev/dri/renderD128` | VAAPI レンダーデバイス（`HLS_HW_ACCEL=vaapi` で使用） |
 | `HLS_TONE_MAP` | `0` | `1` で HLS トランスコードに HDR→SDR トーンマッピングを有効化 |
 | `SUBTITLE_OS_USERNAME` / `SUBTITLE_OS_PASSWORD` / `SUBTITLE_OS_API_KEY` | 空 | オンライン字幕検索用の OpenSubtitles 認証情報 |
+| `RTMP_INGEST_URL` | `rtmp://localhost:1935/live` | RTMP 取り込みのベース URL（nginx-rtmp 等）。ストリームごとにキーが付与されます |
 | `YTDLP_PATH` | PATH 上の `yt-dlp` | ダウンロードキューが使う yt-dlp バイナリ |
 | `WEB_ROOT` | 自動（`frontend/dist`） | 単一サービスモードで配信するフロントエンド。未設定なら API 専用デプロイ |
 | `CORS_ORIGINS` | 空（`*`） | API を呼び出せるブラウザオリジン（カンマ区切り。フロント分離デプロイ用） |
@@ -236,7 +237,7 @@ Stash、Kirari04/videocms、yt-dlp ツールなど）の機能セットを参考
 - [x] 一緒に見る（同期再生セッション）
 - [x] キャスト（Web AirPlay）
 - [ ] キャスト（Chromecast / DLNA）
-- [ ] RTMP ライブ取り込みと内蔵チャット
+- [x] RTMP ライブ取り込みと内蔵チャット
 
 **メタデータと AI**
 
