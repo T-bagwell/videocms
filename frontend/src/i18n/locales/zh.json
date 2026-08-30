@@ -29,7 +29,8 @@
     "switchToRegister": "没有账号？注册一个",
     "switchToLogin": "已有账号？去登录",
     "hint": "初始管理员：admin / admin123（首次登录后请修改）",
-    "sso": "使用 SSO 登录",
+    "ssoOidc": "使用 OIDC 登录",
+    "ssoSaml": "使用 SAML 登录",
     "busy": "请稍候…"
   },
   "common": {

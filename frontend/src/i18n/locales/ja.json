@@ -29,7 +29,8 @@
     "switchToRegister": "アカウントがありませんか？登録",
     "switchToLogin": "アカウントをお持ちですか？ログイン",
     "hint": "初期管理者: admin / admin123（初回ログイン後に変更してください）",
-    "sso": "SSO でログイン",
+    "ssoOidc": "OIDC でログイン",
+    "ssoSaml": "SAML でログイン",
     "busy": "しばらくお待ちください…"
   },
   "common": {

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../auth.jsx';
-import { setToken } from '../api.js';
+import { api, setToken } from '../api.js';
 import { SUPPORTED_LANGS, setLang } from '../i18n';
 
 export default function LoginPage() {
@@ -19,6 +19,7 @@ export default function LoginPage() {
   const [displayName, setDisplayName] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+  const [sso, setSso] = useState({ oidc: false, saml: false });
 
   useEffect(() => {
     const sso = searchParams.get('sso_token');
@@ -27,6 +28,12 @@ export default function LoginPage() {
       navigate(from, { replace: true });
     }
   }, [searchParams, from, navigate]);
+
+  useEffect(() => {
+    api('/auth/sso')
+      .then(setSso)
+      .catch(() => {});
+  }, []);
 
   async function submit(e) {
     e.preventDefault();
@@ -48,6 +55,10 @@ export default function LoginPage() {
 
   function ssoLogin() {
     window.location.href = '/api/auth/oidc/start';
+  }
+
+  function samlLogin() {
+    window.location.href = '/api/auth/saml/login';
   }
 
   return (
@@ -81,9 +92,16 @@ export default function LoginPage() {
           </label>
         )}
 
-        <button type="button" className="btn ghost" onClick={ssoLogin}>
-          {t('login.sso')}
-        </button>
+        {sso.oidc && (
+          <button type="button" className="btn ghost" onClick={ssoLogin}>
+            {t('login.ssoOidc')}
+          </button>
+        )}
+        {sso.saml && (
+          <button type="button" className="btn ghost" onClick={samlLogin}>
+            {t('login.ssoSaml')}
+          </button>
+        )}
         <label>
           {t('login.username')}
           <input value={username} onChange={(e) => setUsername(e.target.value)} autoFocus />

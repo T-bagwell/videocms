@@ -29,7 +29,8 @@
     "switchToRegister": "No account? Sign up",
     "switchToLogin": "Already have an account? Log in",
     "hint": "Initial admin: admin / admin123 (change after first login)",
-    "sso": "Sign in with SSO",
+    "ssoOidc": "Sign in with OIDC",
+    "ssoSaml": "Sign in with SAML",
     "busy": "Please wait…"
   },
   "common": {
