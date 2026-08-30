@@ -91,6 +91,8 @@ Ouvrez l’interface et connectez-vous avec l’administrateur initial **admin /
   le déplacement ; un clic saute à la position visée
 - Les sous-titres ASS/SSA sont rendus avec leur style d’origine (polices,
   couleurs, position et effets)
+- Les administrateurs peuvent rechercher et télécharger des sous-titres auprès
+  de fournisseurs en ligne (p. ex. OpenSubtitles) par vidéo
 - **Télécharger** un remux MKV ou MP4 avec la piste audio et les sous-titres
   choisis (sans ré-encodage), ou récupérer le fichier original
 - La progression est sauvegardée toutes les 5 secondes et à la pause/fin
@@ -217,6 +219,7 @@ Tout se configure par variables d’environnement (table complète dans le READM
 | `WATCH_INTERVAL` | `30` | Secondes entre analyses incrémentales automatiques ; `0` désactive |
 | `YTDLP_PATH` | `yt-dlp` dans le PATH | Binaire yt-dlp utilisé par la file de téléchargements |
 | `HLS_HW_ACCEL` | vide (x264 logiciel) | Codec vidéo HLS : videotoolbox, nvenc ou qsv ; vide = libx264 |
+| `SUBTITLE_OS_USERNAME` / `SUBTITLE_OS_PASSWORD` / `SUBTITLE_OS_API_KEY` | vide | Identifiants OpenSubtitles pour la recherche de sous-titres |
 
 ## 7. FAQ
 
