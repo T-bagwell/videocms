@@ -20,6 +20,9 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Trick-play previews: hovering the seek strip shows the thumbnail frame
+  nearest the pointer (one 160×90 frame every 10 seconds, generated on demand
+  per video) and clicking seeks to that time
 - Subtitle sync: players can nudge subtitles by ±0.5s (saved per user per
   video), and the subtitle endpoint serves shifted WebVTT for direct playback
 - Hardware-accelerated HLS transcoding: `HLS_HW_ACCEL=videotoolbox|nvenc|qsv`
