@@ -96,6 +96,10 @@ make serve                              # http://<LAN-IP>:8080
 - **Gemeinsam ansehen**: Erstellen oder betreten Sie einen Raum, um die
   Wiedergabe mit Freunden zu synchronisieren; wo unterstützt, gibt es einen
   **Cast / AirPlay**-Button
+- **Intro/Abspann überspringen**: Markieren Sie Anfang und Ende von Intro oder
+  Abspann (je zwei Klicks) und überspringen Sie sie per Ein-Klick-Button;
+  die Intervalle werden pro Video gespeichert und können jederzeit gelöscht
+  werden
 - **Live-Streaming**: Admins erstellen RTMP-Streams (OBS-kompatible
   Ingest-URL); Zuschauer haben einen integrierten Chat
 - Admins können die **Sprachtranskription** (Whisper) eines Videos ausführen;
