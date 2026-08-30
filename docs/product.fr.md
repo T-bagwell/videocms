@@ -197,6 +197,8 @@ Statistiques : vidéos, bibliothèques, utilisateurs, listes, favoris, séries e
 - Les vidéos peuvent porter des **étiquettes** (manuelles ou issues d’un outil
   d’analyse IA optionnel) ; elles s’affichent sur la page détail et peuvent
   filtrer la recherche
+- La page détail affiche des **vidéos similaires** ; la page de navigation
+  propose un **nuage d’étiquettes** pour filtrer en un clic
 
 ### 5.4 Utilisateurs
 
