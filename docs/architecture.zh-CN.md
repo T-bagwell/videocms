@@ -147,6 +147,12 @@ subtitle_tracks -- id, video_id(外键, ON DELETE CASCADE), position, lang, titl
                 --   stream_index（多语言字幕轨道）
 user_subtitle_prefs -- 主键(user_id, video_id), track_id(外键, ON DELETE CASCADE),
                 --   updated_at（按用户的默认字幕轨）
+uploads         -- id, filename, target_path, total_size, chunk_size,
+                --   status(uploading|completed|failed), error, 时间戳
+                --   （分片上传会话；分片存放在 DATA_DIR/uploads/<id>/）
+downloads       -- id, url, title, target_path, format, status(queued|downloading|
+                --   completed|failed|canceled), progress, error, interval_secs,
+                --   last_run_at, 时间戳（yt-dlp 任务，支持定时重复）
 ```
 
 关键索引：`videos(lower(title))`、`videos(library_id)`、部分索引
@@ -221,6 +227,9 @@ erDiagram
 watcher）与差异扫描结合。变更文件（包括大小不变的修改）数秒内即被重新探测，
 被删除的文件/目录立即标记为不可用；同时仍以 `WATCH_INTERVAL` 周期跑全量差异
 扫描作为兜底。
+
+通过其他途径进入媒体库目录的文件（分片上传完成、yt-dlp 下载完成、外部拷贝等）
+也会被同一个 watcher 捕获并自动入库。
 
 **剧集自动分组**：每次扫描后 `rebuildSeries` 从标题解析集数标记
 （`S01E01`、`EP1`、`E01`、`第1集`、结尾括号数字等），把共享前缀 + 同季的视频归组，
