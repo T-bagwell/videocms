@@ -54,6 +54,7 @@ export default function PlayerPage() {
   const [watchJoinToken, setWatchJoinToken] = useState('');
   const watchRoomRef = useRef(null);
   watchRoomRef.current = watchRoom;
+  const [hasAirPlay, setHasAirPlay] = useState(false);
 
   useEffect(() => {
     setActiveId(id);
@@ -452,6 +453,12 @@ export default function PlayerPage() {
     setWatchRoom(null);
   }
 
+  function castToAirPlay() {
+    const el = videoRef.current;
+    if (!el || typeof el.webkitShowPlaybackUI !== 'function') return;
+    el.webkitShowPlaybackUI();
+  }
+
   if (err) return <div className="container"><div className="form-error">{err}</div></div>;
   if (!video) return <div className="container"><div className="loading">{t('common.loading')}</div></div>;
 
@@ -468,6 +475,11 @@ export default function PlayerPage() {
           {watchRoom && <p className="muted">{t('player.watchSyncing')}</p>}
         </div>
         <div className="detail-actions">
+          {hasAirPlay && (
+            <button className="btn ghost" onClick={castToAirPlay}>
+              {t('player.cast')}
+            </button>
+          )}
           {!watchRoom ? (
             <button className="btn ghost" onClick={() => setWatchModal(true)}>
               {t('player.watchTogether')}
@@ -521,6 +533,9 @@ export default function PlayerPage() {
           autoPlay
           src={streamUrl}
           poster={video.has_poster ? mediaUrl(`/videos/${activeId}/poster`) : undefined}
+          onLoadedMetadata={(e) => {
+            setHasAirPlay(typeof e.currentTarget.webkitShowPlaybackUI === 'function');
+          }}
           onSeeking={onSeeking}
           onTimeUpdate={() => {
             const el = videoRef.current;

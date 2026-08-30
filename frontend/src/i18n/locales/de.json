@@ -142,7 +142,8 @@
     "watchJoinId": "Raum-ID",
     "watchJoinToken": "Raum-Token",
     "watchLeave": "Raum verlassen",
-    "watchSyncing": "Wiedergabe wird synchronisiert…"
+    "watchSyncing": "Wiedergabe wird synchronisiert…",
+    "cast": "Cast / AirPlay"
   },
   "playlists": {
     "title": "Wiedergabelisten",

@@ -142,7 +142,8 @@
     "watchJoinId": "房间 ID",
     "watchJoinToken": "房间口令",
     "watchLeave": "退出房间",
-    "watchSyncing": "正在同步播放…"
+    "watchSyncing": "正在同步播放…",
+    "cast": "投屏 / AirPlay"
   },
   "playlists": {
     "title": "播放列表",

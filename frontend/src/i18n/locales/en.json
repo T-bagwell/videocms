@@ -142,7 +142,8 @@
     "watchJoinId": "Room ID",
     "watchJoinToken": "Room token",
     "watchLeave": "Leave room",
-    "watchSyncing": "Syncing playback…"
+    "watchSyncing": "Syncing playback…",
+    "cast": "Cast / AirPlay"
   },
   "playlists": {
     "title": "Playlists",

@@ -142,7 +142,8 @@
     "watchJoinId": "ID de la salle",
     "watchJoinToken": "Jeton de la salle",
     "watchLeave": "Quitter la salle",
-    "watchSyncing": "Synchronisation de la lecture…"
+    "watchSyncing": "Synchronisation de la lecture…",
+    "cast": "Diffuser / AirPlay"
   },
   "playlists": {
     "title": "Listes de lecture",

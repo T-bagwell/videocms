@@ -142,7 +142,8 @@
     "watchJoinId": "ルーム ID",
     "watchJoinToken": "ルームトークン",
     "watchLeave": "ルーム退出",
-    "watchSyncing": "再生を同期中…"
+    "watchSyncing": "再生を同期中…",
+    "cast": "キャスト / AirPlay"
   },
   "playlists": {
     "title": "プレイリスト",
