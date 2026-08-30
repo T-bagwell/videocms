@@ -20,6 +20,9 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Fuzzy full-text search: pg_trgm GIN indexes accelerate substring matching,
+  and a new `sort=fuzzy` mode filters and ranks by trigram similarity so typos
+  still find videos (title / synopsis / filename)
 - User-defined tags (manual + AI), smart collections (named saved filter
   sets) and saved browse filters; collections and filters are stored per user
   and replay the same `/videos` filter parameters
