@@ -160,6 +160,7 @@ make serve                                 # UI をビルドし :8080 で一括�
 | `AI_TAG_BIN` | 空 | 外部 AI タグ付けツール。メディアパスを受け取り、1 行に 1 タグを出力 |
 | `OIDC_ISSUER` / `OIDC_CLIENT_ID` / `OIDC_CLIENT_SECRET` / `OIDC_REDIRECT_URL` | 空 | OIDC シングルサインオン（ディスカバリー + 認可コードフロー） |
 | `NOTIFY_WEBHOOK_URL` / `NOTIFY_APPRISE_URL` | 空 | 通知チャンネル（JSON Webhook、Apprise API） |
+| `MAINT_INTERVAL_HOURS` / `MAINT_BACKUP_RETENTION` / `MAINT_RESCAN` | `24` / `7` / `0` | 定期メンテナンス：バックアップ間隔・保持数・再スキャン有無 |
 | `YTDLP_PATH` | PATH 上の `yt-dlp` | ダウンロードキューが使う yt-dlp バイナリ |
 | `WEB_ROOT` | 自動（`frontend/dist`） | 単一サービスモードで配信するフロントエンド。未設定なら API 専用デプロイ |
 | `CORS_ORIGINS` | 空（`*`） | API を呼び出せるブラウザオリジン（カンマ区切り。フロント分離デプロイ用） |
@@ -273,7 +274,7 @@ Stash、Kirari04/videocms、yt-dlp ツールなど）の機能セットを参考
 
 - [x] ストレージプール：ローカル・S3 互換・SFTP、管理 UI からルーティング
 - [x] バックグラウンドジョブダッシュボード（監視/キャンセル/リトライ）+ 詳細なシステム統計
-- [ ] 定期メンテナンス：再スキャン、ヘルスチェック、メタデータのバックアップ/復元
+- [x] 定期メンテナンス：再スキャン、ヘルスチェック、メタデータのバックアップ/復元
 - [ ] Webhook + 成熟した公開 REST API によるサードパーティ自動化
 - [ ] PWA オフラインダウンロードとモバイル UX の改善
 
