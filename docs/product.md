@@ -188,6 +188,8 @@ Stats: videos, libraries, users, playlists, favorites, series and storage used.
   overwrite of existing metadata
 - Videos can carry **tags** (manual or from an optional AI analysis tool);
   tags are shown on the detail page and can filter search
+- The detail page shows **similar videos**; the browse page has a **tag cloud**
+  for one-click filtering
 
 ### 5.4 Users
 
