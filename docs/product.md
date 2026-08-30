@@ -94,6 +94,8 @@ Open the web UI and sign in with the initial administrator **admin / admin123**
   positioning and effects)
 - Admins can search and download subtitles from online providers (e.g.
   OpenSubtitles) per video
+- **Watch together**: create or join a room to keep playback synchronized with
+  friends; a **Cast / AirPlay** button is available where the browser supports it
 - **Download** a remuxed copy as MKV or MP4 with a chosen audio track and
   subtitles (no re-encode), or grab the original file for offline playback
 - Progress is saved every 5 seconds and on pause/end — visible in Continue Watching
