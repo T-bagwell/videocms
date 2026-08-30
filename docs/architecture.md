@@ -260,7 +260,11 @@ back to the keyless TVMaze API, then AniList, then Wikipedia
 
 - `GET /api/admin/stats` — aggregate counts and total bytes
 - `GET /api/admin/paths?path=…` — server directory browser (subdirs, parent,
-  home shortcut, free disk space via `statfs`) used by the folder picker
+  home shortcut, free disk space via `statfs`) used by the folder picker; the
+  input is normalized to a clean absolute path so relative and `..` segments
+  resolve below `/`
+- Library creation (`POST /api/libraries`) requires an absolute server path;
+  relative paths are rejected and the path is normalized with `filepath.Clean`
 - User management: list / change role / reset password / delete (with guards)
 - Content blocking: `GET|POST /api/admin/blocked-titles`,
   `DELETE /api/admin/blocked-titles/{id}` — titles are matched as

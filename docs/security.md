@@ -33,6 +33,10 @@ directly. Include:
 
 - Media URLs require a valid user JWT (header or `?token=`)
 - All mutation endpoints are admin-only
+- Media library paths must be absolute server paths; relative paths are
+  rejected
+- The admin directory browser normalizes paths to a clean absolute path, so
+  relative input and `..` segments resolve below the filesystem root
 - `POST /api/libraries/{id}/open` launches the system file manager on the
   server; it is admin-only and requires the library path to exist
 - Passwords are stored as bcrypt hashes only

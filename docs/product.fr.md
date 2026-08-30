@@ -63,7 +63,8 @@ Ouvrez l’interface et connectez-vous avec l’administrateur initial **admin /
 ### Ajouter votre première médiathèque
 
 1. Allez dans **Administration → Bibliothèques**
-2. Saisissez un nom, puis un chemin serveur ou cliquez sur **Parcourir…** pour choisir
+2. Saisissez un nom, puis un chemin serveur **absolu** (p. ex. `/media/movies`)
+   ou cliquez sur **Parcourir…** pour choisir — les chemins relatifs sont refusés
 3. Cliquez sur **Analyser** — le compteur progresse en direct ; les vidéos apparaissent sur l’accueil
 
 ## 4. Guide utilisateur
@@ -149,7 +150,7 @@ Statistiques : vidéos, bibliothèques, utilisateurs, listes, favoris, séries e
 
 ### 5.2 Bibliothèques
 
-- Ajout avec un nom et un chemin serveur (sélecteur de dossiers inclus)
+- Ajout avec un nom et un chemin serveur **absolu** (sélecteur de dossiers inclus)
 - **Analyser** indexe les nouveautés ; **Arrêter l’analyse** annule ; progression en direct
 - Supprimer une bibliothèque retire ses enregistrements — les fichiers restent sur le disque
 - **Ouvrir le dossier** ouvre le répertoire de la médiathèque sur le serveur

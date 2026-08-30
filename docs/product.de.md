@@ -63,7 +63,8 @@ make serve                              # http://<LAN-IP>:8080
 ### Erste Mediathek hinzufügen
 
 1. Gehen Sie zu **Verwaltung → Bibliotheken**
-2. Name eingeben, dann einen Server-Pfad tippen oder **Durchsuchen…** verwenden
+2. Name eingeben, dann einen **absoluten** Server-Pfad (z. B. `/media/movies`)
+   tippen oder **Durchsuchen…** verwenden — relative Pfade werden abgelehnt
 3. **Scannen** klicken — der Zähler steigt live; Videos erscheinen auf der Startseite
 
 ## 4. Benutzerhandbuch
@@ -146,7 +147,7 @@ Statistiken: Videos, Bibliotheken, Benutzer, Wiedergabelisten, Favoriten, Serien
 
 ### 5.2 Bibliotheken
 
-- Hinzufügen mit Name und Server-Pfad (inkl. Ordnerauswahl)
+- Hinzufügen mit Name und **absolutem** Server-Pfad (inkl. Ordnerauswahl)
 - **Scannen** indexiert neue/geänderte Dateien; **Scan stoppen** bricht ab; Fortschritt live
 - Das Löschen einer Bibliothek entfernt ihre Videoeinträge — Dateien auf der Platte bleiben
 - **Ordner öffnen** öffnet das Mediatheks-Verzeichnis auf dem Server im

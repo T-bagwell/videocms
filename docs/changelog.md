@@ -80,6 +80,16 @@ All notable changes to VideoCMS are documented here.
 - Project-level Codex skill (`.codex/skills/videocms/`) with environment
   wrapper, commands and conventions
 
+### Fixed
+
+- The initial admin password is no longer printed in plain text in server logs
+- Creating a library now requires an absolute server path; relative paths are
+  rejected with a clear error instead of being resolved against the working
+  directory
+- The admin directory browser normalizes user-supplied paths to a clean
+  absolute path, so `..` segments and relative input can never escape the
+  filesystem root (path-injection hardening)
+
 ## [0.1.0] — 2026-08-09
 
 ### Added

@@ -113,7 +113,8 @@ make serve                                 # builds UI + serves everything on :8
 
 Log in with the initial admin **admin / admin123** and change the password
 immediately (Admin → Users → Reset password). Then add your first library under
-**Admin → Libraries → Scan**.
+**Admin → Libraries → Scan** (the path must be an absolute server path, e.g.
+`/media/movies`).
 
 ## LAN / Phone Access
 

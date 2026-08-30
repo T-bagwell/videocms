@@ -245,7 +245,10 @@ AniList 与 Wikipedia（`TVMAZE_ENABLED=0` / `ANILIST_ENABLED=0` /
 
 - `GET /api/admin/stats` — 聚合统计与总字节数
 - `GET /api/admin/paths?path=…` — 服务器目录浏览器（子目录、上级、主目录快捷方式、
-  通过 `statfs` 获取磁盘可用空间），供目录选择器使用
+  通过 `statfs` 获取磁盘可用空间），供目录选择器使用；输入会被归一化为干净的
+  绝对路径，相对路径和 `..` 段都会解析在 `/` 之下
+- 创建媒体库（`POST /api/libraries`）要求服务器绝对路径；相对路径会被拒绝，
+  路径经 `filepath.Clean` 归一化
 - 用户管理：列表 / 改角色 / 重置密码 / 删除（带守卫）
 - 内容屏蔽：`GET|POST /api/admin/blocked-titles`、
   `DELETE /api/admin/blocked-titles/{id}` — 标题按不区分大小写的子串匹配；

@@ -251,7 +251,10 @@ Wikipedia の順に自動フォールバック（`TVMAZE_ENABLED=0` / `ANILIST_E
 
 - `GET /api/admin/stats` — 集計統計と総バイト数
 - `GET /api/admin/paths?path=…` — サーバーディレクトリブラウザ（サブディレクトリ、
-  親、ホームショートカット、`statfs` による空き容量）。フォルダ選択 UI で使用
+  親、ホームショートカット、`statfs` による空き容量）。フォルダ選択 UI で使用。
+  入力はクリーンな絶対パスに正規化され、相対パスや `..` は `/` より下に解決されます
+- ライブラリ作成（`POST /api/libraries`）はサーバーの絶対パスのみ受け付けます。
+  相対パスは拒否され、パスは `filepath.Clean` で正規化されます
 - ユーザー管理：一覧 / ロール変更 / パスワード再設定 / 削除（ガード付き）
 - コンテンツブロック：`GET|POST /api/admin/blocked-titles`、
   `DELETE /api/admin/blocked-titles/{id}` — タイトルを大文字小文字を無視した

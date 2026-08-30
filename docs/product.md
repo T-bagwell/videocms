@@ -64,7 +64,8 @@ Open the web UI and sign in with the initial administrator **admin / admin123**
 ### Add your first library
 
 1. Go to **Admin → Libraries**
-2. Enter a name, then type a server folder path or click **Browse…** to pick one
+2. Enter a name, then type an **absolute** server folder path (e.g.
+   `/media/movies`) or click **Browse…** to pick one — relative paths are rejected
 3. Click **Scan** — the count updates live; videos appear on the home page
 
 ## 4. User Guide
@@ -145,7 +146,7 @@ Stats: videos, libraries, users, playlists, favorites, series and storage used.
 
 ### 5.2 Libraries
 
-- Add libraries with a name and a server path (folder picker included)
+- Add libraries with a name and an absolute server path (folder picker included)
 - **Scan** indexes new/changed files; **Stop scan** cancels; progress is live
 - Deleting a library removes its video records — files on disk are kept
 - **Open folder** opens the library directory on the server with the system
