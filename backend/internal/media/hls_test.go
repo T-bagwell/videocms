@@ -3,6 +3,7 @@ package media
 import (
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
 
@@ -123,6 +124,38 @@ func TestSessionFileAllowsAudioTracks(t *testing.T) {
 	}
 	if _, ok := m.SessionFile(id, "a1/other.ts"); ok {
 		t.Error("SessionFile must reject non-segment files")
+	}
+}
+
+func TestHWEncodeOpts(t *testing.T) {
+	cases := []struct {
+		accel string
+		want  []string
+		err   bool
+	}{
+		{"", nil, false},
+		{"software", nil, false},
+		{"libx264", nil, false},
+		{"videotoolbox", []string{"-c:v", "h264_videotoolbox", "-b:v", "3000k", "-allow_sw", "1"}, false},
+		{"nvenc", []string{"-c:v", "h264_nvenc", "-preset", "p4", "-b:v", "3000k"}, false},
+		{"qsv", []string{"-c:v", "h264_qsv", "-b:v", "3000k"}, false},
+		{"bogus", nil, true},
+	}
+	for i, c := range cases {
+		got, err := hwEncodeOpts(c.accel)
+		if c.err {
+			if err == nil {
+				t.Errorf("case %d: hwEncodeOpts(%q) should error", i, c.accel)
+			}
+			continue
+		}
+		if err != nil {
+			t.Errorf("case %d: hwEncodeOpts(%q) error: %v", i, c.accel, err)
+			continue
+		}
+		if !reflect.DeepEqual(got, c.want) {
+			t.Errorf("case %d: hwEncodeOpts(%q) = %v, want %v", i, c.accel, got, c.want)
+		}
 	}
 }
 
