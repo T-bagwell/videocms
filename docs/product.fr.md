@@ -199,6 +199,8 @@ Statistiques : vidéos, bibliothèques, utilisateurs, listes, favoris, séries e
   filtrer la recherche
 - La page détail affiche des **vidéos similaires** ; la page de navigation
   propose un **nuage d’étiquettes** pour filtrer en un clic
+- La page de navigation peut **enregistrer des filtres**, les réappliquer et
+  créer des **collections intelligentes** nommées à partir du filtre courant
 
 ### 5.4 Utilisateurs
 
