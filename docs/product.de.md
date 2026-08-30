@@ -205,6 +205,10 @@ Statistiken: Videos, Bibliotheken, Benutzer, Wiedergabelisten, Favoriten, Serien
   Startseite zeigt einen Aktivitätsfeed mit Kommentaren und Favoriten
 - **Single Sign-on** (OIDC): Die Anmeldeseite bietet einen SSO-Button, wenn der
   Server mit einem Identity Provider konfiguriert ist
+- **Kindersicherung**: Admins legen eine Einstufungsrichtlinie pro Benutzer und
+  eine Einstufung pro Video fest; Benutzer können mit PIN sperren und klassierte
+  Inhalte 5 Minuten entsperren. Bibliotheken können auch ein **Speicherkontingent**
+  tragen, das beim Upload geprüft wird
 
 ### 5.4 Benutzer
 
