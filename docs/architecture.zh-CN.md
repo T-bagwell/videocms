@@ -339,6 +339,10 @@ AniList 与 Wikipedia（`TVMAZE_ENABLED=0` / `ANILIST_ENABLED=0` /
 - NFO：`POST /api/libraries/{id}/export-nfo` 在每个视频旁写 Kodi 风格电影 NFO，
   `/import-nfo` 把 title/year/plot/genres 解析回数据库
   （media.NFOFileFor/WriteNFO/ReadNFO）
+- 社交（迁移 025）：`comments` 与 `ratings` 表支撑按视频评论
+  （`GET|POST /api/videos/{id}/comments`、`DELETE /api/comments/{id}`）、
+  1-5 星评分（`GET /api/videos/{id}/ratings`、`PUT /api/videos/{id}/rating`），
+  `GET /api/feed` 返回最近的评论与收藏
 
 ### 3.10 关键设计决策
 
