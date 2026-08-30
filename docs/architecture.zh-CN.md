@@ -240,6 +240,10 @@ erDiagram
   `GET /api/videos?tag=` 可按标签过滤
 - 推荐：`GET /api/videos/{id}/similar` 按共享类型、年份、系列与标签给其他
   视频排序；`GET /api/tags` 驱动浏览页标签云与 `?tag=` 过滤
+- 合集与保存筛选（迁移 022）：`collections` 按用户保存命名的筛选 JSON
+  （`GET|POST|DELETE /api/collections`），`user_filter_prefs` 保存最近一次
+  浏览筛选（`GET|PUT /api/users/me/filters`）；前端对两者复用同一套
+  `/videos` 筛选参数回放
 - 请求的 `start` 与当前会话相差超过一个分片（6 秒）时，杀掉旧会话并从新位置重启（跳转）
 - 清单在响应时重写，使每个分片 URL 都携带 `?token=`
 - 空闲会话 **15 分钟**后回收，同时删除会话目录
