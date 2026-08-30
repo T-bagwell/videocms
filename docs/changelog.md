@@ -20,6 +20,9 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Media health checks: admins run a per-library check that reports
+  missing/corrupt files and duplicate candidates, then keep the best version
+  while moving the rest into the server trash (`DATA_DIR/trash`)
 - AI tagging: an optional external tagger (`AI_TAG_BIN`, one tag per stdout
   line) can label videos; tags live in the new `tags`/`video_tags` tables, are
   shown on the detail page, filter search via `?tag=`, and can be managed
