@@ -89,6 +89,8 @@ make serve                              # http://<LAN-IP>:8080
   der Offset wird pro Benutzer und Video gespeichert
 - Beim Überfahren der Fortschrittsleiste erscheinen Vorschaubilder; ein Klick
   springt an die gewünschte Position
+- ASS/SSA-Untertitel werden mit ihrem Original-Styling gerendert (Schriftarten,
+  Farben, Position und Effekte)
 - **Download** liefert einen MKV/MP4-Remux mit gewählter Audiospur und
   Untertiteln (ohne Re-Encoding) oder die Originaldatei
 - Fortschritt wird alle 5 Sekunden sowie bei Pause/Ende gespeichert
