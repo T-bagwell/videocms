@@ -415,6 +415,7 @@ type hlsVideo struct {
 	SubtitlePath string
 	Available    bool
 	Subs         []media.HLSSubtitle
+	Audios       []media.HLSAudio
 }
 
 func (a *App) videoForHLS(ctx context.Context, id uuid.UUID) (hlsVideo, bool) {
@@ -444,6 +445,15 @@ func (a *App) videoForHLS(ctx context.Context, id uuid.UUID) (hlsVideo, bool) {
 				Name:   name,
 				Active: path != "" && path == v.SubtitlePath,
 			})
+		}
+	}
+	if streams, err := media.ProbeAudioStreams(ctx, a.ffprobeBin(), v.FilePath); err == nil {
+		for _, s := range streams {
+			name := s.Title
+			if name == "" {
+				name = s.Language
+			}
+			v.Audios = append(v.Audios, media.HLSAudio{Index: s.Index, Name: name})
 		}
 	}
 	return v, true
@@ -476,7 +486,7 @@ func (a *App) serveHLS(w http.ResponseWriter, r *http.Request, id uuid.UUID, v h
 		if s := r.URL.Query().Get("start"); s != "" {
 			start, _ = strconv.ParseFloat(s, 64)
 		}
-		manifest, err := a.hls.Playlist(r.Context(), id, v.FilePath, start, v.Width, v.Height, v.Subs)
+		manifest, err := a.hls.Playlist(r.Context(), id, v.FilePath, start, v.Width, v.Height, v.Subs, v.Audios...)
 		if err != nil {
 			log.Printf("[hls] %v", err)
 			writeErr(w, http.StatusInternalServerError, "failed to start transcode session: "+err.Error())
