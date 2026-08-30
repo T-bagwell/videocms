@@ -195,6 +195,8 @@ Statistiken: Videos, Bibliotheken, Benutzer, Wiedergabelisten, Favoriten, Serien
   **Tag-Cloud** zum Filtern mit einem Klick
 - Die Browseseite kann **Filter speichern**, erneut anwenden und aus dem
   aktuellen Filter benannte **Smart-Sammlungen** erstellen
+- Die Suche bietet eine **fuzzy Relevanz-Sortierung**, die Tippfehler toleriert
+  (Titel / Beschreibung / Dateiname)
 
 ### 5.4 Benutzer
 
