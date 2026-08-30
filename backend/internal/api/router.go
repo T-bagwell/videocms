@@ -78,6 +78,10 @@ func (a *App) Routes() http.Handler {
 	mux.HandleFunc("POST /api/libraries/{id}/open", authAdmin(a.openLibrary))
 	mux.HandleFunc("POST /api/libraries/{id}/health", authAdmin(a.runHealthCheck))
 	mux.HandleFunc("POST /api/libraries/{id}/health/keep-best", authAdmin(a.keepBestVersions))
+
+	mux.HandleFunc("GET /api/admin/trash", authAdmin(a.listTrash))
+	mux.HandleFunc("POST /api/admin/trash/{id}/restore", authAdmin(a.restoreTrash))
+	mux.HandleFunc("POST /api/admin/videos/batch", authAdmin(a.batchVideos))
 	mux.HandleFunc("PATCH /api/libraries/{id}", authAdmin(a.setLibraryBlocked))
 	mux.HandleFunc("DELETE /api/libraries/{id}", authAdmin(a.deleteLibrary))
 
