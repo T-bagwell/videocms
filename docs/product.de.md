@@ -203,6 +203,8 @@ Statistiken: Videos, Bibliotheken, Benutzer, Wiedergabelisten, Favoriten, Serien
   in Papierkorb) und einen **Papierkorb** mit Wiederherstellung per Klick
 - Benutzer können Videos **kommentieren und bewerten** (1-5 Sterne); die
   Startseite zeigt einen Aktivitätsfeed mit Kommentaren und Favoriten
+- **Single Sign-on** (OIDC): Die Anmeldeseite bietet einen SSO-Button, wenn der
+  Server mit einem Identity Provider konfiguriert ist
 
 ### 5.4 Benutzer
 
@@ -247,6 +249,7 @@ Alles wird über Umgebungsvariablen konfiguriert (vollständige Tabelle im READM
 | `WHISPER_BIN` / `WHISPER_MODEL` | leer | whisper.cpp-Binary und Modell für Sprachtranskription |
 | `SCRAPE_CUSTOM_URL` | leer | Benutzerdefinierter JSON-Scraper-Endpoint; `%s` wird durch den URL-codierten Titel ersetzt |
 | `AI_TAG_BIN` | leer | Externes KI-Tagging-Tool (Medienpfad als Argument, ein Tag pro Zeile) |
+| `OIDC_ISSUER` / `OIDC_CLIENT_ID` / `OIDC_CLIENT_SECRET` / `OIDC_REDIRECT_URL` | leer | OIDC-Single-Sign-on-Einstellungen |
 
 ## 7. FAQ
 
