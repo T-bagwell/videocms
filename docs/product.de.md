@@ -96,6 +96,10 @@ make serve                              # http://<LAN-IP>:8080
 - **Gemeinsam ansehen**: Erstellen oder betreten Sie einen Raum, um die
   Wiedergabe mit Freunden zu synchronisieren; wo unterstützt, gibt es einen
   **Cast / AirPlay**-Button
+- **Streaming**: Der Player kann auf einen Chromecast streamen (der Button
+  „Auf TV streamen“ erstellt einen kurzlebigen Freigabelink und spielt darüber
+  ab); mit `DLNA_ENABLED=1` wird die Mediathek für UPnP/DLNA-fähige Geräte im
+  LAN sichtbar
 - **Intro/Abspann überspringen**: Markieren Sie Anfang und Ende von Intro oder
   Abspann (je zwei Klicks) und überspringen Sie sie per Ein-Klick-Button;
   die Intervalle werden pro Video gespeichert und können jederzeit gelöscht
@@ -277,6 +281,7 @@ Alles wird über Umgebungsvariablen konfiguriert (vollständige Tabelle im READM
 | `SCRAPE_CUSTOM_URL` | leer | Benutzerdefinierter JSON-Scraper-Endpoint; `%s` wird durch den URL-codierten Titel ersetzt |
 | `AI_TAG_BIN` | leer | Externes KI-Tagging-Tool (Medienpfad als Argument, ein Tag pro Zeile) |
 | `OIDC_ISSUER` / `OIDC_CLIENT_ID` / `OIDC_CLIENT_SECRET` / `OIDC_REDIRECT_URL` | leer | OIDC-Single-Sign-on-Einstellungen |
+| `DLNA_ENABLED` / `DLNA_FRIENDLY_NAME` / `DLNA_ALLOWED_IPS` | `0` / `VideoCMS` / leer (ganzes LAN) | UPnP/DLNA-Medienserver-Schalter, Anzeigename, kommaseparierte IP/CIDR-Allowlist |
 | `NOTIFY_WEBHOOK_URL` / `NOTIFY_APPRISE_URL` | leer | Benachrichtigungskanäle (JSON-Webhook, Apprise-API) |
 | `MAINT_INTERVAL_HOURS` / `MAINT_BACKUP_RETENTION` / `MAINT_RESCAN` | `24` / `7` / `0` | Wartungsplan, Backup-Aufbewahrung, Rescan-Flag |
 
