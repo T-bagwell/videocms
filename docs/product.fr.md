@@ -229,6 +229,9 @@ Statistiques : vidéos, bibliothèques, utilisateurs, listes, favoris, séries e
 - **Tableau des tâches** : surveillez analyses, téléversements, téléchargements
   et directs (progression, erreurs, annuler/réessayer/démarrer/arrêter) et
   l’usage disque
+- **Maintenance planifiée** : sauvegardes JSON et contrôles de santé
+  automatiques (intervalle et rétention configurables) ; exécution manuelle et
+  téléchargement des sauvegardes
 
 ### 5.4 Utilisateurs
 
@@ -275,6 +278,7 @@ Tout se configure par variables d’environnement (table complète dans le READM
 | `AI_TAG_BIN` | vide | Outil d’étiquetage IA externe (argument : chemin média, une étiquette par ligne) |
 | `OIDC_ISSUER` / `OIDC_CLIENT_ID` / `OIDC_CLIENT_SECRET` / `OIDC_REDIRECT_URL` | vide | Paramètres de connexion unique OIDC |
 | `NOTIFY_WEBHOOK_URL` / `NOTIFY_APPRISE_URL` | vide | Canaux de notification (webhook JSON, API Apprise) |
+| `MAINT_INTERVAL_HOURS` / `MAINT_BACKUP_RETENTION` / `MAINT_RESCAN` | `24` / `7` / `0` | Planification, rétention et re-scan de maintenance |
 
 ## 7. FAQ
 
