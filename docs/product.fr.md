@@ -231,7 +231,8 @@ Statistiques : vidéos, bibliothèques, utilisateurs, listes, favoris, séries e
   chrome dans n’importe quelle page
 - **Notifications** : des canaux webhook ou Apprise peuvent recevoir les
   événements d’analyse, de téléversement et de téléchargement ; les admins
-  peuvent envoyer une notification de test depuis l’aperçu
+  peuvent envoyer une notification de test depuis l’aperçu. Avec un serveur
+  SMTP configuré, les mêmes événements sont aussi envoyés par **e-mail**
 - **Pools de stockage** : définissez des pools locaux, S3 compatibles ou SFTP
   avec un chemin de montage local ; téléversements et téléchargements peuvent
   cibler `pool://nom[/sous-chemin]`
@@ -293,6 +294,7 @@ Tout se configure par variables d’environnement (table complète dans le READM
 | `SAML_IDP_METADATA_URL` / `SAML_SP_CERT` / `SAML_SP_KEY` / `SAML_SP_ENTITY_ID` / `SAML_ACS_URL` | vide | Connexion unique SAML 2.0 (URL des métadonnées IdP, chemins certificat/clé SP, ID d’entité, URL ACS) |
 | `DLNA_ENABLED` / `DLNA_FRIENDLY_NAME` / `DLNA_ALLOWED_IPS` | `0` / `VideoCMS` / vide (tout le LAN) | Activation du serveur UPnP/DLNA, nom affiché, liste blanche IP/CIDR séparée par des virgules |
 | `NOTIFY_WEBHOOK_URL` / `NOTIFY_APPRISE_URL` | vide | Canaux de notification (webhook JSON, API Apprise) |
+| `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASSWORD` / `NOTIFY_EMAIL_FROM` / `NOTIFY_EMAIL_TO` | vide / `587` | Notifications par e-mail SMTP (TLS implicite sur 465, STARTTLS sinon) |
 | `MAINT_INTERVAL_HOURS` / `MAINT_BACKUP_RETENTION` / `MAINT_RESCAN` | `24` / `7` / `0` | Planification, rétention et re-scan de maintenance |
 
 ## 7. FAQ
