@@ -152,6 +152,7 @@ make serve                                 # 构建前端并统一在 :8080 提�
 | `HLS_TONE_MAP` | `0` | 设为 `1` 在 HLS 转码中启用 HDR→SDR 色调映射 |
 | `SUBTITLE_OS_USERNAME` / `SUBTITLE_OS_PASSWORD` / `SUBTITLE_OS_API_KEY` | 空 | 在线字幕搜索用的 OpenSubtitles 凭证 |
 | `RTMP_INGEST_URL` | `rtmp://localhost:1935/live` | RTMP 推流基础地址（nginx-rtmp 或等价服务）；直播会附加自己的 key |
+| `WHISPER_BIN` / `WHISPER_MODEL` | 空 | whisper.cpp 可执行文件与模型路径（语音转写用） |
 | `YTDLP_PATH` | PATH 上的 `yt-dlp` | 「下载」队列使用的 yt-dlp 二进制 |
 | `WEB_ROOT` | 自动（`frontend/dist`） | 单服务模式托管的前端目录；不设置即纯 API 部署 |
 | `CORS_ORIGINS` | 空（`*`） | 允许调用 API 的浏览器来源（逗号分隔，用于前后端分离部署） |
@@ -238,7 +239,7 @@ scripts/                 演示素材生成器
 
 **元数据与 AI**
 
-- [ ] 本地语音转写（Whisper）→ 可搜索的字幕/文稿
+- [x] 本地语音转写（Whisper）→ 可搜索的字幕/文稿
 - [ ] 可插拔元数据源 / 自定义刮削器，支持单条覆盖
 - [ ] AI 打标、场景识别与图像分析，辅助搜索
 - [ ] 媒体健康检查：重复检测、损坏文件检查、保留最佳版本清理
