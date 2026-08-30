@@ -206,8 +206,9 @@ Stats: videos, libraries, users, playlists, favorites, series and storage used.
   trash) and a **recycle bin** with one-click restore
 - Users can **comment and rate** videos (1-5 stars); the home page shows a
   recent-activity feed of comments and favorites
-- **Single sign-on** (OIDC): the login page offers an SSO button when the
-  server is configured with an identity provider
+- **Single sign-on**: the login page offers **OIDC** and **SAML 2.0** buttons
+  when the corresponding provider is configured (ADFS, Okta, Keycloak…); SAML
+  users can be granted admin automatically via a `roles` attribute
 - **Parental controls**: admins set an allowed-rating policy per user and a
   content rating per video; users can lock with a PIN and unlock rated content
   for 5 minutes. Libraries can also carry a **storage quota** enforced on
@@ -272,6 +273,7 @@ most important ones:
 | `SCRAPE_CUSTOM_URL` | empty | Custom JSON scraper endpoint; `%s` is replaced with the URL-escaped title |
 | `AI_TAG_BIN` | empty | External AI tagging tool (media path argument, one tag per line) |
 | `OIDC_ISSUER` / `OIDC_CLIENT_ID` / `OIDC_CLIENT_SECRET` / `OIDC_REDIRECT_URL` | empty | OIDC single sign-on settings |
+| `SAML_IDP_METADATA_URL` / `SAML_SP_CERT` / `SAML_SP_KEY` / `SAML_SP_ENTITY_ID` / `SAML_ACS_URL` | empty | SAML 2.0 single sign-on (IdP metadata URL, SP certificate/key paths, entity ID, ACS URL) |
 | `DLNA_ENABLED` / `DLNA_FRIENDLY_NAME` / `DLNA_ALLOWED_IPS` | `0` / `VideoCMS` / empty (whole LAN) | UPnP/DLNA media server switch, display name, comma-separated IP/CIDR allowlist |
 | `NOTIFY_WEBHOOK_URL` / `NOTIFY_APPRISE_URL` | empty | Notification channels (JSON webhook, Apprise API) |
 | `MAINT_INTERVAL_HOURS` / `MAINT_BACKUP_RETENTION` / `MAINT_RESCAN` | `24` / `7` / `0` | Maintenance schedule, backup retention, rescan flag |
