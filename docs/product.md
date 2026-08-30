@@ -190,6 +190,8 @@ Stats: videos, libraries, users, playlists, favorites, series and storage used.
   tags are shown on the detail page and can filter search
 - The detail page shows **similar videos**; the browse page has a **tag cloud**
   for one-click filtering
+- The browse page can **save filters**, re-apply them, and create named
+  **smart collections** from the current filter set
 
 ### 5.4 Users
 
