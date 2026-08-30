@@ -90,9 +90,43 @@ blockedTitlesCondition`.
 — written against `v.library_id` so it works in subqueries without a
 `libraries` join.
 
+## uploads (migration 015)
+
+| column | type | notes |
+| --- | --- | --- |
+| id | uuid PK | upload session id |
+| filename | text | sanitized with `filepath.Base` at creation |
+| target_path | text | existing absolute server directory (no `..`) |
+| total_size | bigint | 0 = unknown (chunk sequence must be contiguous) |
+| chunk_size | bigint | default 8 MiB |
+| status | text | uploading / completed / failed |
+| error | text | |
+| created_at / updated_at | timestamptz | |
+
+Chunks live on disk at `DATA_DIR/uploads/<id>/<n>.part` and are removed after
+`complete` assembles the final file into `target_path`.
+
+## downloads (migration 016)
+
+| column | type | notes |
+| --- | --- | --- |
+| id | uuid PK | |
+| url | text | http(s) video/playlist/channel URL |
+| title | text | filled by yt-dlp, empty for queued jobs |
+| target_path | text | existing absolute server directory |
+| format | text | yt-dlp format selector, default `bv*+ba/b` |
+| status | text | queued / downloading / completed / failed / canceled |
+| progress | double precision | parsed from `[download] NN%` lines |
+| error | text | failure message |
+| interval_secs | bigint | 0 = once; >0 = re-run on schedule after completion |
+| last_run_at | timestamptz | used to decide when a scheduled job is due |
+| created_at / updated_at | timestamptz | |
+
 ## Notes
 
 - Never modify an applied migration; append `NNN_<name>.sql` and use
   `IF NOT EXISTS` guards.
+- `uploads` and `downloads` are admin-only operational tables; they are not
+  exposed to regular users and hold no media metadata.
 - Series rows are fully derived from videos during `rebuildSeries`; do not
   hand-insert them outside the rebuild path.
