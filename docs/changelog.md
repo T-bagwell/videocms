@@ -20,6 +20,9 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Webhooks + API docs: admin-managed webhook subscriptions deliver signed
+  events (`X-Videocms-Signature` HMAC) with per-subscription event filters;
+  `GET /api/openapi.json` exposes a lightweight OpenAPI 3 document
 - Scheduled maintenance: `MAINT_INTERVAL_HOURS` (default 24) runs JSON backups
   (`MAINT_BACKUP_RETENTION`, default 7) plus per-library health checks, with
   optional rescans (`MAINT_RESCAN=1`); admins can trigger it manually and
