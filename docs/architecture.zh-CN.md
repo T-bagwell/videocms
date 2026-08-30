@@ -373,6 +373,12 @@ AniList 与 Wikipedia（`TVMAZE_ENABLED=0` / `ANILIST_ENABLED=0` /
 - PWA：前端提供 web manifest 与 service worker（只缓存应用壳，绝不缓存
   API/媒体）；详情页可把流保存进 Cache API 供离线观看；
   `viewport-fit=cover` + 安全区 padding 适配刘海屏
+- 片头/片尾跳过（迁移 031）：`skip_intervals(video_id, kind,
+  start_sec, end_sec)` 为每个视频保存最多一个 `intro`/`credits` 区间；
+  播放器通过 `GET /api/videos/{id}/skip-intervals`、
+  `PUT /api/videos/{id}/skip-interval` 与
+  `DELETE /api/videos/{id}/skip-interval?kind=…` 标记、更新与清除区间，
+  点击跳过时跳转到 `end_sec`
 
 ### 3.10 关键设计决策
 
