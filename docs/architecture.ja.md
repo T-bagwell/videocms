@@ -196,6 +196,9 @@ erDiagram
   `-ss <start> -i <input> -c:v libx264 -preset veryfast -crf 23
   -vf scale=<width>:-2 -force_key_frames expr:gte(t,n_forced*6) -c:a aac -b:a 96k
   -f hls -hls_time 6 -hls_list_size 0 -hls_flags independent_segments`
+- ビデオエンコードは既定でソフトウェア x264。`HLS_HW_ACCEL=videotoolbox|nvenc|qsv`
+  でハードウェアエンコーダー（`h264_videotoolbox` / `h264_nvenc` / `h264_qsv`）に
+  切替可能。不正な値は静かに劣化させるのではなくセッション開始を失敗させます
 - 各レンディションは `data/hls/<video-id>/v<幅>/` に書き込み。サーバーは全
   レンディションと、字幕トラックごとに `#EXT-X-MEDIA` エントリ
   （`subs/<トラックid>/playlist.m3u8`、内蔵トラックは初回リクエスト時に遅延抽出）を
