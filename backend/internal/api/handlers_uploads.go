@@ -174,9 +174,9 @@ func (a *App) createUpload(w http.ResponseWriter, r *http.Request) {
 	// a quota, current library size + this upload must stay within it.
 	var quota, used int64
 	if err := a.pool.QueryRow(r.Context(), `
-		SELECT COALESCE(MAX(l.quota_bytes), 0),
-		       COALESCE((SELECT SUM(v.size_bytes) FROM videos v
-		                 WHERE v.available AND v.file_path LIKE l.path || '%'), 0)
+		SELECT l.quota_bytes,
+		       (SELECT COALESCE(SUM(v.size_bytes), 0) FROM videos v
+		        WHERE v.available AND v.file_path LIKE l.path || '%')
 		FROM libraries l
 		WHERE $1 LIKE l.path || '%' AND l.quota_bytes > 0`,
 		filepath.Clean(req.TargetPath)).Scan(&quota, &used); err == nil && quota > 0 && used+req.Size > quota {
