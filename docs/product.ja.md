@@ -198,6 +198,8 @@ make serve                              # http://<LAN IP>:8080
   ライブラリにはアップロード時に適用される**ストレージクォータ**も設定可能
 - **共有のカスタマイズ**：テーマ・カスタムタイトル・ナビゲーション非表示を選択。
   `?embed=1` を付けると任意のページに装飾なしプレイヤーを埋め込めます
+- **通知**：Webhook または Apprise でスキャン・アップロード・ダウンロードの
+  イベントを受信できます。管理者は概要ページからテスト通知を送信可能
 
 ### 5.4 ユーザー
 
@@ -241,6 +243,7 @@ make serve                              # http://<LAN IP>:8080
 | `SCRAPE_CUSTOM_URL` | 空 | カスタム JSON スクレイパー端点。`%s` は URL エスケープ済みタイトルに置換 |
 | `AI_TAG_BIN` | 空 | 外部 AI タグ付けツール（メディアパスを引数に、1 行 1 タグ） |
 | `OIDC_ISSUER` / `OIDC_CLIENT_ID` / `OIDC_CLIENT_SECRET` / `OIDC_REDIRECT_URL` | 空 | OIDC シングルサインオン設定 |
+| `NOTIFY_WEBHOOK_URL` / `NOTIFY_APPRISE_URL` | 空 | 通知チャンネル（JSON Webhook、Apprise API） |
 
 ## 7. FAQ
 
