@@ -167,6 +167,7 @@ All settings are environment variables:
 | `SAML_IDP_METADATA_URL` / `SAML_SP_CERT` / `SAML_SP_KEY` / `SAML_SP_ENTITY_ID` / `SAML_ACS_URL` | empty | SAML 2.0 single sign-on (IdP metadata URL, SP cert/key, entity ID, ACS URL) |
 | `NOTIFY_WEBHOOK_URL` / `NOTIFY_APPRISE_URL` | empty | Notification channels (JSON webhook, Apprise API) |
 | `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASSWORD` / `NOTIFY_EMAIL_FROM` / `NOTIFY_EMAIL_TO` | empty / `587` | SMTP email notifications (implicit TLS on 465, STARTTLS otherwise) |
+| `DLNA_ENABLED` / `DLNA_FRIENDLY_NAME` / `DLNA_ALLOWED_IPS` | `0` / `VideoCMS` / empty (whole LAN) | UPnP/DLNA media server switch, display name, comma-separated IP/CIDR allowlist |
 | `MAINT_INTERVAL_HOURS` / `MAINT_BACKUP_RETENTION` / `MAINT_RESCAN` | `24` / `7` / `0` | Scheduled maintenance: backup interval, backup retention, enable rescans |
 | `WEB_ROOT` | auto (`frontend/dist`) | Built frontend for single-service mode; leave unset for API-only deployment |
 | `CORS_ORIGINS` | empty (`*`) | Comma-separated browser origins allowed to call the API (separate frontend deployments) |
