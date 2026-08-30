@@ -102,7 +102,7 @@ func (a *App) downloadSubtitle(w http.ResponseWriter, r *http.Request) {
 		base = "subtitle"
 	}
 	name := base + detectSubtitleExt(content)
-	if filepath.Base(name) != name {
+	if !filepath.IsLocal(name) {
 		writeErr(w, http.StatusBadRequest, "invalid subtitle file name")
 		return
 	}
