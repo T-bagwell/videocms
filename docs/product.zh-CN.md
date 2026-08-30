@@ -182,6 +182,7 @@ make serve                              # http://<局域网IP>:8080
   立即运行并下载备份
 - **Webhook 与 API 文档**：可订阅带签名的事件，并在 `/api/openapi.json`
   查看 OpenAPI 文档以支持第三方自动化
+- **PWA 与离线**：可将 VideoCMS 安装为应用，并从详情页保存视频供离线观看
 
 ### 5.4 用户
 
