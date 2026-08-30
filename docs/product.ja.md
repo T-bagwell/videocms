@@ -195,6 +195,7 @@ make serve                              # http://<LAN IP>:8080
 | `SCAN_WORKERS` | `4` | 並列スキャンワーカー数 |
 | `WATCH_INTERVAL` | `30` | 自動インクリメンタルスキャンの間隔（秒）。`0` で無効 |
 | `YTDLP_PATH` | PATH 上の `yt-dlp` | ダウンロードキューが使う yt-dlp バイナリ |
+| `HLS_HW_ACCEL` | 空（ソフトウェア x264） | HLS ビデオエンコーダー：videotoolbox、nvenc または qsv。空なら libx264 |
 
 ## 7. FAQ
 
