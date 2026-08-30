@@ -37,6 +37,9 @@ type Config struct {
 	OIDCRedirectURL    string
 	NotifyWebhookURL   string
 	NotifyAppriseURL   string
+	MaintIntervalHours int
+	MaintRetention     int
+	MaintRescan        bool
 }
 
 func Load() Config {
@@ -69,6 +72,9 @@ func Load() Config {
 		OIDCRedirectURL:    os.Getenv("OIDC_REDIRECT_URL"),
 		NotifyWebhookURL:   os.Getenv("NOTIFY_WEBHOOK_URL"),
 		NotifyAppriseURL:   os.Getenv("NOTIFY_APPRISE_URL"),
+		MaintIntervalHours: envInt("MAINT_INTERVAL_HOURS", 24),
+		MaintRetention:     envInt("MAINT_BACKUP_RETENTION", 7),
+		MaintRescan:        envBool("MAINT_RESCAN"),
 	}
 	if cfg.Addr != "" && cfg.Addr[0] != ':' {
 		cfg.Addr = ":" + cfg.Addr
@@ -117,4 +123,11 @@ func envBool(key string) bool {
 		return true
 	}
 	return false
+}
+
+func envInt(key string, fallback int) int {
+	if v, err := strconv.Atoi(os.Getenv(key)); err == nil {
+		return v
+	}
+	return fallback
 }
