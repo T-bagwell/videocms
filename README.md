@@ -284,7 +284,7 @@ Planned work is informed by feature sets of similar self-hosted video projects
 - [x] Background-jobs dashboard (monitor / cancel / retry) + richer system stats
 - [x] Scheduled maintenance: re-scan, health checks, metadata backup/restore
 - [x] Webhooks + mature public REST API for third-party automation
-- [ ] PWA with offline downloads and polished mobile UX
+- [x] PWA with offline downloads and polished mobile UX
 
 ## Contributing
 
