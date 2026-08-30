@@ -346,6 +346,10 @@ AniList 与 Wikipedia（`TVMAZE_ENABLED=0` / `ANILIST_ENABLED=0` /
 - OIDC SSO：`GET /api/auth/oidc/start|callback` 实现发现 + 授权码 + userinfo
   （`OIDC_*` 配置）；用户通过唯一 `users.oauth_sub` 列（迁移 026）自动创建或
   绑定，前端经 `/login?sso_token=…` 获取会话 JWT
+- 家长控制与配额（迁移 027）：bcrypt 的 `users.pin` 配合
+  `PUT|POST /api/users/me/pin[/verify]` 签发 5 分钟解锁令牌，列表请求通过
+  `X-Videocms-Unlock` 接受；`users.allowed_rating` 过滤 `videos.content_rating`
+  （未解锁时），`libraries.quota_bytes` 在上传目标指向该库时生效
 
 ### 3.10 关键设计决策
 
