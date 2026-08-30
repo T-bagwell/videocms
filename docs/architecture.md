@@ -364,6 +364,10 @@ back to the keyless TVMaze API, then AniList, then Wikipedia
   files and duplicate candidates (same declared size);
   `POST /api/libraries/{id}/health/keep-best` moves duplicates except the best
   (highest resolution, then longest filename) into `DATA_DIR/trash/<date>/`
+- Batch & recycle bin: `POST /api/admin/videos/batch` bulk-tags, clears tags
+  or moves selected videos to trash; `trash_records` (migration 024) keeps the
+  original path so `GET /api/admin/trash` + `POST /api/admin/trash/{id}/restore`
+  can move files back and re-enable them
 
 ### 3.10 Key design decisions
 
