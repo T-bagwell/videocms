@@ -30,6 +30,9 @@ export default function VideoDetailPage() {
   const [transcribing, setTranscribing] = useState(false);
   const [scrapeProvider, setScrapeProvider] = useState('tmdb');
   const [scrapeForce, setScrapeForce] = useState(false);
+  const [tags, setTags] = useState([]);
+  const [tagInput, setTagInput] = useState('');
+  const [tagBusy, setTagBusy] = useState(false);
   const [subtitleBusy, setSubtitleBusy] = useState(false);
   const [tracks, setTracks] = useState([]);
   const [setGlobal, setSetGlobal] = useState(false);
@@ -39,7 +42,45 @@ export default function VideoDetailPage() {
     api('/playlists').then((d) => setPlaylists(d.items)).catch(() => {});
     api(`/videos/${id}/subtitle-tracks`).then((d) => setTracks(d.items)).catch(() => setTracks([]));
     api(`/videos/${id}/transcripts`).then(setTranscript).catch(() => setTranscript(null));
+    api(`/videos/${id}/tags`).then((d) => setTags(d.items || [])).catch(() => setTags([]));
   }, [id]);
+
+  async function addTag(e) {
+    e.preventDefault();
+    const name = tagInput.trim().toLowerCase();
+    if (!name) return;
+    try {
+      const d = await api(`/videos/${id}/tags`, { method: 'POST', body: { name } });
+      setTags((prev) => (prev.some((t) => t.id === d.id) ? prev : [...prev, d]));
+      setTagInput('');
+    } catch (e2) {
+      setErr(e2.message);
+    }
+  }
+
+  async function removeTag(tagId) {
+    try {
+      await api(`/videos/${id}/tags/${tagId}`, { method: 'DELETE' });
+      setTags((prev) => prev.filter((t) => t.id !== tagId));
+    } catch (e2) {
+      setErr(e2.message);
+    }
+  }
+
+  async function analyze() {
+    setTagBusy(true);
+    setErr('');
+    try {
+      await api(`/videos/${id}/analyze`, { method: 'POST' });
+      const d = await api(`/videos/${id}/tags`);
+      setTags(d.items || []);
+      setMsg(t('video.analyzeDone'));
+    } catch (e2) {
+      setErr(e2.message);
+    } finally {
+      setTagBusy(false);
+    }
+  }
 
   async function transcribe() {
     setTranscribing(true);
@@ -245,6 +286,30 @@ export default function VideoDetailPage() {
             <p className="synopsis">{video.synopsis}</p>
           ) : (
             <p className="synopsis muted">{t('video.noSynopsis')}</p>
+          )}
+          {(tags.length > 0 || user?.role === 'admin') && (
+            <div className="tag-box">
+              {tags.map((tg) => (
+                <span key={tg.id} className="tag-chip">
+                  {tg.name}
+                  {tg.kind === 'auto' && <span className="tag-auto" title={t('video.tagAuto')}>✦</span>}
+                  <button className="tag-remove" onClick={() => removeTag(tg.id)} aria-label={t('common.remove')}>×</button>
+                </span>
+              ))}
+              <form className="tag-add" onSubmit={addTag}>
+                <input
+                  placeholder={t('video.tagPlaceholder')}
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  maxLength={50}
+                />
+              </form>
+              {user?.role === 'admin' && (
+                <button className="btn small ghost" onClick={analyze} disabled={tagBusy}>
+                  {tagBusy ? t('video.analyzing') : t('video.analyze')}
+                </button>
+              )}
+            </div>
           )}
           <div className="detail-actions">
             <button className="btn primary big" onClick={() => navigate(`/player/${video.id}`)}>

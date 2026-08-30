@@ -322,6 +322,15 @@ label input, label textarea { margin-top: 6px; }
 .chat-message b { margin-right: 6px; color: var(--primary); }
 .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
 .transcript-box { margin-top: 14px; padding: 12px; }
+.tag-box { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 12px; }
+.tag-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--bg-soft); border: 1px solid var(--border);
+  border-radius: 999px; padding: 3px 10px; font-size: 12px;
+}
+.tag-auto { color: var(--warn); font-size: 10px; }
+.tag-remove { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 13px; padding: 0 2px; }
+.tag-add input { padding: 4px 8px; font-size: 12px; border-radius: 6px; }
 .status-cancelled { background: rgba(243,156,18,0.15); color: var(--warn); }
 .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
 .small-muted { color: var(--muted); font-size: 12px; }
