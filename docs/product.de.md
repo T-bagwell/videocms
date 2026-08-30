@@ -29,8 +29,33 @@ Hardware. Ihre Videos verlassen Ihr Netzwerk nie, außer Sie teilen sie bewusst.
 
 ## Screenshots
 
-> *In Kürze — starten Sie `make serve` und öffnen Sie `http://<Server-IP>:8080`,
-> um die Oberfläche zu sehen.*
+**Durchsuchen & Suche** — filterbares Raster, Tag-Cloud, Fuzzy-Suche und
+gespeicherte Smart Collections:
+
+![Startseite](screenshots/home.png)
+
+**Serien** — nummerierte Dateien werden automatisch nach Staffel → Folge
+gruppiert:
+
+![Serien](screenshots/series.png)
+
+**Videodetails** — Metadaten, Tags, ähnliche Videos, Teilen und Offline-Speichern:
+
+![Details](screenshots/detail.png)
+
+**Player** — native oder adaptive HLS-Wiedergabe mit Untertitel-/Audioumschaltung,
+Qualitätsauswahl, Gemeinsam ansehen, Streaming und Intro/Abspann-Überspringen:
+
+![Player](screenshots/player.png)
+
+**Öffentliche Freigabeseite** — passwort- und domänengeschützte Links:
+
+![Freigabe](screenshots/share.png)
+
+**Admin-Konsole** — Übersicht, Bibliotheken, Videos, Benutzer, Uploads,
+Downloads, Speicher, Jobs und Webhooks:
+
+![Admin](screenshots/admin.png)
 
 ## 3. Schnellstart
 
