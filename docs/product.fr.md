@@ -201,6 +201,8 @@ Statistiques : vidéos, bibliothèques, utilisateurs, listes, favoris, séries e
   propose un **nuage d’étiquettes** pour filtrer en un clic
 - La page de navigation peut **enregistrer des filtres**, les réappliquer et
   créer des **collections intelligentes** nommées à partir du filtre courant
+- La recherche propose un **tri par pertinence floue** qui tolère les fautes
+  de frappe (titre / synopsis / nom de fichier)
 
 ### 5.4 Utilisateurs
 
