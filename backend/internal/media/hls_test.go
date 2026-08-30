@@ -133,9 +133,9 @@ func TestHWEncodeOpts(t *testing.T) {
 		want  []string
 		err   bool
 	}{
-		{"", nil, false},
-		{"software", nil, false},
-		{"libx264", nil, false},
+		{"", []string{"-c:v", "libx264", "-preset", "veryfast", "-crf", "23"}, false},
+		{"software", []string{"-c:v", "libx264", "-preset", "veryfast", "-crf", "23"}, false},
+		{"libx264", []string{"-c:v", "libx264", "-preset", "veryfast", "-crf", "23"}, false},
 		{"videotoolbox", []string{"-c:v", "h264_videotoolbox", "-b:v", "3000k", "-allow_sw", "1"}, false},
 		{"nvenc", []string{"-c:v", "h264_nvenc", "-preset", "p4", "-b:v", "3000k"}, false},
 		{"qsv", []string{"-c:v", "h264_qsv", "-b:v", "3000k"}, false},

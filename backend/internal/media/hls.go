@@ -145,11 +145,13 @@ type HLSSession struct {
 }
 
 type HLSManager struct {
-	dataDir  string
-	ffmpeg   string
-	hwAccel  string
-	mu       sync.Mutex
-	sessions map[uuid.UUID]*HLSSession
+	dataDir     string
+	ffmpeg      string
+	hwAccel     string
+	vaapiDevice string
+	toneMap     bool
+	mu          sync.Mutex
+	sessions    map[uuid.UUID]*HLSSession
 }
 
 func NewHLSManager(dataDir, ffmpegBin string, hwAccel ...string) *HLSManager {
@@ -168,21 +170,71 @@ func NewHLSManager(dataDir, ffmpegBin string, hwAccel ...string) *HLSManager {
 	return m
 }
 
-// hwEncodeOpts returns the ffmpeg video-encoding options for the configured
-// hardware accelerator. A nil slice means the default software x264 encoding.
-func hwEncodeOpts(accel string) ([]string, error) {
+// SetVAAPIDevice configures the VAAPI render device (default /dev/dri/renderD128).
+func (m *HLSManager) SetVAAPIDevice(device string) {
+	m.vaapiDevice = device
+}
+
+// SetToneMap enables HDR → SDR tone mapping on the video filter chain.
+func (m *HLSManager) SetToneMap(enabled bool) {
+	m.toneMap = enabled
+}
+
+// encodePlan describes how to encode video renditions.
+type encodePlan struct {
+	global []string // options that must appear before -i (VAAPI device init)
+	codec  []string // -c:v options
+	scale  string   // scale filter expression; W is replaced with the width
+}
+
+func hwEncodePlan(accel, vaapiDevice string, toneMap bool) (encodePlan, error) {
+	tone := ""
+	if toneMap {
+		tone = "zscale=t=linear:npl=100,tonemap=hable,zscale=p=bt709,"
+	}
 	switch strings.ToLower(strings.TrimSpace(accel)) {
 	case "", "software", "libx264":
-		return nil, nil
+		return encodePlan{
+			codec: []string{"-c:v", "libx264", "-preset", "veryfast", "-crf", "23"},
+			scale: tone + "scale=W:-2",
+		}, nil
 	case "videotoolbox":
-		return []string{"-c:v", "h264_videotoolbox", "-b:v", "3000k", "-allow_sw", "1"}, nil
+		return encodePlan{
+			codec: []string{"-c:v", "h264_videotoolbox", "-b:v", "3000k", "-allow_sw", "1"},
+			scale: tone + "scale=W:-2",
+		}, nil
 	case "nvenc":
-		return []string{"-c:v", "h264_nvenc", "-preset", "p4", "-b:v", "3000k"}, nil
+		return encodePlan{
+			codec: []string{"-c:v", "h264_nvenc", "-preset", "p4", "-b:v", "3000k"},
+			scale: tone + "scale=W:-2",
+		}, nil
 	case "qsv":
-		return []string{"-c:v", "h264_qsv", "-b:v", "3000k"}, nil
+		return encodePlan{
+			codec: []string{"-c:v", "h264_qsv", "-b:v", "3000k"},
+			scale: tone + "scale=W:-2",
+		}, nil
+	case "vaapi":
+		if vaapiDevice == "" {
+			vaapiDevice = "/dev/dri/renderD128"
+		}
+		return encodePlan{
+			global: []string{"-vaapi_device", vaapiDevice, "-hwaccel", "vaapi", "-hwaccel_output_format", "vaapi"},
+			codec:  []string{"-c:v", "h264_vaapi", "-b:v", "3000k"},
+			scale:  tone + "format=nv12,hwupload,scale_vaapi=w=W:h=-2",
+		}, nil
 	default:
-		return nil, fmt.Errorf("unsupported HLS_HW_ACCEL %q (use videotoolbox, nvenc, qsv or leave empty)", accel)
+		return encodePlan{}, fmt.Errorf("unsupported HLS_HW_ACCEL %q (use videotoolbox, nvenc, qsv, vaapi or leave empty)", accel)
 	}
+}
+
+// hwEncodeOpts returns just the video codec options (kept for compatibility
+// with the original helper).
+func hwEncodeOpts(accel string) ([]string, error) {
+	plan, err := hwEncodePlan(accel, "", false)
+	if err != nil {
+		return nil, err
+	}
+	return plan.codec, nil
 }
 
 func (m *HLSManager) sessionDir(videoID uuid.UUID) string {
@@ -219,7 +271,7 @@ func (m *HLSManager) Playlist(ctx context.Context, videoID uuid.UUID, input stri
 	}
 
 	rends := renditionPlan(srcWidth, srcHeight)
-	encOpts, err := hwEncodeOpts(m.hwAccel)
+	enc, err := hwEncodePlan(m.hwAccel, m.vaapiDevice, m.toneMap)
 	if err != nil {
 		return "", err
 	}
@@ -228,7 +280,9 @@ func (m *HLSManager) Playlist(ctx context.Context, videoID uuid.UUID, input stri
 		return "", err
 	}
 
-	args := []string{"-v", "error", "-y", "-ss", fmt.Sprintf("%.2f", startSec), "-i", input}
+	args := []string{"-v", "error", "-y"}
+	args = append(args, enc.global...)
+	args = append(args, "-ss", fmt.Sprintf("%.2f", startSec), "-i", input)
 	for _, r := range rends {
 		outDir := filepath.Join(dir, r.Name)
 		if err := os.MkdirAll(outDir, 0o755); err != nil {
@@ -246,13 +300,9 @@ func (m *HLSManager) Playlist(ctx context.Context, videoID uuid.UUID, input stri
 			"-map", "0:v:0",
 		)
 		args = append(args, audioOpts...)
-		if len(encOpts) == 0 {
-			args = append(args, "-c:v", "libx264", "-preset", "veryfast", "-crf", "23")
-		} else {
-			args = append(args, encOpts...)
-		}
+		args = append(args, enc.codec...)
 		args = append(args,
-			"-vf", "scale="+fmt.Sprint(r.Width)+":-2",
+			"-vf", strings.ReplaceAll(enc.scale, "W", fmt.Sprint(r.Width)),
 			"-force_key_frames", "expr:gte(t,n_forced*6)",
 			"-f", "hls",
 			"-hls_time", fmt.Sprint(hlsSegmentDur),

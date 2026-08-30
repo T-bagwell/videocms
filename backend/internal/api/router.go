@@ -44,6 +44,8 @@ func New(cfg config.Config, pool *pgxpool.Pool) (*App, error) {
 		scraper: media.NewScraper(pool, cfg.DataDir, cfg.TMDBAPIKey),
 		dl:      media.NewDownloader(pool, cfg.YtDLPPath),
 	}
+	app.hls.SetVAAPIDevice(cfg.HLSVAAPIDevice)
+	app.hls.SetToneMap(cfg.HLSToneMap)
 	scanner.SetEnricher(app.scraper)
 	return app, nil
 }

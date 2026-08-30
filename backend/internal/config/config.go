@@ -21,6 +21,8 @@ type Config struct {
 	YtDLPPath          string
 	CORSOrigins        []string
 	HLSHWAccel         string
+	HLSVAAPIDevice     string
+	HLSToneMap         bool
 	SubtitleOSUser     string
 	SubtitleOSPassword string
 	SubtitleOSAPIKey   string
@@ -40,6 +42,8 @@ func Load() Config {
 		YtDLPPath:          os.Getenv("YTDLP_PATH"),
 		CORSOrigins:        envList("CORS_ORIGINS"),
 		HLSHWAccel:         os.Getenv("HLS_HW_ACCEL"),
+		HLSVAAPIDevice:     os.Getenv("HLS_VAAPI_DEVICE"),
+		HLSToneMap:         envBool("HLS_TONE_MAP"),
 		SubtitleOSUser:     os.Getenv("SUBTITLE_OS_USERNAME"),
 		SubtitleOSPassword: os.Getenv("SUBTITLE_OS_PASSWORD"),
 		SubtitleOSAPIKey:   os.Getenv("SUBTITLE_OS_API_KEY"),
@@ -83,4 +87,12 @@ func envList(key string) []string {
 		}
 	}
 	return out
+}
+
+func envBool(key string) bool {
+	switch strings.ToLower(strings.TrimSpace(os.Getenv(key))) {
+	case "1", "true", "yes", "on":
+		return true
+	}
+	return false
 }
