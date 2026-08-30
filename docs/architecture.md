@@ -31,26 +31,55 @@ flowchart LR
     subgraph Browser["Browser (React SPA)"]
         UI["Vite UI · i18n en/zh/fr/ja/de"]
         HLS["hls.js player"]
+        CAST["Chromecast sender (Cast SDK)"]
+        PWA["Service worker + Cache API"]
     end
     subgraph Server["Server (Go :8080)"]
         API["net/http + middleware"]
         SCAN["Scanner (parallel)"]
         HLSM["HLS manager"]
-        SCR["TMDB scraper"]
+        SCR["Metadata scraper"]
+        DL["yt-dlp downloader"]
+        LIVE["Live manager (RTMP→HLS)"]
+        WHIS["Whisper transcription"]
+        SUB["Subtitle provider"]
+        NOT["Notifier"]
+        DLNA["DLNA/UPnP server (SSDP)"]
     end
     DB[("PostgreSQL 14")]
     DISK["Media folders on disk"]
     TMDB[("TMDB API")]
+    META[("TVMaze / AniList / Wikipedia / custom")]
+    OS[("OpenSubtitles / whisper.cpp / AI tagger")]
+    IDP[("OIDC / SAML IdP")]
+    TV["DLNA TV / Chromecast"]
+    SMTP[("SMTP server")]
 
     UI -->|"/api"| API
     HLS -->|"Range / HLS"| API
+    PWA -->|"offline Cache API"| API
+    CAST -->|"share stream"| TV
     API --> DB
     API --> SCAN
     API --> HLSM
     API --> SCR
+    API --> DL
+    API --> LIVE
+    API --> WHIS
+    API --> SUB
+    API --> NOT
+    API --> DLNA
     SCAN -->|"ffprobe / ffmpeg"| DISK
     HLSM -->|"ffmpeg transcode"| DISK
+    DL -->|"yt-dlp"| DISK
+    LIVE -->|"ffmpeg"| DISK
     SCR -->|"search/details/poster"| TMDB
+    SCR -->|"keyless fallback"| META
+    SUB -->|"search/download"| OS
+    WHIS -->|"transcribe"| OS
+    DLNA -->|"SSDP + DIDL-Lite + stream"| TV
+    API -->|"AuthnRequest / SAMLResponse"| IDP
+    NOT -->|"mail"| SMTP
 ```
 
 ```
@@ -88,11 +117,21 @@ backend/
     media/
       scanner.go              library scanning (parallel walk + probe + upsert)
       scraper.go              TMDB metadata enrichment
+      episode.go              series/episode grouping from filenames
       hls.go                  HLS transcode session manager
       stream.go               HTTP Range streaming
       segment.go              HLS segment filename validation
       tracks.go               ffprobe stream listing for remux downloads
       downloader.go           yt-dlp job runner (queue + schedule)
+      live.go                 RTMP ingest → rolling HLS (LiveManager)
+      whisper.go              local speech transcription (whisper.cpp)
+      subtitle_provider.go    pluggable online subtitle search/download
+      thumbnails.go           trick-play preview extraction
+      health.go               media health checks (missing/corrupt/duplicates)
+      nfo.go                  Kodi-style NFO import/export
+      analyze.go              external AI tagging tool integration
+      notify.go               webhook / Apprise / SMTP notification fan-out
+      dlna.go                 SSDP responder + UPnP device identity
     api/
       router.go               route table, CORS/logging/recovery middleware
       json.go                 JSON helpers
@@ -128,14 +167,16 @@ backend/
 Managed by embedded SQL migrations (`schema_migrations` table tracks versions).
 
 ```sql
-users           -- id, username(unique), password_hash, display_name, role, created_at
+users           -- id, username(unique), password_hash, display_name, role,
+                --   oauth_sub(unique, NULL for local; "oidc:…"/"saml:…" for SSO),
+                --   pin(bcrypt, parental unlock), allowed_rating, created_at
 libraries       -- id, name, path(unique), scan_status(idle|scanning|error|cancelled),
                 --   scan_error, scan_started_at, scan_finished_at, video_count,
-                --   blocked
+                --   blocked, quota_bytes
 videos          -- id, library_id(fk), title, filename, file_path(unique), size_bytes,
                 --   duration_sec, width, height, video_codec, container, year, synopsis,
                 --   genres(text[]), poster_path, subtitle_path, tmdb_id, scraped_at,
-                --   available, created_at, updated_at, last_scanned_at
+                --   available, content_rating, created_at, updated_at, last_scanned_at
 watch_progress  -- PK(user_id, video_id), position_sec, duration_sec, updated_at
 favorites       -- PK(user_id, video_id), created_at
 playlists       -- id, user_id(fk), name, description, timestamps
@@ -162,6 +203,28 @@ uploads         -- id, filename, target_path, total_size, chunk_size,
 downloads       -- id, url, title, target_path, format, status(queued|downloading|
                 --   completed|failed|canceled), progress, error, interval_secs,
                 --   last_run_at, timestamps (yt-dlp jobs, optional schedule)
+watch_rooms     -- id, code(unique), video_id, owner, playing, position_sec,
+                --   updated_at (watch-together sessions, polled every 2.5s)
+live_streams    -- id, title, stream_key(unique), status(offline|starting|live|idle),
+                --   error, created_by(fk → users), timestamps (RTMP ingest)
+chat_messages   -- id, stream_id(fk, ON DELETE CASCADE), user_name, text, created_at
+video_transcripts -- PK(video_id, lang), transcript_path, format(webvtt|text),
+                --   updated_at (Whisper output, searchable)
+tags            -- id, name(unique), created_at
+video_tags      -- PK(video_id, tag_id), tagged_by(fk → users, NULL = auto),
+                --   created_at
+collections     -- id, user_id(fk), name, filters(jsonb), created_at
+                --   (named smart collections from saved search filters)
+trash_records   -- id, video_id(fk), original_path, trashed_at, restored_at
+                --   (recycle bin for batch "move to trash" + restore)
+comments        -- id, video_id(fk, ON DELETE CASCADE), user_id(fk),
+                --   text, created_at
+ratings         -- PK(video_id, user_id), score(1-5), updated_at
+storage_pools   -- id, name(unique), type(local|s3|sftp), mount_path,
+                --   config(jsonb), read_only, created_at (upload/download targets)
+webhook_subscriptions -- id, url, events(text[]), secret, active, timestamps
+skip_intervals  -- PK(video_id, kind), kind(intro|credits), start_sec, end_sec,
+                --   updated_at (intro/credits skip bar)
 ```
 
 Key indexes: `videos(lower(title))`, `videos(library_id)`, partial
@@ -175,6 +238,13 @@ erDiagram
     users ||--o{ playlists : owns
     users ||--o{ hidden_paths : hides
     users ||--o{ series_favorites : saves
+    users ||--o{ share_tokens : creates
+    users ||--o{ watch_rooms : hosts
+    users ||--o{ live_streams : ingests
+    users ||--o{ comments : writes
+    users ||--o{ ratings : rates
+    users ||--o{ collections : saves
+    users ||--o{ video_tags : assigns
     admins ||--o{ blocked_titles : blocks
     libraries ||--o{ videos : contains
     libraries ||--o{ series : groups
@@ -183,6 +253,16 @@ erDiagram
     videos ||--o{ playlist_items : included_in
     videos ||--o{ watch_progress : has
     videos ||--o{ favorites : has
+    videos ||--o{ comments : has
+    videos ||--o{ ratings : has
+    videos ||--o{ video_tags : has
+    videos ||--o{ video_transcripts : transcribes
+    videos ||--o{ skip_intervals : skips
+    videos ||--o{ trash_records : trashed
+    videos ||--o{ share_tokens : shared
+    series ||--o{ share_tokens : shared
+    playlists ||--o{ share_tokens : shared
+    live_streams ||--o{ chat_messages : has
 ```
 
 ### 3.5 Streaming (HTTP Range)
@@ -239,7 +319,9 @@ The `HLSManager`:
   current play/pause + position; members poll
   `GET /api/watch/rooms/{id}?token=…` every 2.5s and publish state via PUT, so
   playback stays loosely synchronized. Casting: the player exposes a Web
-  AirPlay button (`webkitShowPlaybackUI`) where the browser supports it
+  AirPlay button (`webkitShowPlaybackUI`) where the browser supports it, plus a
+  **Cast to TV** button that loads the Google Cast SDK and streams a
+  short-lived share URL to the default media receiver
 - Live streaming: `live_streams` + `chat_messages` (migration 019). The
   `LiveManager` pulls an RTMP ingest (`RTMP_INGEST_URL` + per-stream key) into
   a rolling HLS playlist (`data/live/<id>/index.m3u8`); watch at
@@ -478,9 +560,12 @@ frontend/src/
   api.js           fetch wrapper (token, JSON, 401 redirect)
   auth.jsx         auth context (user, login/register/logout)
   i18n/            i18next setup + en/zh/fr/ja/de locale JSON
-  components/      Navbar, Poster, VideoCard, PathPicker, Toast
+  components/      Navbar, Poster, VideoCard, PathPicker, ShareModal,
+                   SubtitleSearchModal, DownloadDialog, UploadManager, Toast
   pages/           Login, Browse, VideoDetail, Player, Playlists,
-                   PlaylistDetail, Favorites, Admin
+                   PlaylistDetail, SeriesList, SeriesDetail, Share, Live,
+                   Favorites, Admin (+ Uploads/Downloads/Storage/Jobs/Webhooks
+                   admin tabs, Blocked titles)
 ```
 
 ### 4.2 Routing & state
@@ -501,9 +586,13 @@ frontend/src/
 
 ### 4.4 Admin UI
 
-Tabs: Overview (stats), Libraries (add via server-side folder picker, scan/stop,
-delete), Videos (search, edit metadata, scrape, upload poster), Users (role,
-reset password, delete).
+Tabs: **Overview** (stats, backup export/import, maintenance run, test
+notification), **Libraries** (server-side folder picker, scan/stop, health
+check/keep-best, NFO import/export, block), **Videos** (search, edit metadata,
+scrape, poster, batch actions, recycle bin), **Users** (role, reset password,
+delete), **Uploads** (chunked uploads), **Downloads** (yt-dlp queue),
+**Storage** (local/S3/SFTP pools), **Jobs** (scans/uploads/downloads/live +
+disk usage), **Webhooks** (subscriptions + OpenAPI).
 
 ## 5. Key Flows
 
@@ -592,12 +681,39 @@ The backend binds all interfaces (`:8080`), so LAN clients reach the UI directly
 | `FFPROBE_BIN` / `FFMPEG_BIN` | auto-detect | Tool paths (Homebrew fallback) |
 | `TMDB_API_KEY` / `TMDB_LANGUAGE` | empty / zh-CN | Scraping |
 | `SCAN_WORKERS` | `4` | Parallel probe workers |
+| `CORS_ORIGINS` | empty (`*`) | Browser origins allowed to call the API |
+| `WATCH_INTERVAL` | `30` | Fallback incremental-scan interval (seconds); fsnotify indexes immediately |
+| `YTDLP_PATH` | `yt-dlp` on PATH | yt-dlp binary for the Downloads queue |
 | `WEB_ROOT` | auto (`frontend/dist`) | Built frontend for production mode |
+| `HLS_HW_ACCEL` / `HLS_VAAPI_DEVICE` / `HLS_TONE_MAP` | empty / `/dev/dri/renderD128` / `0` | Hardware HLS encoding (videotoolbox/nvenc/qsv/vaapi), VAAPI device, HDR→SDR tone mapping |
+| `SUBTITLE_OS_USERNAME` / `SUBTITLE_OS_PASSWORD` / `SUBTITLE_OS_API_KEY` | empty | OpenSubtitles credentials for online subtitle search |
+| `RTMP_INGEST_URL` | `rtmp://localhost:1935/live` | Base RTMP ingest URL for live streams |
+| `WHISPER_BIN` / `WHISPER_MODEL` | empty | whisper.cpp CLI + model for transcription |
+| `SCRAPE_CUSTOM_URL` | empty | Custom JSON scraper endpoint (`%s` = URL-escaped title) |
+| `AI_TAG_BIN` | empty | External AI tagging tool (media path arg, one tag per line) |
+| `OIDC_ISSUER` / `OIDC_CLIENT_ID` / `OIDC_CLIENT_SECRET` / `OIDC_REDIRECT_URL` | empty | OIDC single sign-on |
+| `SAML_IDP_METADATA_URL` / `SAML_SP_CERT` / `SAML_SP_KEY` / `SAML_SP_ENTITY_ID` / `SAML_ACS_URL` | empty | SAML 2.0 single sign-on |
+| `NOTIFY_WEBHOOK_URL` / `NOTIFY_APPRISE_URL` | empty | Webhook/Apprise notification channels |
+| `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASSWORD` / `NOTIFY_EMAIL_FROM` / `NOTIFY_EMAIL_TO` | empty / `587` | SMTP email notifications |
+| `MAINT_INTERVAL_HOURS` / `MAINT_BACKUP_RETENTION` / `MAINT_RESCAN` | `24` / `7` / `0` | Scheduled maintenance (backups, health checks, rescans) |
+| `DLNA_ENABLED` / `DLNA_FRIENDLY_NAME` / `DLNA_ALLOWED_IPS` | `0` / `VideoCMS` / empty (whole LAN) | UPnP/DLNA media server, display name, IP/CIDR allowlist |
+| `VITE_API_BASE_URL` | empty | Frontend build-time API base URL for cross-origin deployments |
 
 ## 7. Security Considerations
 
 - Admin-only for all mutation/browsing endpoints
 - Media URLs require the user's JWT (header or query param)
+- Public share links are unguessable tokens with expiry, optional password and
+  domain allow-list; casting reuses a 1-hour video share so no JWT leaves the
+  browser
+- DLNA endpoints are unauthenticated by design but gated by `DLNA_ALLOWED_IPS`
+  (IP/CIDR); leave it empty only on a trusted LAN
+- SAML assertions are verified with the IdP's certificate (signature, conditions,
+  audience); SP keys come from `SAML_SP_CERT`/`SAML_SP_KEY` files
+- SMTP notifications prefer TLS: implicit TLS on port 465, STARTTLS otherwise;
+  credentials are only sent after the channel is encrypted
+- Webhook deliveries carry an HMAC-SHA256 `X-Videocms-Signature` so receivers
+  can verify authenticity
 - HLS segment names are validated (`seg_\d+\.ts`) and confined to the session dir
 - SQL is parameterized via pgx throughout
 - Default `JWT_SECRET` is for development only; plain HTTP is only recommended
@@ -616,3 +732,19 @@ The backend binds all interfaces (`:8080`), so LAN clients reach the UI directly
 
 - **JAV DB metadata provider** (requires an API key; TMDB/TVMaze/AniList/Wikipedia
   cover keyless scraping today)
+- **Custom metadata scraper** — `SCRAPE_CUSTOM_URL` points at any JSON endpoint;
+  `%s` is replaced with the URL-escaped title, so a self-hosted scraper can be
+  plugged in without code changes
+- **Subtitle providers** — the `SubtitleProvider` interface (OpenSubtitles.com
+  today) can be extended with new sources; searches/downloads are per-video
+- **AI tagging** — an external binary (`AI_TAG_BIN`) receives the media path and
+  prints one tag per line; tags flow into `tags`/`video_tags` and the tag cloud
+- **Speech transcription** — whisper.cpp (`WHISPER_BIN`) turns audio into
+  searchable transcripts; the same pipeline produces a WebVTT subtitle track
+- **Notification channels** — `media.Notifier` fans one event payload out to
+  webhook, Apprise and SMTP; adding a channel is a new branch in `Send`
+- **SSO providers** — OIDC and SAML 2.0 both resolve to a `users.oauth_sub`
+  binding; a new provider needs a start/callback pair plus an upsert path
+- **DLNA / Chromecast** — the UPnP server (`/dlna/*`) and the Cast sender are
+  self-contained; DLNA browsing can be extended with new object containers and
+  the share-token flow can power other cast targets
