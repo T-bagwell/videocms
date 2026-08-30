@@ -39,11 +39,14 @@ favorites, playlists — and numbered files automatically group into TV Shows.
 | 🔍 Scanning | Recursive discovery of mp4/mkv/webm/avi/mov/ts…; parallel probing (4 workers, `SCAN_WORKERS`); live progress; **cancel anytime**; skips macOS `._` files and `.m3u8` stream folders |
 | 🏷️ Metadata | ffprobe extracts codec/resolution/duration; posters generated from the video; editable title/year/synopsis/genres; optional **TMDB scraping** |
 | 📺 TV Shows | Numbered files (`S01E01`, `EP1`, `第1集`, `Show01Title`…) auto-group into series sorted by episode; season-aware; play-all with continuous playback |
-| ▶️ Playback | H.264/WebM play natively (HTTP Range); **MKV/HEVC transcoded to adaptive multi-quality HLS on the fly** (quality selector); subtitles auto-detected (SRT→WebVTT), embedded-subtitle extraction, upload, **multi-language switching** and per-user subtitle preference; **download as MKV/MP4 with a chosen audio track and subtitles (remuxed, no re-encode)** |
+| ▶️ Playback | H.264/WebM play natively (HTTP Range); **MKV/HEVC transcoded to adaptive multi-quality HLS on the fly** (quality selector); subtitles auto-detected (SRT→WebVTT), embedded-subtitle extraction, upload, **multi-language switching**, per-user preference and ASS styling; **intro/credits skip**; **Watch together**, **AirPlay/Chromecast casting** and **DLNA**; trick-play thumbnails; **download as MKV/MP4 with a chosen audio track and subtitles (remuxed, no re-encode)** |
 | ⬆️ Uploads & downloads | Admin **Uploads** tab: chunked, resumable uploads into any server folder (auto-indexed inside libraries); **yt-dlp** download queue with optional scheduled repeats |
 | 🔗 Sharing | Short-lived public share links for **videos, TV shows and playlists** (signed, expiring, revocable, optional password and domain allow-list) — anyone with the link can watch without an account; content blocking is respected |
 | 👤 Personal | Continue watching, favorites (videos **and** series), playlists with sequential playback |
 | 🔐 Users | Register/login with JWT; admin/user roles; admin user management with safety guards |
+| 🔐 SSO | **OIDC** and **SAML 2.0** single sign-on (ADFS, Okta, Keycloak…), with automatic admin role mapping from SAML attributes |
+| 📡 Live & social | **RTMP live streaming** with built-in chat; per-video **comments and ratings**; **Whisper transcription** and **AI tagging**; webhook/Apprise/**email** notifications |
+| 📦 Operations | **Storage pools** (local/S3/SFTP), scheduled **maintenance/backups**, jobs dashboard, health checks with duplicate cleanup, NFO import/export, PWA with **offline saving** |
 | 🚫 Content blocking | Admins block media by title in the admin panel — hidden for everyone, files and records kept, unblock anytime |
 | 🚫 Library blocking | Block an entire library from the admin panel — all its media vanishes for everyone, nothing is deleted |
 | 🚫 Path filters | Hide any server path per user — excluded everywhere (home, series, favorites, continue watching, playlists) |
