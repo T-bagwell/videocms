@@ -123,7 +123,11 @@
     "audioTrack": "Audio",
     "subtitles": "Subtitles",
     "subtitlesOn": "Subtitles: On",
-    "subtitlesOff": "Subtitles: Off"
+    "subtitlesOff": "Subtitles: Off",
+    "subtitleSync": "Subtitle sync",
+    "subtitleEarlier": "−0.5s",
+    "subtitleLater": "+0.5s",
+    "subtitleReset": "Reset"
   },
   "playlists": {
     "title": "Playlists",

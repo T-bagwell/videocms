@@ -123,7 +123,11 @@
     "audioTrack": "音轨",
     "subtitles": "字幕",
     "subtitlesOn": "字幕：开",
-    "subtitlesOff": "字幕：关"
+    "subtitlesOff": "字幕：关",
+    "subtitleSync": "字幕同步",
+    "subtitleEarlier": "提前 0.5s",
+    "subtitleLater": "延后 0.5s",
+    "subtitleReset": "重置"
   },
   "playlists": {
     "title": "播放列表",

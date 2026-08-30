@@ -33,6 +33,7 @@ export default function PlayerPage() {
   const [subtitleIdx, setSubtitleIdx] = useState(-1);
   const [audioTracks, setAudioTracks] = useState([]);
   const [audioIdx, setAudioIdx] = useState(-1);
+  const [subtitleOffsetMs, setSubtitleOffsetMs] = useState(0);
 
   useEffect(() => {
     setActiveId(id);
@@ -64,6 +65,9 @@ export default function PlayerPage() {
         setTracks([]);
         tracksRef.current = [];
       });
+    api(`/users/me/subtitle-offset?video_id=${activeId}`)
+      .then((d) => setSubtitleOffsetMs(d.offset_ms || 0))
+      .catch(() => setSubtitleOffsetMs(0));
 
     const playlistId = searchParams.get('playlist');
     const seriesId = searchParams.get('series');
@@ -187,6 +191,20 @@ export default function PlayerPage() {
     if (!hls) return;
     hls.audioTrack = i;
     setAudioIdx(i);
+  }
+
+  function adjustSubtitleOffset(delta) {
+    const next = Math.max(-300000, Math.min(300000, subtitleOffsetMs + delta));
+    setSubtitleOffsetMs(next);
+    api('/users/me/subtitle-offset', {
+      method: 'PUT',
+      body: { video_id: activeId, offset_ms: next },
+    }).catch(() => {});
+  }
+
+  function resetSubtitleOffset() {
+    setSubtitleOffsetMs(0);
+    api(`/users/me/subtitle-offset?video_id=${activeId}`, { method: 'DELETE' }).catch(() => {});
   }
 
   useEffect(() => {
@@ -333,15 +351,37 @@ export default function PlayerPage() {
         {!useTranscode &&
           tracks.map((tr) => (
             <track
-              key={tr.id}
+              key={`${tr.id}-${subtitleOffsetMs}`}
               kind="subtitles"
               srcLang={tr.lang || undefined}
               label={tr.title || tr.lang || t('player.subtitles')}
-              src={mediaUrl(`/videos/${activeId}/subtitles/${tr.id}`)}
+              src={mediaUrl(
+                `/videos/${activeId}/subtitles/${tr.id}${subtitleOffsetMs ? `?offset_ms=${subtitleOffsetMs}` : ''}`,
+              )}
               default={tr.is_active}
             />
           ))}
       </video>
+
+      {!useTranscode && tracks.length > 0 && (
+        <div className="player-tools subtitle-sync">
+          <span className="muted">
+            {t('player.subtitleSync')}: {subtitleOffsetMs >= 0 ? '+' : ''}
+            {subtitleOffsetMs / 1000}s
+          </span>
+          <button className="btn small" onClick={() => adjustSubtitleOffset(-500)}>
+            {t('player.subtitleEarlier')}
+          </button>
+          <button className="btn small" onClick={() => adjustSubtitleOffset(500)}>
+            {t('player.subtitleLater')}
+          </button>
+          {subtitleOffsetMs !== 0 && (
+            <button className="btn small" onClick={resetSubtitleOffset}>
+              {t('player.subtitleReset')}
+            </button>
+          )}
+        </div>
+      )}
 
       {useTranscode && (levels.length > 1 || subtitleTracks.length > 0 || audioTracks.length > 1) && (
         <div className="player-tools">

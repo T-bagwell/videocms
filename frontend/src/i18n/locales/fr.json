@@ -123,7 +123,11 @@
     "audioTrack": "Piste audio",
     "subtitles": "Sous-titres",
     "subtitlesOn": "Sous-titres : activés",
-    "subtitlesOff": "Sous-titres : désactivés"
+    "subtitlesOff": "Sous-titres : désactivés",
+    "subtitleSync": "Synchro sous-titres",
+    "subtitleEarlier": "−0,5 s",
+    "subtitleLater": "+0,5 s",
+    "subtitleReset": "Réinitialiser"
   },
   "playlists": {
     "title": "Listes de lecture",

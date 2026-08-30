@@ -123,7 +123,11 @@
     "audioTrack": "音声",
     "subtitles": "字幕",
     "subtitlesOn": "字幕: オン",
-    "subtitlesOff": "字幕: オフ"
+    "subtitlesOff": "字幕: オフ",
+    "subtitleSync": "字幕同期",
+    "subtitleEarlier": "0.5 秒早く",
+    "subtitleLater": "0.5 秒遅く",
+    "subtitleReset": "リセット"
   },
   "playlists": {
     "title": "プレイリスト",
