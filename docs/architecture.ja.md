@@ -228,6 +228,10 @@ erDiagram
   `SUBTITLE_OS_*` で設定）が `POST /api/videos/{id}/subtitles/search|download`
   を支えます。ダウンロード内容は gzip/zip からデコードして
   `DATA_DIR/subtitles/<video-id>/` に保存し、`upload` 字幕トラックとして登録
+- 一緒に見る：`watch_rooms`（マイグレーション 018）が共有トークンと再生状態
+  （再生/一時停止・位置）を保持。メンバーは `GET /api/watch/rooms/{id}?token=…`
+  を 2.5 秒ごとにポーリングし、PUT で状態を公開して緩く同期します。キャスト：
+  ブラウザが対応していれば Web AirPlay ボタン（`webkitShowPlaybackUI`）を表示
 - 要求された `start` が実行中セッションと 1 セグメント（6 秒）以上ずれている場合、
   セッションを終了して新しい位置で再開（シーク）
 - プレイリストは応答時に書き換えられ、各セグメント URL に `?token=` が付く
