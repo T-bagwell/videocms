@@ -28,6 +28,7 @@ type App struct {
 	subProvider media.SubtitleProvider
 	live        *media.LiveManager
 	notify      *media.Notifier
+	dlna        *media.DLNAManager
 }
 
 func New(cfg config.Config, pool *pgxpool.Pool) (*App, error) {
@@ -39,6 +40,12 @@ func New(cfg config.Config, pool *pgxpool.Pool) (*App, error) {
 	}
 	scanner := media.NewScanner(pool, cfg.DataDir)
 	notify := media.NewNotifier(cfg.NotifyWebhookURL, cfg.NotifyAppriseURL)
+	var dlnaMgr *media.DLNAManager
+	if cfg.DLNAEnabled {
+		port := cfg.Addr
+		port = strings.TrimPrefix(port, ":")
+		dlnaMgr = media.NewDLNAManager(cfg.DLNAFriendlyName, port, cfg.DLNAAllowedIPs)
+	}
 	app := &App{
 		cfg:     cfg,
 		pool:    pool,
@@ -48,6 +55,7 @@ func New(cfg config.Config, pool *pgxpool.Pool) (*App, error) {
 		dl:      media.NewDownloader(pool, cfg.YtDLPPath),
 		live:    media.NewLiveManager(cfg.DataDir, media.ResolveTool("ffmpeg")),
 		notify:  notify,
+		dlna:    dlnaMgr,
 	}
 	app.hls.SetVAAPIDevice(cfg.HLSVAAPIDevice)
 	app.hls.SetToneMap(cfg.HLSToneMap)
@@ -76,6 +84,13 @@ func (a *App) StartDownloadWorker(ctx context.Context) {
 	go a.dl.Run(ctx)
 }
 
+// StartDLNA runs the SSDP responder when the feature is enabled.
+func (a *App) StartDLNA(ctx context.Context) {
+	if a.dlna != nil {
+		a.dlna.Start(ctx)
+	}
+}
+
 func (a *App) Routes() http.Handler {
 	mux := http.NewServeMux()
 
@@ -91,6 +106,15 @@ func (a *App) Routes() http.Handler {
 	mux.HandleFunc("GET /api/auth/me", authUser(a.me))
 	mux.HandleFunc("GET /api/auth/oidc/start", a.oidcStart)
 	mux.HandleFunc("GET /api/auth/oidc/callback", a.oidcCallback)
+
+	if a.dlna != nil {
+		mux.HandleFunc("GET /dlna/device.xml", a.dlnaGuard(a.dlnaDeviceDescription))
+		mux.HandleFunc("GET /dlna/scpd.xml", a.dlnaGuard(a.dlnaSCPD))
+		mux.HandleFunc("GET /dlna/content/{id}", a.dlnaGuard(a.dlnaBrowseGET))
+		mux.HandleFunc("POST /dlna/control/ContentDirectory", a.dlnaGuard(a.dlnaContentControl))
+		mux.HandleFunc("GET /dlna/video/{id}/stream", a.dlnaGuard(a.dlnaVideoStream))
+		mux.HandleFunc("GET /dlna/video/{id}/poster", a.dlnaGuard(a.dlnaVideoPoster))
+	}
 
 	mux.HandleFunc("GET /api/libraries", authUser(a.listLibraries))
 	mux.HandleFunc("POST /api/libraries", authAdmin(a.createLibrary))

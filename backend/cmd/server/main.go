@@ -41,6 +41,7 @@ func main() {
 	app.StartShareCleanup(ctx)
 	app.StartDownloadWorker(ctx)
 	app.StartMaintenance(ctx)
+	app.StartDLNA(ctx)
 
 	srv := &http.Server{
 		Addr:              cfg.Addr,

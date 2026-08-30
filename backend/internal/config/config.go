@@ -40,6 +40,9 @@ type Config struct {
 	MaintIntervalHours int
 	MaintRetention     int
 	MaintRescan        bool
+	DLNAEnabled        bool
+	DLNAFriendlyName   string
+	DLNAAllowedIPs     []string
 }
 
 func Load() Config {
@@ -75,6 +78,9 @@ func Load() Config {
 		MaintIntervalHours: envInt("MAINT_INTERVAL_HOURS", 24),
 		MaintRetention:     envInt("MAINT_BACKUP_RETENTION", 7),
 		MaintRescan:        envBool("MAINT_RESCAN"),
+		DLNAEnabled:        envBool("DLNA_ENABLED"),
+		DLNAFriendlyName:   os.Getenv("DLNA_FRIENDLY_NAME"),
+		DLNAAllowedIPs:     envList("DLNA_ALLOWED_IPS"),
 	}
 	if cfg.Addr != "" && cfg.Addr[0] != ':' {
 		cfg.Addr = ":" + cfg.Addr
