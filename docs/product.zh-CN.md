@@ -172,6 +172,8 @@ make serve                              # http://<局域网IP>:8080
   PIN 锁定，并解锁分级内容 5 分钟。媒体库还可设置**存储配额**并在上传时校验
 - **分享定制**：可选择主题、自定义标题并隐藏导航；在链接后加 `?embed=1`
   即可在任意页面嵌入无装饰播放器
+- **通知**：可通过 Webhook 或 Apprise 接收扫描、上传与下载事件；管理员可从
+  概览页发送测试通知
 
 ### 5.4 用户
 
@@ -214,6 +216,7 @@ make serve                              # http://<局域网IP>:8080
 | `SCRAPE_CUSTOM_URL` | 空 | 自定义 JSON 刮削端点；`%s` 会被替换为 URL 转义后的标题 |
 | `AI_TAG_BIN` | 空 | 外部 AI 打标工具（接收媒体路径参数，每行输出一个标签） |
 | `OIDC_ISSUER` / `OIDC_CLIENT_ID` / `OIDC_CLIENT_SECRET` / `OIDC_REDIRECT_URL` | 空 | OIDC 单点登录配置 |
+| `NOTIFY_WEBHOOK_URL` / `NOTIFY_APPRISE_URL` | 空 | 通知渠道（JSON Webhook、Apprise API） |
 
 ## 7. 常见问题
 
