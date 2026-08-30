@@ -110,3 +110,12 @@ func TestMoveToTrashRejectsDotDot(t *testing.T) {
 		t.Fatal("expected error for a path whose base is ..")
 	}
 }
+
+func TestMoveToTrashRejectsRelativePath(t *testing.T) {
+	env := newIntegrationEnv(t)
+	libID := env.insertLibrary(t, false)
+	videoID := env.insertVideo(t, libID, "Relative", ".mkv")
+	if _, err := env.app.moveToTrash(context.Background(), videoID, "relative/path.mkv"); err == nil {
+		t.Fatal("expected error for a relative media path")
+	}
+}
