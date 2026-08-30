@@ -371,6 +371,10 @@ back to the keyless TVMaze API, then AniList, then Wikipedia
 - NFO: `POST /api/libraries/{id}/export-nfo` writes a Kodi-style movie NFO next
   to each video and `/import-nfo` parses title/year/plot/genres back into the
   database (media.NFOFileFor/WriteNFO/ReadNFO)
+- Social (migration 025): `comments` + `ratings` tables back per-video comment
+  CRUD (`GET|POST /api/videos/{id}/comments`, `DELETE /api/comments/{id}`),
+  1-5 star ratings (`GET /api/videos/{id}/ratings`, `PUT /api/videos/{id}/rating`),
+  and `GET /api/feed` returns recent comments + favorites
 
 ### 3.10 Key design decisions
 
