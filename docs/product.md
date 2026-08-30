@@ -204,6 +204,7 @@ most important ones:
 | `SCAN_WORKERS` | `4` | Parallel scanning workers |
 | `WATCH_INTERVAL` | `30` | Seconds between automatic incremental scans; `0` disables |
 | `YTDLP_PATH` | `yt-dlp` on PATH | yt-dlp binary used by the Downloads queue |
+| `HLS_HW_ACCEL` | empty (software x264) | HLS video encoder: videotoolbox, nvenc or qsv; empty uses libx264 |
 
 ## 7. FAQ
 
