@@ -148,6 +148,12 @@ subtitle_tracks -- id, video_id(FK, ON DELETE CASCADE), position, lang, title,
                 --   stream_index（多言語字幕トラック）
 user_subtitle_prefs -- PK(user_id, video_id), track_id(FK, ON DELETE CASCADE),
                 --   updated_at（ユーザー別の既定字幕トラック）
+uploads         -- id, filename, target_path, total_size, chunk_size,
+                --   status(uploading|completed|failed), error, タイムスタンプ
+                --   （チャンクアップロードセッション。チャンクは DATA_DIR/uploads/<id>/）
+downloads       -- id, url, title, target_path, format, status(queued|downloading|
+                --   completed|failed|canceled), progress, error, interval_secs,
+                --   last_run_at, タイムスタンプ（yt-dlp ジョブ、定期実行対応）
 ```
 
 主要インデックス：`videos(lower(title))`、`videos(library_id)`、部分インデックス
@@ -225,6 +231,10 @@ erDiagram
 ルートごとに 1 つ）と差分スキャンを組み合わせます。変更ファイル（サイズが同じ
 変更を含む）は数秒以内に再プローブされ、削除されたファイル/ディレクトリは
 即座に利用不可に。さらに `WATCH_INTERVAL` ごとの全量差分スキャンも保険として継続
+
+ライブラリフォルダに別経路で届いたファイル（チャンクアップロードの完了、
+yt-dlp ダウンロードの完了、外部からのコピーなど）も同じ watcher が検出し、
+自動的に取り込まれます。
 
 **ドラマ自動グループ化**：スキャン後に `rebuildSeries` がタイトルからエピソード
 マーカー（`S01E01`、`EP1`、`E01`、`第1集`、末尾のかっこ数字など）を解析し、
