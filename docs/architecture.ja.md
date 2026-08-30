@@ -373,6 +373,10 @@ Wikipedia の順に自動フォールバック（`TVMAZE_ENABLED=0` / `ANILIST_E
   `theme`/`custom_title`/`hide_nav` を受け付け、`share_tokens` に保存して公開
   info エンドポイントで返却。共有ページはこれらを適用し、`?embed=1` で
   iframe 埋め込み用に装飾を非表示にします
+- 通知：`media.Notifier` が `NOTIFY_WEBHOOK_URL` や Apprise API
+  （`NOTIFY_APPRISE_URL`）へ JSON を送信。スキャン完了/失敗、yt-dlp ダウンロード
+  完了/失敗、アップロード完了イベントをカバー。
+  `POST /api/admin/notify/test` でテストイベントを送信できます
 
 ### 3.10 主要な設計判断
 
