@@ -26,6 +26,7 @@ type App struct {
 	scraper     *media.Scraper
 	dl          *media.Downloader
 	subProvider media.SubtitleProvider
+	live        *media.LiveManager
 }
 
 func New(cfg config.Config, pool *pgxpool.Pool) (*App, error) {
@@ -43,6 +44,7 @@ func New(cfg config.Config, pool *pgxpool.Pool) (*App, error) {
 		hls:     media.NewHLSManager(cfg.DataDir, media.ResolveTool("ffmpeg"), cfg.HLSHWAccel),
 		scraper: media.NewScraper(pool, cfg.DataDir, cfg.TMDBAPIKey),
 		dl:      media.NewDownloader(pool, cfg.YtDLPPath),
+		live:    media.NewLiveManager(cfg.DataDir, media.ResolveTool("ffmpeg")),
 	}
 	app.hls.SetVAAPIDevice(cfg.HLSVAAPIDevice)
 	app.hls.SetToneMap(cfg.HLSToneMap)
@@ -162,6 +164,15 @@ func (a *App) Routes() http.Handler {
 	mux.HandleFunc("GET /api/watch/rooms/{id}", authUser(a.getWatchRoom))
 	mux.HandleFunc("POST /api/watch/rooms/{id}/join", authUser(a.joinWatchRoom))
 	mux.HandleFunc("PUT /api/watch/rooms/{id}", authUser(a.updateWatchRoom))
+
+	mux.HandleFunc("GET /api/live", authUser(a.listLiveStreams))
+	mux.HandleFunc("POST /api/live", authAdmin(a.createLiveStream))
+	mux.HandleFunc("GET /api/live/{id}", authUser(a.getLiveStream))
+	mux.HandleFunc("POST /api/live/{id}/start", authAdmin(a.startLiveStream))
+	mux.HandleFunc("POST /api/live/{id}/stop", authAdmin(a.stopLiveStream))
+	mux.HandleFunc("GET /api/live/{id}/hls/{file...}", authUser(a.liveHLS))
+	mux.HandleFunc("GET /api/live/{id}/chat", authUser(a.listChatMessages))
+	mux.HandleFunc("POST /api/live/{id}/chat", authUser(a.sendChatMessage))
 
 	mux.HandleFunc("GET /api/playlists", authUser(a.listPlaylists))
 	mux.HandleFunc("POST /api/playlists", authUser(a.createPlaylist))

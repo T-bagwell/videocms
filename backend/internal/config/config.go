@@ -26,6 +26,7 @@ type Config struct {
 	SubtitleOSUser     string
 	SubtitleOSPassword string
 	SubtitleOSAPIKey   string
+	RTMPIngestURL      string
 }
 
 func Load() Config {
@@ -47,6 +48,7 @@ func Load() Config {
 		SubtitleOSUser:     os.Getenv("SUBTITLE_OS_USERNAME"),
 		SubtitleOSPassword: os.Getenv("SUBTITLE_OS_PASSWORD"),
 		SubtitleOSAPIKey:   os.Getenv("SUBTITLE_OS_API_KEY"),
+		RTMPIngestURL:      envOr("RTMP_INGEST_URL", "rtmp://localhost:1935/live"),
 	}
 	if cfg.Addr != "" && cfg.Addr[0] != ':' {
 		cfg.Addr = ":" + cfg.Addr
