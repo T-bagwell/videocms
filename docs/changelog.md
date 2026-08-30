@@ -20,6 +20,9 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Multi-audio HLS playback: videos with several audio streams get a separate
+  HLS audio track per stream (`EXT-X-MEDIA` AUDIO group), and the player shows
+  an audio track selector so you can switch without restarting playback
 - Frontend API base URL is configurable for separate deployments: build with
   `VITE_API_BASE_URL` or inject `window.__VIDEOCMS_API_BASE__` at runtime
 - Configurable CORS: `CORS_ORIGINS` (comma-separated) restricts which browser
