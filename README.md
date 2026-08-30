@@ -283,7 +283,7 @@ Planned work is informed by feature sets of similar self-hosted video projects
 - [x] Storage pools: local, S3-compatible and SFTP, routed from the admin UI
 - [x] Background-jobs dashboard (monitor / cancel / retry) + richer system stats
 - [x] Scheduled maintenance: re-scan, health checks, metadata backup/restore
-- [ ] Webhooks + mature public REST API for third-party automation
+- [x] Webhooks + mature public REST API for third-party automation
 - [ ] PWA with offline downloads and polished mobile UX
 
 ## Contributing
