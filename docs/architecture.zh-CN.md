@@ -197,9 +197,11 @@ erDiagram
   `-ss <start> -i <input> -c:v libx264 -preset veryfast -crf 23
   -vf scale=<width>:-2 -force_key_frames expr:gte(t,n_forced*6) -c:a aac -b:a 96k
   -f hls -hls_time 6 -hls_list_size 0 -hls_flags independent_segments`
-- 视频编码默认使用软件 x264；`HLS_HW_ACCEL=videotoolbox|nvenc|qsv` 可切换到
-  硬件编码器（`h264_videotoolbox` / `h264_nvenc` / `h264_qsv`），非法值会
-  直接使会话启动失败，而不是静默降级
+- 视频编码默认使用软件 x264；`HLS_HW_ACCEL=videotoolbox|nvenc|qsv|vaapi` 可切换到
+  硬件编码器（`h264_videotoolbox` / `h264_nvenc` / `h264_qsv` / `h264_vaapi`），
+  VAAPI 设备由 `HLS_VAAPI_DEVICE` 指定并使用 `hwupload`/`scale_vaapi` 管线；
+  `HLS_TONE_MAP=1` 会在 filter 链前置软件 `zscale`+`tonemap` 做 HDR→SDR；
+  非法取值直接使会话启动失败，而不是静默降级
 - 每档写入 `data/hls/<video-id>/v<宽度>/`；服务端生成引用所有档位、并为每条字幕轨
   输出一个 `#EXT-X-MEDIA` 条目（`subs/<轨道id>/playlist.m3u8`，内嵌轨首次请求时
   按需提取）的 master 播放列表。清单随转码增长，ffmpeg 结束后由服务端追加
