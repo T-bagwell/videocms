@@ -31,14 +31,14 @@ func TestSkipIntervalCRUD(t *testing.T) {
 	}
 
 	// Upsert replaces the interval.
-	status, d = doJSON(t, "PUT", env.server.URL+"/api/videos/"+videoID.String()+"/skip-interval", token,
+	status, _ = doJSON(t, "PUT", env.server.URL+"/api/videos/"+videoID.String()+"/skip-interval", token,
 		map[string]any{"kind": "intro", "start_sec": 10, "end_sec": 90})
 	if status != http.StatusOK {
 		t.Fatalf("upsert status = %d", status)
 	}
 
 	// Both kinds visible after adding credits.
-	status, d = doJSON(t, "PUT", env.server.URL+"/api/videos/"+videoID.String()+"/skip-interval", token,
+	status, _ = doJSON(t, "PUT", env.server.URL+"/api/videos/"+videoID.String()+"/skip-interval", token,
 		map[string]any{"kind": "credits", "start_sec": 3600, "end_sec": 3750})
 	if status != http.StatusOK {
 		t.Fatalf("put credits status = %d", status)
@@ -60,7 +60,7 @@ func TestSkipIntervalCRUD(t *testing.T) {
 	}
 
 	// Delete credits only.
-	status, d = doJSON(t, "DELETE", env.server.URL+"/api/videos/"+videoID.String()+"/skip-interval?kind=credits", token, nil)
+	status, _ = doJSON(t, "DELETE", env.server.URL+"/api/videos/"+videoID.String()+"/skip-interval?kind=credits", token, nil)
 	if status != http.StatusOK {
 		t.Fatalf("delete status = %d", status)
 	}
