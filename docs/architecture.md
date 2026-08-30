@@ -400,6 +400,11 @@ back to the keyless TVMaze API, then AniList, then Wikipedia
 - Jobs dashboard: `GET /api/admin/jobs` aggregates scans, uploads, downloads
   and live streams into one list, and `GET /api/admin/system` reports
   free/total disk bytes; the admin UI offers contextual actions per job
+- Maintenance: `StartMaintenance` runs every `MAINT_INTERVAL_HOURS` — full JSON
+  backup to `DATA_DIR/backups` (retention `MAINT_BACKUP_RETENTION`), per-library
+  health checks, and optional rescans (`MAINT_RESCAN=1`); manual trigger at
+  `POST /api/admin/maintenance/run`, backups listed/downloaded at
+  `GET /api/admin/backups[/{name}]`
 
 ### 3.10 Key design decisions
 
