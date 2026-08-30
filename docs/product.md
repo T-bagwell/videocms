@@ -212,7 +212,9 @@ most important ones:
 | `SCAN_WORKERS` | `4` | Parallel scanning workers |
 | `WATCH_INTERVAL` | `30` | Seconds between automatic incremental scans; `0` disables |
 | `YTDLP_PATH` | `yt-dlp` on PATH | yt-dlp binary used by the Downloads queue |
-| `HLS_HW_ACCEL` | empty (software x264) | HLS video encoder: videotoolbox, nvenc or qsv; empty uses libx264 |
+| `HLS_HW_ACCEL` | empty (software x264) | HLS video encoder: videotoolbox, nvenc, qsv or vaapi; empty uses libx264 |
+| `HLS_VAAPI_DEVICE` | `/dev/dri/renderD128` | VAAPI render device (with `HLS_HW_ACCEL=vaapi`) |
+| `HLS_TONE_MAP` | `0` | `1` enables HDR→SDR tone mapping in HLS transcoding |
 | `SUBTITLE_OS_USERNAME` / `SUBTITLE_OS_PASSWORD` / `SUBTITLE_OS_API_KEY` | empty | OpenSubtitles credentials for the online subtitle search |
 
 ## 7. FAQ
