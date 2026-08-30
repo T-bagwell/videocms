@@ -159,6 +159,42 @@ func TestHWEncodeOpts(t *testing.T) {
 	}
 }
 
+func TestHWEncodePlan(t *testing.T) {
+	vaapi, err := hwEncodePlan("vaapi", "/dev/dri/renderD129", false)
+	if err != nil {
+		t.Fatalf("vaapi plan: %v", err)
+	}
+	if got := strings.Join(vaapi.global, " "); !strings.Contains(got, "-vaapi_device /dev/dri/renderD129") ||
+		!strings.Contains(got, "-hwaccel vaapi") {
+		t.Fatalf("vaapi global = %q", got)
+	}
+	if got := strings.Join(vaapi.codec, " "); got != "-c:v h264_vaapi -b:v 3000k" {
+		t.Fatalf("vaapi codec = %q", got)
+	}
+	if !strings.Contains(vaapi.scale, "hwupload,scale_vaapi=w=") {
+		t.Fatalf("vaapi scale = %q", vaapi.scale)
+	}
+
+	tone, err := hwEncodePlan("nvenc", "", true)
+	if err != nil {
+		t.Fatalf("tone plan: %v", err)
+	}
+	if !strings.Contains(tone.scale, "tonemap=hable") || !strings.Contains(tone.scale, "scale=") {
+		t.Fatalf("tone scale = %q", tone.scale)
+	}
+	plain, err := hwEncodePlan("", "", false)
+	if err != nil {
+		t.Fatalf("software plan: %v", err)
+	}
+	if strings.Contains(plain.scale, "tonemap") {
+		t.Fatalf("software scale should not tonemap: %q", plain.scale)
+	}
+
+	if _, err := hwEncodePlan("bogus", "", false); err == nil {
+		t.Fatal("bogus accel should error")
+	}
+}
+
 func TestIsImageSubtitleCodec(t *testing.T) {
 	for _, c := range []string{"hdmv_pgs_subtitle", "DVD_SUBTITLE", "dvb_subtitle"} {
 		if !IsImageSubtitleCodec(c) {
