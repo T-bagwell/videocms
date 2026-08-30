@@ -150,6 +150,7 @@ make serve                                 # UI をビルドし :8080 で一括�
 | `WIKIPEDIA_LANG` / `WIKIPEDIA_ENABLED` | `en` / `1` | 免キー Wikipedia フォールバックの言語版とスイッチ |
 | `SCAN_WORKERS` | `4` | 並列スキャンワーカー数（1-16） |
 | `WATCH_INTERVAL` | `30` | 増分スキャンの保険間隔（fsnotify イベントは即時反映）。`0` で監視無効 |
+| `HLS_HW_ACCEL` | 空（ソフトウェア x264） | HLS ビデオエンコーダー：`videotoolbox`、`nvenc` または `qsv`。空なら libx264 |
 | `YTDLP_PATH` | PATH 上の `yt-dlp` | ダウンロードキューが使う yt-dlp バイナリ |
 | `WEB_ROOT` | 自動（`frontend/dist`） | 単一サービスモードで配信するフロントエンド。未設定なら API 専用デプロイ |
 | `CORS_ORIGINS` | 空（`*`） | API を呼び出せるブラウザオリジン（カンマ区切り。フロント分離デプロイ用） |
