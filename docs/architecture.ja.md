@@ -89,6 +89,8 @@ backend/
       hls.go                  HLS トランスコードセッション管理
       stream.go               HTTP Range ストリーミング
       segment.go              HLS セグメントファイル名検証
+      tracks.go               ffprobe ストリーム一覧（リマックスDL用）
+      downloader.go           yt-dlp ジョブランナー（キュー + 定期実行）
     api/
       router.go               ルーティング、CORS / ログ / リカバリミドルウェア
       json.go                 JSON ヘルパー
@@ -255,6 +257,16 @@ Wikipedia の順に自動フォールバック（`TVMAZE_ENABLED=0` / `ANILIST_E
   入力はクリーンな絶対パスに正規化され、相対パスや `..` は `/` より下に解決されます
 - ライブラリ作成（`POST /api/libraries`）はサーバーの絶対パスのみ受け付けます。
   相対パスは拒否され、パスは `filepath.Clean` で正規化されます
+- アップロード：`GET|POST /api/uploads`、`GET /api/uploads/{id}`、
+  `PUT /api/uploads/{id}/chunk/{index}`、`POST /api/uploads/{id}/complete`、
+  `DELETE /api/uploads/{id}` — サーバーの絶対パスへのチャンク/再開対応アップロード。
+  完了ファイルはライブラリのファイル監視で自動取り込み
+- ダウンロード：`GET|POST /api/downloads`、`DELETE /api/downloads/{id}`、
+  `POST /api/downloads/{id}/retry` — yt-dlp キュー、間隔指定による繰り返し対応。
+  バックグラウンドワーカー（`media.Downloader`）が順次実行し進捗を記録
+- リマックスダウンロード：`GET /api/videos/{id}/tracks` で音声/字幕ストリームを一覧し、
+  `GET /api/videos/{id}/download/remux?container=…&audio=…&sub=…&sidecar=…`
+  で選択したトラックを再エンコードなしでストリーム出力
 - ユーザー管理：一覧 / ロール変更 / パスワード再設定 / 削除（ガード付き）
 - コンテンツブロック：`GET|POST /api/admin/blocked-titles`、
   `DELETE /api/admin/blocked-titles/{id}` — タイトルを大文字小文字を無視した

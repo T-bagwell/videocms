@@ -83,7 +83,8 @@ make serve                              # http://<LAN-IP>:8080
 - **Abspielen** startet; vorhandener Fortschritt wird automatisch fortgesetzt
 - H.264 MP4/WebM laufen nativ; MKV/HEVC werden live transkodiert
   (erste Wiedergabe dauert einige Sekunden; „Transkodiert abspielen“ als Fallback)
-- Download für Offline-/lokale Wiedergabe verfügbar
+- **Download** liefert einen MKV/MP4-Remux mit gewählter Audiospur und
+  Untertiteln (ohne Re-Encoding) oder die Originaldatei
 - Fortschritt wird alle 5 Sekunden sowie bei Pause/Ende gespeichert
 
 ### 4.3 Favoriten und Wiedergabelisten
@@ -148,6 +149,8 @@ Statistiken: Videos, Bibliotheken, Benutzer, Wiedergabelisten, Favoriten, Serien
 ### 5.2 Bibliotheken
 
 - Hinzufügen mit Name und **absolutem** Server-Pfad (inkl. Ordnerauswahl)
+- Register **Uploads**: fortsetzbare Block-Uploads in jeden Serverordner
+  (z. B. einen Bibliotheksordner) — fertige Dateien werden automatisch erfasst
 - **Scannen** indexiert neue/geänderte Dateien; **Scan stoppen** bricht ab; Fortschritt live
 - Das Löschen einer Bibliothek entfernt ihre Videoeinträge — Dateien auf der Platte bleiben
 - **Ordner öffnen** öffnet das Mediatheks-Verzeichnis auf dem Server im
@@ -160,6 +163,8 @@ Statistiken: Videos, Bibliotheken, Benutzer, Wiedergabelisten, Favoriten, Serien
 
 - Videos suchen und Titel/Jahr/Genres/Beschreibung bearbeiten
 - Eigenes Poster hochladen
+- **Download** öffnet einen Dialog zum Speichern als MKV oder MP4 mit gewählter
+  Audiospur und eingebetteten/hochgeladenen Untertiteln (Remux ohne Re-Encoding)
 - **Abrufen** holt Metadaten von TMDB (erfordert `TMDB_API_KEY` und Zugriff auf
   api.themoviedb.org)
 
@@ -176,6 +181,15 @@ Statistiken: Videos, Bibliotheken, Benutzer, Wiedergabelisten, Favoriten, Serien
   Weiterschauen und Wiedergabelisten — Freigabe stellt sie sofort wieder her
 - Nutzen Sie die Suche, um vor dem Blockieren zu prüfen, welche Medien ein Titel betrifft
 
+### 5.6 Downloads (yt-dlp)
+
+- Beliebige Video-/Playlist-/Kanal-URLs in die Warteschlange; Zielordner,
+  yt-dlp-Format und optionales Wiederholungsintervall (Stunden) wählen — der
+  Server lädt über yt-dlp herunter
+- Live-Fortschritt, Abbrechen und erneuter Versuch fehlgeschlagener Jobs
+- Fertige Dateien landen im gewählten Ordner und werden automatisch erfasst,
+  wenn er Teil einer Bibliothek ist
+
 ## 6. Konfiguration
 
 Alles wird über Umgebungsvariablen konfiguriert (vollständige Tabelle im README). Die wichtigsten:
@@ -188,6 +202,7 @@ Alles wird über Umgebungsvariablen konfiguriert (vollständige Tabelle im READM
 | `TMDB_API_KEY` | leer | Aktiviert Metadaten-Scraping |
 | `SCAN_WORKERS` | `4` | Parallele Scan-Worker |
 | `WATCH_INTERVAL` | `30` | Sekunden zwischen automatischen Inkrement-Scans; `0` deaktiviert |
+| `YTDLP_PATH` | `yt-dlp` im PATH | yt-dlp-Binary für die Download-Warteschlange |
 
 ## 7. FAQ
 

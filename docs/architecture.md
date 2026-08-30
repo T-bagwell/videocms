@@ -91,6 +91,8 @@ backend/
       hls.go                  HLS transcode session manager
       stream.go               HTTP Range streaming
       segment.go              HLS segment filename validation
+      tracks.go               ffprobe stream listing for remux downloads
+      downloader.go           yt-dlp job runner (queue + schedule)
     api/
       router.go               route table, CORS/logging/recovery middleware
       json.go                 JSON helpers
@@ -265,6 +267,17 @@ back to the keyless TVMaze API, then AniList, then Wikipedia
   resolve below `/`
 - Library creation (`POST /api/libraries`) requires an absolute server path;
   relative paths are rejected and the path is normalized with `filepath.Clean`
+- Uploads: `GET|POST /api/uploads`, `GET /api/uploads/{id}`,
+  `PUT /api/uploads/{id}/chunk/{index}`, `POST /api/uploads/{id}/complete`,
+  `DELETE /api/uploads/{id}` — chunked, resumable uploads into any absolute
+  server folder; finished files are picked up by the library file watcher
+- Downloads: `GET|POST /api/downloads`, `DELETE /api/downloads/{id}`,
+  `POST /api/downloads/{id}/retry` — yt-dlp queue with an optional repeat
+  interval; a background worker (`media.Downloader`) runs jobs one at a time
+  and records progress
+- Remux download: `GET /api/videos/{id}/tracks` lists audio and subtitle
+  streams, and `GET /api/videos/{id}/download/remux?container=…&audio=…&sub=…&sidecar=…`
+  streams a no-re-encode copy with the selected tracks
 - User management: list / change role / reset password / delete (with guards)
 - Content blocking: `GET|POST /api/admin/blocked-titles`,
   `DELETE /api/admin/blocked-titles/{id}` — titles are matched as

@@ -39,7 +39,8 @@ favorites, playlists — and numbered files automatically group into TV Shows.
 | 🔍 Scanning | Recursive discovery of mp4/mkv/webm/avi/mov/ts…; parallel probing (4 workers, `SCAN_WORKERS`); live progress; **cancel anytime**; skips macOS `._` files and `.m3u8` stream folders |
 | 🏷️ Metadata | ffprobe extracts codec/resolution/duration; posters generated from the video; editable title/year/synopsis/genres; optional **TMDB scraping** |
 | 📺 TV Shows | Numbered files (`S01E01`, `EP1`, `第1集`, `Show01Title`…) auto-group into series sorted by episode; season-aware; play-all with continuous playback |
-| ▶️ Playback | H.264/WebM play natively (HTTP Range); **MKV/HEVC transcoded to adaptive multi-quality HLS on the fly** (quality selector); subtitles auto-detected (SRT→WebVTT), embedded-subtitle extraction, upload, **multi-language switching** and per-user subtitle preference; download for offline |
+| ▶️ Playback | H.264/WebM play natively (HTTP Range); **MKV/HEVC transcoded to adaptive multi-quality HLS on the fly** (quality selector); subtitles auto-detected (SRT→WebVTT), embedded-subtitle extraction, upload, **multi-language switching** and per-user subtitle preference; **download as MKV/MP4 with a chosen audio track and subtitles (remuxed, no re-encode)** |
+| ⬆️ Uploads & downloads | Admin **Uploads** tab: chunked, resumable uploads into any server folder (auto-indexed inside libraries); **yt-dlp** download queue with optional scheduled repeats |
 | 🔗 Sharing | Short-lived public share links for **videos, TV shows and playlists** (signed, expiring, revocable, optional password and domain allow-list) — anyone with the link can watch without an account; content blocking is respected |
 | 👤 Personal | Continue watching, favorites (videos **and** series), playlists with sequential playback |
 | 🔐 Users | Register/login with JWT; admin/user roles; admin user management with safety guards |
@@ -137,6 +138,7 @@ All settings are environment variables:
 | `DATA_DIR` | `data` | Posters + HLS segments |
 | `ADMIN_USERNAME` / `ADMIN_PASSWORD` | admin / admin123 | Initial admin |
 | `FFPROBE_BIN` / `FFMPEG_BIN` | auto-detect | Tool paths (Homebrew fallback) |
+| `YTDLP_PATH` | `yt-dlp` on PATH | yt-dlp binary used by the Downloads queue |
 | `TMDB_API_KEY` / `TMDB_LANGUAGE` | empty / zh-CN | Metadata scraping; without a key the free TVMaze, AniList and Wikipedia APIs are used |
 | `TVMAZE_ENABLED` | `1` | Set `0` to disable the keyless TVMaze metadata fallback |
 | `ANILIST_ENABLED` | `1` | Set `0` to disable the keyless AniList metadata fallback |
@@ -209,9 +211,9 @@ Planned work is informed by feature sets of similar self-hosted video projects
 
 **Upload & download**
 
-- [ ] Chunked, resumable browser uploads with a queue-based upload manager
-- [ ] Download as MP4/MKV with selectable audio/subtitle tracks (no re-encode)
-- [ ] yt-dlp integration: pull videos/channels from online sites on a schedule
+- [x] Chunked, resumable browser uploads with a queue-based upload manager
+- [x] Download as MP4/MKV with selectable audio/subtitle tracks (no re-encode)
+- [x] yt-dlp integration: pull videos/channels from online sites on a schedule
 
 **Playback & subtitles**
 

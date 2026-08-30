@@ -84,7 +84,8 @@ Open the web UI and sign in with the initial administrator **admin / admin123**
 - **Play** starts playback; if you have progress it resumes automatically
 - H.264 MP4 / WebM play natively; MKV/HEVC are transcoded on the fly
   (first playback takes a few seconds; “Transcode play” is offered as a fallback)
-- Download is available for offline/local playback
+- **Download** a remuxed copy as MKV or MP4 with a chosen audio track and
+  subtitles (no re-encode), or grab the original file for offline playback
 - Progress is saved every 5 seconds and on pause/end — visible in Continue Watching
 
 ### 4.3 Favorites & playlists
@@ -147,6 +148,8 @@ Stats: videos, libraries, users, playlists, favorites, series and storage used.
 ### 5.2 Libraries
 
 - Add libraries with a name and an absolute server path (folder picker included)
+- **Uploads** tab: chunked, resumable uploads into any server folder (e.g. a
+  library folder) — finished files are indexed automatically
 - **Scan** indexes new/changed files; **Stop scan** cancels; progress is live
 - Deleting a library removes its video records — files on disk are kept
 - **Open folder** opens the library directory on the server with the system
@@ -159,6 +162,8 @@ Stats: videos, libraries, users, playlists, favorites, series and storage used.
 
 - Search any video and edit title/year/genres/synopsis
 - Upload a custom poster
+- **Download** opens a dialog to save the video as MKV or MP4 with a chosen
+  audio track and embedded/uploaded subtitles (remuxed without re-encoding)
 - **Scrape** fetches metadata from TMDB (requires `TMDB_API_KEY` and network
   access to api.themoviedb.org)
 
@@ -175,6 +180,14 @@ Stats: videos, libraries, users, playlists, favorites, series and storage used.
   continue watching and playlists — unblocking restores them immediately
 - Use the search box to preview which media a title would block before adding it
 
+### 5.6 Downloads (yt-dlp)
+
+- Queue any video/playlist/channel URL; pick a target folder, a yt-dlp format
+  and an optional repeat interval (hours) — the server downloads via yt-dlp
+- Live progress, cancel, and retry failed jobs
+- Finished files land in the chosen folder and are indexed automatically if
+  it is inside a library
+
 ## 6. Configuration
 
 All settings are environment variables (see the README for the full table). The
@@ -188,6 +201,7 @@ most important ones:
 | `TMDB_API_KEY` | empty | Enables metadata scraping |
 | `SCAN_WORKERS` | `4` | Parallel scanning workers |
 | `WATCH_INTERVAL` | `30` | Seconds between automatic incremental scans; `0` disables |
+| `YTDLP_PATH` | `yt-dlp` on PATH | yt-dlp binary used by the Downloads queue |
 
 ## 7. FAQ
 

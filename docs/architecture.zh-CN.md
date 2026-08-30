@@ -89,6 +89,8 @@ backend/
       hls.go                  HLS 转码会话管理
       stream.go               HTTP Range 流媒体
       segment.go              HLS 分片文件名校验
+      tracks.go               ffprobe 流信息查询（转封装下载用）
+      downloader.go           yt-dlp 任务执行器（队列 + 定时）
     api/
       router.go               路由表、CORS/日志/恢复中间件
       json.go                 JSON 工具
@@ -249,6 +251,16 @@ AniList 与 Wikipedia（`TVMAZE_ENABLED=0` / `ANILIST_ENABLED=0` /
   绝对路径，相对路径和 `..` 段都会解析在 `/` 之下
 - 创建媒体库（`POST /api/libraries`）要求服务器绝对路径；相对路径会被拒绝，
   路径经 `filepath.Clean` 归一化
+- 上传：`GET|POST /api/uploads`、`GET /api/uploads/{id}`、
+  `PUT /api/uploads/{id}/chunk/{index}`、`POST /api/uploads/{id}/complete`、
+  `DELETE /api/uploads/{id}` — 向任意服务器绝对路径分片可续传上传；
+  完成后由媒体库文件监听自动收录
+- 下载：`GET|POST /api/downloads`、`DELETE /api/downloads/{id}`、
+  `POST /api/downloads/{id}/retry` — yt-dlp 下载队列，支持按间隔重复；
+  后台 worker（`media.Downloader`）逐个执行并记录进度
+- 转封装下载：`GET /api/videos/{id}/tracks` 列出音轨/字幕流，
+  `GET /api/videos/{id}/download/remux?container=…&audio=…&sub=…&sidecar=…`
+  以所选轨道流式输出无需重编码的副本
 - 用户管理：列表 / 改角色 / 重置密码 / 删除（带守卫）
 - 内容屏蔽：`GET|POST /api/admin/blocked-titles`、
   `DELETE /api/admin/blocked-titles/{id}` — 标题按不区分大小写的子串匹配；

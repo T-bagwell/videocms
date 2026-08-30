@@ -83,7 +83,8 @@ Ouvrez l’interface et connectez-vous avec l’administrateur initial **admin /
 - **Lecture** démarre ; si vous avez de la progression, elle reprend automatiquement
 - H.264 MP4 / WebM se lisent nativement ; MKV/HEVC sont transcodés à la volée
   (première lecture : quelques secondes ; « Lecture transcodée » en secours)
-- Le téléchargement est disponible pour une lecture hors ligne
+- **Télécharger** un remux MKV ou MP4 avec la piste audio et les sous-titres
+  choisis (sans ré-encodage), ou récupérer le fichier original
 - La progression est sauvegardée toutes les 5 secondes et à la pause/fin
 
 ### 4.3 Favoris et listes de lecture
@@ -151,6 +152,9 @@ Statistiques : vidéos, bibliothèques, utilisateurs, listes, favoris, séries e
 ### 5.2 Bibliothèques
 
 - Ajout avec un nom et un chemin serveur **absolu** (sélecteur de dossiers inclus)
+- Onglet **Téléversements** : téléversements en morceaux reprenables vers tout
+  dossier serveur (p. ex. un dossier de bibliothèque) — indexés automatiquement
+  une fois terminés
 - **Analyser** indexe les nouveautés ; **Arrêter l’analyse** annule ; progression en direct
 - Supprimer une bibliothèque retire ses enregistrements — les fichiers restent sur le disque
 - **Ouvrir le dossier** ouvre le répertoire de la médiathèque sur le serveur
@@ -163,6 +167,9 @@ Statistiques : vidéos, bibliothèques, utilisateurs, listes, favoris, séries e
 
 - Recherchez une vidéo et modifiez titre/année/genres/synopsis
 - Importez une affiche personnalisée
+- **Télécharger** ouvre une boîte de dialogue pour enregistrer la vidéo en MKV
+  ou MP4 avec la piste audio et les sous-titres intégrés/téléversés choisis
+  (remux sans ré-encodage)
 - **Récupérer** obtient les métadonnées de TMDB (nécessite `TMDB_API_KEY` et l’accès
   réseau à api.themoviedb.org)
 
@@ -179,6 +186,15 @@ Statistiques : vidéos, bibliothèques, utilisateurs, listes, favoris, séries e
   reprise de lecture et listes de lecture — le déblocage restaure immédiatement
 - Utilisez la recherche pour prévisualiser quels médias un titre bloquerait avant de l’ajouter
 
+### 5.6 Téléchargements (yt-dlp)
+
+- Mettez en file toute URL de vidéo/playlist/chaîne ; choisissez un dossier
+  cible, un format yt-dlp et un intervalle de répétition optionnel (heures) —
+  le serveur télécharge via yt-dlp
+- Progression en direct, annulation et nouvelle tentative après échec
+- Les fichiers finis arrivent dans le dossier choisi et sont indexés
+  automatiquement s’il fait partie d’une bibliothèque
+
 ## 6. Configuration
 
 Tout se configure par variables d’environnement (table complète dans le README). Principales :
@@ -191,6 +207,7 @@ Tout se configure par variables d’environnement (table complète dans le READM
 | `TMDB_API_KEY` | vide | Active le scraping de métadonnées |
 | `SCAN_WORKERS` | `4` | Workers d’analyse parallèles |
 | `WATCH_INTERVAL` | `30` | Secondes entre analyses incrémentales automatiques ; `0` désactive |
+| `YTDLP_PATH` | `yt-dlp` dans le PATH | Binaire yt-dlp utilisé par la file de téléchargements |
 
 ## 7. FAQ
 
