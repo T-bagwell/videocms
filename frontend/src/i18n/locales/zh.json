@@ -245,6 +245,7 @@
     "tabDownloads": "下载",
     "tabLive": "直播",
     "tabStorage": "存储池",
+    "tabJobs": "任务",
     "statsVideos": "视频总数",
     "statsLibraries": "媒体库",
     "statsUsers": "用户",
@@ -355,7 +356,18 @@
     "storageConfigInvalid": "配置必须是合法 JSON",
     "storageSaved": "存储池已保存",
     "storageHint": "远端池（S3/SFTP）通过本地挂载路径路由（如 s3fs/sshfs）；上传与下载可使用 pool://名称[/子路径] 作为目标。",
-    "storageEmpty": "还没有存储池。"
+    "storageEmpty": "还没有存储池。",
+    "jobsDiskFree": "磁盘剩余",
+    "jobsDiskTotal": "磁盘总量",
+    "jobsEmpty": "没有后台任务。",
+    "jobsKindScan": "扫描",
+    "jobsKindUpload": "上传",
+    "jobsKindDownload": "下载",
+    "jobsKindLive": "直播",
+    "jobsCancel": "取消",
+    "jobsRetry": "重试",
+    "jobsStart": "开始",
+    "jobsStop": "停止"
   },
   "picker": {
     "title": "选择服务器文件夹",

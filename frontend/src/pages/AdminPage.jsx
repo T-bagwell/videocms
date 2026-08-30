@@ -9,6 +9,7 @@ import UploadsAdmin from './UploadsAdmin.jsx';
 import DownloadsAdmin from './DownloadsAdmin.jsx';
 import LiveAdmin from './LiveAdmin.jsx';
 import StorageAdmin from './StorageAdmin.jsx';
+import JobsAdmin from './JobsAdmin.jsx';
 
 export default function AdminPage() {
   const [tab, setTab] = useState('overview');
@@ -45,6 +46,9 @@ export default function AdminPage() {
         <button className={tab === 'storage' ? 'tab active' : 'tab'} onClick={() => setTab('storage')}>
           {t('admin.tabStorage')}
         </button>
+        <button className={tab === 'jobs' ? 'tab active' : 'tab'} onClick={() => setTab('jobs')}>
+          {t('admin.tabJobs')}
+        </button>
       </div>
       {tab === 'overview' && <Overview />}
       {tab === 'libraries' && <Libraries />}
@@ -55,6 +59,7 @@ export default function AdminPage() {
       {tab === 'downloads' && <DownloadsAdmin />}
       {tab === 'live' && <LiveAdmin />}
       {tab === 'storage' && <StorageAdmin />}
+      {tab === 'jobs' && <JobsAdmin />}
     </div>
   );
 }

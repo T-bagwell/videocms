@@ -245,6 +245,7 @@
     "tabDownloads": "ダウンロード",
     "tabLive": "ライブ",
     "tabStorage": "ストレージ",
+    "tabJobs": "タスク",
     "statsVideos": "動画数",
     "statsLibraries": "ライブラリ",
     "statsUsers": "ユーザー",
@@ -355,7 +356,18 @@
     "storageConfigInvalid": "設定は有効な JSON にしてください",
     "storageSaved": "ストレージプールを保存しました",
     "storageHint": "リモートプール（S3/SFTP）はローカルマウントパス（例: s3fs/sshfs）経由でルーティングされます。アップロード先は pool://名前[/サブパス] を指定可能。",
-    "storageEmpty": "ストレージプールはまだありません。"
+    "storageEmpty": "ストレージプールはまだありません。",
+    "jobsDiskFree": "空きディスク",
+    "jobsDiskTotal": "ディスク合計",
+    "jobsEmpty": "バックグラウンドタスクはありません。",
+    "jobsKindScan": "スキャン",
+    "jobsKindUpload": "アップロード",
+    "jobsKindDownload": "ダウンロード",
+    "jobsKindLive": "ライブ",
+    "jobsCancel": "キャンセル",
+    "jobsRetry": "再試行",
+    "jobsStart": "開始",
+    "jobsStop": "停止"
   },
   "picker": {
     "title": "サーバーフォルダを選択",

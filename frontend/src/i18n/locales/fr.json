@@ -245,6 +245,7 @@
     "tabDownloads": "Téléchargements",
     "tabLive": "Direct",
     "tabStorage": "Stockage",
+    "tabJobs": "Tâches",
     "statsVideos": "Vidéos",
     "statsLibraries": "Bibliothèques",
     "statsUsers": "Utilisateurs",
@@ -355,7 +356,18 @@
     "storageConfigInvalid": "La config doit être un JSON valide",
     "storageSaved": "Pool de stockage enregistré",
     "storageHint": "Les pools distants (S3/SFTP) passent par leur chemin de montage local (p. ex. s3fs/sshfs) ; les téléversements peuvent cibler pool://nom[/sous-chemin].",
-    "storageEmpty": "Aucun pool de stockage."
+    "storageEmpty": "Aucun pool de stockage.",
+    "jobsDiskFree": "Disque libre",
+    "jobsDiskTotal": "Disque total",
+    "jobsEmpty": "Aucune tâche en arrière-plan.",
+    "jobsKindScan": "Analyse",
+    "jobsKindUpload": "Téléversement",
+    "jobsKindDownload": "Téléchargement",
+    "jobsKindLive": "Direct",
+    "jobsCancel": "Annuler",
+    "jobsRetry": "Réessayer",
+    "jobsStart": "Démarrer",
+    "jobsStop": "Arrêter"
   },
   "picker": {
     "title": "Choisir un dossier serveur",

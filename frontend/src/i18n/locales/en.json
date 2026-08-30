@@ -245,6 +245,7 @@
     "tabDownloads": "Downloads",
     "tabLive": "Live",
     "tabStorage": "Storage",
+    "tabJobs": "Jobs",
     "statsVideos": "Videos",
     "statsLibraries": "Libraries",
     "statsUsers": "Users",
@@ -355,7 +356,18 @@
     "storageConfigInvalid": "Config must be valid JSON",
     "storageSaved": "Storage pool saved",
     "storageHint": "Remote pools (S3/SFTP) are routed through their local mount path (e.g. s3fs/sshfs); uploads and downloads can target pool://name[/sub].",
-    "storageEmpty": "No storage pools yet."
+    "storageEmpty": "No storage pools yet.",
+    "jobsDiskFree": "Disk free",
+    "jobsDiskTotal": "Disk total",
+    "jobsEmpty": "No background jobs.",
+    "jobsKindScan": "Scan",
+    "jobsKindUpload": "Upload",
+    "jobsKindDownload": "Download",
+    "jobsKindLive": "Live",
+    "jobsCancel": "Cancel",
+    "jobsRetry": "Retry",
+    "jobsStart": "Start",
+    "jobsStop": "Stop"
   },
   "picker": {
     "title": "Select server folder",

@@ -245,6 +245,7 @@
     "tabDownloads": "Downloads",
     "tabLive": "Live",
     "tabStorage": "Speicher",
+    "tabJobs": "Aufträge",
     "statsVideos": "Videos",
     "statsLibraries": "Bibliotheken",
     "statsUsers": "Benutzer",
@@ -355,7 +356,18 @@
     "storageConfigInvalid": "Konfiguration muss gültiges JSON sein",
     "storageSaved": "Speicherpool gespeichert",
     "storageHint": "Remote-Pools (S3/SFTP) werden über ihren lokalen Mount-Pfad (z. B. s3fs/sshfs) geroutet; Uploads können pool://name[/Unterpfad] als Ziel nutzen.",
-    "storageEmpty": "Noch keine Speicherpools."
+    "storageEmpty": "Noch keine Speicherpools.",
+    "jobsDiskFree": "Freier Speicher",
+    "jobsDiskTotal": "Speicher gesamt",
+    "jobsEmpty": "Keine Hintergrundaufträge.",
+    "jobsKindScan": "Scan",
+    "jobsKindUpload": "Upload",
+    "jobsKindDownload": "Download",
+    "jobsKindLive": "Live",
+    "jobsCancel": "Abbrechen",
+    "jobsRetry": "Erneut",
+    "jobsStart": "Starten",
+    "jobsStop": "Stoppen"
   },
   "picker": {
     "title": "Serverordner auswählen",
