@@ -178,6 +178,8 @@ make serve                              # http://<局域网IP>:8080
   目标可使用 `pool://名称[/子路径]`
 - **任务看板**：统一查看扫描、上传、下载与直播（进度/错误/取消/重试/启停）
   以及磁盘用量
+- **定时维护**：自动 JSON 备份与健康检查（间隔与保留份数可配置）；管理员可
+  立即运行并下载备份
 
 ### 5.4 用户
 
@@ -221,6 +223,7 @@ make serve                              # http://<局域网IP>:8080
 | `AI_TAG_BIN` | 空 | 外部 AI 打标工具（接收媒体路径参数，每行输出一个标签） |
 | `OIDC_ISSUER` / `OIDC_CLIENT_ID` / `OIDC_CLIENT_SECRET` / `OIDC_REDIRECT_URL` | 空 | OIDC 单点登录配置 |
 | `NOTIFY_WEBHOOK_URL` / `NOTIFY_APPRISE_URL` | 空 | 通知渠道（JSON Webhook、Apprise API） |
+| `MAINT_INTERVAL_HOURS` / `MAINT_BACKUP_RETENTION` / `MAINT_RESCAN` | `24` / `7` / `0` | 维护间隔、备份保留份数、是否重扫 |
 
 ## 7. 常见问题
 
