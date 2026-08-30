@@ -17,6 +17,13 @@ All notable changes to VideoCMS are documented here.
 - Roadmap expanded with planned capabilities (uploads/downloads, playback &
   subtitles, metadata & AI, organization & search, sharing & social, storage &
   operations), benchmarked against similar self-hosted video projects
+- Documentation overhaul: architecture docs (en/zh-CN/ja) refreshed with the
+  full system diagram, ER diagram, schema listing, configuration table and
+  extension points; product user manuals (5 languages) gained offline saving,
+  parental PIN, smart collections and FAQ entries; the deployment guide now
+  documents the expanded REST API surface plus DLNA, SAML and SMTP setups; the
+  security policy covers DLNA allowlists, SAML keys, SMTP TLS and webhook
+  signatures
 
 ### Added
 
