@@ -252,6 +252,9 @@ The `HLSManager`:
   `GET|POST|DELETE /api/videos/{id}/tags` and `POST /api/videos/{id}/analyze`,
   which runs an external tagger (`AI_TAG_BIN`, one tag per stdout line) and
   stores auto tags; `GET /api/videos?tag=` filters
+- Recommendations: `GET /api/videos/{id}/similar` ranks other videos by shared
+  genres, year, series and tags; `GET /api/tags` powers the browse-page tag
+  cloud and `?tag=` filtering
 - If the requested `start` differs from the running session by more than one
   segment (6s), the session is killed and restarted at the new position (seek)
 - The manifest is rewritten on the fly so every segment URL carries `?token=`
