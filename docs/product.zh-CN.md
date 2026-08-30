@@ -180,7 +180,7 @@ make serve                              # http://<局域网IP>:8080
 - **分享定制**：可选择主题、自定义标题并隐藏导航；在链接后加 `?embed=1`
   即可在任意页面嵌入无装饰播放器
 - **通知**：可通过 Webhook 或 Apprise 接收扫描、上传与下载事件；管理员可从
-  概览页发送测试通知
+  概览页发送测试通知；配置 SMTP 后同样的事件也会以**邮件**送达
 - **存储池**：可配置本地、S3 兼容或 SFTP 池（含本地挂载路径）；上传与下载
   目标可使用 `pool://名称[/子路径]`
 - **任务看板**：统一查看扫描、上传、下载与直播（进度/错误/取消/重试/启停）
@@ -235,6 +235,7 @@ make serve                              # http://<局域网IP>:8080
 | `SAML_IDP_METADATA_URL` / `SAML_SP_CERT` / `SAML_SP_KEY` / `SAML_SP_ENTITY_ID` / `SAML_ACS_URL` | 空 | SAML 2.0 单点登录（IdP 元数据 URL、SP 证书/密钥路径、实体 ID、ACS URL） |
 | `DLNA_ENABLED` / `DLNA_FRIENDLY_NAME` / `DLNA_ALLOWED_IPS` | `0` / `VideoCMS` / 空（整个局域网） | UPnP/DLNA 媒体服务器开关、显示名称、逗号分隔的 IP/CIDR 白名单 |
 | `NOTIFY_WEBHOOK_URL` / `NOTIFY_APPRISE_URL` | 空 | 通知渠道（JSON Webhook、Apprise API） |
+| `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASSWORD` / `NOTIFY_EMAIL_FROM` / `NOTIFY_EMAIL_TO` | 空 / `587` | SMTP 邮件通知（465 隐式 TLS，其余走 STARTTLS） |
 | `MAINT_INTERVAL_HOURS` / `MAINT_BACKUP_RETENTION` / `MAINT_RESCAN` | `24` / `7` / `0` | 维护间隔、备份保留份数、是否重扫 |
 
 ## 7. 常见问题
