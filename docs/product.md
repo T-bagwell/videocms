@@ -217,6 +217,8 @@ Stats: videos, libraries, users, playlists, favorites, series and storage used.
 - **Scheduled maintenance**: automatic JSON backups and health checks
   (interval and retention configurable); admins can run it now and download
   backups
+- **Webhooks & API docs**: subscribe endpoints to signed events and browse the
+  OpenAPI document at `/api/openapi.json` for third-party automation
 
 ### 5.4 Users
 
