@@ -232,6 +232,11 @@ erDiagram
   （再生/一時停止・位置）を保持。メンバーは `GET /api/watch/rooms/{id}?token=…`
   を 2.5 秒ごとにポーリングし、PUT で状態を公開して緩く同期します。キャスト：
   ブラウザが対応していれば Web AirPlay ボタン（`webkitShowPlaybackUI`）を表示
+- ライブ配信：`live_streams` と `chat_messages`（マイグレーション 019）。
+  `LiveManager` が RTMP 取り込み（`RTMP_INGEST_URL` + ストリームごとのキー）を
+  ローリング HLS プレイリスト（`data/live/<id>/index.m3u8`）に変換。
+  視聴は `GET /api/live/{id}/hls/...`、チャットはポーリングの
+  `GET|POST /api/live/{id}/chat`
 - 要求された `start` が実行中セッションと 1 セグメント（6 秒）以上ずれている場合、
   セッションを終了して新しい位置で再開（シーク）
 - プレイリストは応答時に書き換えられ、各セグメント URL に `?token=` が付く
