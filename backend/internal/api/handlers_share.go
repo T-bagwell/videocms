@@ -34,27 +34,38 @@ func newShareToken() (string, error) {
 }
 
 type shareRequest struct {
-	Hours    int      `json:"hours"`
-	Password string   `json:"password"`
-	Domains  []string `json:"domains"`
+	Hours       int      `json:"hours"`
+	Password    string   `json:"password"`
+	Domains     []string `json:"domains"`
+	Theme       string   `json:"theme"`
+	CustomTitle string   `json:"custom_title"`
+	HideNav     bool     `json:"hide_nav"`
 }
 
 // parseShareRequest reads hours and an optional password from the request
 // body, returning the expiry hours and the bcrypt hash of the password ("" when
 // no password was set).
-func parseShareRequest(r *http.Request) (int, string, []string, error) {
+func parseShareRequest(r *http.Request) (int, string, []string, string, string, bool, error) {
 	hours := defaultShareHours
 	password := ""
 	domains := []string{}
+	theme := "default"
+	customTitle := ""
+	hideNav := false
 	if r.Body != nil {
 		var body shareRequest
 		if err := json.NewDecoder(io.LimitReader(r.Body, 1<<20)).Decode(&body); err != nil && err != io.EOF {
-			return hours, "", nil, err
+			return hours, "", nil, theme, customTitle, hideNav, err
 		}
 		if body.Hours > 0 {
 			hours = body.Hours
 		}
 		password = body.Password
+		if body.Theme != "" {
+			theme = body.Theme
+		}
+		customTitle = strings.TrimSpace(body.CustomTitle)
+		hideNav = body.HideNav
 		for _, d := range body.Domains {
 			d = normalizeDomain(d)
 			if d != "" {
@@ -65,14 +76,17 @@ func parseShareRequest(r *http.Request) (int, string, []string, error) {
 	if hours > 24*365 {
 		hours = 24 * 365
 	}
+	if len(customTitle) > 200 {
+		customTitle = customTitle[:200]
+	}
 	if password != "" {
 		hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 		if err != nil {
-			return hours, "", nil, err
+			return hours, "", nil, theme, customTitle, hideNav, err
 		}
 		password = string(hash)
 	}
-	return hours, password, domains, nil
+	return hours, password, domains, theme, customTitle, hideNav, nil
 }
 
 func normalizeDomain(d string) string {
@@ -95,15 +109,15 @@ func nullableUUID(id uuid.UUID) any {
 	return id
 }
 
-func (a *App) insertShare(ctx context.Context, scope string, videoID, seriesID, playlistID uuid.UUID, expires time.Time, passwordHash string, domains []string, userID uuid.UUID) (string, error) {
+func (a *App) insertShare(ctx context.Context, scope string, videoID, seriesID, playlistID uuid.UUID, expires time.Time, passwordHash string, domains []string, userID uuid.UUID, theme, customTitle string, hideNav bool) (string, error) {
 	token, err := newShareToken()
 	if err != nil {
 		return "", err
 	}
 	_, err = a.pool.Exec(ctx, `
-		INSERT INTO share_tokens (scope, video_id, series_id, playlist_id, token, expires_at, password_hash, allowed_domains, created_by)
-		VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`,
-		scope, nullableUUID(videoID), nullableUUID(seriesID), nullableUUID(playlistID), token, expires, passwordHash, domains, userID)
+		INSERT INTO share_tokens (scope, video_id, series_id, playlist_id, token, expires_at, password_hash, allowed_domains, created_by, theme, custom_title, hide_nav)
+		VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`,
+		scope, nullableUUID(videoID), nullableUUID(seriesID), nullableUUID(playlistID), token, expires, passwordHash, domains, userID, theme, customTitle, hideNav)
 	if err != nil {
 		return "", err
 	}
@@ -135,13 +149,13 @@ func (a *App) createVideoShare(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusNotFound, "video not found or not visible")
 		return
 	}
-	hours, passwordHash, domains, err := parseShareRequest(r)
+	hours, passwordHash, domains, theme, customTitle, hideNav, err := parseShareRequest(r)
 	if err != nil {
 		writeErr(w, http.StatusBadRequest, "invalid share request")
 		return
 	}
 	expires := time.Now().Add(time.Duration(hours) * time.Hour)
-	token, err := a.insertShare(r.Context(), "video", id, uuid.Nil, uuid.Nil, expires, passwordHash, domains, user.ID)
+	token, err := a.insertShare(r.Context(), "video", id, uuid.Nil, uuid.Nil, expires, passwordHash, domains, user.ID, theme, customTitle, hideNav)
 	if err != nil {
 		writeErr(w, http.StatusInternalServerError, "create share failed")
 		return
@@ -166,13 +180,13 @@ func (a *App) createSeriesShare(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusNotFound, "series not found or not visible")
 		return
 	}
-	hours, passwordHash, domains, err := parseShareRequest(r)
+	hours, passwordHash, domains, theme, customTitle, hideNav, err := parseShareRequest(r)
 	if err != nil {
 		writeErr(w, http.StatusBadRequest, "invalid share request")
 		return
 	}
 	expires := time.Now().Add(time.Duration(hours) * time.Hour)
-	token, err := a.insertShare(r.Context(), "series", uuid.Nil, id, uuid.Nil, expires, passwordHash, domains, user.ID)
+	token, err := a.insertShare(r.Context(), "series", uuid.Nil, id, uuid.Nil, expires, passwordHash, domains, user.ID, theme, customTitle, hideNav)
 	if err != nil {
 		writeErr(w, http.StatusInternalServerError, "create share failed")
 		return
@@ -189,7 +203,7 @@ func (a *App) createPlaylistShare(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusBadRequest, "invalid playlist id")
 		return
 	}
-	hours, passwordHash, domains, err := parseShareRequest(r)
+	hours, passwordHash, domains, theme, customTitle, hideNav, err := parseShareRequest(r)
 	if err != nil {
 		writeErr(w, http.StatusBadRequest, "invalid share request")
 		return
@@ -201,9 +215,9 @@ func (a *App) createPlaylistShare(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	tag, err := a.pool.Exec(r.Context(), `
-		INSERT INTO share_tokens (scope, playlist_id, token, expires_at, password_hash, allowed_domains, created_by)
-		SELECT 'playlist', id, $1, $2, $3, $4, $5 FROM playlists WHERE id=$6 AND user_id=$5`,
-		token, expires, passwordHash, domains, user.ID, id)
+		INSERT INTO share_tokens (scope, playlist_id, token, expires_at, password_hash, allowed_domains, created_by, theme, custom_title, hide_nav)
+		SELECT 'playlist', id, $1, $2, $3, $4, $5, $6, $7, $8 FROM playlists WHERE id=$9 AND user_id=$5`,
+		token, expires, passwordHash, domains, user.ID, theme, customTitle, hideNav, id)
 	if err != nil {
 		writeErr(w, http.StatusInternalServerError, "create share failed")
 		return
@@ -309,17 +323,20 @@ type shareTokenRow struct {
 	PlaylistID     uuid.UUID
 	PasswordHash   string
 	AllowedDomains []string
+	Theme          string
+	CustomTitle    string
+	HideNav        bool
 }
 
 func (a *App) resolveShareToken(r *http.Request, token string) (shareTokenRow, bool) {
 	var row shareTokenRow
 	err := a.pool.QueryRow(r.Context(), `
-		SELECT scope, expires_at, password_hash, allowed_domains,
+		SELECT scope, expires_at, password_hash, allowed_domains, theme, custom_title, hide_nav,
 		       COALESCE(video_id, '00000000-0000-0000-0000-000000000000'),
 		       COALESCE(series_id, '00000000-0000-0000-0000-000000000000'),
 		       COALESCE(playlist_id, '00000000-0000-0000-0000-000000000000')
 		FROM share_tokens WHERE token=$1 AND expires_at > now()`, token).
-		Scan(&row.Scope, &row.ExpiresAt, &row.PasswordHash, &row.AllowedDomains, &row.VideoID, &row.SeriesID, &row.PlaylistID)
+		Scan(&row.Scope, &row.ExpiresAt, &row.PasswordHash, &row.AllowedDomains, &row.Theme, &row.CustomTitle, &row.HideNav, &row.VideoID, &row.SeriesID, &row.PlaylistID)
 	if err != nil {
 		return shareTokenRow{}, false
 	}
@@ -500,9 +517,12 @@ func (a *App) shareInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	base := map[string]any{
-		"scope":      row.Scope,
-		"url":        "/share/" + token,
-		"expires_at": row.ExpiresAt,
+		"scope":        row.Scope,
+		"url":          "/share/" + token,
+		"expires_at":   row.ExpiresAt,
+		"theme":        row.Theme,
+		"custom_title": row.CustomTitle,
+		"hide_nav":     row.HideNav,
 	}
 
 	switch row.Scope {
