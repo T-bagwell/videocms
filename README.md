@@ -165,6 +165,7 @@ All settings are environment variables:
 | `AI_TAG_BIN` | empty | External AI tagging tool; receives the media path and prints one tag per line |
 | `OIDC_ISSUER` / `OIDC_CLIENT_ID` / `OIDC_CLIENT_SECRET` / `OIDC_REDIRECT_URL` | empty | OIDC single sign-on (discovery + authorization code flow) |
 | `NOTIFY_WEBHOOK_URL` / `NOTIFY_APPRISE_URL` | empty | Notification channels (JSON webhook, Apprise API) |
+| `MAINT_INTERVAL_HOURS` / `MAINT_BACKUP_RETENTION` / `MAINT_RESCAN` | `24` / `7` / `0` | Scheduled maintenance: backup interval, backup retention, enable rescans |
 | `WEB_ROOT` | auto (`frontend/dist`) | Built frontend for single-service mode; leave unset for API-only deployment |
 | `CORS_ORIGINS` | empty (`*`) | Comma-separated browser origins allowed to call the API (separate frontend deployments) |
 | `VITE_API_BASE_URL` | empty | Frontend build-time API base URL for cross-origin deployments (runtime override: `window.__VIDEOCMS_API_BASE__`) |
@@ -281,7 +282,7 @@ Planned work is informed by feature sets of similar self-hosted video projects
 
 - [x] Storage pools: local, S3-compatible and SFTP, routed from the admin UI
 - [x] Background-jobs dashboard (monitor / cancel / retry) + richer system stats
-- [ ] Scheduled maintenance: re-scan, health checks, metadata backup/restore
+- [x] Scheduled maintenance: re-scan, health checks, metadata backup/restore
 - [ ] Webhooks + mature public REST API for third-party automation
 - [ ] PWA with offline downloads and polished mobile UX
 
