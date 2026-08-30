@@ -263,7 +263,7 @@ Planned work is informed by feature sets of similar self-hosted video projects
 - [x] User-defined tags, smart collections, saved filters
 - [x] Full-text/fuzzy search over titles, synopsis, transcripts and tags
 - [x] Batch edit/organize (move, rename, re-tag) with recycle bin
-- [ ] NFO metadata import/export for Plex/Jellyfin/Kodi compatibility
+- [x] NFO metadata import/export for Plex/Jellyfin/Kodi compatibility
 
 **Users, sharing & social**
 
