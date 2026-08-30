@@ -35,6 +35,6 @@ func SeedAdmin(ctx context.Context, pool *pgxpool.Pool, username, password strin
 		user, string(hash), user); err != nil {
 		return err
 	}
-	log.Printf("created initial admin user %q (password %q) — change it after first login", user, pass)
+	log.Printf("created initial admin user %q — change its password after first login", user)
 	return nil
 }

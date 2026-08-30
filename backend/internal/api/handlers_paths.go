@@ -25,12 +25,10 @@ func (a *App) listServerPaths(w http.ResponseWriter, r *http.Request) {
 	if path == "" {
 		path = "/"
 	}
-	if !filepath.IsAbs(path) {
-		if abs, err := filepath.Abs(path); err == nil {
-			path = abs
-		}
-	}
-	path = filepath.Clean(path)
+	// Normalize user input into a clean, absolute path. Prepending "/" makes
+	// relative input resolve against the filesystem root and lets filepath.Clean
+	// clamp any ".." segments below the root, so the path can never escape it.
+	path = filepath.Clean("/" + path)
 
 	if st, err := os.Stat(path); err != nil || !st.IsDir() {
 		if home != "" && home != path {

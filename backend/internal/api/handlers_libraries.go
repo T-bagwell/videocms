@@ -58,11 +58,11 @@ func (a *App) createLibrary(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusBadRequest, "name and path are required")
 		return
 	}
-	abs, err := filepath.Abs(req.Path)
-	if err != nil {
-		writeErr(w, http.StatusBadRequest, "invalid path")
+	if !filepath.IsAbs(req.Path) {
+		writeErr(w, http.StatusBadRequest, "path must be an absolute server path")
 		return
 	}
+	abs := filepath.Clean("/" + req.Path)
 	st, err := os.Stat(abs)
 	if err != nil || !st.IsDir() {
 		writeErr(w, http.StatusBadRequest, "path does not exist or is not a directory: "+abs)
