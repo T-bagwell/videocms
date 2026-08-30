@@ -388,6 +388,10 @@ back to the keyless TVMaze API, then AniList, then Wikipedia
   `theme`/`custom_title`/`hide_nav`, stored on `share_tokens` and returned by
   the public info endpoint; the share page applies them and `?embed=1` hides
   chrome for iframe embedding
+- Notifications: `media.Notifier` posts JSON to `NOTIFY_WEBHOOK_URL` and/or the
+  Apprise API (`NOTIFY_APPRISE_URL`) for scan completed/failed, yt-dlp
+  download completed/failed and upload completed events; a test event is
+  available at `POST /api/admin/notify/test`
 
 ### 3.10 Key design decisions
 
