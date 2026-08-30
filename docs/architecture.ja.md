@@ -385,7 +385,10 @@ Wikipedia の順に自動フォールバック（`TVMAZE_ENABLED=0` / `ANILIST_E
 - 通知：`media.Notifier` が `NOTIFY_WEBHOOK_URL` や Apprise API
   （`NOTIFY_APPRISE_URL`）へ JSON を送信。スキャン完了/失敗、yt-dlp ダウンロード
   完了/失敗、アップロード完了イベントをカバー。
-  `POST /api/admin/notify/test` でテストイベントを送信できます
+  `POST /api/admin/notify/test` でテストイベントを送信できます。SMTP チャンネル
+  （`SMTP_HOST`/`SMTP_PORT`/`SMTP_USER`/`SMTP_PASSWORD`、
+  `NOTIFY_EMAIL_FROM`/`NOTIFY_EMAIL_TO`）は暗黙 TLS（465）または STARTTLS で
+  プレーンテキストメールを送信し、同じイベントを再利用します
 - ストレージプール（マイグレーション 029）：`storage_pools` が名前付きの
   ローカル/S3/SFTP プール（ローカルマウントパス + JSON 設定）を保持。
   管理は `GET|POST|PATCH|DELETE /api/admin/storage-pools` で行い、アップロード/
