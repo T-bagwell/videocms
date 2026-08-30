@@ -276,7 +276,16 @@
     "libUnblocked": "已解除媒体库「{{name}}」的屏蔽",
     "export": "导出数据",
     "import": "导入备份",
-    "importDone": "备份已导入：{{counts}}"
+    "importDone": "备份已导入：{{counts}}",
+    "healthCheck": "健康检查",
+    "healthRunning": "检查中…",
+    "healthChecked": "已检查 {{count}} 个视频",
+    "healthMissing": "{{n}} 个文件缺失",
+    "healthCorrupt": "{{n}} 个损坏/空文件",
+    "healthDuplicates": "{{count}} 个疑似重复（{{size}}）",
+    "healthKeepBest": "保留最佳版本（其余移入回收站）",
+    "healthMoved": "已将 {{count}} 个重复文件移入回收站",
+    "healthOk": "未发现问题。"
   },
   "picker": {
     "title": "选择服务器文件夹",

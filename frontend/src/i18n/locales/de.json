@@ -276,7 +276,16 @@
     "libUnblocked": "Bibliothek „{{name}}“ ist freigegeben",
     "export": "Daten exportieren",
     "import": "Backup importieren",
-    "importDone": "Backup importiert: {{counts}}"
+    "importDone": "Backup importiert: {{counts}}",
+    "healthCheck": "Gesundheitscheck",
+    "healthRunning": "Prüfe…",
+    "healthChecked": "{{count}} Videos geprüft",
+    "healthMissing": "{{n}} fehlende Dateien",
+    "healthCorrupt": "{{n}} beschädigte/leere Dateien",
+    "healthDuplicates": "{{count}} mögliche Duplikate ({{size}})",
+    "healthKeepBest": "Beste Version behalten (Rest in Papierkorb)",
+    "healthMoved": "{{count}} Duplikat(e) in den Papierkorb verschoben",
+    "healthOk": "Keine Probleme gefunden."
   },
   "picker": {
     "title": "Serverordner auswählen",

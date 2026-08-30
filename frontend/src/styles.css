@@ -331,6 +331,7 @@ label input, label textarea { margin-top: 6px; }
 .tag-auto { color: var(--warn); font-size: 10px; }
 .tag-remove { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 13px; padding: 0 2px; }
 .tag-add input { padding: 4px 8px; font-size: 12px; border-radius: 6px; }
+.health-report { margin-top: 10px; padding: 8px 12px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 4px; }
 .status-cancelled { background: rgba(243,156,18,0.15); color: var(--warn); }
 .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
 .small-muted { color: var(--muted); font-size: 12px; }

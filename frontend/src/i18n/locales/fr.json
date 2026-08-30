@@ -276,7 +276,16 @@
     "libUnblocked": "Bibliothèque « {{name}} » débloquée",
     "export": "Exporter les données",
     "import": "Importer la sauvegarde",
-    "importDone": "Sauvegarde importée : {{counts}}"
+    "importDone": "Sauvegarde importée : {{counts}}",
+    "healthCheck": "Contrôle de santé",
+    "healthRunning": "Vérification…",
+    "healthChecked": "{{count}} vidéos vérifiées",
+    "healthMissing": "{{n}} fichiers manquants",
+    "healthCorrupt": "{{n}} fichiers corrompus/vides",
+    "healthDuplicates": "{{count}} doublons possibles ({{size}})",
+    "healthKeepBest": "Garder la meilleure version (corbeille pour le reste)",
+    "healthMoved": "{{count}} doublon(s) déplacé(s) vers la corbeille",
+    "healthOk": "Aucun problème détecté."
   },
   "picker": {
     "title": "Choisir un dossier serveur",

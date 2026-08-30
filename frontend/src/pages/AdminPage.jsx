@@ -116,6 +116,8 @@ function Libraries() {
   const [pickerOpen, setPickerOpen] = useState(false);
   const [err, setErr] = useState('');
   const [msg, setMsg] = useState('');
+  const [healthReports, setHealthReports] = useState({});
+  const [healthBusy, setHealthBusy] = useState(new Set());
 
   function refresh() {
     api('/libraries').then((d) => setLibs(d.items)).catch((e) => setErr(e.message));
@@ -203,6 +205,35 @@ function Libraries() {
     }
   }
 
+  async function runHealth(l) {
+    setHealthBusy((prev) => new Set(prev).add(l.id));
+    setErr('');
+    try {
+      const d = await api(`/libraries/${l.id}/health`, { method: 'POST' });
+      setHealthReports((prev) => ({ ...prev, [l.id]: d }));
+    } catch (e) {
+      setErr(e.message);
+    } finally {
+      setHealthBusy((prev) => {
+        const next = new Set(prev);
+        next.delete(l.id);
+        return next;
+      });
+    }
+  }
+
+  async function keepBest(l) {
+    setErr('');
+    try {
+      const d = await api(`/libraries/${l.id}/health/keep-best`, { method: 'POST' });
+      setMsg(t('admin.healthMoved', { count: (d.moved || []).length }));
+      await runHealth(l);
+      refresh();
+    } catch (e) {
+      setErr(e.message);
+    }
+  }
+
   return (
     <div>
       {msg && <div className="toast toast-success">{msg}</div>}
@@ -282,11 +313,47 @@ function Libraries() {
                 <button className="btn small" onClick={() => openFolder(l)}>
                   📂 {t('admin.openFolder')}
                 </button>
+                <button className="btn small" onClick={() => runHealth(l)} disabled={healthBusy.has(l.id)}>
+                  {healthBusy.has(l.id) ? t('admin.healthRunning') : t('admin.healthCheck')}
+                </button>
                 <button className="btn small danger-ghost" onClick={() => toggleLibraryBlock(l)}>
                   {l.blocked ? t('admin.blockUnblock') : t('admin.blockLibrary')}
                 </button>
                 <button className="btn small danger-ghost" onClick={() => remove(l.id)}>{t('admin.delete')}</button>
               </div>
+              {healthReports[l.id] && (
+                <div className="health-report">
+                  <div className="muted small">{t('admin.healthChecked', { count: healthReports[l.id].checked })}</div>
+                  {healthReports[l.id].missing.length > 0 && (
+                    <div className="form-error small">
+                      {t('admin.healthMissing', { n: healthReports[l.id].missing.length })}:{' '}
+                      {healthReports[l.id].missing.join(', ')}
+                    </div>
+                  )}
+                  {healthReports[l.id].corrupt.length > 0 && (
+                    <div className="form-error small">
+                      {t('admin.healthCorrupt', { n: healthReports[l.id].corrupt.length })}:{' '}
+                      {healthReports[l.id].corrupt.join(', ')}
+                    </div>
+                  )}
+                  {healthReports[l.id].duplicates.map((g) => (
+                    <div key={g.size} className="muted small">
+                      {t('admin.healthDuplicates', { size: fmtBytes(g.size), count: g.count })}:{' '}
+                      {g.files.join(', ')}
+                    </div>
+                  ))}
+                  {healthReports[l.id].duplicates.length > 0 && (
+                    <button className="btn small ghost" onClick={() => keepBest(l)}>
+                      {t('admin.healthKeepBest')}
+                    </button>
+                  )}
+                  {healthReports[l.id].missing.length === 0 &&
+                    healthReports[l.id].corrupt.length === 0 &&
+                    healthReports[l.id].duplicates.length === 0 && (
+                      <div className="muted small">{t('admin.healthOk')}</div>
+                    )}
+                </div>
+              )}
             </div>
           ))}
         </div>

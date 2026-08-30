@@ -276,7 +276,16 @@
     "libUnblocked": "Library “{{name}}” is unblocked",
     "export": "Export data",
     "import": "Import backup",
-    "importDone": "Backup imported: {{counts}}"
+    "importDone": "Backup imported: {{counts}}",
+    "healthCheck": "Health check",
+    "healthRunning": "Checking…",
+    "healthChecked": "Checked {{count}} videos",
+    "healthMissing": "{{n}} missing files",
+    "healthCorrupt": "{{n}} corrupt/empty files",
+    "healthDuplicates": "{{count}} possible duplicates ({{size}})",
+    "healthKeepBest": "Keep best version (move rest to trash)",
+    "healthMoved": "Moved {{count}} duplicate(s) to trash",
+    "healthOk": "No issues found."
   },
   "picker": {
     "title": "Select server folder",

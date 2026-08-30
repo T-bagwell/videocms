@@ -276,7 +276,16 @@
     "libUnblocked": "ライブラリ「{{name}}」のブロックを解除しました",
     "export": "データをエクスポート",
     "import": "バックアップをインポート",
-    "importDone": "バックアップをインポートしました：{{counts}}"
+    "importDone": "バックアップをインポートしました：{{counts}}",
+    "healthCheck": "ヘルスチェック",
+    "healthRunning": "確認中…",
+    "healthChecked": "{{count}} 本の動画を確認しました",
+    "healthMissing": "{{n}} 件のファイルがありません",
+    "healthCorrupt": "{{n}} 件の破損/空ファイル",
+    "healthDuplicates": "重複の可能性 {{count}} 件（{{size}}）",
+    "healthKeepBest": "最良版を保持（他はゴミ箱へ）",
+    "healthMoved": "{{count}} 件の重複をゴミ箱に移動しました",
+    "healthOk": "問題は見つかりませんでした。"
   },
   "picker": {
     "title": "サーバーフォルダを選択",
