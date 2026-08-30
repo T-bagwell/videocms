@@ -213,6 +213,10 @@ erDiagram
 - 字幕同期：`GET /api/videos/{id}/subtitles/{trackId}?offset_ms=…` で全キューの
   タイミングを移動（WebVTT/SRT）。ユーザー別の `subtitle_offsets` に保存され、
   ダイレクト再生時に調整が記憶されます
+- プレビューサムネイル：`GET /api/videos/{id}/thumbnails` が 10 秒ごとに
+  160×90 のフレーム（最大 120 枚）を `DATA_DIR/thumbnails/<video-id>/` へ
+  遅延抽出。`GET /api/videos/{id}/thumbnails/{n}` で 1 枚を配信し、プレイヤーは
+  シークバーホバー位置に最も近いフレームを表示します
 - 要求された `start` が実行中セッションと 1 セグメント（6 秒）以上ずれている場合、
   セッションを終了して新しい位置で再開（シーク）
 - プレイリストは応答時に書き換えられ、各セグメント URL に `?token=` が付く
