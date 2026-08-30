@@ -55,6 +55,7 @@ Go・React・PostgreSQL で構築されたセルフホスト型のビデオリ�
 - Node.js 20+、22+、または 24+（CI では 3 バージョンすべてを実行）
 - PostgreSQL 14+
 - ffmpeg/ffprobe（MKV/HEVC のトランスコードには libx265 が必要）
+- yt-dlp（任意 — ローカルで「ダウンロード」キューを動かす場合に必要）
 
 ### 初期セットアップ
 
@@ -152,6 +153,10 @@ docs/             製品、アーキテクチャ、スクリーンショット
 - メディアエンドポイント（`/stream`、`/download`、`/poster`、`/hls/*`）は
   `?token=` を受け付け続ける。`<video>`/`<img>` タグがヘッダーなしで
   機能するようにするため。
+- サーバーフォルダへ書き込む処理（ライブラリ作成、アップロード、yt-dlp
+  ダウンロード）は、既存の絶対ディレクトリを要求し `..` を拒否すること。
+  アップロードのファイル名はディスクに触れる前に `filepath.Base` で
+  サニタイズする。
 - API・エラーメッセージは英語のまま。ローカライズされるのは Web UI のみ。
 
 ### フロントエンド
@@ -206,6 +211,9 @@ npm run build
   （例：`internal/media/episode_test.go`）。
 - 統合テスト（`internal/api/integration_test.go`）は PostgreSQL に接続できない
   場合は自動でスキップされる。実行するには `TEST_PG_DSN` を設定する。
+- アップロード/ダウンロード/yt-dlp の流れは `internal/api` の統合テストで
+  カバーされる。yt-dlp ワーカーのテストは `Downloader.SetBin` で偽バイナリを
+  使い、ネットワークにアクセスしない。
 - ネットワーク依存のスクレイパーテストは `NETWORK_TEST=1` が設定されていない
   限りスキップされる。
 
