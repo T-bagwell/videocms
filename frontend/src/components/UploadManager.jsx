@@ -1,6 +1,6 @@
 import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { api, getToken } from '../api.js';
+import { api, apiBaseUrl, getToken } from '../api.js';
 import { fmtBytes } from '../i18n';
 
 const CHUNK_SIZE = 8 * 1024 * 1024; // keep in sync with the backend default
@@ -74,7 +74,7 @@ const UploadManager = forwardRef(function UploadManager({ targetPath }, ref) {
         const start = index * cs;
         const end = Math.min(start + cs, total);
         await putChunk(
-          `/api/uploads/${item.session.id}/chunk/${index}`,
+          `${apiBaseUrl()}/api/uploads/${item.session.id}/chunk/${index}`,
           item.file.slice(start, end),
           getToken(),
           (loaded) => update(item.key, { uploaded: start + loaded }),

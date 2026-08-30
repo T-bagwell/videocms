@@ -13,6 +13,10 @@ function resolveApiBase() {
 
 const API_BASE = resolveApiBase();
 
+export function apiBaseUrl() {
+  return API_BASE;
+}
+
 export function getToken() {
   return localStorage.getItem(TOKEN_KEY);
 }

@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { mediaUrl, publicUrl, setToken } from './api.js';
+import { apiBaseUrl, mediaUrl, publicUrl, setToken } from './api.js';
 
 describe('api url helpers', () => {
   afterEach(() => setToken(null));
@@ -19,5 +19,9 @@ describe('api url helpers', () => {
   it('publicUrl needs no token', () => {
     setToken('abc');
     expect(publicUrl('/share/tok/video/1/stream')).toBe('/api/share/tok/video/1/stream');
+  });
+
+  it('apiBaseUrl is same-origin by default', () => {
+    expect(apiBaseUrl()).toBe('');
   });
 });
