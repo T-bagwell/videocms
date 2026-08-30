@@ -159,6 +159,7 @@ make serve                                 # UI をビルドし :8080 で一括�
 | `SCRAPE_CUSTOM_URL` | 空 | カスタム JSON スクレイパー端点。`%s` は URL エスケープ済みタイトルに置換 |
 | `AI_TAG_BIN` | 空 | 外部 AI タグ付けツール。メディアパスを受け取り、1 行に 1 タグを出力 |
 | `OIDC_ISSUER` / `OIDC_CLIENT_ID` / `OIDC_CLIENT_SECRET` / `OIDC_REDIRECT_URL` | 空 | OIDC シングルサインオン（ディスカバリー + 認可コードフロー） |
+| `NOTIFY_WEBHOOK_URL` / `NOTIFY_APPRISE_URL` | 空 | 通知チャンネル（JSON Webhook、Apprise API） |
 | `YTDLP_PATH` | PATH 上の `yt-dlp` | ダウンロードキューが使う yt-dlp バイナリ |
 | `WEB_ROOT` | 自動（`frontend/dist`） | 単一サービスモードで配信するフロントエンド。未設定なら API 専用デプロイ |
 | `CORS_ORIGINS` | 空（`*`） | API を呼び出せるブラウザオリジン（カンマ区切り。フロント分離デプロイ用） |
@@ -265,7 +266,8 @@ Stash、Kirari04/videocms、yt-dlp ツールなど）の機能セットを参考
 - [ ] SAML シングルサインオン
 - [x] ペアレンタルコントロール（PIN/レーティング）とユーザーごとのクォータ
 - [x] 共有ページのカスタマイズとプレイヤー埋め込み
-- [ ] 通知（メール/Webhook/Apprise）：スキャン・アップロード・トランスコードイベント
+- [x] 通知（Webhook/Apprise）：スキャン・アップロード・ダウンロードイベント
+- [ ] メール通知
 
 **ストレージと運用**
 
