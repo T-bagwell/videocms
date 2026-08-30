@@ -226,6 +226,8 @@ Statistiken: Videos, Bibliotheken, Benutzer, Wiedergabelisten, Favoriten, Serien
 - **Webhooks & API-Dokumentation**: signierte Ereignisse an Endpoints
   abonnieren und das OpenAPI-Dokument unter `/api/openapi.json` für
   Automatisierung einsehen
+- **PWA & offline**: VideoCMS als App installieren und Videos von der
+  Detailseite für die Offline-Wiedergabe speichern
 
 ### 5.4 Benutzer
 
