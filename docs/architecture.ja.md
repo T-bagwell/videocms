@@ -394,6 +394,10 @@ Wikipedia の順に自動フォールバック（`TVMAZE_ENABLED=0` / `ANILIST_E
   （管理 `/api/admin/webhooks` CRUD）がイベント種別でフィルターされた、
   `X-Videocms-Signature`（HMAC-SHA256）付き JSON イベントを受信。
   公開 API は `GET /api/openapi.json` で記述
+- PWA：フロントエンドは web manifest と service worker（アプリシェルのみ
+  キャッシュし、API/メディアは絶対にキャッシュしない）を提供。詳細ページで
+  ストリームを Cache API に保存してオフライン視聴可能。
+  `viewport-fit=cover` とセーフエリア padding でノッチ付き端末に対応
 
 ### 3.10 主要な設計判断
 
