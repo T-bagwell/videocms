@@ -278,6 +278,28 @@ label input, label textarea { margin-top: 6px; }
 .status-canceled { background: var(--bg-soft); color: var(--muted); }
 .progress { background: var(--bg-soft); border-radius: 6px; height: 8px; margin: 8px 0 4px; overflow: hidden; }
 .progress-bar { background: var(--primary); height: 100%; transition: width 0.3s; }
+.preview-strip {
+  position: relative;
+  height: 10px;
+  margin: 8px 0 16px;
+  border-radius: 5px;
+  background: var(--bg-soft);
+  cursor: pointer;
+}
+.preview-tip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  transform: translateX(-50%);
+  background: var(--card-bg, #1a1a2e);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 4px;
+  text-align: center;
+  font-size: 12px;
+  z-index: 20;
+  pointer-events: none;
+}
+.preview-tip img { display: block; border-radius: 4px; }
 .status-cancelled { background: rgba(243,156,18,0.15); color: var(--warn); }
 .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
 .small-muted { color: var(--muted); font-size: 12px; }

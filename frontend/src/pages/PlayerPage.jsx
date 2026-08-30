@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { api, mediaUrl } from '../api.js';
+import { fmtDuration } from '../i18n';
 
 const BROWSER_PLAYABLE = ['.mp4', '.m4v', '.webm', '.mov', '.ogv'];
 
@@ -34,6 +35,8 @@ export default function PlayerPage() {
   const [audioTracks, setAudioTracks] = useState([]);
   const [audioIdx, setAudioIdx] = useState(-1);
   const [subtitleOffsetMs, setSubtitleOffsetMs] = useState(0);
+  const [thumbMeta, setThumbMeta] = useState(null);
+  const [hover, setHover] = useState(null);
 
   useEffect(() => {
     setActiveId(id);
@@ -68,6 +71,9 @@ export default function PlayerPage() {
     api(`/users/me/subtitle-offset?video_id=${activeId}`)
       .then((d) => setSubtitleOffsetMs(d.offset_ms || 0))
       .catch(() => setSubtitleOffsetMs(0));
+    api(`/videos/${activeId}/thumbnails`)
+      .then(setThumbMeta)
+      .catch(() => setThumbMeta(null));
 
     const playlistId = searchParams.get('playlist');
     const seriesId = searchParams.get('series');
@@ -205,6 +211,23 @@ export default function PlayerPage() {
   function resetSubtitleOffset() {
     setSubtitleOffsetMs(0);
     api(`/users/me/subtitle-offset?video_id=${activeId}`, { method: 'DELETE' }).catch(() => {});
+  }
+
+  function onStripMove(e) {
+    const el = videoRef.current;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    const dur = el?.duration || video?.duration_sec || 0;
+    const time = pct * dur;
+    const frame = thumbMeta && dur > 0
+      ? Math.min(thumbMeta.count, Math.floor(time / thumbMeta.interval_sec) + 1)
+      : 1;
+    setHover({ pct: pct * 100, time, frame });
+  }
+
+  function onStripClick() {
+    if (!hover || !videoRef.current) return;
+    videoRef.current.currentTime = hover.time;
   }
 
   useEffect(() => {
@@ -362,6 +385,27 @@ export default function PlayerPage() {
             />
           ))}
       </video>
+
+      {thumbMeta && (
+        <div
+          className="preview-strip"
+          onMouseMove={onStripMove}
+          onMouseLeave={() => setHover(null)}
+          onClick={onStripClick}
+        >
+          {hover && (
+            <div className="preview-tip" style={{ left: `${hover.pct}%` }}>
+              <img
+                src={mediaUrl(`/videos/${activeId}/thumbnails/${hover.frame}`)}
+                alt=""
+                width={thumbMeta.width}
+                height={thumbMeta.height}
+              />
+              <span>{fmtDuration(hover.time)}</span>
+            </div>
+          )}
+        </div>
+      )}
 
       {!useTranscode && tracks.length > 0 && (
         <div className="player-tools subtitle-sync">
