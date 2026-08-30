@@ -207,7 +207,8 @@ make serve                              # http://<LAN IP>:8080
 - **共有のカスタマイズ**：テーマ・カスタムタイトル・ナビゲーション非表示を選択。
   `?embed=1` を付けると任意のページに装飾なしプレイヤーを埋め込めます
 - **通知**：Webhook または Apprise でスキャン・アップロード・ダウンロードの
-  イベントを受信できます。管理者は概要ページからテスト通知を送信可能
+  イベントを受信できます。管理者は概要ページからテスト通知を送信可能。
+  SMTP を設定すると同じイベントが**メール**でも届きます
 - **ストレージプール**：ローカル・S3 互換・SFTP のプール（ローカルマウント
   パス付き）を定義可能。アップロード/ダウンロード先に `pool://名前[/サブパス]`
   を指定できます
@@ -265,6 +266,7 @@ make serve                              # http://<LAN IP>:8080
 | `SAML_IDP_METADATA_URL` / `SAML_SP_CERT` / `SAML_SP_KEY` / `SAML_SP_ENTITY_ID` / `SAML_ACS_URL` | 空 | SAML 2.0 シングルサインオン（IdP メタデータ URL、SP 証明書/鍵パス、エンティティ ID、ACS URL） |
 | `DLNA_ENABLED` / `DLNA_FRIENDLY_NAME` / `DLNA_ALLOWED_IPS` | `0` / `VideoCMS` / 空（LAN 全体） | UPnP/DLNA メディアサーバーの有効化、表示名、カンマ区切りの IP/CIDR 許可リスト |
 | `NOTIFY_WEBHOOK_URL` / `NOTIFY_APPRISE_URL` | 空 | 通知チャンネル（JSON Webhook、Apprise API） |
+| `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASSWORD` / `NOTIFY_EMAIL_FROM` / `NOTIFY_EMAIL_TO` | 空 / `587` | SMTP メール通知（465 は暗黙 TLS、それ以外は STARTTLS） |
 | `MAINT_INTERVAL_HOURS` / `MAINT_BACKUP_RETENTION` / `MAINT_RESCAN` | `24` / `7` / `0` | メンテナンス間隔・バックアップ保持数・再スキャン有無 |
 
 ## 7. FAQ
