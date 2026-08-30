@@ -305,7 +305,11 @@
     "trash": "Recycle bin",
     "trashEmpty": "The recycle bin is empty.",
     "restore": "Restore",
-    "restored": "Restored: {{path}}"
+    "restored": "Restored: {{path}}",
+    "exportNFO": "Export NFO",
+    "importNFO": "Import NFO",
+    "nfoExported": "Exported {{count}} NFO file(s)",
+    "nfoImported": "Updated {{count}} video(s) from NFO"
   },
   "picker": {
     "title": "Select server folder",

@@ -305,7 +305,11 @@
     "trash": "Corbeille",
     "trashEmpty": "La corbeille est vide.",
     "restore": "Restaurer",
-    "restored": "Restauré : {{path}}"
+    "restored": "Restauré : {{path}}",
+    "exportNFO": "Exporter NFO",
+    "importNFO": "Importer NFO",
+    "nfoExported": "{{count}} fichier(s) NFO exporté(s)",
+    "nfoImported": "{{count}} vidéo(s) mise(s) à jour depuis NFO"
   },
   "picker": {
     "title": "Choisir un dossier serveur",

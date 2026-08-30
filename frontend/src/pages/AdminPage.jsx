@@ -234,6 +234,19 @@ function Libraries() {
     }
   }
 
+  async function nfo(l, action) {
+    setErr('');
+    try {
+      const d = await api(`/libraries/${l.id}/${action === 'export' ? 'export-nfo' : 'import-nfo'}`, { method: 'POST' });
+      setMsg(action === 'export'
+        ? t('admin.nfoExported', { count: d.exported || 0 })
+        : t('admin.nfoImported', { count: d.updated || 0 }));
+      refresh();
+    } catch (e) {
+      setErr(e.message);
+    }
+  }
+
   return (
     <div>
       {msg && <div className="toast toast-success">{msg}</div>}
@@ -316,6 +329,8 @@ function Libraries() {
                 <button className="btn small" onClick={() => runHealth(l)} disabled={healthBusy.has(l.id)}>
                   {healthBusy.has(l.id) ? t('admin.healthRunning') : t('admin.healthCheck')}
                 </button>
+                <button className="btn small" onClick={() => nfo(l, 'export')}>{t('admin.exportNFO')}</button>
+                <button className="btn small" onClick={() => nfo(l, 'import')}>{t('admin.importNFO')}</button>
                 <button className="btn small danger-ghost" onClick={() => toggleLibraryBlock(l)}>
                   {l.blocked ? t('admin.blockUnblock') : t('admin.blockLibrary')}
                 </button>

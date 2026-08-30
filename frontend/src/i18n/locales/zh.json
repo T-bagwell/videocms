@@ -305,7 +305,11 @@
     "trash": "回收站",
     "trashEmpty": "回收站为空。",
     "restore": "恢复",
-    "restored": "已恢复：{{path}}"
+    "restored": "已恢复：{{path}}",
+    "exportNFO": "导出 NFO",
+    "importNFO": "导入 NFO",
+    "nfoExported": "已导出 {{count}} 个 NFO 文件",
+    "nfoImported": "已从 NFO 更新 {{count}} 个视频"
   },
   "picker": {
     "title": "选择服务器文件夹",

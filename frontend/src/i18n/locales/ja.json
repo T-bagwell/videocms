@@ -305,7 +305,11 @@
     "trash": "ゴミ箱",
     "trashEmpty": "ゴミ箱は空です。",
     "restore": "復元",
-    "restored": "復元しました：{{path}}"
+    "restored": "復元しました：{{path}}",
+    "exportNFO": "NFO エクスポート",
+    "importNFO": "NFO インポート",
+    "nfoExported": "NFO を {{count}} 件エクスポートしました",
+    "nfoImported": "NFO から {{count}} 件の動画を更新しました"
   },
   "picker": {
     "title": "サーバーフォルダを選択",

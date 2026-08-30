@@ -305,7 +305,11 @@
     "trash": "Papierkorb",
     "trashEmpty": "Der Papierkorb ist leer.",
     "restore": "Wiederherstellen",
-    "restored": "Wiederhergestellt: {{path}}"
+    "restored": "Wiederhergestellt: {{path}}",
+    "exportNFO": "NFO exportieren",
+    "importNFO": "NFO importieren",
+    "nfoExported": "{{count}} NFO-Datei(en) exportiert",
+    "nfoImported": "{{count}} Video(s) aus NFO aktualisiert"
   },
   "picker": {
     "title": "Serverordner auswählen",
