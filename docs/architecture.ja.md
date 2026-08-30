@@ -369,6 +369,10 @@ Wikipedia の順に自動フォールバック（`TVMAZE_ENABLED=0` / `ANILIST_E
   `users.allowed_rating` が `videos.content_rating` をフィルターし
   （ロック解除時以外）、`libraries.quota_bytes` はアップロード先がその
   ライブラリの場合に適用されます
+- 共有のカスタマイズ（マイグレーション 028）：共有作成時に
+  `theme`/`custom_title`/`hide_nav` を受け付け、`share_tokens` に保存して公開
+  info エンドポイントで返却。共有ページはこれらを適用し、`?embed=1` で
+  iframe 埋め込み用に装飾を非表示にします
 
 ### 3.10 主要な設計判断
 
