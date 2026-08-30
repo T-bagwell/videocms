@@ -34,11 +34,12 @@ func (a *App) moveToTrash(ctx context.Context, videoID uuid.UUID, path string) (
 	if base == "." || base == ".." {
 		return "", fmt.Errorf("invalid media path")
 	}
+	src := filepath.Clean("/" + path)
 	dst := filepath.Join(trashDir, base)
 	if _, err := os.Stat(dst); err == nil {
 		dst = filepath.Join(trashDir, fmt.Sprintf("%s-%s", videoID.String()[:8], base))
 	}
-	if err := os.Rename(path, dst); err != nil {
+	if err := os.Rename(src, dst); err != nil {
 		return "", err
 	}
 	if _, err := a.pool.Exec(ctx, `
