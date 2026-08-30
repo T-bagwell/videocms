@@ -348,6 +348,10 @@ Wikipedia の順に自動フォールバック（`TVMAZE_ENABLED=0` / `ANILIST_E
   （宣言サイズが同一）を報告。`POST /api/libraries/{id}/health/keep-best` は
   各グループの最良版（解像度、次にファイル名の長さ）を残し、他を
   `DATA_DIR/trash/<日付>/` へ移動
+- 一括操作とゴミ箱：`POST /api/admin/videos/batch` が一括タグ付け・タグクリア・
+  選択動画のゴミ箱移動。`trash_records`（マイグレーション 024）が元パスを保持し、
+  `GET /api/admin/trash` + `POST /api/admin/trash/{id}/restore` でファイルを
+  戻して再有効化できます
 
 ### 3.10 主要な設計判断
 
