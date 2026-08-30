@@ -20,6 +20,9 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Watch together: create or join a synchronized watch room (shared id +
+  token) and keep play/pause/position in sync across viewers via polling; a
+  Cast / AirPlay button opens the native casting UI where supported
 - VAAPI hardware encoding (`HLS_HW_ACCEL=vaapi`, device via `HLS_VAAPI_DEVICE`)
   and HDR→SDR tone mapping (`HLS_TONE_MAP=1`) round out hardware-accelerated
   HLS transcoding
