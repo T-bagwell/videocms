@@ -198,8 +198,9 @@ make serve                              # http://<LAN IP>:8080
   **ゴミ箱**（ワンクリック復元）が使えます
 - 動画に**コメントと評価**（1〜5 星）が付けられます。ホームには最近の
   コメントとお気に入りのアクティビティフィードが表示されます
-- **シングルサインオン**（OIDC）：サーバーが IdP 設定済みの場合、ログインページに
-  SSO ボタンが表示されます
+- **シングルサインオン**：対応プロバイダーを設定すると、ログインページに
+  **OIDC** と **SAML 2.0** のボタンが表示されます（ADFS、Okta、
+  Keycloak など）。SAML ユーザーは `roles` 属性で管理者権限を自動付与可能
 - **ペアレンタルコントロール**：管理者がユーザーごとの許可レーティングと動画ごとの
   レーティングを設定。ユーザーは PIN でロックし、5 分間ロック解除できます。
   ライブラリにはアップロード時に適用される**ストレージクォータ**も設定可能
@@ -261,6 +262,7 @@ make serve                              # http://<LAN IP>:8080
 | `SCRAPE_CUSTOM_URL` | 空 | カスタム JSON スクレイパー端点。`%s` は URL エスケープ済みタイトルに置換 |
 | `AI_TAG_BIN` | 空 | 外部 AI タグ付けツール（メディアパスを引数に、1 行 1 タグ） |
 | `OIDC_ISSUER` / `OIDC_CLIENT_ID` / `OIDC_CLIENT_SECRET` / `OIDC_REDIRECT_URL` | 空 | OIDC シングルサインオン設定 |
+| `SAML_IDP_METADATA_URL` / `SAML_SP_CERT` / `SAML_SP_KEY` / `SAML_SP_ENTITY_ID` / `SAML_ACS_URL` | 空 | SAML 2.0 シングルサインオン（IdP メタデータ URL、SP 証明書/鍵パス、エンティティ ID、ACS URL） |
 | `DLNA_ENABLED` / `DLNA_FRIENDLY_NAME` / `DLNA_ALLOWED_IPS` | `0` / `VideoCMS` / 空（LAN 全体） | UPnP/DLNA メディアサーバーの有効化、表示名、カンマ区切りの IP/CIDR 許可リスト |
 | `NOTIFY_WEBHOOK_URL` / `NOTIFY_APPRISE_URL` | 空 | 通知チャンネル（JSON Webhook、Apprise API） |
 | `MAINT_INTERVAL_HOURS` / `MAINT_BACKUP_RETENTION` / `MAINT_RESCAN` | `24` / `7` / `0` | メンテナンス間隔・バックアップ保持数・再スキャン有無 |
