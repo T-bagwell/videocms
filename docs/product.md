@@ -29,9 +29,32 @@ hardware. Your videos never leave your network unless you choose to share them.
 
 ## Screenshots
 
-> *Coming soon — run `make serve` and open `http://<server-ip>:8080` to see the UI
-> in action. The web player, series pages and admin console are all covered in
-> the [product tour](product.md).*
+**Browse & search** — filterable grid, tag cloud, fuzzy search and saved smart
+collections:
+
+![Home](screenshots/home.png)
+
+**TV Shows** — numbered files auto-group into series with season/episode order:
+
+![Series](screenshots/series.png)
+
+**Video detail** — metadata, tags, similar videos, share and save-offline:
+
+![Video detail](screenshots/detail.png)
+
+**Player** — native or adaptive HLS playback with subtitle/audio switching,
+quality selector, watch together, casting and intro/credits skip:
+
+![Player](screenshots/player.png)
+
+**Public share page** — password- and domain-restricted links:
+
+![Share](screenshots/share.png)
+
+**Admin console** — overview, libraries, videos, users, uploads, downloads,
+storage, jobs and webhooks:
+
+![Admin](screenshots/admin.png)
 
 ## 3. Quick Start
 
