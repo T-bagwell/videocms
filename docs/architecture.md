@@ -255,6 +255,11 @@ The `HLSManager`:
 - Recommendations: `GET /api/videos/{id}/similar` ranks other videos by shared
   genres, year, series and tags; `GET /api/tags` powers the browse-page tag
   cloud and `?tag=` filtering
+- Collections & saved filters (migration 022): `collections` stores named
+  filter-set JSON per user (`GET|POST|DELETE /api/collections`) and
+  `user_filter_prefs` stores the last saved browse filters
+  (`GET|PUT /api/users/me/filters`); the frontend replays the same `/videos`
+  filter parameters for both
 - If the requested `start` differs from the running session by more than one
   segment (6s), the session is killed and restarted at the new position (seek)
 - The manifest is rewritten on the fly so every segment URL carries `?token=`
