@@ -182,6 +182,8 @@ Stats: videos, libraries, users, playlists, favorites, series and storage used.
   audio track and embedded/uploaded subtitles (remuxed without re-encoding)
 - **Scrape** fetches metadata from TMDB (requires `TMDB_API_KEY` and network
   access to api.themoviedb.org)
+- Admins can pick **TMDB or a custom provider** for scraping and force an
+  overwrite of existing metadata
 
 ### 5.4 Users
 
@@ -224,6 +226,7 @@ most important ones:
 | `SUBTITLE_OS_USERNAME` / `SUBTITLE_OS_PASSWORD` / `SUBTITLE_OS_API_KEY` | empty | OpenSubtitles credentials for the online subtitle search |
 | `RTMP_INGEST_URL` | `rtmp://localhost:1935/live` | Base RTMP ingest URL (nginx-rtmp or equivalent) |
 | `WHISPER_BIN` / `WHISPER_MODEL` | empty | whisper.cpp CLI and model for speech transcription |
+| `SCRAPE_CUSTOM_URL` | empty | Custom JSON scraper endpoint; `%s` is replaced with the URL-escaped title |
 
 ## 7. FAQ
 
