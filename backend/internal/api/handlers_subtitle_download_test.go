@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"net/http"
+	"path/filepath"
 	"testing"
 
 	"videocms/backend/internal/media"
@@ -56,5 +57,19 @@ func TestSubtitleSearchAndDownload(t *testing.T) {
 	track := items[0].(map[string]any)
 	if track["kind"] != "upload" || track["format"] != "srt" {
 		t.Fatalf("track = %v", track)
+	}
+
+	// A hostile file_id must be scrubbed to a safe basename inside the
+	// per-video subtitle directory, never escaping it.
+	status, d = doJSON(t, "POST", base+"/download", token, map[string]any{"file_id": "../../etc/passwd"})
+	if status != http.StatusCreated {
+		t.Fatalf("hostile download status = %d, body = %v", status, d)
+	}
+	p, _ := d["path"].(string)
+	if filepath.Dir(p) != filepath.Join(env.app.cfg.DataDir, "subtitles", videoID.String()) {
+		t.Fatalf("subtitle saved outside per-video dir: %s", p)
+	}
+	if filepath.Base(p) == "passwd.srt" {
+		t.Fatalf("file_id leaked into filename: %s", p)
 	}
 }
