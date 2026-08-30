@@ -135,7 +135,14 @@
     "subtitleEarlier": "−0,5 s",
     "subtitleLater": "+0,5 s",
     "subtitleReset": "Réinitialiser",
-    "assSubtitles": "Sous-titres stylisés (ASS)"
+    "assSubtitles": "Sous-titres stylisés (ASS)",
+    "watchTogether": "Regarder ensemble",
+    "watchCreate": "Créer une salle",
+    "watchJoin": "Rejoindre",
+    "watchJoinId": "ID de la salle",
+    "watchJoinToken": "Jeton de la salle",
+    "watchLeave": "Quitter la salle",
+    "watchSyncing": "Synchronisation de la lecture…"
   },
   "playlists": {
     "title": "Listes de lecture",

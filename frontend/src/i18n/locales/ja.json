@@ -135,7 +135,14 @@
     "subtitleEarlier": "0.5 秒早く",
     "subtitleLater": "0.5 秒遅く",
     "subtitleReset": "リセット",
-    "assSubtitles": "スタイル付き字幕 (ASS)"
+    "assSubtitles": "スタイル付き字幕 (ASS)",
+    "watchTogether": "一緒に見る",
+    "watchCreate": "ルーム作成",
+    "watchJoin": "参加",
+    "watchJoinId": "ルーム ID",
+    "watchJoinToken": "ルームトークン",
+    "watchLeave": "ルーム退出",
+    "watchSyncing": "再生を同期中…"
   },
   "playlists": {
     "title": "プレイリスト",

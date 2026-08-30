@@ -135,7 +135,14 @@
     "subtitleEarlier": "提前 0.5s",
     "subtitleLater": "延后 0.5s",
     "subtitleReset": "重置",
-    "assSubtitles": "样式化字幕 (ASS)"
+    "assSubtitles": "样式化字幕 (ASS)",
+    "watchTogether": "一起看",
+    "watchCreate": "创建房间",
+    "watchJoin": "加入",
+    "watchJoinId": "房间 ID",
+    "watchJoinToken": "房间口令",
+    "watchLeave": "退出房间",
+    "watchSyncing": "正在同步播放…"
   },
   "playlists": {
     "title": "播放列表",

@@ -48,6 +48,12 @@ export default function PlayerPage() {
   const [hover, setHover] = useState(null);
   const [assIdx, setAssIdx] = useState('');
   const assRef = useRef(null);
+  const [watchRoom, setWatchRoom] = useState(null);
+  const [watchModal, setWatchModal] = useState(false);
+  const [watchJoinId, setWatchJoinId] = useState('');
+  const [watchJoinToken, setWatchJoinToken] = useState('');
+  const watchRoomRef = useRef(null);
+  watchRoomRef.current = watchRoom;
 
   useEffect(() => {
     setActiveId(id);
@@ -386,6 +392,66 @@ export default function PlayerPage() {
     }
   }
 
+  function publishWatch(playing) {
+    const room = watchRoomRef.current;
+    const el = videoRef.current;
+    if (!room || !el) return;
+    api(`/watch/rooms/${room.id}`, {
+      method: 'PUT',
+      body: { token: room.token, playing, position_sec: el.currentTime || 0 },
+    }).catch(() => {});
+  }
+
+  useEffect(() => {
+    if (!watchRoom) return;
+    const timer = setInterval(async () => {
+      const room = watchRoomRef.current;
+      const el = videoRef.current;
+      if (!room || !el) return;
+      try {
+        const d = await api(`/watch/rooms/${room.id}?token=${room.token}`);
+        if (Math.abs((el.currentTime || 0) - d.position_sec) > 2) {
+          el.currentTime = d.position_sec;
+        }
+        if (d.playing && el.paused) el.play().catch(() => {});
+        if (!d.playing && !el.paused) el.pause();
+      } catch {
+        // room may have been deleted; keep polling
+      }
+    }, 2500);
+    return () => clearInterval(timer);
+  }, [watchRoom]);
+
+  async function createWatchRoom() {
+    try {
+      const d = await api('/watch/rooms', { method: 'POST', body: { video_id: activeId } });
+      setWatchRoom(d);
+      setWatchModal(false);
+    } catch (e) {
+      setErr(e.message);
+    }
+  }
+
+  async function joinWatchRoom(e) {
+    e.preventDefault();
+    try {
+      const d = await api(`/watch/rooms/${watchJoinId.trim()}/join`, {
+        method: 'POST',
+        body: { token: watchJoinToken.trim() },
+      });
+      setWatchRoom(d);
+      setWatchModal(false);
+      setWatchJoinId('');
+      setWatchJoinToken('');
+    } catch (e2) {
+      setErr(e2.message);
+    }
+  }
+
+  function leaveWatchRoom() {
+    setWatchRoom(null);
+  }
+
   if (err) return <div className="container"><div className="form-error">{err}</div></div>;
   if (!video) return <div className="container"><div className="loading">{t('common.loading')}</div></div>;
 
@@ -399,8 +465,53 @@ export default function PlayerPage() {
         <div>
           <h1>{video.title}</h1>
           {queueTitle && <p className="muted">{queueTitle}</p>}
+          {watchRoom && <p className="muted">{t('player.watchSyncing')}</p>}
+        </div>
+        <div className="detail-actions">
+          {!watchRoom ? (
+            <button className="btn ghost" onClick={() => setWatchModal(true)}>
+              {t('player.watchTogether')}
+            </button>
+          ) : (
+            <button className="btn ghost" onClick={leaveWatchRoom}>
+              {t('player.watchLeave')}
+            </button>
+          )}
         </div>
       </div>
+
+      {watchModal && (
+        <div className="modal-backdrop" onClick={() => setWatchModal(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h3>{t('player.watchTogether')}</h3>
+            <div className="modal-actions">
+              <button className="btn primary" onClick={createWatchRoom}>
+                {t('player.watchCreate')}
+              </button>
+            </div>
+            <form className="inline-form" onSubmit={joinWatchRoom}>
+              <input
+                placeholder={t('player.watchJoinId')}
+                value={watchJoinId}
+                onChange={(e) => setWatchJoinId(e.target.value)}
+                required
+              />
+              <input
+                placeholder={t('player.watchJoinToken')}
+                value={watchJoinToken}
+                onChange={(e) => setWatchJoinToken(e.target.value)}
+                required
+              />
+              <button className="btn ghost">{t('player.watchJoin')}</button>
+            </form>
+            <div className="modal-actions">
+              <button className="btn ghost" onClick={() => setWatchModal(false)}>
+                {t('common.close')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="player-wrap">
         <video
@@ -418,8 +529,10 @@ export default function PlayerPage() {
               savedRef.current = el.currentTime;
               saveProgress();
             }
+            publishWatch(true);
           }}
           onPause={saveProgress}
+          onPlay={() => publishWatch(true)}
           onEnded={() => {
             saveProgress();
             playNext();

@@ -135,7 +135,14 @@
     "subtitleEarlier": "−0,5 s",
     "subtitleLater": "+0,5 s",
     "subtitleReset": "Zurücksetzen",
-    "assSubtitles": "Gestylte Untertitel (ASS)"
+    "assSubtitles": "Gestylte Untertitel (ASS)",
+    "watchTogether": "Gemeinsam ansehen",
+    "watchCreate": "Raum erstellen",
+    "watchJoin": "Beitreten",
+    "watchJoinId": "Raum-ID",
+    "watchJoinToken": "Raum-Token",
+    "watchLeave": "Raum verlassen",
+    "watchSyncing": "Wiedergabe wird synchronisiert…"
   },
   "playlists": {
     "title": "Wiedergabelisten",
