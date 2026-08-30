@@ -218,7 +218,9 @@ Tout se configure par variables d’environnement (table complète dans le READM
 | `SCAN_WORKERS` | `4` | Workers d’analyse parallèles |
 | `WATCH_INTERVAL` | `30` | Secondes entre analyses incrémentales automatiques ; `0` désactive |
 | `YTDLP_PATH` | `yt-dlp` dans le PATH | Binaire yt-dlp utilisé par la file de téléchargements |
-| `HLS_HW_ACCEL` | vide (x264 logiciel) | Codec vidéo HLS : videotoolbox, nvenc ou qsv ; vide = libx264 |
+| `HLS_HW_ACCEL` | vide (x264 logiciel) | Codec vidéo HLS : videotoolbox, nvenc, qsv ou vaapi ; vide = libx264 |
+| `HLS_VAAPI_DEVICE` | `/dev/dri/renderD128` | Périphérique VAAPI (avec `HLS_HW_ACCEL=vaapi`) |
+| `HLS_TONE_MAP` | `0` | `1` active le mappage de tons HDR→SDR dans le transcodage HLS |
 | `SUBTITLE_OS_USERNAME` / `SUBTITLE_OS_PASSWORD` / `SUBTITLE_OS_API_KEY` | vide | Identifiants OpenSubtitles pour la recherche de sous-titres |
 
 ## 7. FAQ
