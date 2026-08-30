@@ -379,6 +379,15 @@ back to the keyless TVMaze API, then AniList, then Wikipedia
   authorization-code + userinfo (config `OIDC_*`); users are provisioned or
   linked via the unique `users.oauth_sub` column (migration 026), and the
   frontend receives a session JWT via `/login?sso_token=…`
+- SAML 2.0 SSO: built on crewjam/saml — `GET /api/auth/saml/login` redirects
+  to the IdP with an AuthnRequest (HTTP-Redirect/POST binding),
+  `POST /api/auth/saml/acs` consumes and verifies the signed SAMLResponse
+  (signature, conditions, audience), and `/api/auth/saml/metadata` publishes
+  SP metadata for the IdP. Config: `SAML_IDP_METADATA_URL`, `SAML_SP_CERT`,
+  `SAML_SP_KEY`, `SAML_SP_ENTITY_ID`, `SAML_ACS_URL`. Users bind to the same
+  `users.oauth_sub` (prefixed `saml:`), a `roles` attribute containing "admin"
+  grants admin on first login, and `GET /api/auth/sso` tells the login page
+  which providers to offer
 - Parental controls & quotas (migration 027): bcrypt `users.pin` with
   `PUT|POST /api/users/me/pin[/verify]` issuing a 5-minute unlock token that
   listings accept via `X-Videocms-Unlock`; `users.allowed_rating` filters
