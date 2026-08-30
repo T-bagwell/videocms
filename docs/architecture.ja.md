@@ -363,6 +363,12 @@ Wikipedia の順に自動フォールバック（`TVMAZE_ENABLED=0` / `ANILIST_E
   userinfo を実装（`OIDC_*` 設定）。ユーザーは一意の `users.oauth_sub` 列
   （マイグレーション 026）で自動作成/紐付けされ、フロントエンドは
   `/login?sso_token=…` でセッション JWT を受け取ります
+- ペアレンタルコントロールとクォータ（マイグレーション 027）：bcrypt の
+  `users.pin` と `PUT|POST /api/users/me/pin[/verify]` で 5 分間のロック解除
+  トークンを発行し、一覧は `X-Videocms-Unlock` で受け付け。
+  `users.allowed_rating` が `videos.content_rating` をフィルターし
+  （ロック解除時以外）、`libraries.quota_bytes` はアップロード先がその
+  ライブラリの場合に適用されます
 
 ### 3.10 主要な設計判断
 
