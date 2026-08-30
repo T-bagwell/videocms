@@ -26,6 +26,17 @@ performance and extension points.
 | 中文 | [architecture.zh-CN.md](architecture.zh-CN.md) |
 | 日本語 | [architecture.ja.md](architecture.ja.md) |
 
+## Deployment
+
+For operators: single-service vs. separate frontend/backend deployment, REST
+API usage and CORS.
+
+| Language | Link |
+| --- | --- |
+| English | [deployment.md](deployment.md) |
+| 中文 | [deployment.zh-CN.md](deployment.zh-CN.md) |
+| 日本語 | [deployment.ja.md](deployment.ja.md) |
+
 ## READMEs
 
 | Language | Link |
