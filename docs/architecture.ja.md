@@ -355,6 +355,10 @@ Wikipedia の順に自動フォールバック（`TVMAZE_ENABLED=0` / `ANILIST_E
 - NFO：`POST /api/libraries/{id}/export-nfo` が各動画の隣に Kodi 形式の映画 NFO
   を書き出し、`/import-nfo` が title/year/plot/genres を DB に戻します
   （media.NFOFileFor/WriteNFO/ReadNFO）
+- ソーシャル（マイグレーション 025）：`comments` と `ratings` テーブルが動画ごとの
+  コメント CRUD（`GET|POST /api/videos/{id}/comments`、`DELETE /api/comments/{id}`）、
+  1〜5 星評価（`GET /api/videos/{id}/ratings`、`PUT /api/videos/{id}/rating`）を支え、
+  `GET /api/feed` が最近のコメントとお気に入りを返します
 
 ### 3.10 主要な設計判断
 
