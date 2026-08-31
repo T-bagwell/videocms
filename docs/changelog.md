@@ -20,6 +20,10 @@ All notable changes to VideoCMS are documented here.
   buttons, side-by-side rating/comments, the player download button, and
   clean posters for the demo media (previously some demo posters were frames
   of ffmpeg test patterns with large red regions)
+- Fixed two CSS layout bugs on video cards: the generic progress-bar style
+  was overriding the card progress bar (rendering a full-height red block on
+  partially-watched posters) and the detail-page poster was being stretched
+  by `height: 100%` instead of keeping its 16:9 ratio
 - Roadmap expanded with a new backlog organized by capability area (playback &
   subtitles, media types & libraries, live TV & IPTV, discovery & automation,
   users & analytics, extensibility & operations): multi-version movies,
