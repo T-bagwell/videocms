@@ -16,6 +16,10 @@ All notable changes to VideoCMS are documented here.
 - The player page gained a Download button in its toolbar that opens the
   same track-picker dialog as the detail page (container, audio, subtitles,
   original file), so media can be downloaded without leaving playback
+- Product manual screenshots refreshed with the current UI: icon-based action
+  buttons, side-by-side rating/comments, the player download button, and
+  clean posters for the demo media (previously some demo posters were frames
+  of ffmpeg test patterns with large red regions)
 - Roadmap expanded with a new backlog organized by capability area (playback &
   subtitles, media types & libraries, live TV & IPTV, discovery & automation,
   users & analytics, extensibility & operations): multi-version movies,
