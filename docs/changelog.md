@@ -24,6 +24,10 @@ All notable changes to VideoCMS are documented here.
   was overriding the card progress bar (rendering a full-height red block on
   partially-watched posters) and the detail-page poster was being stretched
   by `height: 100%` instead of keeping its 16:9 ratio
+- Product manual screenshots refreshed again: the video detail page now shows
+  a richer demo poster (blurred video-frame backdrop with title), synopsis,
+  tags, ratings and comments, and the demo library metadata was filled in for
+  the featured demo title
 - Roadmap expanded with a new backlog organized by capability area (playback &
   subtitles, media types & libraries, live TV & IPTV, discovery & automation,
   users & analytics, extensibility & operations): multi-version movies,
