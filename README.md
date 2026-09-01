@@ -317,7 +317,7 @@ from the product's own perspective.
 - [x] Music library: audio files scanned and organized by artist/album, with
       embedded cover art and gapless playback
 - [x] Audiobooks: chapter navigation and remembered playback speed
-- [ ] Books & comics: EPUB reader and CBZ comic viewer
+- [x] Books & comics: EPUB reader and CBZ comic viewer
 - [ ] Photo library: albums, EXIF metadata and slideshows
 - [ ] Audio, image and PDF treated as first-class library items
 - [ ] Per-item visibility: public / private / unlisted / password-protected
