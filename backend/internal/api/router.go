@@ -260,6 +260,7 @@ func (a *App) Routes() http.Handler {
 	mux.HandleFunc("DELETE /api/admin/users/{id}", authAdmin(a.deleteUser))
 
 	mux.HandleFunc("PUT /api/users/me/progress", authUser(a.saveProgress))
+	mux.HandleFunc("GET /api/users/me/playback-speed/{videoId}", authUser(a.getPlaybackSpeed))
 	mux.HandleFunc("GET /api/users/me/continue", authUser(a.continueWatching))
 	mux.HandleFunc("POST /api/users/me/favorites", authUser(a.addFavorite))
 	mux.HandleFunc("DELETE /api/users/me/favorites/{videoId}", authUser(a.removeFavorite))

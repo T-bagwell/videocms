@@ -235,6 +235,7 @@ export default function PlayerPage() {
         video_id: activeId,
         position_sec: position,
         duration_sec: duration,
+        playback_rate: speedRef.current,
       },
     }).catch(() => {});
   }, [activeId]);
@@ -262,6 +263,15 @@ export default function PlayerPage() {
     api(`/videos/${activeId}/chapters`)
       .then((d) => setChapters(d.items || []))
       .catch(() => setChapters([]));
+    api(`/users/me/playback-speed/${activeId}`)
+      .then((d) => {
+        const r = Number(d.playback_rate) || 1;
+        speedRef.current = r;
+        setSpeed(r);
+        const el = videoRef.current;
+        if (el) el.playbackRate = r;
+      })
+      .catch(() => {});
 
     const playlistId = searchParams.get('playlist');
     const seriesId = searchParams.get('series');

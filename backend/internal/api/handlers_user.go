@@ -1,19 +1,24 @@
 package api
 
 import (
+	"errors"
 	"fmt"
+	"math"
 	"net/http"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 
 	"videocms/backend/internal/auth"
 	"videocms/backend/internal/models"
 )
 
 type saveProgressRequest struct {
-	VideoID     uuid.UUID `json:"video_id"`
-	PositionSec float64   `json:"position_sec"`
-	DurationSec float64   `json:"duration_sec"`
+	VideoID      uuid.UUID `json:"video_id"`
+	PositionSec  float64   `json:"position_sec"`
+	DurationSec  float64   `json:"duration_sec"`
+	PlaybackRate *float64  `json:"playback_rate"`
 }
 
 func (a *App) saveProgress(w http.ResponseWriter, r *http.Request) {
@@ -26,14 +31,29 @@ func (a *App) saveProgress(w http.ResponseWriter, r *http.Request) {
 		req.PositionSec = 0
 	}
 	user := auth.UserFrom(r)
-	tag, err := a.pool.Exec(r.Context(), `
-		INSERT INTO watch_progress (user_id, video_id, position_sec, duration_sec, updated_at)
-		VALUES ($1,$2,$3,$4,now())
-		ON CONFLICT (user_id, video_id) DO UPDATE SET
-			position_sec = EXCLUDED.position_sec,
-			duration_sec = EXCLUDED.duration_sec,
-			updated_at = now()`,
-		user.ID, req.VideoID, req.PositionSec, req.DurationSec)
+	var tag pgconn.CommandTag
+	var err error
+	if req.PlaybackRate != nil {
+		rate := clampPlaybackRate(*req.PlaybackRate)
+		tag, err = a.pool.Exec(r.Context(), `
+			INSERT INTO watch_progress (user_id, video_id, position_sec, duration_sec, playback_rate, updated_at)
+			VALUES ($1,$2,$3,$4,$5,now())
+			ON CONFLICT (user_id, video_id) DO UPDATE SET
+				position_sec = EXCLUDED.position_sec,
+				duration_sec = EXCLUDED.duration_sec,
+				playback_rate = EXCLUDED.playback_rate,
+				updated_at = now()`,
+			user.ID, req.VideoID, req.PositionSec, req.DurationSec, rate)
+	} else {
+		tag, err = a.pool.Exec(r.Context(), `
+			INSERT INTO watch_progress (user_id, video_id, position_sec, duration_sec, updated_at)
+			VALUES ($1,$2,$3,$4,now())
+			ON CONFLICT (user_id, video_id) DO UPDATE SET
+				position_sec = EXCLUDED.position_sec,
+				duration_sec = EXCLUDED.duration_sec,
+				updated_at = now()`,
+			user.ID, req.VideoID, req.PositionSec, req.DurationSec)
+	}
 	if err != nil {
 		writeErr(w, http.StatusInternalServerError, "save progress failed")
 		return
@@ -43,6 +63,32 @@ func (a *App) saveProgress(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"message": "saved"})
+}
+
+// clampPlaybackRate bounds a user-supplied speed to a sane audiobook range.
+func clampPlaybackRate(r float64) float64 {
+	return math.Max(0.25, math.Min(3, r))
+}
+
+// GET /api/users/me/playback-speed/{videoId}
+func (a *App) getPlaybackSpeed(w http.ResponseWriter, r *http.Request) {
+	id, err := uuid.Parse(r.PathValue("videoId"))
+	if err != nil {
+		writeErr(w, http.StatusBadRequest, "invalid video id")
+		return
+	}
+	user := auth.UserFrom(r)
+	var rate float64
+	err = a.pool.QueryRow(r.Context(),
+		`SELECT playback_rate FROM watch_progress WHERE user_id=$1 AND video_id=$2`,
+		user.ID, id).Scan(&rate)
+	if errors.Is(err, pgx.ErrNoRows) {
+		rate = 1
+	} else if err != nil {
+		writeErr(w, http.StatusInternalServerError, "query playback speed failed")
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]any{"playback_rate": rate})
 }
 
 func (a *App) continueWatching(w http.ResponseWriter, r *http.Request) {
