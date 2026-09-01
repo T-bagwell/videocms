@@ -59,6 +59,10 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Quality profiles & automatic upgrades: admins define profiles (min/max
+  height, preferred codec) and activate one; scans and the admin "apply"
+  action re-score multi-version movies so in-range copies win and better new
+  releases automatically become the primary playback version
 - Request workflow: users submit title requests (movie/TV with notes) and
   track their status; admins approve or reject them, and approving with a
   download URL queues a yt-dlp job into the existing download pipeline
