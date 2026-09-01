@@ -320,7 +320,7 @@ from the product's own perspective.
 - [x] Books & comics: EPUB reader and CBZ comic viewer
 - [x] Photo library: albums, EXIF metadata and slideshows
 - [x] Audio, image and PDF treated as first-class library items
-- [ ] Per-item visibility: public / private / unlisted / password-protected
+- [x] Per-item visibility: public / private / unlisted / password-protected
 
 **Live TV & IPTV**
 
