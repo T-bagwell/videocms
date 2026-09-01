@@ -423,6 +423,35 @@ label input, label textarea { margin-top: 6px; }
 }
 .detail-poster.album-cover { aspect-ratio: 1 / 1; }
 .album-name { margin-top: 8px; font-weight: 600; font-size: 14px; }
+.book-cover {
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 52px;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.reader-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.reader-shell { padding: 16px; }
+.cbz-stage { display: flex; justify-content: center; background: #000; border-radius: 8px; overflow: hidden; }
+.cbz-page { max-width: 100%; max-height: 72vh; object-fit: contain; }
+.reader-frame {
+  width: 100%;
+  height: 72vh;
+  border: 0;
+  border-radius: 8px;
+  background: #fff;
+}
+.reader-tools {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 12px;
+}
 .browse-save { flex-wrap: wrap; align-items: center; margin-bottom: 8px; }
 .browse-group { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .collection-input { padding: 6px 10px; border-radius: 6px; font-size: 13px; }

@@ -10,6 +10,8 @@ import FavoritesPage from './pages/FavoritesPage.jsx';
 import SeriesListPage from './pages/SeriesListPage.jsx';
 import SeriesDetailPage from './pages/SeriesDetailPage.jsx';
 import MusicPage from './pages/MusicPage.jsx';
+import BooksPage from './pages/BooksPage.jsx';
+import BookReaderPage from './pages/BookReaderPage.jsx';
 import AdminPage from './pages/AdminPage.jsx';
 import LivePage from './pages/LivePage.jsx';
 import SharePage from './pages/SharePage.jsx';
@@ -111,6 +113,22 @@ export default function App() {
             element={
               <RequireAuth>
                 <MusicPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/books"
+            element={
+              <RequireAuth>
+                <BooksPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/books/:id"
+            element={
+              <RequireAuth>
+                <BookReaderPage />
               </RequireAuth>
             }
           />

@@ -8,6 +8,7 @@
     "playlists": "播放列表",
     "favorites": "我的收藏",
     "music": "音乐",
+    "books": "图书",
     "admin": "管理",
     "logout": "退出",
     "parentalLock": "家长锁",
@@ -519,5 +520,14 @@
     "noAlbums": "暂无专辑——请扫描包含音乐文件的库",
     "noTracks": "暂无曲目",
     "tracks": "首曲目"
+  },
+  "books": {
+    "noBooks": "暂无图书——请扫描包含 EPUB 或 CBZ 文件的库",
+    "page": "页",
+    "pageOf": "第 {{current}} / {{total}} 页",
+    "chapterOf": "第 {{current}} / {{total}} 章",
+    "prev": "上一页",
+    "next": "下一页",
+    "unreadable": "这本书没有可阅读的内容"
   }
 }

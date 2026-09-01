@@ -38,6 +38,11 @@ var audioExts = map[string]bool{
 	".opus": true, ".wav": true, ".aac": true,
 }
 
+// bookExts are indexed as books/comics (EPUB, CBZ) without media probing.
+var bookExts = map[string]bool{
+	".epub": true, ".cbz": true,
+}
+
 // subtitleExts in preference order: when several sidecar files exist next to a
 // video, the first match wins. Kept as a slice (not a map) so the choice is
 // deterministic.
@@ -218,6 +223,7 @@ func (s *Scanner) scan(ctx context.Context, lib models.Library) {
 		log.Printf("scan %s had errors: %v", lib.Path, walkErr)
 	}
 	s.markMissing(ctx, lib.ID, scanStart)
+	s.markMissingBooks(ctx, lib.ID, scanStart)
 	s.rebuildSeries(ctx, lib)
 	s.rebuildMovieVersions(ctx, lib)
 	s.rebuildAlbums(ctx, lib)
@@ -267,7 +273,7 @@ func walkVideos(root string, fn func(path string, d fs.DirEntry) error) error {
 			return nil
 		}
 		ext := strings.ToLower(filepath.Ext(path))
-		if !videoExts[ext] && !audioExts[ext] {
+		if !videoExts[ext] && !audioExts[ext] && !bookExts[ext] {
 			return nil
 		}
 		return fn(path, d)
@@ -292,6 +298,12 @@ func (s *Scanner) indexFiles(ctx context.Context, libID uuid.UUID, paths chan st
 				if ctx.Err() != nil {
 					return
 				}
+				if bookExts[strings.ToLower(filepath.Ext(path))] {
+					if err := s.upsertBook(ctx, libID, path); err != nil {
+						log.Printf("upsert book %s: %v", path, err)
+					}
+					continue
+				}
 				info, err := s.probe(ctx, path)
 				if err != nil {
 					log.Printf("probe %s: %v", path, err)
@@ -314,6 +326,44 @@ func (s *Scanner) indexFiles(ctx context.Context, libID uuid.UUID, paths chan st
 	}
 	wg.Wait()
 	return found.Load()
+}
+
+// upsertBook indexes an EPUB/CBZ file without probing: title comes from the
+// filename and the size from the filesystem.
+func (s *Scanner) upsertBook(ctx context.Context, libID uuid.UUID, path string) error {
+	filename := filepath.Base(path)
+	title, _ := deriveTitle(filename)
+	st, err := os.Stat(path)
+	if err != nil {
+		return err
+	}
+	format := strings.TrimPrefix(strings.ToLower(filepath.Ext(path)), ".")
+	_, err = s.pool.Exec(ctx, `
+		INSERT INTO books (library_id, title, format, file_path, size_bytes, available, updated_at, last_scanned_at)
+		VALUES ($1,$2,$3,$4,$5,true,now(),now())
+		ON CONFLICT (file_path) DO UPDATE SET
+			library_id = EXCLUDED.library_id,
+			title = EXCLUDED.title,
+			format = EXCLUDED.format,
+			size_bytes = EXCLUDED.size_bytes,
+			available = true,
+			updated_at = now(),
+			last_scanned_at = now()`,
+		libID, title, format, path, st.Size())
+	if err != nil {
+		return fmt.Errorf("upsert book: %w", err)
+	}
+	return nil
+}
+
+// markMissingBooks disables book rows that were not seen in the latest pass.
+func (s *Scanner) markMissingBooks(ctx context.Context, libID uuid.UUID, scanStart time.Time) {
+	if _, err := s.pool.Exec(ctx,
+		`UPDATE books SET available=false, updated_at=now()
+		 WHERE library_id=$1 AND available=true AND last_scanned_at < $2`,
+		libID, scanStart); err != nil {
+		log.Printf("mark missing books: %v", err)
+	}
 }
 
 // Watch keeps the library index in sync with the disk. It reacts to
@@ -499,6 +549,12 @@ func (s *Scanner) applyEventBatch(ctx context.Context, libID uuid.UUID, videos m
 			log.Printf("watcher: mark removed dir %s: %v", dir, err)
 		} else if tag.RowsAffected() > 0 {
 			changed = true
+		}
+		if _, err := s.pool.Exec(ctx, `
+			UPDATE books SET available=false, updated_at=now()
+			WHERE library_id=$1 AND available AND starts_with(file_path, $2 || '/')`,
+			libID, dir); err != nil {
+			log.Printf("watcher: mark removed book dir %s: %v", dir, err)
 		}
 	}
 
@@ -762,6 +818,15 @@ func (s *Scanner) watchLibrary(ctx context.Context, lib models.Library) error {
 		lib.ID, passStart)
 	if err != nil {
 		log.Printf("watcher: mark missing: %v", err)
+	} else if tag.RowsAffected() > 0 {
+		changed = true
+	}
+	tag, err = s.pool.Exec(ctx,
+		`UPDATE books SET available=false, updated_at=now()
+		 WHERE library_id=$1 AND available=true AND last_scanned_at < $2`,
+		lib.ID, passStart)
+	if err != nil {
+		log.Printf("watcher: mark missing books: %v", err)
 	} else if tag.RowsAffected() > 0 {
 		changed = true
 	}

@@ -8,6 +8,7 @@
     "playlists": "Playlists",
     "favorites": "My Favorites",
     "music": "Music",
+    "books": "Books",
     "admin": "Admin",
     "logout": "Log out",
     "parentalLock": "Parental lock",
@@ -519,5 +520,14 @@
     "noAlbums": "No albums yet — scan a library that contains music files",
     "noTracks": "No tracks",
     "tracks": "tracks"
+  },
+  "books": {
+    "noBooks": "No books yet — scan a library that contains EPUB or CBZ files",
+    "page": "Page",
+    "pageOf": "Page {{current}} / {{total}}",
+    "chapterOf": "Chapter {{current}} / {{total}}",
+    "prev": "Previous",
+    "next": "Next",
+    "unreadable": "This book has no readable pages"
   }
 }

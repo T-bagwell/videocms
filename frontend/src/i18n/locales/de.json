@@ -8,6 +8,7 @@
     "playlists": "Wiedergabelisten",
     "favorites": "Meine Favoriten",
     "music": "Musik",
+    "books": "Bücher",
     "admin": "Verwaltung",
     "logout": "Abmelden",
     "parentalLock": "Kindersicherung",
@@ -519,5 +520,14 @@
     "noAlbums": "Noch keine Alben — scannen Sie eine Bibliothek mit Musikdateien",
     "noTracks": "Keine Titel",
     "tracks": "Titel"
+  },
+  "books": {
+    "noBooks": "Noch keine Bücher — scannen Sie eine Bibliothek mit EPUB- oder CBZ-Dateien",
+    "page": "Seite",
+    "pageOf": "Seite {{current}} / {{total}}",
+    "chapterOf": "Kapitel {{current}} / {{total}}",
+    "prev": "Zurück",
+    "next": "Weiter",
+    "unreadable": "Dieses Buch enthält keine lesbaren Seiten"
   }
 }

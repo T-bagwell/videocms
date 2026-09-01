@@ -62,6 +62,9 @@ export default function Navbar() {
         <NavLink to="/music" className={({ isActive }) => (isActive ? 'active' : '')}>
           {t('nav.music')}
         </NavLink>
+        <NavLink to="/books" className={({ isActive }) => (isActive ? 'active' : '')}>
+          {t('nav.books')}
+        </NavLink>
         {user?.role === 'admin' && (
           <NavLink to="/admin" className={({ isActive }) => (isActive ? 'active' : '')}>
             {t('nav.admin')}

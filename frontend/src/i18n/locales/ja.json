@@ -8,6 +8,7 @@
     "playlists": "プレイリスト",
     "favorites": "お気に入り",
     "music": "音楽",
+    "books": "本",
     "admin": "管理",
     "logout": "ログアウト",
     "parentalLock": "ペアレンタルロック",
@@ -519,5 +520,14 @@
     "noAlbums": "アルバムがまだありません — 音楽ファイルを含むライブラリをスキャンしてください",
     "noTracks": "曲がありません",
     "tracks": "曲"
+  },
+  "books": {
+    "noBooks": "本がまだありません — EPUB または CBZ ファイルを含むライブラリをスキャンしてください",
+    "page": "ページ",
+    "pageOf": "{{current}} / {{total}} ページ",
+    "chapterOf": "{{current}} / {{total}} 章",
+    "prev": "前へ",
+    "next": "次へ",
+    "unreadable": "この本には読めるページがありません"
   }
 }

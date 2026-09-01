@@ -8,6 +8,7 @@
     "playlists": "Listes de lecture",
     "favorites": "Mes favoris",
     "music": "Musique",
+    "books": "Livres",
     "admin": "Administration",
     "logout": "Se déconnecter",
     "parentalLock": "Contrôle parental",
@@ -519,5 +520,14 @@
     "noAlbums": "Aucun album pour l'instant — scannez une bibliothèque contenant de la musique",
     "noTracks": "Aucune piste",
     "tracks": "pistes"
+  },
+  "books": {
+    "noBooks": "Aucun livre pour l'instant — scannez une bibliothèque contenant des EPUB ou CBZ",
+    "page": "Page",
+    "pageOf": "Page {{current}} / {{total}}",
+    "chapterOf": "Chapitre {{current}} / {{total}}",
+    "prev": "Précédent",
+    "next": "Suivant",
+    "unreadable": "Ce livre ne contient aucune page lisible"
   }
 }
