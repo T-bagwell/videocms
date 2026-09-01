@@ -305,7 +305,7 @@ from the product's own perspective.
       page
 - [x] Chapters: read from ffprobe/chapter files and shown on the player
       timeline, backed by a generic media-segment API
-- [ ] More transcode profiles (AV1/VP9) and HDR passthrough for Dolby Vision /
+- [x] More transcode profiles (AV1/VP9) and HDR passthrough for Dolby Vision /
       HDR10+ content
 - [ ] Player enhancements: playback speed, picture-in-picture and full keyboard
       shortcuts
