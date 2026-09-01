@@ -265,6 +265,7 @@ export default function PlayerPage() {
 
     const playlistId = searchParams.get('playlist');
     const seriesId = searchParams.get('series');
+    const albumId = searchParams.get('album');
     setQueue([]);
     setQueueTitle('');
     if (playlistId) {
@@ -279,6 +280,13 @@ export default function PlayerPage() {
         .then((d) => {
           setQueue(d.items);
           setQueueTitle(t('player.fromSeries', { name: d.series.name }));
+        })
+        .catch(() => {});
+    } else if (albumId) {
+      api(`/albums/${albumId}`)
+        .then((d) => {
+          setQueue(d.tracks || []);
+          setQueueTitle(t('player.fromAlbum', { name: d.album.name }));
         })
         .catch(() => {});
     }
@@ -548,6 +556,8 @@ export default function PlayerPage() {
     if (p) return `playlist=${p}`;
     const s = searchParams.get('series');
     if (s) return `series=${s}`;
+    const al = searchParams.get('album');
+    if (al) return `album=${al}`;
     return '';
   }
 

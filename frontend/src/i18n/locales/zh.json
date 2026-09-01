@@ -7,6 +7,7 @@
     "tv": "剧集",
     "playlists": "播放列表",
     "favorites": "我的收藏",
+    "music": "音乐",
     "admin": "管理",
     "logout": "退出",
     "parentalLock": "家长锁",
@@ -195,6 +196,7 @@
     "queue": "播放队列（{{count}}）",
     "nowPlaying": "播放中",
     "fromSeries": "来自剧集：{{name}}",
+    "fromAlbum": "来自专辑：{{name}}",
     "quality": "清晰度",
     "qualityAuto": "自动",
     "audioTrack": "音轨",
@@ -510,5 +512,12 @@
     "backToSite": "← 返回 VideoCMS",
     "passwordTitle": "此分享链接受密码保护",
     "passwordPlaceholder": "输入分享密码"
+  },
+  "music": {
+    "playAll": "播放专辑",
+    "play": "播放",
+    "noAlbums": "暂无专辑——请扫描包含音乐文件的库",
+    "noTracks": "暂无曲目",
+    "tracks": "首曲目"
   }
 }

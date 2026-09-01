@@ -7,6 +7,7 @@
     "tv": "ドラマ",
     "playlists": "プレイリスト",
     "favorites": "お気に入り",
+    "music": "音楽",
     "admin": "管理",
     "logout": "ログアウト",
     "parentalLock": "ペアレンタルロック",
@@ -195,6 +196,7 @@
     "queue": "再生キュー（{{count}}）",
     "nowPlaying": "再生中",
     "fromSeries": "ドラマ: {{name}}",
+    "fromAlbum": "アルバムから: {{name}}",
     "quality": "画質",
     "qualityAuto": "自動",
     "audioTrack": "音声",
@@ -510,5 +512,12 @@
     "backToSite": "← VideoCMS に戻る",
     "passwordTitle": "この共有はパスワードで保護されています",
     "passwordPlaceholder": "共有パスワードを入力"
+  },
+  "music": {
+    "playAll": "アルバムを再生",
+    "play": "再生",
+    "noAlbums": "アルバムがまだありません — 音楽ファイルを含むライブラリをスキャンしてください",
+    "noTracks": "曲がありません",
+    "tracks": "曲"
   }
 }

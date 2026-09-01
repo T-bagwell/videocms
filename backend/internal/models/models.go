@@ -76,6 +76,8 @@ type Video struct {
 	TrailerURL      string     `json:"trailer_url,omitempty"`
 	TrailerTitle    string     `json:"trailer_title,omitempty"`
 	FeaturetteCount int        `json:"featurette_count"`
+	Artist          string     `json:"artist,omitempty"`
+	Album           string     `json:"album,omitempty"`
 	CreatedAt       time.Time  `json:"created_at"`
 	UpdatedAt       time.Time  `json:"updated_at"`
 	ContentRating   string     `json:"content_rating,omitempty"`
@@ -103,6 +105,32 @@ type Series struct {
 	HasPoster    bool      `json:"has_poster"`
 	PosterPath   string    `json:"-"`
 	UpdatedAt    time.Time `json:"updated_at"`
+}
+
+type Album struct {
+	ID          uuid.UUID `json:"id"`
+	LibraryID   uuid.UUID `json:"library_id"`
+	LibraryName string    `json:"library_name"`
+	Name        string    `json:"name"`
+	Artist      string    `json:"artist"`
+	Year        int       `json:"year"`
+	TrackCount  int       `json:"track_count"`
+	HasCover    bool      `json:"has_cover"`
+	CoverPath   string    `json:"-"`
+	UpdatedAt   time.Time `json:"updated_at"`
+}
+
+type MusicTrack struct {
+	ID          uuid.UUID `json:"id"`
+	Title       string    `json:"title"`
+	Filename    string    `json:"filename"`
+	Artist      string    `json:"artist"`
+	Album       string    `json:"album"`
+	DurationSec float64   `json:"duration_sec"`
+	SizeBytes   int64     `json:"size_bytes"`
+	Year        int       `json:"year"`
+	HasPoster   bool      `json:"has_poster"`
+	PosterPath  string    `json:"-"`
 }
 
 type Playlist struct {

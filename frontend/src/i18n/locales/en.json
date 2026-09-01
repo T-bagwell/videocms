@@ -7,6 +7,7 @@
     "tv": "TV Shows",
     "playlists": "Playlists",
     "favorites": "My Favorites",
+    "music": "Music",
     "admin": "Admin",
     "logout": "Log out",
     "parentalLock": "Parental lock",
@@ -195,6 +196,7 @@
     "queue": "Play queue ({{count}})",
     "nowPlaying": "Playing",
     "fromSeries": "From TV show: {{name}}",
+    "fromAlbum": "From album: {{name}}",
     "quality": "Quality",
     "qualityAuto": "Auto",
     "audioTrack": "Audio",
@@ -510,5 +512,12 @@
     "backToSite": "← Back to VideoCMS",
     "passwordTitle": "This share is password protected",
     "passwordPlaceholder": "Enter the share password"
+  },
+  "music": {
+    "playAll": "Play album",
+    "play": "Play",
+    "noAlbums": "No albums yet — scan a library that contains music files",
+    "noTracks": "No tracks",
+    "tracks": "tracks"
   }
 }

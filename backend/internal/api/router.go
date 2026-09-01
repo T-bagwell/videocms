@@ -173,6 +173,9 @@ func (a *App) Routes() http.Handler {
 
 	mux.HandleFunc("GET /api/videos", authUser(a.listVideos))
 	mux.HandleFunc("GET /api/videos/{id}", authUser(a.getVideo))
+	mux.HandleFunc("GET /api/albums", authUser(a.listAlbums))
+	mux.HandleFunc("GET /api/albums/{id}", authUser(a.getAlbum))
+	mux.HandleFunc("GET /api/albums/{id}/poster", authUser(a.albumPoster))
 	mux.HandleFunc("GET /api/videos/{id}/versions", authUser(a.getVideoVersions))
 	mux.HandleFunc("PATCH /api/videos/{id}", authAdmin(a.updateVideo))
 	mux.HandleFunc("POST /api/videos/{id}/poster", authAdmin(a.uploadPoster))

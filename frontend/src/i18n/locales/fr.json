@@ -7,6 +7,7 @@
     "tv": "Séries TV",
     "playlists": "Listes de lecture",
     "favorites": "Mes favoris",
+    "music": "Musique",
     "admin": "Administration",
     "logout": "Se déconnecter",
     "parentalLock": "Contrôle parental",
@@ -195,6 +196,7 @@
     "queue": "File de lecture ({{count}})",
     "nowPlaying": "En lecture",
     "fromSeries": "De la série : {{name}}",
+    "fromAlbum": "De l'album : {{name}}",
     "quality": "Qualité",
     "qualityAuto": "Auto",
     "audioTrack": "Piste audio",
@@ -510,5 +512,12 @@
     "backToSite": "← Retour à VideoCMS",
     "passwordTitle": "Ce partage est protégé par mot de passe",
     "passwordPlaceholder": "Saisissez le mot de passe du partage"
+  },
+  "music": {
+    "playAll": "Lire l'album",
+    "play": "Lire",
+    "noAlbums": "Aucun album pour l'instant — scannez une bibliothèque contenant de la musique",
+    "noTracks": "Aucune piste",
+    "tracks": "pistes"
   }
 }

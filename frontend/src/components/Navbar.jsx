@@ -59,6 +59,9 @@ export default function Navbar() {
         <NavLink to="/favorites" className={({ isActive }) => (isActive ? 'active' : '')}>
           {t('nav.favorites')}
         </NavLink>
+        <NavLink to="/music" className={({ isActive }) => (isActive ? 'active' : '')}>
+          {t('nav.music')}
+        </NavLink>
         {user?.role === 'admin' && (
           <NavLink to="/admin" className={({ isActive }) => (isActive ? 'active' : '')}>
             {t('nav.admin')}

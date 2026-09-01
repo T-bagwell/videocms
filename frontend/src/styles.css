@@ -412,6 +412,17 @@ label input, label textarea { margin-top: 6px; }
 .similar-section { margin-top: 26px; }
 .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
 .poster-link img { width: 100%; border-radius: 8px; display: block; }
+.album-card { text-align: left; }
+.album-cover {
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+  background: var(--bg-soft);
+  display: block;
+}
+.detail-poster.album-cover { aspect-ratio: 1 / 1; }
+.album-name { margin-top: 8px; font-weight: 600; font-size: 14px; }
 .browse-save { flex-wrap: wrap; align-items: center; margin-bottom: 8px; }
 .browse-group { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .collection-input { padding: 6px 10px; border-radius: 6px; font-size: 13px; }

@@ -32,6 +32,12 @@ var videoExts = map[string]bool{
 	".3gp": true, ".ogv": true,
 }
 
+// audioExts are indexed as music tracks and grouped into albums.
+var audioExts = map[string]bool{
+	".mp3": true, ".m4a": true, ".flac": true, ".ogg": true,
+	".opus": true, ".wav": true, ".aac": true,
+}
+
 // subtitleExts in preference order: when several sidecar files exist next to a
 // video, the first match wins. Kept as a slice (not a map) so the choice is
 // deterministic.
@@ -150,6 +156,8 @@ type probeInfo struct {
 	Codec     string
 	Container string
 	HDR       bool
+	Artist    string
+	Album     string
 	Subs      []probeSubtitle // text subtitle streams inside the container
 	Chapters  []probeChapter
 }
@@ -212,6 +220,7 @@ func (s *Scanner) scan(ctx context.Context, lib models.Library) {
 	s.markMissing(ctx, lib.ID, scanStart)
 	s.rebuildSeries(ctx, lib)
 	s.rebuildMovieVersions(ctx, lib)
+	s.rebuildAlbums(ctx, lib)
 
 	status := "idle"
 	scanErr := ""
@@ -257,7 +266,8 @@ func walkVideos(root string, fn func(path string, d fs.DirEntry) error) error {
 		if strings.HasPrefix(d.Name(), ".") {
 			return nil
 		}
-		if !videoExts[strings.ToLower(filepath.Ext(path))] {
+		ext := strings.ToLower(filepath.Ext(path))
+		if !videoExts[ext] && !audioExts[ext] {
 			return nil
 		}
 		return fn(path, d)
@@ -462,7 +472,8 @@ func (s *Scanner) watchEvents(ctx context.Context, watcher *fsnotify.Watcher) {
 }
 
 func isVideoFile(name string) bool {
-	return videoExts[strings.ToLower(filepath.Ext(name))]
+	ext := strings.ToLower(filepath.Ext(name))
+	return videoExts[ext] || audioExts[ext]
 }
 
 func isSubtitleFile(name string) bool {
@@ -758,6 +769,7 @@ func (s *Scanner) watchLibrary(ctx context.Context, lib models.Library) error {
 	if changed {
 		s.rebuildSeries(ctx, lib)
 		s.rebuildMovieVersions(ctx, lib)
+		s.rebuildAlbums(ctx, lib)
 		if _, err := s.pool.Exec(ctx,
 			`UPDATE libraries SET video_count=(SELECT count(*) FROM videos WHERE library_id=$1 AND available=true) WHERE id=$2`,
 			lib.ID, lib.ID); err != nil {
@@ -880,6 +892,85 @@ func (s *Scanner) rebuildMovieVersions(ctx context.Context, lib models.Library) 
 	log.Printf("movie versions rebuilt for library %s", lib.ID.String()[:8])
 }
 
+// rebuildAlbums groups available music tracks into albums by (artist, album)
+// tag pairs. Tracks without tags keep no album assignment. Runs after every
+// scan, mirroring rebuildSeries and rebuildMovieVersions.
+func (s *Scanner) rebuildAlbums(ctx context.Context, lib models.Library) {
+	type track struct {
+		id     uuid.UUID
+		artist string
+		album  string
+		year   int
+		poster string
+	}
+	rows, err := s.pool.Query(ctx,
+		`SELECT id, artist, album, year, poster_path FROM videos
+		 WHERE library_id=$1 AND available=true AND (artist <> '' OR album <> '')`, lib.ID)
+	if err != nil {
+		log.Printf("rebuild albums query: %v", err)
+		return
+	}
+	byKey := map[string][]track{}
+	meta := map[string]struct{ name, artist string }{}
+	var order []string
+	for rows.Next() {
+		var t track
+		if err := rows.Scan(&t.id, &t.artist, &t.album, &t.year, &t.poster); err != nil {
+			continue
+		}
+		key := strings.ToLower(strings.TrimSpace(t.artist)) + "\x00" + strings.ToLower(strings.TrimSpace(t.album))
+		if _, ok := byKey[key]; !ok {
+			name := strings.TrimSpace(t.album)
+			if name == "" {
+				name = strings.TrimSpace(t.artist)
+			}
+			artist := strings.TrimSpace(t.artist)
+			if artist == "" {
+				artist = strings.TrimSpace(t.album)
+			}
+			meta[key] = struct{ name, artist string }{name, artist}
+			order = append(order, key)
+		}
+		byKey[key] = append(byKey[key], t)
+	}
+	rows.Close()
+
+	if _, err := s.pool.Exec(ctx,
+		`DELETE FROM albums WHERE library_id=$1`, lib.ID); err != nil {
+		log.Printf("reset albums: %v", err)
+		return
+	}
+	for _, key := range order {
+		group := byKey[key]
+		m := meta[key]
+		year := 0
+		cover := ""
+		for _, t := range group {
+			if year == 0 && t.year > 0 {
+				year = t.year
+			}
+			if cover == "" && t.poster != "" {
+				cover = t.poster
+			}
+		}
+		var albumID uuid.UUID
+		if err := s.pool.QueryRow(ctx, `
+			INSERT INTO albums (library_id, name, artist, year, cover_path)
+			VALUES ($1,$2,$3,$4,$5) RETURNING id`,
+			lib.ID, m.name, m.artist, year, cover).Scan(&albumID); err != nil {
+			log.Printf("upsert album %q: %v", m.name, err)
+			continue
+		}
+		for _, t := range group {
+			if _, err := s.pool.Exec(ctx,
+				`UPDATE videos SET album_id=$1 WHERE id=$2`, albumID, t.id); err != nil {
+				log.Printf("assign album track: %v", err)
+			}
+		}
+	}
+	log.Printf("albums rebuilt for library %s: %d groups", lib.ID.String()[:8], len(order))
+}
+
 func scanWorkers() int {
 	n := 4
 	if v := os.Getenv("SCAN_WORKERS"); v != "" {
@@ -918,9 +1009,9 @@ func (s *Scanner) upsert(ctx context.Context, libID uuid.UUID, path string, info
 		INSERT INTO videos (
 			library_id, title, filename, file_path, size_bytes, duration_sec,
 			width, height, video_codec, container, year, subtitle_path,
-			version_key, version_label, version_rank, hdr,
+			version_key, version_label, version_rank, hdr, artist, album,
 			available, updated_at, last_scanned_at
-		) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,true,now(),now())
+		) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,true,now(),now())
 		ON CONFLICT (file_path) DO UPDATE SET
 			library_id = EXCLUDED.library_id,
 			title = EXCLUDED.title,
@@ -937,20 +1028,29 @@ func (s *Scanner) upsert(ctx context.Context, libID uuid.UUID, path string, info
 			version_label = EXCLUDED.version_label,
 			version_rank = EXCLUDED.version_rank,
 			hdr = EXCLUDED.hdr,
+			artist = EXCLUDED.artist,
+			album = EXCLUDED.album,
 			available = true,
 			updated_at = now(),
 			last_scanned_at = now()
 		RETURNING id, poster_path`,
 		libID, title, filename, path, info.Size, info.Duration,
 		info.Width, info.Height, info.Codec, info.Container, year, subtitle,
-		versionKey, versionLabel, versionRank, info.HDR,
+		versionKey, versionLabel, versionRank, info.HDR, info.Artist, info.Album,
 	).Scan(&id, &posterPath)
 	if err != nil {
 		return fmt.Errorf("upsert video: %w", err)
 	}
 
 	if posterPath == "" {
-		if p, err := s.extractPoster(ctx, id, path, info.Duration); err == nil && p != "" {
+		var p string
+		var perr error
+		if audioExts[strings.ToLower(filepath.Ext(path))] {
+			p, perr = s.extractAudioCover(ctx, id, path)
+		} else {
+			p, perr = s.extractPoster(ctx, id, path, info.Duration)
+		}
+		if perr == nil && p != "" {
 			if _, err := s.pool.Exec(ctx,
 				`UPDATE videos SET poster_path=$1 WHERE id=$2`, p, id); err != nil {
 				log.Printf("save poster path: %v", err)
@@ -1021,6 +1121,10 @@ func (s *Scanner) probe(ctx context.Context, path string) (probeInfo, error) {
 			Duration   string `json:"duration"`
 			Size       string `json:"size"`
 			FormatName string `json:"format_name"`
+			Tags       struct {
+				Artist string `json:"artist"`
+				Album  string `json:"album"`
+			} `json:"tags"`
 		} `json:"format"`
 		Chapters []struct {
 			StartTime string `json:"start_time"`
@@ -1036,6 +1140,8 @@ func (s *Scanner) probe(ctx context.Context, path string) (probeInfo, error) {
 	info.Duration, _ = strconv.ParseFloat(raw.Format.Duration, 64)
 	info.Size, _ = strconv.ParseInt(raw.Format.Size, 10, 64)
 	info.Container = raw.Format.FormatName
+	info.Artist = strings.TrimSpace(raw.Format.Tags.Artist)
+	info.Album = strings.TrimSpace(raw.Format.Tags.Album)
 	for _, st := range raw.Streams {
 		if st.CodecType != "video" {
 			continue
@@ -1111,6 +1217,24 @@ func (s *Scanner) extractPoster(ctx context.Context, videoID uuid.UUID, path str
 		"-i", path, "-frames:v", "1", "-vf", "scale=480:-2", "-q:v", "4", dst)
 	if out, err := cmd.CombinedOutput(); err != nil {
 		return "", fmt.Errorf("ffmpeg: %w: %s", err, truncate(string(out), 300))
+	}
+	return dst, nil
+}
+
+// extractAudioCover pulls the embedded cover art (attached picture stream)
+// out of an audio file and stores it as the track poster / album cover.
+func (s *Scanner) extractAudioCover(ctx context.Context, videoID uuid.UUID, path string) (string, error) {
+	posterDir := filepath.Join(s.dataDir, "posters")
+	if err := os.MkdirAll(posterDir, 0o755); err != nil {
+		return "", err
+	}
+	dst := filepath.Join(posterDir, videoID.String()+".jpg")
+	ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
+	defer cancel()
+	cmd := exec.CommandContext(ctx, s.ffmpegBin, "-y", "-i", path,
+		"-map", "0:v:0", "-frames:v", "1", "-vf", "scale=480:-2", "-q:v", "4", dst)
+	if out, err := cmd.CombinedOutput(); err != nil {
+		return "", fmt.Errorf("ffmpeg cover: %w: %s", err, truncate(string(out), 300))
 	}
 	return dst, nil
 }
