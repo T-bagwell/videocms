@@ -17,7 +17,9 @@ func TestCustomScraperProvider(t *testing.T) {
 		w.Header().Set("Content-Type", "application/json")
 		_ = json.NewEncoder(w).Encode(map[string]any{
 			"title": "Custom Title", "year": 2021, "synopsis": "Custom synopsis",
-			"genres": []string{"Sci-Fi"},
+			"genres":        []string{"Sci-Fi"},
+			"trailer_url":   "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+			"trailer_title": "Official Trailer",
 		})
 	}))
 	defer srv.Close()
@@ -34,6 +36,9 @@ func TestCustomScraperProvider(t *testing.T) {
 	status, d = doJSON(t, "GET", env.server.URL+"/api/videos/"+videoID.String(), token, nil)
 	if status != http.StatusOK || d["title"] != "Custom Title" {
 		t.Fatalf("video after scrape status = %d, body = %v", status, d)
+	}
+	if d["trailer_url"] != "https://www.youtube.com/watch?v=dQw4w9WgXcQ" {
+		t.Fatalf("trailer_url after scrape = %v, want youtube watch URL", d["trailer_url"])
 	}
 
 	// Without force, an already-enriched video is rejected with 409.

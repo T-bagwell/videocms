@@ -48,6 +48,8 @@ const videoColumns = `
 	            WHERE vv3.version_key = v.version_key AND vv3.version_key <> ''
 	              AND (vv3.version_rank > v.version_rank
 	                   OR (vv3.version_rank = v.version_rank AND vv3.id < v.id))) AS is_primary,
+	v.trailer_url, v.trailer_title,
+	(SELECT count(*) FROM featurettes ft WHERE ft.video_id=v.id) AS featurette_count,
 	COALESCE(bl.id::text, '') AS blocked_id,
 	v.created_at, v.updated_at, v.content_rating,
 	EXISTS(SELECT 1 FROM favorites f WHERE f.user_id=$1 AND f.video_id=v.id) AS is_fav,
@@ -100,7 +102,7 @@ func scanVideo(row pgx.Row) (models.Video, error) {
 		&v.SizeBytes, &v.DurationSec, &v.Width, &v.Height, &v.VideoCodec, &v.Container,
 		&v.Year, &v.Synopsis, &v.Genres, &v.PosterPath, &v.SubtitlePath, &v.Available,
 		&v.SeriesID, &v.Season, &v.Episode, &v.SeriesName, &v.VersionKey, &v.VersionLabel,
-		&v.VersionCount, &v.IsPrimary, &v.BlockedID,
+		&v.VersionCount, &v.IsPrimary, &v.TrailerURL, &v.TrailerTitle, &v.FeaturetteCount, &v.BlockedID,
 		&v.CreatedAt, &v.UpdatedAt, &v.ContentRating, &v.IsFavorite, &v.ProgressSec, &v.ProgressDur)
 	v.Blocked = v.BlockedID != ""
 	v.HasPoster = v.PosterPath != ""

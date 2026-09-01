@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { api, mediaUrl } from '../api.js';
@@ -30,6 +30,12 @@ export default function VideoDetailPage() {
   const [transcript, setTranscript] = useState(null);
   const [transcribing, setTranscribing] = useState(false);
   const [versions, setVersions] = useState([]);
+  const [trailerOpen, setTrailerOpen] = useState(false);
+  const [featurettes, setFeaturettes] = useState([]);
+  const [featurettePlaying, setFeaturettePlaying] = useState(null);
+  const [featuretteTitle, setFeaturetteTitle] = useState('');
+  const [featuretteBusy, setFeaturetteBusy] = useState(false);
+  const featuretteFileRef = useRef(null);
   const [scrapeProvider, setScrapeProvider] = useState('tmdb');
   const [scrapeForce, setScrapeForce] = useState(false);
   const [tags, setTags] = useState([]);
@@ -56,7 +62,47 @@ export default function VideoDetailPage() {
     api(`/videos/${id}/versions`)
       .then((d) => setVersions(d.versions || []))
       .catch(() => setVersions([]));
+    api(`/videos/${id}/featurettes`)
+      .then((d) => setFeaturettes(d.items || []))
+      .catch(() => setFeaturettes([]));
   }, [id]);
+
+  function youtubeId(url) {
+    const m = String(url || '').match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([\w-]{11})/);
+    return m ? m[1] : null;
+  }
+
+  async function uploadFeaturette(e) {
+    e.preventDefault();
+    const file = featuretteFileRef.current?.files?.[0];
+    if (!file) return;
+    setFeaturetteBusy(true);
+    setErr('');
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      if (featuretteTitle.trim()) fd.append('title', featuretteTitle.trim());
+      await api(`/videos/${video.id}/featurettes`, { method: 'POST', form: fd });
+      if (featuretteFileRef.current) featuretteFileRef.current.value = '';
+      setFeaturetteTitle('');
+      const d = await api(`/videos/${video.id}/featurettes`);
+      setFeaturettes(d.items || []);
+      setMsg(t('video.featuretteUploaded'));
+    } catch (e2) {
+      setErr(e2.message);
+    } finally {
+      setFeaturetteBusy(false);
+    }
+  }
+
+  async function removeFeaturette(ft) {
+    try {
+      await api(`/videos/${video.id}/featurettes/${ft.id}`, { method: 'DELETE' });
+      setFeaturettes((prev) => prev.filter((x) => x.id !== ft.id));
+    } catch (e2) {
+      setErr(e2.message);
+    }
+  }
 
   async function postComment(e) {
     e.preventDefault();
@@ -382,6 +428,12 @@ export default function VideoDetailPage() {
               <PlayIcon />
               {video.progress_sec > 5 ? t('video.resume') : t('video.play')}
             </button>
+            {video.trailer_url && youtubeId(video.trailer_url) && (
+              <button className="btn" onClick={() => setTrailerOpen(true)}>
+                <PlayIcon />
+                {t('video.trailer')}
+              </button>
+            )}
             <button className="btn" onClick={toggleFavorite}>
               {video.is_favorite ? <StarFilledIcon /> : <StarIcon />}
               {video.is_favorite ? t('video.unfavorite') : t('video.favorite')}
@@ -427,6 +479,51 @@ export default function VideoDetailPage() {
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+          {(featurettes.length > 0 || user?.role === 'admin') && (
+            <div className="card versions-panel">
+              <h3>{t('video.featurettesTitle')}</h3>
+              <div className="version-list">
+                {featurettes.map((ft) => (
+                  <div key={ft.id} className="version-row">
+                    <div className="version-info">
+                      <b>{ft.title}</b>
+                      <span className="muted small">{fmtBytes(ft.size_bytes)}</span>
+                    </div>
+                    <div className="version-actions">
+                      <button className="btn small primary" onClick={() => setFeaturettePlaying(ft)}>
+                        <PlayIcon />
+                        {t('video.featurettePlay')}
+                      </button>
+                      {user?.role === 'admin' && (
+                        <button className="btn small ghost" onClick={() => removeFeaturette(ft)}>
+                          {t('common.remove')}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {user?.role === 'admin' && (
+                <form className="inline-form featurette-upload" onSubmit={uploadFeaturette}>
+                  <input
+                    type="file"
+                    accept="video/mp4,video/webm,video/quicktime,.mkv,.m4v,.avi,.mov,.mpg,.mpeg"
+                    ref={featuretteFileRef}
+                    required
+                  />
+                  <input
+                    placeholder={t('video.featuretteTitlePlaceholder')}
+                    value={featuretteTitle}
+                    onChange={(e) => setFeaturetteTitle(e.target.value)}
+                    maxLength={200}
+                  />
+                  <button className="btn small primary" disabled={featuretteBusy}>
+                    {featuretteBusy ? t('video.uploading') : t('video.featuretteUpload')}
+                  </button>
+                </form>
+              )}
             </div>
           )}
           {user?.role === 'admin' && (
@@ -688,6 +785,45 @@ export default function VideoDetailPage() {
               .catch(() => {});
           }}
         />
+      )}
+
+      {trailerOpen && (
+        <div className="modal-backdrop" onClick={() => setTrailerOpen(false)}>
+          <div className="modal modal-wide" onClick={(e) => e.stopPropagation()}>
+            <h3>{video.trailer_title || t('video.trailer')}</h3>
+            <iframe
+              className="trailer-frame"
+              src={`https://www.youtube-nocookie.com/embed/${youtubeId(video.trailer_url)}`}
+              title={t('video.trailer')}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+            <div className="modal-actions">
+              <button className="btn ghost" onClick={() => setTrailerOpen(false)}>
+                {t('common.close')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {featurettePlaying && (
+        <div className="modal-backdrop" onClick={() => setFeaturettePlaying(null)}>
+          <div className="modal modal-wide" onClick={(e) => e.stopPropagation()}>
+            <h3>{featurettePlaying.title}</h3>
+            <video
+              className="featurette-player"
+              src={mediaUrl(`/videos/${video.id}/featurettes/${featurettePlaying.id}/stream`)}
+              controls
+              autoPlay
+            />
+            <div className="modal-actions">
+              <button className="btn ghost" onClick={() => setFeaturettePlaying(null)}>
+                {t('common.close')}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       <div className="back-link">

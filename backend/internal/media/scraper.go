@@ -191,16 +191,21 @@ func (s *Scraper) searchCustom(ctx context.Context, title string, year int) (*tm
 		return nil, fmt.Errorf("custom scraper: HTTP %d", resp.StatusCode)
 	}
 	var d struct {
-		Title     string   `json:"title"`
-		Year      int      `json:"year"`
-		Synopsis  string   `json:"synopsis"`
-		Genres    []string `json:"genres"`
-		PosterURL string   `json:"poster_url"`
+		Title       string   `json:"title"`
+		Year        int      `json:"year"`
+		Synopsis    string   `json:"synopsis"`
+		Genres      []string `json:"genres"`
+		PosterURL   string   `json:"poster_url"`
+		TrailerURL  string   `json:"trailer_url"`
+		TrailerName string   `json:"trailer_title"`
 	}
 	if err := json.NewDecoder(io.LimitReader(resp.Body, 2<<20)).Decode(&d); err != nil {
 		return nil, fmt.Errorf("custom scraper: parse response: %w", err)
 	}
-	info := &tmdbInfo{Title: d.Title, Year: d.Year, Synopsis: d.Synopsis, Genres: d.Genres, Poster: d.PosterURL}
+	info := &tmdbInfo{
+		Title: d.Title, Year: d.Year, Synopsis: d.Synopsis, Genres: d.Genres,
+		Poster: d.PosterURL, TrailerURL: d.TrailerURL, TrailerTitle: d.TrailerName,
+	}
 	if info.Year == 0 {
 		info.Year = year
 	}
@@ -208,12 +213,14 @@ func (s *Scraper) searchCustom(ctx context.Context, title string, year int) (*tm
 }
 
 type tmdbInfo struct {
-	TmdbID   int
-	Title    string
-	Year     int
-	Synopsis string
-	Genres   []string
-	Poster   string
+	TmdbID       int
+	Title        string
+	Year         int
+	Synopsis     string
+	Genres       []string
+	Poster       string
+	TrailerURL   string
+	TrailerTitle string
 }
 
 func (s *Scraper) search(ctx context.Context, title string, year int) (*tmdbInfo, error) {
@@ -287,6 +294,40 @@ func (s *Scraper) searchTMDB(ctx context.Context, title string, year int) (*tmdb
 	if err := s.getJSON(ctx, du, &detail); err == nil {
 		for _, g := range detail.Genres {
 			info.Genres = append(info.Genres, g.Name)
+		}
+	}
+
+	// Official trailers: prefer the configured language, then any English
+	// trailer, and keep the first YouTube result.
+	var videosResp struct {
+		Results []struct {
+			Key      string `json:"key"`
+			Name     string `json:"name"`
+			Site     string `json:"site"`
+			Type     string `json:"type"`
+			Language string `json:"iso_639_1"`
+		} `json:"results"`
+	}
+	vu := fmt.Sprintf("https://api.themoviedb.org/3/movie/%d/videos?api_key=%s&language=%s",
+		best.ID, s.apiKey, s.lang)
+	if err := s.getJSON(ctx, vu, &videosResp); err == nil {
+		for _, pass := range []string{s.lang, "en", ""} {
+			found := false
+			for _, v := range videosResp.Results {
+				if v.Site != "YouTube" || v.Type != "Trailer" {
+					continue
+				}
+				if pass != "" && v.Language != pass {
+					continue
+				}
+				info.TrailerURL = "https://www.youtube.com/watch?v=" + v.Key
+				info.TrailerTitle = v.Name
+				found = true
+				break
+			}
+			if found {
+				break
+			}
 		}
 	}
 	return info, nil
@@ -483,8 +524,9 @@ func (s *Scraper) apply(ctx context.Context, videoID uuid.UUID, info *tmdbInfo) 
 	}
 	if _, err := s.pool.Exec(ctx, `
 		UPDATE videos SET title=$1, year=$2, synopsis=$3, genres=$4, poster_path=$5,
-			tmdb_id=$6, scraped_at=now(), updated_at=now() WHERE id=$7`,
-		info.Title, info.Year, info.Synopsis, info.Genres, posterPath, info.TmdbID, videoID); err != nil {
+			tmdb_id=$6, trailer_url=$7, trailer_title=$8, scraped_at=now(), updated_at=now() WHERE id=$9`,
+		info.Title, info.Year, info.Synopsis, info.Genres, posterPath, info.TmdbID,
+		info.TrailerURL, info.TrailerTitle, videoID); err != nil {
 		return err
 	}
 	if oldPoster != "" && oldPoster != posterPath &&
