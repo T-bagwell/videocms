@@ -324,7 +324,7 @@ from the product's own perspective.
 
 **Live TV & IPTV**
 
-- [ ] IPTV channels: scheduled channels generated from M3U sources or the
+- [x] IPTV channels: scheduled channels generated from M3U sources or the
       library, with M3U and EPG (XMLTV) output
 - [ ] Tuner-based live TV (DVB/ATSC/HDHomeRun) with guide data and recording
       schedules

@@ -306,7 +306,7 @@ scripts/                 演示素材生成器
 
 **直播电视与 IPTV**
 
-- [ ] IPTV 频道：从 M3U 源或媒体库生成定时频道，输出 M3U 与 EPG（XMLTV）
+- [x] IPTV 频道：从 M3U 源或媒体库生成定时频道，输出 M3U 与 EPG（XMLTV）
 - [ ] 调谐器直播（DVB/ATSC/HDHomeRun）：节目指南与录像排程
 - [ ] 台标、回看与时移播放
 
