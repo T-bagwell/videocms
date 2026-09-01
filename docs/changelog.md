@@ -59,6 +59,9 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Request workflow: users submit title requests (movie/TV with notes) and
+  track their status; admins approve or reject them, and approving with a
+  download URL queues a yt-dlp job into the existing download pipeline
 - IPTV channels: channels can be imported from M3U playlists or generated from
   a library (streamed as a continuous MPEG-TS feed via ffmpeg concat), with
   token-protected M3U and XMLTV EPG outputs and an XMLTV EPG importer; an IPTV
