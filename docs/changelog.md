@@ -59,6 +59,11 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- More transcode profiles: `HLS_VCODEC=libx265|libsvtav1|libvpx-vp9` switches
+  software HLS transcodes to HEVC/AV1/VP9, and `HLS_PASSTHROUGH_HDR=1`
+  (default) preserves Dolby Vision / HDR10+ signal on 10-bit-capable encoders
+  while 8-bit encoders fall back to tone mapping; HDR is detected from ffprobe
+  during scans
 - Chapters: ffprobe chapter data is stored per video during scans and served
   by `GET /api/videos/{id}/chapters`; the player renders chapter ticks on the
   preview timeline and clickable chapter chips that seek to each segment
