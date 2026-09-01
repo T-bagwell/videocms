@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"image"
 	"io/fs"
 	"log"
 	"math"
@@ -21,8 +22,14 @@ import (
 	"github.com/fsnotify/fsnotify"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/rwcarlsen/goexif/exif"
 
 	"videocms/backend/internal/models"
+
+	// register standard image decoders for photo dimension probing
+	_ "image/gif"
+	_ "image/jpeg"
+	_ "image/png"
 )
 
 var videoExts = map[string]bool{
@@ -41,6 +48,12 @@ var audioExts = map[string]bool{
 // bookExts are indexed as books/comics (EPUB, CBZ) without media probing.
 var bookExts = map[string]bool{
 	".epub": true, ".cbz": true,
+}
+
+// photoExts are indexed as photos with EXIF metadata (no media probe).
+var photoExts = map[string]bool{
+	".jpg": true, ".jpeg": true, ".png": true, ".gif": true,
+	".webp": true, ".bmp": true,
 }
 
 // subtitleExts in preference order: when several sidecar files exist next to a
@@ -224,9 +237,11 @@ func (s *Scanner) scan(ctx context.Context, lib models.Library) {
 	}
 	s.markMissing(ctx, lib.ID, scanStart)
 	s.markMissingBooks(ctx, lib.ID, scanStart)
+	s.markMissingPhotos(ctx, lib.ID, scanStart)
 	s.rebuildSeries(ctx, lib)
 	s.rebuildMovieVersions(ctx, lib)
 	s.rebuildAlbums(ctx, lib)
+	s.rebuildPhotoAlbums(ctx, lib)
 
 	status := "idle"
 	scanErr := ""
@@ -273,7 +288,7 @@ func walkVideos(root string, fn func(path string, d fs.DirEntry) error) error {
 			return nil
 		}
 		ext := strings.ToLower(filepath.Ext(path))
-		if !videoExts[ext] && !audioExts[ext] && !bookExts[ext] {
+		if !videoExts[ext] && !audioExts[ext] && !bookExts[ext] && !photoExts[ext] {
 			return nil
 		}
 		return fn(path, d)
@@ -301,6 +316,12 @@ func (s *Scanner) indexFiles(ctx context.Context, libID uuid.UUID, paths chan st
 				if bookExts[strings.ToLower(filepath.Ext(path))] {
 					if err := s.upsertBook(ctx, libID, path); err != nil {
 						log.Printf("upsert book %s: %v", path, err)
+					}
+					continue
+				}
+				if photoExts[strings.ToLower(filepath.Ext(path))] {
+					if err := s.upsertPhoto(ctx, libID, path); err != nil {
+						log.Printf("upsert photo %s: %v", path, err)
 					}
 					continue
 				}
@@ -354,6 +375,75 @@ func (s *Scanner) upsertBook(ctx context.Context, libID uuid.UUID, path string) 
 		return fmt.Errorf("upsert book: %w", err)
 	}
 	return nil
+}
+
+// upsertPhoto indexes an image file: title from the filename, dimensions via
+// image.DecodeConfig and EXIF (taken-at, camera) when present.
+func (s *Scanner) upsertPhoto(ctx context.Context, libID uuid.UUID, path string) error {
+	filename := filepath.Base(path)
+	title, _ := deriveTitle(filename)
+	st, err := os.Stat(path)
+	if err != nil {
+		return err
+	}
+	width, height := 0, 0
+	if f, err := os.Open(path); err == nil {
+		if cfg, _, err := image.DecodeConfig(f); err == nil {
+			width, height = cfg.Width, cfg.Height
+		}
+		_ = f.Close()
+	}
+	var takenAt *time.Time
+	camera := ""
+	if strings.EqualFold(filepath.Ext(path), ".jpg") || strings.EqualFold(filepath.Ext(path), ".jpeg") {
+		if f, err := os.Open(path); err == nil {
+			if x, err := exif.Decode(f); err == nil {
+				if t, err := x.DateTime(); err == nil {
+					takenAt = &t
+				}
+				parts := []string{}
+				if m, err := x.Get(exif.Make); err == nil {
+					parts = append(parts, strings.TrimSpace(fmt.Sprint(m)))
+				}
+				if md, err := x.Get(exif.Model); err == nil {
+					parts = append(parts, strings.TrimSpace(fmt.Sprint(md)))
+				}
+				if v := strings.Join(parts, " "); strings.TrimSpace(v) != "" {
+					camera = v
+				}
+			}
+			_ = f.Close()
+		}
+	}
+	_, err = s.pool.Exec(ctx, `
+		INSERT INTO photos (library_id, title, file_path, size_bytes, width, height, taken_at, camera, available, updated_at, last_scanned_at)
+		VALUES ($1,$2,$3,$4,$5,$6,$7,$8,true,now(),now())
+		ON CONFLICT (file_path) DO UPDATE SET
+			library_id = EXCLUDED.library_id,
+			title = EXCLUDED.title,
+			size_bytes = EXCLUDED.size_bytes,
+			width = EXCLUDED.width,
+			height = EXCLUDED.height,
+			taken_at = EXCLUDED.taken_at,
+			camera = EXCLUDED.camera,
+			available = true,
+			updated_at = now(),
+			last_scanned_at = now()`,
+		libID, title, path, st.Size(), width, height, takenAt, camera)
+	if err != nil {
+		return fmt.Errorf("upsert photo: %w", err)
+	}
+	return nil
+}
+
+// markMissingPhotos disables photo rows that were not seen in the latest pass.
+func (s *Scanner) markMissingPhotos(ctx context.Context, libID uuid.UUID, scanStart time.Time) {
+	if _, err := s.pool.Exec(ctx,
+		`UPDATE photos SET available=false, updated_at=now()
+		 WHERE library_id=$1 AND available=true AND last_scanned_at < $2`,
+		libID, scanStart); err != nil {
+		log.Printf("mark missing photos: %v", err)
+	}
 }
 
 // markMissingBooks disables book rows that were not seen in the latest pass.
@@ -555,6 +645,12 @@ func (s *Scanner) applyEventBatch(ctx context.Context, libID uuid.UUID, videos m
 			WHERE library_id=$1 AND available AND starts_with(file_path, $2 || '/')`,
 			libID, dir); err != nil {
 			log.Printf("watcher: mark removed book dir %s: %v", dir, err)
+		}
+		if _, err := s.pool.Exec(ctx, `
+			UPDATE photos SET available=false, updated_at=now()
+			WHERE library_id=$1 AND available AND starts_with(file_path, $2 || '/')`,
+			libID, dir); err != nil {
+			log.Printf("watcher: mark removed photo dir %s: %v", dir, err)
 		}
 	}
 
@@ -830,11 +926,21 @@ func (s *Scanner) watchLibrary(ctx context.Context, lib models.Library) error {
 	} else if tag.RowsAffected() > 0 {
 		changed = true
 	}
+	tag, err = s.pool.Exec(ctx,
+		`UPDATE photos SET available=false, updated_at=now()
+		 WHERE library_id=$1 AND available=true AND last_scanned_at < $2`,
+		lib.ID, passStart)
+	if err != nil {
+		log.Printf("watcher: mark missing photos: %v", err)
+	} else if tag.RowsAffected() > 0 {
+		changed = true
+	}
 
 	if changed {
 		s.rebuildSeries(ctx, lib)
 		s.rebuildMovieVersions(ctx, lib)
 		s.rebuildAlbums(ctx, lib)
+		s.rebuildPhotoAlbums(ctx, lib)
 		if _, err := s.pool.Exec(ctx,
 			`UPDATE libraries SET video_count=(SELECT count(*) FROM videos WHERE library_id=$1 AND available=true) WHERE id=$2`,
 			lib.ID, lib.ID); err != nil {
@@ -1034,6 +1140,79 @@ func (s *Scanner) rebuildAlbums(ctx context.Context, lib models.Library) {
 		}
 	}
 	log.Printf("albums rebuilt for library %s: %d groups", lib.ID.String()[:8], len(order))
+}
+
+// rebuildPhotoAlbums groups available photos into albums by the first folder
+// under the library root. Photos in the root itself share the library name.
+// Runs after every scan.
+func (s *Scanner) rebuildPhotoAlbums(ctx context.Context, lib models.Library) {
+	rows, err := s.pool.Query(ctx,
+		`SELECT id, file_path FROM photos WHERE library_id=$1 AND available=true`, lib.ID)
+	if err != nil {
+		log.Printf("rebuild photo albums query: %v", err)
+		return
+	}
+	byName := map[string][]uuid.UUID{}
+	coverOf := map[string]string{}
+	var order []string
+	for rows.Next() {
+		var id uuid.UUID
+		var fp string
+		if err := rows.Scan(&id, &fp); err != nil {
+			continue
+		}
+		name := photoAlbumName(lib.Path, fp)
+		if name == "" {
+			continue
+		}
+		if _, ok := byName[name]; !ok {
+			order = append(order, name)
+		}
+		byName[name] = append(byName[name], id)
+		if _, ok := coverOf[name]; !ok {
+			coverOf[name] = fp
+		}
+	}
+	rows.Close()
+
+	if _, err := s.pool.Exec(ctx,
+		`DELETE FROM photo_albums WHERE library_id=$1`, lib.ID); err != nil {
+		log.Printf("reset photo albums: %v", err)
+		return
+	}
+	for _, name := range order {
+		var albumID uuid.UUID
+		if err := s.pool.QueryRow(ctx, `
+			INSERT INTO photo_albums (library_id, name, cover_path)
+			VALUES ($1,$2,$3) RETURNING id`,
+			lib.ID, name, coverOf[name]).Scan(&albumID); err != nil {
+			log.Printf("upsert photo album %q: %v", name, err)
+			continue
+		}
+		ids := byName[name]
+		if _, err := s.pool.Exec(ctx,
+			`UPDATE photos SET album_id=$1 WHERE id = ANY($2::uuid[])`, albumID, ids); err != nil {
+			log.Printf("assign photo album: %v", err)
+		}
+	}
+	log.Printf("photo albums rebuilt for library %s: %d groups", lib.ID.String()[:8], len(order))
+}
+
+// photoAlbumName returns the first path segment of a photo under the library
+// root, or the library basename for photos in the root.
+func photoAlbumName(libPath, filePath string) string {
+	rel, err := filepath.Rel(libPath, filepath.Dir(filePath))
+	if err != nil {
+		return ""
+	}
+	rel = filepath.Clean(rel)
+	if rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+		return ""
+	}
+	if rel == "." {
+		return filepath.Base(libPath)
+	}
+	return strings.Split(rel, string(filepath.Separator))[0]
 }
 
 func scanWorkers() int {

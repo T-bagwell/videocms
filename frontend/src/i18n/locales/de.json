@@ -9,6 +9,7 @@
     "favorites": "Meine Favoriten",
     "music": "Musik",
     "books": "Bücher",
+    "photos": "Fotos",
     "admin": "Verwaltung",
     "logout": "Abmelden",
     "parentalLock": "Kindersicherung",
@@ -529,5 +530,16 @@
     "prev": "Zurück",
     "next": "Weiter",
     "unreadable": "Dieses Buch enthält keine lesbaren Seiten"
+  },
+  "photos": {
+    "noAlbums": "Noch keine Fotoalben — scannen Sie eine Bibliothek mit Bildern",
+    "noPhotos": "Keine Fotos in diesem Album",
+    "photos": "Fotos",
+    "slideshow": "Diashow",
+    "play": "Abspielen",
+    "pause": "Pause",
+    "prev": "Zurück",
+    "next": "Weiter",
+    "of": "{{current}} / {{total}}"
   }
 }

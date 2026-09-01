@@ -16,15 +16,6 @@ import (
 	"videocms/backend/internal/models"
 )
 
-var tinyPNG = []byte{
-	0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D,
-	0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
-	0x08, 0x06, 0x00, 0x00, 0x00, 0x1F, 0x15, 0xC4, 0x89, 0x00, 0x00, 0x00,
-	0x0D, 0x49, 0x44, 0x41, 0x54, 0x78, 0x9C, 0x62, 0x00, 0x01, 0x00, 0x00,
-	0x05, 0x00, 0x01, 0x0D, 0x0A, 0x2D, 0xB4, 0x00, 0x00, 0x00, 0x00, 0x49,
-	0x45, 0x4E, 0x44, 0xAE, 0x42, 0x60, 0x82,
-}
-
 func writeZip(t *testing.T, path string, entries map[string][]byte) {
 	t.Helper()
 	out, err := os.Create(path)
@@ -49,9 +40,10 @@ func writeZip(t *testing.T, path string, entries map[string][]byte) {
 
 func makeTestCBZ(t *testing.T, path string) {
 	t.Helper()
+	pngData := makeValidPNG(t)
 	writeZip(t, path, map[string][]byte{
-		"page 01.png": tinyPNG,
-		"page 02.png": tinyPNG,
+		"page 01.png": pngData,
+		"page 02.png": pngData,
 	})
 }
 
@@ -90,6 +82,7 @@ func TestBooksFromScan(t *testing.T) {
 	env := newIntegrationEnv(t)
 	ctx := context.Background()
 	libDir := t.TempDir()
+	pngData := makeValidPNG(t)
 	makeTestCBZ(t, filepath.Join(libDir, "Comic.cbz"))
 	makeTestEPUB(t, filepath.Join(libDir, "Novel.epub"))
 
@@ -162,7 +155,7 @@ func TestBooksFromScan(t *testing.T) {
 	}
 	body, _ := io.ReadAll(resp2.Body)
 	_ = resp2.Body.Close()
-	if resp2.StatusCode != http.StatusOK || !bytes.Equal(body, tinyPNG) {
+	if resp2.StatusCode != http.StatusOK || !bytes.Equal(body, pngData) {
 		t.Fatalf("cbz page 0 status = %d, body len = %d", resp2.StatusCode, len(body))
 	}
 

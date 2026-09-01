@@ -9,6 +9,7 @@
     "favorites": "Mes favoris",
     "music": "Musique",
     "books": "Livres",
+    "photos": "Photos",
     "admin": "Administration",
     "logout": "Se déconnecter",
     "parentalLock": "Contrôle parental",
@@ -529,5 +530,16 @@
     "prev": "Précédent",
     "next": "Suivant",
     "unreadable": "Ce livre ne contient aucune page lisible"
+  },
+  "photos": {
+    "noAlbums": "Aucun album photo pour l'instant — scannez une bibliothèque contenant des images",
+    "noPhotos": "Aucune photo dans cet album",
+    "photos": "photos",
+    "slideshow": "Diaporama",
+    "play": "Lire",
+    "pause": "Pause",
+    "prev": "Précédent",
+    "next": "Suivant",
+    "of": "{{current}} / {{total}}"
   }
 }

@@ -452,6 +452,32 @@ label input, label textarea { margin-top: 6px; }
   gap: 16px;
   margin-top: 12px;
 }
+.photo-cell {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+.photo-cell img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 10px;
+  display: block;
+}
+.slideshow-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.slideshow { display: flex; flex-direction: column; align-items: center; gap: 14px; max-width: 96vw; }
+.slideshow-img { max-width: 92vw; max-height: 78vh; object-fit: contain; border-radius: 8px; }
+.slideshow-tools { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center; }
 .browse-save { flex-wrap: wrap; align-items: center; margin-bottom: 8px; }
 .browse-group { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .collection-input { padding: 6px 10px; border-radius: 6px; font-size: 13px; }

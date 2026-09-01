@@ -12,6 +12,7 @@ import SeriesDetailPage from './pages/SeriesDetailPage.jsx';
 import MusicPage from './pages/MusicPage.jsx';
 import BooksPage from './pages/BooksPage.jsx';
 import BookReaderPage from './pages/BookReaderPage.jsx';
+import PhotosPage from './pages/PhotosPage.jsx';
 import AdminPage from './pages/AdminPage.jsx';
 import LivePage from './pages/LivePage.jsx';
 import SharePage from './pages/SharePage.jsx';
@@ -129,6 +130,22 @@ export default function App() {
             element={
               <RequireAuth>
                 <BookReaderPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/photos"
+            element={
+              <RequireAuth>
+                <PhotosPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/photos/:albumId"
+            element={
+              <RequireAuth>
+                <PhotosPage />
               </RequireAuth>
             }
           />

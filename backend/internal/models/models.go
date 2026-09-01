@@ -133,6 +133,28 @@ type MusicTrack struct {
 	PosterPath  string    `json:"-"`
 }
 
+type PhotoAlbum struct {
+	ID           uuid.UUID  `json:"id"`
+	LibraryID    uuid.UUID  `json:"library_id"`
+	Name         string     `json:"name"`
+	PhotoCount   int        `json:"photo_count"`
+	CoverPhotoID *uuid.UUID `json:"cover_photo_id,omitempty"`
+	HasCover     bool       `json:"has_cover"`
+	CreatedAt    time.Time  `json:"created_at"`
+}
+
+type Photo struct {
+	ID        uuid.UUID  `json:"id"`
+	AlbumID   *uuid.UUID `json:"album_id,omitempty"`
+	Title     string     `json:"title"`
+	Width     int        `json:"width"`
+	Height    int        `json:"height"`
+	SizeBytes int64      `json:"size_bytes"`
+	TakenAt   *time.Time `json:"taken_at,omitempty"`
+	Camera    string     `json:"camera,omitempty"`
+	CreatedAt time.Time  `json:"created_at"`
+}
+
 type Playlist struct {
 	ID          uuid.UUID `json:"id"`
 	UserID      uuid.UUID `json:"-"`

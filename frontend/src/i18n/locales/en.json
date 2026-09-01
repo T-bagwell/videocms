@@ -9,6 +9,7 @@
     "favorites": "My Favorites",
     "music": "Music",
     "books": "Books",
+    "photos": "Photos",
     "admin": "Admin",
     "logout": "Log out",
     "parentalLock": "Parental lock",
@@ -529,5 +530,16 @@
     "prev": "Previous",
     "next": "Next",
     "unreadable": "This book has no readable pages"
+  },
+  "photos": {
+    "noAlbums": "No photo albums yet — scan a library that contains images",
+    "noPhotos": "No photos in this album",
+    "photos": "photos",
+    "slideshow": "Slideshow",
+    "play": "Play",
+    "pause": "Pause",
+    "prev": "Previous",
+    "next": "Next",
+    "of": "{{current}} / {{total}}"
   }
 }

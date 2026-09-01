@@ -9,6 +9,7 @@
     "favorites": "お気に入り",
     "music": "音楽",
     "books": "本",
+    "photos": "写真",
     "admin": "管理",
     "logout": "ログアウト",
     "parentalLock": "ペアレンタルロック",
@@ -529,5 +530,16 @@
     "prev": "前へ",
     "next": "次へ",
     "unreadable": "この本には読めるページがありません"
+  },
+  "photos": {
+    "noAlbums": "写真アルバムがまだありません — 画像を含むライブラリをスキャンしてください",
+    "noPhotos": "このアルバムには写真がありません",
+    "photos": "枚",
+    "slideshow": "スライドショー",
+    "play": "再生",
+    "pause": "一時停止",
+    "prev": "前へ",
+    "next": "次へ",
+    "of": "{{current}} / {{total}}"
   }
 }

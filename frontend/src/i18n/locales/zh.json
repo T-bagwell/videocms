@@ -9,6 +9,7 @@
     "favorites": "我的收藏",
     "music": "音乐",
     "books": "图书",
+    "photos": "照片",
     "admin": "管理",
     "logout": "退出",
     "parentalLock": "家长锁",
@@ -529,5 +530,16 @@
     "prev": "上一页",
     "next": "下一页",
     "unreadable": "这本书没有可阅读的内容"
+  },
+  "photos": {
+    "noAlbums": "暂无照片相册——请扫描包含图片的库",
+    "noPhotos": "该相册暂无照片",
+    "photos": "张照片",
+    "slideshow": "幻灯片",
+    "play": "播放",
+    "pause": "暂停",
+    "prev": "上一张",
+    "next": "下一张",
+    "of": "{{current}} / {{total}}"
   }
 }
