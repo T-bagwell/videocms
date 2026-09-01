@@ -301,7 +301,7 @@ from the product's own perspective.
       the detail page lets you switch manually
 - [x] Trailers & featurettes: official trailers fetched during scraping and
       stored with the movie; self-hosted featurettes can be attached as well
-- [ ] Theme songs for movies and TV shows, with a preview entry on the detail
+- [x] Theme songs for movies and TV shows, with a preview entry on the detail
       page
 - [ ] Chapters: read from ffprobe/chapter files and shown on the player
       timeline, backed by a generic media-segment API
