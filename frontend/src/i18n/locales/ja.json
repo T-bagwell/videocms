@@ -215,6 +215,7 @@
     "watchSyncing": "再生を同期中…",
     "cast": "キャスト / AirPlay",
     "skipLabel": "イントロ/エンドロールをスキップ",
+    "chaptersLabel": "チャプター",
     "skipIntroStart": "イントロ開始をマーク",
     "skipIntroEnd": "イントロ終了をマーク",
     "skipIntroRange": "イントロ {{from}}–{{to}}",

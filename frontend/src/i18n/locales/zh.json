@@ -215,6 +215,7 @@
     "watchSyncing": "正在同步播放…",
     "cast": "投屏 / AirPlay",
     "skipLabel": "跳过片头/片尾",
+    "chaptersLabel": "章节",
     "skipIntroStart": "标记片头起点",
     "skipIntroEnd": "标记片头终点",
     "skipIntroRange": "片头 {{from}}–{{to}}",

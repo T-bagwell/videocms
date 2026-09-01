@@ -342,6 +342,23 @@ label input, label textarea { margin-top: 6px; }
   background: var(--bg-soft);
   cursor: pointer;
 }
+.chapter-tick {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--accent);
+  opacity: 0.9;
+  pointer-events: none;
+}
+.chapters-bar { align-items: flex-start; }
+.chapters-list { display: flex; flex-wrap: wrap; gap: 8px; flex: 1; }
+.chapter-chip { display: inline-flex; align-items: center; gap: 6px; max-width: 260px; }
+.chapter-time {
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  font-size: 11px;
+}
 .preview-tip {
   position: absolute;
   bottom: calc(100% + 8px);

@@ -150,6 +150,7 @@ type probeInfo struct {
 	Codec     string
 	Container string
 	Subs      []probeSubtitle // text subtitle streams inside the container
+	Chapters  []probeChapter
 }
 
 type probeSubtitle struct {
@@ -157,6 +158,12 @@ type probeSubtitle struct {
 	Codec    string
 	Language string
 	Title    string
+}
+
+type probeChapter struct {
+	Start float64
+	End   float64
+	Title string
 }
 
 func (s *Scanner) scan(ctx context.Context, lib models.Library) {
@@ -954,6 +961,9 @@ func (s *Scanner) upsert(ctx context.Context, libID uuid.UUID, path string, info
 	if err != nil {
 		log.Printf("sync subtitle tracks for %s: %v", path, err)
 	}
+	if err := s.syncChapters(ctx, id, info.Chapters); err != nil {
+		log.Printf("sync chapters for %s: %v", path, err)
+	}
 	if active != "" && active != subtitle {
 		if _, err := s.pool.Exec(ctx,
 			`UPDATE videos SET subtitle_path=$1 WHERE id=$2`, active, id); err != nil {
@@ -983,7 +993,7 @@ func (s *Scanner) probe(ctx context.Context, path string) (probeInfo, error) {
 	defer cancel()
 
 	cmd := exec.CommandContext(ctx, s.ffprobeBin, "-v", "error", "-print_format", "json",
-		"-show_format", "-show_streams", path)
+		"-show_format", "-show_streams", "-show_chapters", path)
 	out, err := cmd.Output()
 	if err != nil {
 		return info, fmt.Errorf("ffprobe: %w", err)
@@ -1006,6 +1016,13 @@ func (s *Scanner) probe(ctx context.Context, path string) (probeInfo, error) {
 			Size       string `json:"size"`
 			FormatName string `json:"format_name"`
 		} `json:"format"`
+		Chapters []struct {
+			StartTime string `json:"start_time"`
+			EndTime   string `json:"end_time"`
+			Tags      struct {
+				Title string `json:"title"`
+			} `json:"tags"`
+		} `json:"chapters"`
 	}
 	if err := json.Unmarshal(out, &raw); err != nil {
 		return info, fmt.Errorf("parse ffprobe output: %w", err)
@@ -1013,6 +1030,16 @@ func (s *Scanner) probe(ctx context.Context, path string) (probeInfo, error) {
 	info.Duration, _ = strconv.ParseFloat(raw.Format.Duration, 64)
 	info.Size, _ = strconv.ParseInt(raw.Format.Size, 10, 64)
 	info.Container = raw.Format.FormatName
+	for _, ch := range raw.Chapters {
+		start, _ := strconv.ParseFloat(ch.StartTime, 64)
+		end, _ := strconv.ParseFloat(ch.EndTime, 64)
+		if end <= start {
+			continue
+		}
+		info.Chapters = append(info.Chapters, probeChapter{
+			Start: start, End: end, Title: strings.TrimSpace(ch.Tags.Title),
+		})
+	}
 	for _, st := range raw.Streams {
 		switch st.CodecType {
 		case "video":
@@ -1152,6 +1179,24 @@ func (s *Scanner) syncSubtitleTracks(ctx context.Context, videoID uuid.UUID, vid
 		return dst, nil
 	}
 	return "", nil
+}
+
+// syncChapters replaces the chapter index for a video with the fresh ffprobe
+// result. A video with no chapters gets an empty index.
+func (s *Scanner) syncChapters(ctx context.Context, videoID uuid.UUID, chapters []probeChapter) error {
+	if _, err := s.pool.Exec(ctx,
+		`DELETE FROM chapters WHERE video_id=$1`, videoID); err != nil {
+		return err
+	}
+	for pos, ch := range chapters {
+		if _, err := s.pool.Exec(ctx, `
+			INSERT INTO chapters (video_id, position, start_sec, end_sec, title)
+			VALUES ($1,$2,$3,$4,$5)`,
+			videoID, pos, ch.Start, ch.End, ch.Title); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 var (

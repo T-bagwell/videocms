@@ -215,6 +215,7 @@
     "watchSyncing": "Synchronisation de la lecture…",
     "cast": "Diffuser / AirPlay",
     "skipLabel": "Sauter intro/générique",
+    "chaptersLabel": "Chapitres",
     "skipIntroStart": "Marquer le début de l’intro",
     "skipIntroEnd": "Marquer la fin de l’intro",
     "skipIntroRange": "Intro {{from}}–{{to}}",

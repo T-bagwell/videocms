@@ -215,6 +215,7 @@
     "watchSyncing": "Wiedergabe wird synchronisiert…",
     "cast": "Cast / AirPlay",
     "skipLabel": "Intro/Abspann überspringen",
+    "chaptersLabel": "Kapitel",
     "skipIntroStart": "Intro-Start markieren",
     "skipIntroEnd": "Intro-Ende markieren",
     "skipIntroRange": "Intro {{from}}–{{to}}",

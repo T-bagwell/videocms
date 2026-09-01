@@ -199,6 +199,7 @@ func (a *App) Routes() http.Handler {
 	mux.HandleFunc("POST /api/videos/{id}/theme-song", authAdmin(a.upsertThemeSong))
 	mux.HandleFunc("DELETE /api/videos/{id}/theme-song", authAdmin(a.deleteThemeSong))
 	mux.HandleFunc("GET /api/videos/{id}/theme-song/stream", authUser(a.streamThemeSong))
+	mux.HandleFunc("GET /api/videos/{id}/chapters", authUser(a.listChapters))
 	mux.HandleFunc("GET /api/videos/{id}/poster", authUser(a.servePoster))
 	mux.HandleFunc("GET /api/videos/{id}/thumbnails", authUser(a.videoThumbnails))
 	mux.HandleFunc("GET /api/videos/{id}/thumbnails/{n}", authUser(a.videoThumbnailImage))

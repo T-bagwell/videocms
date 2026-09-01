@@ -87,6 +87,7 @@ export default function PlayerPage() {
   const [hasAirPlay, setHasAirPlay] = useState(false);
   const [skip, setSkip] = useState({ intro: null, credits: null });
   const [skipDraft, setSkipDraft] = useState(null);
+  const [chapters, setChapters] = useState([]);
   const [hasCast, setHasCast] = useState(false);
   const [casting, setCasting] = useState(false);
 
@@ -147,6 +148,9 @@ export default function PlayerPage() {
     api(`/videos/${activeId}/skip-intervals`)
       .then((d) => setSkip({ intro: d.intro || null, credits: d.credits || null }))
       .catch(() => {});
+    api(`/videos/${activeId}/chapters`)
+      .then((d) => setChapters(d.items || []))
+      .catch(() => setChapters([]));
 
     const playlistId = searchParams.get('playlist');
     const seriesId = searchParams.get('series');
@@ -361,6 +365,14 @@ export default function PlayerPage() {
     const interval = kind === 'intro' ? skip.intro : skip.credits;
     if (!el || !interval) return;
     el.currentTime = interval.end_sec;
+  }
+
+  function seekToChapter(ch) {
+    const el = videoRef.current;
+    if (el && isFinite(el.duration)) {
+      el.currentTime = ch.start_sec;
+      el.play().catch(() => {});
+    }
   }
 
   function clearSkip(kind) {
@@ -703,6 +715,16 @@ export default function PlayerPage() {
           onMouseLeave={() => setHover(null)}
           onClick={onStripClick}
         >
+          {chapters.length > 0 &&
+            video?.duration_sec > 0 &&
+            chapters.map((ch) => (
+              <span
+                key={ch.id}
+                className="chapter-tick"
+                style={{ left: `${Math.min(99.5, (ch.start_sec / video.duration_sec) * 100)}%` }}
+                title={ch.title || `${fmtDuration(ch.start_sec)}`}
+              />
+            ))}
           {hover && (
             <div className="preview-tip" style={{ left: `${hover.pct}%` }}>
               <img
@@ -714,6 +736,24 @@ export default function PlayerPage() {
               <span>{fmtDuration(hover.time)}</span>
             </div>
           )}
+        </div>
+      )}
+
+      {chapters.length > 0 && (
+        <div className="player-tools chapters-bar">
+          <span className="muted">{t('player.chaptersLabel')}</span>
+          <div className="chapters-list">
+            {chapters.map((ch) => (
+              <button
+                key={ch.id}
+                className="btn small ghost chapter-chip"
+                onClick={() => seekToChapter(ch)}
+              >
+                <span className="chapter-time">{fmtDuration(ch.start_sec)}</span>
+                {ch.title || `#${ch.position + 1}`}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
