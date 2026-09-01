@@ -351,7 +351,7 @@ from the product's own perspective.
       "new uploads" feed
 - [ ] Moderation toolset: content reports, account muting, global allow/block
       lists and bulk user actions
-- [ ] Registration policies: open / invite-only / closed, with invite codes
+- [x] Registration policies: open / invite-only / closed, with invite codes
 - [ ] Likes/dislikes and per-item policy toggles (download, comments, reports)
 - [ ] Filterable activity feed and per-user notification preferences
 
