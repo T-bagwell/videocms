@@ -318,7 +318,7 @@ from the product's own perspective.
       embedded cover art and gapless playback
 - [x] Audiobooks: chapter navigation and remembered playback speed
 - [x] Books & comics: EPUB reader and CBZ comic viewer
-- [ ] Photo library: albums, EXIF metadata and slideshows
+- [x] Photo library: albums, EXIF metadata and slideshows
 - [ ] Audio, image and PDF treated as first-class library items
 - [ ] Per-item visibility: public / private / unlisted / password-protected
 
