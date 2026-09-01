@@ -59,6 +59,9 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Per-device playback policy: the player remembers each browser/device's
+  preference (auto / prefer direct / prefer transcode) and automatically falls
+  back to transcoding when direct playback fails
 - Player enhancements: playback speed (0.5×–2×, remembered per browser), native
   picture-in-picture, and full keyboard shortcuts (space/k play-pause,
   arrows seek ±5s and volume, m mute, f fullscreen, p PiP, 0-9 jump to %, >/<
