@@ -339,7 +339,7 @@ from the product's own perspective.
       place
 - [ ] More pluggable metadata sources (TVDB, AniDB, Fanart.tv, OMDb, Trakt, …)
       with per-library provider priority
-- [ ] Backdrops/fanart/season artwork alongside posters
+- [x] Backdrops/fanart/season artwork alongside posters
 - [ ] Watch-history sync to external tracking services (Trakt, SIMKL)
 - [ ] More subtitle providers, with fuzzy matching and manual override
 
