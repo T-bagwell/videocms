@@ -59,6 +59,9 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Chapters: ffprobe chapter data is stored per video during scans and served
+  by `GET /api/videos/{id}/chapters`; the player renders chapter ticks on the
+  preview timeline and clickable chapter chips that seek to each segment
 - Theme songs: admins attach an audio theme song per movie/TV entry (stored
   under `DATA_DIR/theme-songs/`); the detail page shows a preview player with
   the title and stream link for every user
