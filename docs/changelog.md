@@ -59,6 +59,10 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Trailers & featurettes: metadata scraping stores the official YouTube trailer
+  on the video, the detail page plays it in an embedded modal, and admins can
+  attach self-hosted featurette files (uploaded under `DATA_DIR/featurettes`)
+  that are listed, streamed and removable from the same page
 - Multi-version movies: files of the same film (1080p / 4K / extended cut /
   director's cut) are grouped automatically during scans, the best-scored copy
   is the one shown in listings and playback, and the detail page lists every
