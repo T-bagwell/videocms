@@ -59,6 +59,10 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Per-item visibility: each video can be public (anonymous access via a public
+  library page), private (default), unlisted (link-only, hidden from listings)
+  or password-protected with a bcrypt access password and short-lived unlock
+  tokens; anonymous stream/poster endpoints enforce the same rules
 - First-class media types: audio (music library), images (photo library) and
   PDF documents (scanned into the books index with a browser PDF viewer in the
   reader page) are full library items with their own browse and playback
