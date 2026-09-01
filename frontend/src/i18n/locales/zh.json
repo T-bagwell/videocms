@@ -301,6 +301,7 @@
     "tabWebhooks": "Webhook",
     "tabIptv": "IPTV",
     "tabRequests": "点播请求",
+    "tabQuality": "质量档",
     "statsVideos": "视频总数",
     "statsLibraries": "媒体库",
     "statsUsers": "用户",
@@ -603,5 +604,22 @@
     "downloadUrl": "下载地址（可选）",
     "targetPath": "目标文件夹（可选）",
     "decided": "已更新"
+  },
+  "quality": {
+    "profiles": "质量档",
+    "add": "添加档位",
+    "name": "名称",
+    "minHeight": "最小高度",
+    "maxHeight": "最大高度",
+    "codec": "优先编码",
+    "active": "启用",
+    "activate": "启用",
+    "applyNow": "立即应用",
+    "any": "不限画质",
+    "saved": "已保存",
+    "applied": "已重新评分所有媒体库",
+    "activated": "已启用",
+    "deleted": "已删除",
+    "empty": "暂无档位"
   }
 }

@@ -301,6 +301,7 @@
     "tabWebhooks": "Webhooks",
     "tabIptv": "IPTV",
     "tabRequests": "Anfragen",
+    "tabQuality": "Qualität",
     "statsVideos": "Videos",
     "statsLibraries": "Bibliotheken",
     "statsUsers": "Benutzer",
@@ -603,5 +604,22 @@
     "downloadUrl": "Download-URL (optional)",
     "targetPath": "Zielordner (optional)",
     "decided": "Aktualisiert"
+  },
+  "quality": {
+    "profiles": "Qualitätsprofile",
+    "add": "Profil hinzufügen",
+    "name": "Name",
+    "minHeight": "Min. Höhe",
+    "maxHeight": "Max. Höhe",
+    "codec": "Bevorzugter Codec",
+    "active": "Aktiv",
+    "activate": "Aktivieren",
+    "applyNow": "Jetzt anwenden",
+    "any": "Beliebige Qualität",
+    "saved": "Gespeichert",
+    "applied": "Alle Bibliotheken neu bewertet",
+    "activated": "Aktiviert",
+    "deleted": "Gelöscht",
+    "empty": "Noch keine Profile"
   }
 }

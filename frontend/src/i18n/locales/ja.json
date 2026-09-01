@@ -301,6 +301,7 @@
     "tabWebhooks": "Webhook",
     "tabIptv": "IPTV",
     "tabRequests": "リクエスト",
+    "tabQuality": "品質",
     "statsVideos": "動画数",
     "statsLibraries": "ライブラリ",
     "statsUsers": "ユーザー",
@@ -603,5 +604,22 @@
     "downloadUrl": "ダウンロードURL（任意）",
     "targetPath": "保存先フォルダ（任意）",
     "decided": "更新しました"
+  },
+  "quality": {
+    "profiles": "品質プロファイル",
+    "add": "プロファイルを追加",
+    "name": "名前",
+    "minHeight": "最小高さ",
+    "maxHeight": "最大高さ",
+    "codec": "優先コーデック",
+    "active": "有効",
+    "activate": "有効化",
+    "applyNow": "今すぐ適用",
+    "any": "画質指定なし",
+    "saved": "保存しました",
+    "applied": "すべてのライブラリを再スコアリングしました",
+    "activated": "有効化しました",
+    "deleted": "削除しました",
+    "empty": "プロファイルがありません"
   }
 }

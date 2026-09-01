@@ -317,6 +317,12 @@ func (a *App) Routes() http.Handler {
 	mux.HandleFunc("GET /api/requests/all", authAdmin(a.listAllRequests))
 	mux.HandleFunc("POST /api/requests/{id}/decide", authAdmin(a.decideContentRequest))
 
+	mux.HandleFunc("GET /api/admin/quality-profiles", authAdmin(a.listQualityProfiles))
+	mux.HandleFunc("POST /api/admin/quality-profiles", authAdmin(a.createQualityProfile))
+	mux.HandleFunc("DELETE /api/admin/quality-profiles/{id}", authAdmin(a.deleteQualityProfile))
+	mux.HandleFunc("POST /api/admin/quality-profiles/{id}/active", authAdmin(a.setActiveQualityProfile))
+	mux.HandleFunc("POST /api/admin/quality-profiles/apply", authAdmin(a.applyQualityProfile))
+
 	mux.HandleFunc("GET /api/playlists", authUser(a.listPlaylists))
 	mux.HandleFunc("POST /api/playlists", authUser(a.createPlaylist))
 	mux.HandleFunc("GET /api/playlists/{id}", authUser(a.getPlaylist))

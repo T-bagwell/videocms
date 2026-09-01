@@ -68,9 +68,47 @@ type Scanner struct {
 	ffmpegBin  string
 	enricher   MetadataEnricher
 	onDone     func(libraryName, status string)
+	profile    atomic.Pointer[qualityProfile]
 	mu         sync.Mutex
 	active     map[uuid.UUID]context.CancelFunc
 	watching   bool
+}
+
+// qualityProfile biases movie-version selection: out-of-range heights and
+// non-preferred codecs lose points, so the best matching copy wins.
+type qualityProfile struct {
+	minHeight int
+	maxHeight int
+	codec     string
+}
+
+func (s *Scanner) refreshQualityProfile(ctx context.Context) {
+	p := &qualityProfile{}
+	if err := s.pool.QueryRow(ctx, `
+		SELECT min_height, max_height, preferred_codec FROM quality_profiles
+		WHERE active=true LIMIT 1`).Scan(&p.minHeight, &p.maxHeight, &p.codec); err != nil {
+		s.profile.Store(&qualityProfile{})
+		return
+	}
+	s.profile.Store(p)
+}
+
+// profilePenalty returns the rank adjustment for a video under the active
+// quality profile.
+func profilePenalty(p *qualityProfile, height int, codec string) int {
+	if p == nil {
+		return 0
+	}
+	penalty := 0
+	if p.maxHeight > 0 && height > p.maxHeight {
+		penalty -= 100
+	} else if p.minHeight > 0 && height > 0 && height < p.minHeight {
+		penalty -= 50
+	}
+	if p.codec != "" && codec != "" && codec != p.codec {
+		penalty -= 10
+	}
+	return penalty
 }
 
 // MetadataEnricher fills in metadata after a video is indexed (e.g. TMDB).
@@ -1047,6 +1085,41 @@ func (s *Scanner) rebuildSeries(ctx context.Context, lib models.Library) {
 // needs at least two files to form a group; singletons are reset so they never
 // appear as versions. Runs after every scan, mirroring rebuildSeries.
 func (s *Scanner) rebuildMovieVersions(ctx context.Context, lib models.Library) {
+	s.refreshQualityProfile(ctx)
+	type movieTrack struct {
+		id       uuid.UUID
+		title    string
+		filename string
+		year     int
+		width    int
+		height   int
+		codec    string
+	}
+	rows, err := s.pool.Query(ctx, `
+		SELECT id, title, filename, year, width, height, video_codec
+		FROM videos WHERE library_id=$1 AND available=true`, lib.ID)
+	if err != nil {
+		log.Printf("rebuild movie versions query: %v", err)
+		return
+	}
+	byKey := map[string][]movieTrack{}
+	var order []string
+	for rows.Next() {
+		var t movieTrack
+		if err := rows.Scan(&t.id, &t.title, &t.filename, &t.year, &t.width, &t.height, &t.codec); err != nil {
+			continue
+		}
+		key, _, _ := ParseMovieVersion(t.filename, TitleWithYear(t.title, t.year), t.width, t.height)
+		if key == "" {
+			continue
+		}
+		if _, ok := byKey[key]; !ok {
+			order = append(order, key)
+		}
+		byKey[key] = append(byKey[key], t)
+	}
+	rows.Close()
+
 	if _, err := s.pool.Exec(ctx, `
 		UPDATE videos SET version_key='', version_label='', version_rank=0
 		WHERE library_id=$1 AND available=true AND series_id IS NULL
@@ -1060,7 +1133,28 @@ func (s *Scanner) rebuildMovieVersions(ctx context.Context, lib models.Library) 
 		log.Printf("reset non-group movie versions: %v", err)
 		return
 	}
+	profile := s.profile.Load()
+	for _, key := range order {
+		group := byKey[key]
+		if len(group) < 2 {
+			continue
+		}
+		for _, t := range group {
+			_, _, base := ParseMovieVersion(t.filename, TitleWithYear(t.title, t.year), t.width, t.height)
+			final := base + profilePenalty(profile, t.height, t.codec)
+			if _, err := s.pool.Exec(ctx,
+				`UPDATE videos SET version_rank=$1 WHERE id=$2`, final, t.id); err != nil {
+				log.Printf("score movie version: %v", err)
+			}
+		}
+	}
 	log.Printf("movie versions rebuilt for library %s", lib.ID.String()[:8])
+}
+
+// RebuildMovieVersions re-scores every library's multi-version movie groups
+// against the currently active quality profile (admin "apply" action).
+func (s *Scanner) RebuildMovieVersions(ctx context.Context, lib models.Library) {
+	s.rebuildMovieVersions(ctx, lib)
 }
 
 // rebuildAlbums groups available music tracks into albums by (artist, album)
