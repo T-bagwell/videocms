@@ -59,6 +59,9 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Backdrops/fanart: scraping pulls a wide hero backdrop (TMDB images or a
+  custom provider's `backdrop_url`) and admins can upload one; the detail page
+  renders it as a banner above the poster
 - Quality profiles & automatic upgrades: admins define profiles (min/max
   height, preferred codec) and activate one; scans and the admin "apply"
   action re-score multi-version movies so in-range copies win and better new
