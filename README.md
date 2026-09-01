@@ -334,7 +334,7 @@ from the product's own perspective.
 
 - [x] Request workflow: users search and request titles; admins approve and
       the request feeds the download queue
-- [ ] Quality profiles & automatic upgrades: the best matching file is
+- [x] Quality profiles & automatic upgrades: the best matching file is
       preferred and new releases auto-upgrade; imports are moved/renamed into
       place
 - [ ] More pluggable metadata sources (TVDB, AniDB, Fanart.tv, OMDb, Trakt, …)
