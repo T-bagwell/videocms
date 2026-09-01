@@ -303,7 +303,7 @@ from the product's own perspective.
       stored with the movie; self-hosted featurettes can be attached as well
 - [x] Theme songs for movies and TV shows, with a preview entry on the detail
       page
-- [ ] Chapters: read from ffprobe/chapter files and shown on the player
+- [x] Chapters: read from ffprobe/chapter files and shown on the player
       timeline, backed by a generic media-segment API
 - [ ] More transcode profiles (AV1/VP9) and HDR passthrough for Dolby Vision /
       HDR10+ content
