@@ -59,6 +59,10 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Player enhancements: playback speed (0.5×–2×, remembered per browser), native
+  picture-in-picture, and full keyboard shortcuts (space/k play-pause,
+  arrows seek ±5s and volume, m mute, f fullscreen, p PiP, 0-9 jump to %, >/<
+  speed)
 - More transcode profiles: `HLS_VCODEC=libx265|libsvtav1|libvpx-vp9` switches
   software HLS transcodes to HEVC/AV1/VP9, and `HLS_PASSTHROUGH_HDR=1`
   (default) preserves Dolby Vision / HDR10+ signal on 10-bit-capable encoders
