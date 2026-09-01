@@ -216,6 +216,8 @@
     "cast": "キャスト / AirPlay",
     "skipLabel": "イントロ/エンドロールをスキップ",
     "chaptersLabel": "チャプター",
+    "speed": "再生速度",
+    "pip": "ピクチャーインピクチャー",
     "skipIntroStart": "イントロ開始をマーク",
     "skipIntroEnd": "イントロ終了をマーク",
     "skipIntroRange": "イントロ {{from}}–{{to}}",

@@ -53,6 +53,7 @@ export default function PlayerPage() {
   // so fullscreen survives auto-advance. It follows the route id.
   const [activeId, setActiveId] = useState(id);
   const videoRef = useRef(null);
+  const playerWrapRef = useRef(null);
   const savedRef = useRef(null);
   const hlsRef = useRef(null);
   const tracksRef = useRef([]);
@@ -88,6 +89,12 @@ export default function PlayerPage() {
   const [skip, setSkip] = useState({ intro: null, credits: null });
   const [skipDraft, setSkipDraft] = useState(null);
   const [chapters, setChapters] = useState([]);
+  const [speed, setSpeed] = useState(() => {
+    const saved = parseFloat(localStorage.getItem('videocms_playback_speed') || '1');
+    return [0.5, 0.75, 1, 1.25, 1.5, 2].includes(saved) ? saved : 1;
+  });
+  const speedRef = useRef(speed);
+  speedRef.current = speed;
   const [hasCast, setHasCast] = useState(false);
   const [casting, setCasting] = useState(false);
 
@@ -112,6 +119,102 @@ export default function PlayerPage() {
     }
     setAssIdx('');
   }, [activeId]);
+
+  useEffect(() => {
+    localStorage.setItem('videocms_playback_speed', String(speed));
+  }, [speed]);
+
+  function changeSpeed(s) {
+    setSpeed(s);
+    const el = videoRef.current;
+    if (el) el.playbackRate = s;
+  }
+
+  function togglePip() {
+    const el = videoRef.current;
+    if (!el || !('pictureInPictureEnabled' in document)) return;
+    if (document.pictureInPictureElement) {
+      document.exitPictureInPicture().catch(() => {});
+    } else {
+      el.requestPictureInPicture().catch(() => {});
+    }
+  }
+
+  function toggleFullscreen() {
+    if (document.fullscreenElement) {
+      document.exitFullscreen().catch(() => {});
+    } else {
+      playerWrapRef.current?.requestFullscreen().catch(() => {});
+    }
+  }
+
+  useEffect(() => {
+    function onKey(e) {
+      const tag = (e.target.tagName || '').toLowerCase();
+      if (tag === 'input' || tag === 'select' || tag === 'textarea' || e.target.isContentEditable) {
+        return;
+      }
+      const el = videoRef.current;
+      if (!el) return;
+      switch (e.key) {
+        case ' ':
+        case 'k':
+          e.preventDefault();
+          if (el.paused) el.play().catch(() => {});
+          else el.pause();
+          break;
+        case 'ArrowLeft':
+          e.preventDefault();
+          el.currentTime = Math.max(0, (el.currentTime || 0) - 5);
+          break;
+        case 'ArrowRight':
+          e.preventDefault();
+          el.currentTime = Math.min(el.duration || 0, (el.currentTime || 0) + 5);
+          break;
+        case 'ArrowUp':
+          e.preventDefault();
+          el.volume = Math.min(1, (el.volume || 0) + 0.1);
+          el.muted = false;
+          break;
+        case 'ArrowDown':
+          e.preventDefault();
+          el.volume = Math.max(0, (el.volume || 0) - 0.1);
+          break;
+        case 'm':
+          e.preventDefault();
+          el.muted = !el.muted;
+          break;
+        case 'f':
+          e.preventDefault();
+          toggleFullscreen();
+          break;
+        case 'p':
+          e.preventDefault();
+          togglePip();
+          break;
+        case '>':
+        case '.':
+          e.preventDefault();
+          changeSpeed(Math.min(2, speedRef.current + 0.25));
+          break;
+        case '<':
+        case ',':
+          e.preventDefault();
+          changeSpeed(Math.max(0.5, speedRef.current - 0.25));
+          break;
+        default:
+          if (e.key >= '0' && e.key <= '9') {
+            const dur = el.duration || 0;
+            if (dur > 0) {
+              e.preventDefault();
+              el.currentTime = dur * (Number(e.key) / 10);
+            }
+          }
+      }
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
 
   const saveProgress = useCallback(() => {
     const el = videoRef.current;
@@ -661,7 +764,7 @@ export default function PlayerPage() {
         </div>
       )}
 
-      <div className="player-wrap">
+      <div className="player-wrap" ref={playerWrapRef}>
         <video
           ref={videoRef}
           className="player"
@@ -671,6 +774,7 @@ export default function PlayerPage() {
           poster={video.has_poster ? mediaUrl(`/videos/${activeId}/poster`) : undefined}
           onLoadedMetadata={(e) => {
             setHasAirPlay(typeof e.currentTarget.webkitShowPlaybackUI === 'function');
+            e.currentTarget.playbackRate = speedRef.current;
           }}
           onSeeking={onSeeking}
           onTimeUpdate={() => {
@@ -756,6 +860,22 @@ export default function PlayerPage() {
           </div>
         </div>
       )}
+
+      <div className="player-tools">
+        <label className="player-tool">
+          {t('player.speed')}
+          <select value={speed} onChange={(e) => changeSpeed(Number(e.target.value))}>
+            {[0.5, 0.75, 1, 1.25, 1.5, 2].map((s) => (
+              <option key={s} value={s}>
+                {s}×
+              </option>
+            ))}
+          </select>
+        </label>
+        <button className="btn small" onClick={togglePip} disabled={!('pictureInPictureEnabled' in document)}>
+          {t('player.pip')}
+        </button>
+      </div>
 
       {!useTranscode && tracks.length > 0 && (
         <div className="player-tools subtitle-sync">

@@ -216,6 +216,8 @@
     "cast": "投屏 / AirPlay",
     "skipLabel": "跳过片头/片尾",
     "chaptersLabel": "章节",
+    "speed": "倍速",
+    "pip": "画中画",
     "skipIntroStart": "标记片头起点",
     "skipIntroEnd": "标记片头终点",
     "skipIntroRange": "片头 {{from}}–{{to}}",

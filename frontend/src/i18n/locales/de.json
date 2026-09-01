@@ -216,6 +216,8 @@
     "cast": "Cast / AirPlay",
     "skipLabel": "Intro/Abspann überspringen",
     "chaptersLabel": "Kapitel",
+    "speed": "Geschwindigkeit",
+    "pip": "Bild-in-Bild",
     "skipIntroStart": "Intro-Start markieren",
     "skipIntroEnd": "Intro-Ende markieren",
     "skipIntroRange": "Intro {{from}}–{{to}}",

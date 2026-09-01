@@ -216,6 +216,8 @@
     "cast": "Diffuser / AirPlay",
     "skipLabel": "Sauter intro/générique",
     "chaptersLabel": "Chapitres",
+    "speed": "Vitesse",
+    "pip": "PiP",
     "skipIntroStart": "Marquer le début de l’intro",
     "skipIntroEnd": "Marquer la fin de l’intro",
     "skipIntroRange": "Intro {{from}}–{{to}}",
