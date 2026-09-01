@@ -59,6 +59,9 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Audiobooks: chapter navigation (from the chapters index) works on audio
+  files, and each user's playback speed is remembered per book across devices
+  (`watch_progress.playback_rate`, clamped to 0.25×–3×)
 - Music library: audio files (mp3/m4a/flac/ogg/opus/wav/aac) are scanned with
   their artist/album tags, embedded cover art is extracted as the album cover,
   albums are grouped automatically, and a dedicated Music page (grid + album
