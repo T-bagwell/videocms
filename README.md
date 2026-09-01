@@ -309,7 +309,7 @@ from the product's own perspective.
       HDR10+ content
 - [x] Player enhancements: playback speed, picture-in-picture and full keyboard
       shortcuts
-- [ ] Per-device direct-play policy: each device/network can prefer direct
+- [x] Per-device direct-play policy: each device/network can prefer direct
       play or transcoding, with automatic fallback
 
 **Media types & libraries**
