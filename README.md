@@ -314,7 +314,7 @@ from the product's own perspective.
 
 **Media types & libraries**
 
-- [ ] Music library: audio files scanned and organized by artist/album, with
+- [x] Music library: audio files scanned and organized by artist/album, with
       embedded cover art and gapless playback
 - [ ] Audiobooks: chapter navigation and remembered playback speed
 - [ ] Books & comics: EPUB reader and CBZ comic viewer
