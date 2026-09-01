@@ -59,6 +59,10 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Books & comics: EPUB and CBZ files are scanned into a books library, the
+  reader page renders CBZ pages from the archive and EPUB chapters in order
+  (with keyboard navigation), and backend endpoints serve the raw file, CBZ
+  pages and EPUB spine/resources safely
 - Audiobooks: chapter navigation (from the chapters index) works on audio
   files, and each user's playback speed is remembered per book across devices
   (`watch_progress.playback_rate`, clamped to 0.25×–3×)
