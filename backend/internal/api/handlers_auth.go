@@ -1,11 +1,13 @@
 package api
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"regexp"
 	"strings"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"golang.org/x/crypto/bcrypt"
@@ -20,6 +22,7 @@ type registerRequest struct {
 	Username    string `json:"username"`
 	Password    string `json:"password"`
 	DisplayName string `json:"display_name"`
+	InviteCode  string `json:"invite_code"`
 }
 
 func (a *App) register(w http.ResponseWriter, r *http.Request) {
@@ -36,6 +39,25 @@ func (a *App) register(w http.ResponseWriter, r *http.Request) {
 	if len(req.Password) < 6 {
 		writeErr(w, http.StatusBadRequest, "password must be at least 6 characters")
 		return
+	}
+	if !a.cfg.RegistrationEnabled {
+		writeErr(w, http.StatusForbidden, "registration is closed")
+		return
+	}
+	var inviteID uuid.UUID
+	if a.cfg.RegistrationInviteOnly {
+		req.InviteCode = strings.TrimSpace(req.InviteCode)
+		if req.InviteCode == "" {
+			writeErr(w, http.StatusBadRequest, "an invite code is required")
+			return
+		}
+		err := a.pool.QueryRow(r.Context(),
+			`SELECT id FROM invite_codes WHERE code=$1 AND used_by IS NULL`,
+			req.InviteCode).Scan(&inviteID)
+		if err != nil {
+			writeErr(w, http.StatusForbidden, "invalid or already used invite code")
+			return
+		}
 	}
 	hash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
@@ -58,6 +80,11 @@ func (a *App) register(w http.ResponseWriter, r *http.Request) {
 		}
 		writeErr(w, http.StatusInternalServerError, "failed to create user")
 		return
+	}
+	if inviteID != uuid.Nil {
+		_, _ = a.pool.Exec(context.Background(),
+			`UPDATE invite_codes SET used_by=$1, used_at=now() WHERE id=$2`,
+			user.ID, inviteID)
 	}
 
 	token, err := auth.Sign(a.cfg.JWTSecret, user)
@@ -102,6 +129,14 @@ func (a *App) login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"token": token, "user": user})
+}
+
+// GET /api/auth/registration reports the current registration policy.
+func (a *App) registrationPolicy(w http.ResponseWriter, r *http.Request) {
+	writeJSON(w, http.StatusOK, map[string]any{
+		"enabled":     a.cfg.RegistrationEnabled,
+		"invite_only": a.cfg.RegistrationInviteOnly,
+	})
 }
 
 func (a *App) me(w http.ResponseWriter, r *http.Request) {

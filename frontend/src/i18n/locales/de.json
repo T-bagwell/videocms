@@ -26,6 +26,8 @@
     "subtitle": "Videoverwaltungssystem",
     "displayName": "Anzeigename",
     "displayNamePlaceholder": "Optional",
+    "inviteCode": "Einladungscode",
+    "inviteCodePlaceholder": "Einladungscode eingeben",
     "username": "Benutzername",
     "password": "Passwort",
     "login": "Anmelden",
@@ -304,6 +306,7 @@
     "tabIptv": "IPTV",
     "tabRequests": "Anfragen",
     "tabQuality": "Qualität",
+    "tabInvites": "Einladungen",
     "statsVideos": "Videos",
     "statsLibraries": "Bibliotheken",
     "statsUsers": "Benutzer",
@@ -623,5 +626,15 @@
     "activated": "Aktiviert",
     "deleted": "Gelöscht",
     "empty": "Noch keine Profile"
+  },
+  "invites": {
+    "title": "Einladungscodes",
+    "generate": "Generieren",
+    "empty": "Noch keine Einladungscodes",
+    "usedBy": "Verwendet von",
+    "unused": "Ungenutzt",
+    "revoke": "Widerrufen",
+    "generated": "Einladungscodes generiert",
+    "revoked": "Einladung widerrufen"
   }
 }

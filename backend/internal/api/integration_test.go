@@ -77,9 +77,10 @@ func newIntegrationEnv(t *testing.T, overrides ...func(*config.Config)) *integra
 	}
 
 	cfg := config.Config{
-		Addr:      ":0",
-		DataDir:   t.TempDir(),
-		JWTSecret: "integration-test-secret",
+		Addr:                ":0",
+		DataDir:             t.TempDir(),
+		JWTSecret:           "integration-test-secret",
+		RegistrationEnabled: true,
 	}
 	for _, o := range overrides {
 		o(&cfg)

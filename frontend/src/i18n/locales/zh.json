@@ -26,6 +26,8 @@
     "subtitle": "视频资源管理系统",
     "displayName": "显示名称",
     "displayNamePlaceholder": "可选",
+    "inviteCode": "邀请码",
+    "inviteCodePlaceholder": "输入邀请码",
     "username": "用户名",
     "password": "密码",
     "login": "登录",
@@ -304,6 +306,7 @@
     "tabIptv": "IPTV",
     "tabRequests": "点播请求",
     "tabQuality": "质量档",
+    "tabInvites": "邀请码",
     "statsVideos": "视频总数",
     "statsLibraries": "媒体库",
     "statsUsers": "用户",
@@ -623,5 +626,15 @@
     "activated": "已启用",
     "deleted": "已删除",
     "empty": "暂无档位"
+  },
+  "invites": {
+    "title": "邀请码",
+    "generate": "生成",
+    "empty": "暂无邀请码",
+    "usedBy": "已被使用",
+    "unused": "未使用",
+    "revoke": "撤销",
+    "generated": "邀请码已生成",
+    "revoked": "邀请码已撤销"
   }
 }

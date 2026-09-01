@@ -26,6 +26,8 @@
     "subtitle": "ビデオリソース管理システム",
     "displayName": "表示名",
     "displayNamePlaceholder": "任意",
+    "inviteCode": "招待コード",
+    "inviteCodePlaceholder": "招待コードを入力",
     "username": "ユーザー名",
     "password": "パスワード",
     "login": "ログイン",
@@ -304,6 +306,7 @@
     "tabIptv": "IPTV",
     "tabRequests": "リクエスト",
     "tabQuality": "品質",
+    "tabInvites": "招待",
     "statsVideos": "動画数",
     "statsLibraries": "ライブラリ",
     "statsUsers": "ユーザー",
@@ -623,5 +626,15 @@
     "activated": "有効化しました",
     "deleted": "削除しました",
     "empty": "プロファイルがありません"
+  },
+  "invites": {
+    "title": "招待コード",
+    "generate": "生成",
+    "empty": "招待コードがありません",
+    "usedBy": "使用ユーザー",
+    "unused": "未使用",
+    "revoke": "失効",
+    "generated": "招待コードを生成しました",
+    "revoked": "招待を失効しました"
   }
 }

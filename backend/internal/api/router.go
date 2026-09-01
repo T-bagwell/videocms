@@ -115,6 +115,7 @@ func (a *App) Routes() http.Handler {
 	}
 
 	mux.HandleFunc("POST /api/auth/register", a.register)
+	mux.HandleFunc("GET /api/auth/registration", a.registrationPolicy)
 	mux.HandleFunc("POST /api/auth/login", a.login)
 	mux.HandleFunc("GET /api/auth/sso", a.ssoStatus)
 	mux.HandleFunc("GET /api/auth/me", authUser(a.me))
@@ -324,6 +325,10 @@ func (a *App) Routes() http.Handler {
 	mux.HandleFunc("DELETE /api/admin/quality-profiles/{id}", authAdmin(a.deleteQualityProfile))
 	mux.HandleFunc("POST /api/admin/quality-profiles/{id}/active", authAdmin(a.setActiveQualityProfile))
 	mux.HandleFunc("POST /api/admin/quality-profiles/apply", authAdmin(a.applyQualityProfile))
+
+	mux.HandleFunc("GET /api/admin/invites", authAdmin(a.listInvites))
+	mux.HandleFunc("POST /api/admin/invites", authAdmin(a.generateInvites))
+	mux.HandleFunc("DELETE /api/admin/invites/{id}", authAdmin(a.revokeInvite))
 
 	mux.HandleFunc("GET /api/playlists", authUser(a.listPlaylists))
 	mux.HandleFunc("POST /api/playlists", authUser(a.createPlaylist))

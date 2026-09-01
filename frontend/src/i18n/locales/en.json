@@ -26,6 +26,8 @@
     "subtitle": "Video Resource Management System",
     "displayName": "Display name",
     "displayNamePlaceholder": "Optional",
+    "inviteCode": "Invite code",
+    "inviteCodePlaceholder": "Enter your invite code",
     "username": "Username",
     "password": "Password",
     "login": "Log in",
@@ -304,6 +306,7 @@
     "tabIptv": "IPTV",
     "tabRequests": "Requests",
     "tabQuality": "Quality",
+    "tabInvites": "Invites",
     "statsVideos": "Videos",
     "statsLibraries": "Libraries",
     "statsUsers": "Users",
@@ -623,5 +626,15 @@
     "activated": "Activated",
     "deleted": "Deleted",
     "empty": "No profiles yet"
+  },
+  "invites": {
+    "title": "Invite codes",
+    "generate": "Generate",
+    "empty": "No invite codes yet",
+    "usedBy": "Used by",
+    "unused": "Unused",
+    "revoke": "Revoke",
+    "generated": "Invite codes generated",
+    "revoked": "Invite revoked"
   }
 }

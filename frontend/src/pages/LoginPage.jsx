@@ -17,6 +17,8 @@ export default function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
+  const [inviteCode, setInviteCode] = useState('');
+  const [regPolicy, setRegPolicy] = useState({ enabled: true, invite_only: false });
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [sso, setSso] = useState({ oidc: false, saml: false });
@@ -33,6 +35,9 @@ export default function LoginPage() {
     api('/auth/sso')
       .then(setSso)
       .catch(() => {});
+    api('/auth/registration')
+      .then(setRegPolicy)
+      .catch(() => setRegPolicy({ enabled: true, invite_only: false }));
   }, []);
 
   async function submit(e) {
@@ -43,7 +48,7 @@ export default function LoginPage() {
       if (mode === 'login') {
         await login(username, password);
       } else {
-        await register({ username, password, display_name: displayName });
+        await register({ username, password, display_name: displayName, invite_code: inviteCode });
       }
       navigate(from, { replace: true });
     } catch (err) {
@@ -82,14 +87,26 @@ export default function LoginPage() {
         </select>
 
         {mode === 'register' && (
-          <label>
-            {t('login.displayName')}
-            <input
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
-              placeholder={t('login.displayNamePlaceholder')}
-            />
-          </label>
+          <>
+            <label>
+              {t('login.displayName')}
+              <input
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                placeholder={t('login.displayNamePlaceholder')}
+              />
+            </label>
+            {regPolicy.invite_only && (
+              <label>
+                {t('login.inviteCode')}
+                <input
+                  value={inviteCode}
+                  onChange={(e) => setInviteCode(e.target.value)}
+                  placeholder={t('login.inviteCodePlaceholder')}
+                />
+              </label>
+            )}
+          </>
         )}
 
         {sso.oidc && (
@@ -118,16 +135,18 @@ export default function LoginPage() {
         <button className="btn primary" disabled={busy}>
           {busy ? t('login.busy') : mode === 'login' ? t('login.login') : t('login.register')}
         </button>
-        <button
-          type="button"
-          className="link-btn"
-          onClick={() => {
-            setMode(mode === 'login' ? 'register' : 'login');
-            setError('');
-          }}
-        >
-          {mode === 'login' ? t('login.switchToRegister') : t('login.switchToLogin')}
-        </button>
+        {regPolicy.enabled && (
+          <button
+            type="button"
+            className="link-btn"
+            onClick={() => {
+              setMode(mode === 'login' ? 'register' : 'login');
+              setError('');
+            }}
+          >
+            {mode === 'login' ? t('login.switchToRegister') : t('login.switchToLogin')}
+          </button>
+        )}
         <p className="login-hint">{t('login.hint')}</p>
       </form>
     </div>
