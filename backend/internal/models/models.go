@@ -81,6 +81,7 @@ type Video struct {
 	CreatedAt       time.Time  `json:"created_at"`
 	UpdatedAt       time.Time  `json:"updated_at"`
 	ContentRating   string     `json:"content_rating,omitempty"`
+	Visibility      string     `json:"visibility"`
 }
 
 type SubtitleTrack struct {

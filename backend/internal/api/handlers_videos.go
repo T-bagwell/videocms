@@ -17,6 +17,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+	"golang.org/x/crypto/bcrypt"
 
 	"videocms/backend/internal/auth"
 	"videocms/backend/internal/media"
@@ -51,7 +52,7 @@ const videoColumns = `
 	v.trailer_url, v.trailer_title,
 	(SELECT count(*) FROM featurettes ft WHERE ft.video_id=v.id) AS featurette_count,
 	COALESCE(bl.id::text, '') AS blocked_id,
-	v.created_at, v.updated_at, v.content_rating,
+	v.created_at, v.updated_at, v.content_rating, v.visibility,
 	EXISTS(SELECT 1 FROM favorites f WHERE f.user_id=$1 AND f.video_id=v.id) AS is_fav,
 	COALESCE((SELECT wp.position_sec FROM watch_progress wp WHERE wp.user_id=$1 AND wp.video_id=v.id), 0),
 	COALESCE((SELECT wp.duration_sec FROM watch_progress wp WHERE wp.user_id=$1 AND wp.video_id=v.id), 0)`
@@ -103,7 +104,7 @@ func scanVideo(row pgx.Row) (models.Video, error) {
 		&v.Year, &v.Synopsis, &v.Genres, &v.PosterPath, &v.SubtitlePath, &v.Available,
 		&v.SeriesID, &v.Season, &v.Episode, &v.SeriesName, &v.VersionKey, &v.VersionLabel,
 		&v.VersionCount, &v.IsPrimary, &v.TrailerURL, &v.TrailerTitle, &v.FeaturetteCount, &v.BlockedID,
-		&v.CreatedAt, &v.UpdatedAt, &v.ContentRating, &v.IsFavorite, &v.ProgressSec, &v.ProgressDur)
+		&v.CreatedAt, &v.UpdatedAt, &v.ContentRating, &v.Visibility, &v.IsFavorite, &v.ProgressSec, &v.ProgressDur)
 	v.Blocked = v.BlockedID != ""
 	v.HasPoster = v.PosterPath != ""
 	v.HasSubtitle = v.SubtitlePath != ""
@@ -132,6 +133,8 @@ func (a *App) listVideos(w http.ResponseWriter, r *http.Request) {
 	args := []any{user.ID}
 	// $1 is always present so count and list queries share the same arg layout
 	where := []string{"v.available = true AND $1::uuid IS NOT NULL"}
+	// unlisted items are link-only and never appear in listings
+	where = append(where, "v.visibility <> 'unlisted'")
 	if q.Get("include_blocked") == "1" && auth.UserFrom(r).Role == "admin" {
 		// admins may inspect and unblock blocked videos
 		where = append(where, visiblePaths(1))
@@ -341,11 +344,13 @@ func (a *App) getVideoVersions(w http.ResponseWriter, r *http.Request) {
 }
 
 type updateVideoRequest struct {
-	Title         string   `json:"title"`
-	Synopsis      string   `json:"synopsis"`
-	Year          int      `json:"year"`
-	Genres        []string `json:"genres"`
-	ContentRating string   `json:"content_rating"`
+	Title          string   `json:"title"`
+	Synopsis       string   `json:"synopsis"`
+	Year           int      `json:"year"`
+	Genres         []string `json:"genres"`
+	ContentRating  string   `json:"content_rating"`
+	Visibility     string   `json:"visibility"`
+	AccessPassword string   `json:"access_password"`
 }
 
 func (a *App) updateVideo(w http.ResponseWriter, r *http.Request) {
@@ -364,20 +369,50 @@ func (a *App) updateVideo(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusBadRequest, "title cannot be empty")
 		return
 	}
+	if req.Genres == nil {
+		req.Genres = []string{}
+	}
 	var filename string
 	var width, height int
+	var currentHash string
 	if err := a.pool.QueryRow(r.Context(),
-		`SELECT filename, width, height FROM videos WHERE id=$1`, id).Scan(&filename, &width, &height); err != nil {
+		`SELECT filename, width, height, access_password_hash FROM videos WHERE id=$1`, id).
+		Scan(&filename, &width, &height, &currentHash); err != nil {
 		writeErr(w, http.StatusNotFound, "video not found")
 		return
 	}
 	versionKey, versionLabel, versionRank := media.ParseMovieVersion(filename, media.TitleWithYear(req.Title, req.Year), width, height)
+	visibility := strings.TrimSpace(strings.ToLower(req.Visibility))
+	switch visibility {
+	case "", "private", "public", "unlisted", "password":
+	default:
+		writeErr(w, http.StatusBadRequest, "invalid visibility")
+		return
+	}
+	if visibility == "" {
+		visibility = "private"
+	}
+	passwordHash := ""
+	if visibility == "password" {
+		if strings.TrimSpace(req.AccessPassword) != "" {
+			hash, err := bcrypt.GenerateFromPassword([]byte(req.AccessPassword), bcrypt.DefaultCost)
+			if err != nil {
+				writeErr(w, http.StatusInternalServerError, "hash access password failed")
+				return
+			}
+			passwordHash = string(hash)
+		} else {
+			passwordHash = currentHash
+		}
+	}
 	tag, err := a.pool.Exec(r.Context(),
 		`UPDATE videos SET title=$1, synopsis=$2, year=$3, genres=$4, content_rating=$5,
-		       version_key=$6, version_label=$7, version_rank=$8, updated_at=now() WHERE id=$9`,
+		       version_key=$6, version_label=$7, version_rank=$8,
+		       visibility=$9, access_password_hash=$10, updated_at=now() WHERE id=$11`,
 		req.Title, req.Synopsis, req.Year, req.Genres, strings.ToUpper(strings.TrimSpace(req.ContentRating)),
-		versionKey, versionLabel, versionRank, id)
+		versionKey, versionLabel, versionRank, visibility, passwordHash, id)
 	if err != nil {
+		log.Printf("update video %s: %v", id, err)
 		writeErr(w, http.StatusInternalServerError, "update video failed")
 		return
 	}

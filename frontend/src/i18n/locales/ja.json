@@ -124,6 +124,13 @@
     "fieldGenres": "ジャンル（カンマ区切り）",
     "fieldContentRating": "レーティング",
     "fieldSynopsis": "あらすじ",
+    "visibility": "公開設定",
+    "visibilityPrivate": "非公開",
+    "visibilityPublic": "公開",
+    "visibilityUnlisted": "限定公開",
+    "visibilityPassword": "パスワード保護",
+    "accessPassword": "アクセスパスワード",
+    "accessPasswordPlaceholder": "空欄の場合は現在のパスワードを保持",
     "share": "共有",
     "shareTitle": "この動画を共有",
     "shareHours": "有効期限（時間）",
@@ -541,5 +548,12 @@
     "prev": "前へ",
     "next": "次へ",
     "of": "{{current}} / {{total}}"
+  },
+  "public": {
+    "title": "公開ライブラリ",
+    "empty": "公開動画はまだありません",
+    "passwordTitle": "この動画はパスワードで保護されています",
+    "passwordPlaceholder": "パスワード",
+    "unlock": "ロック解除"
   }
 }

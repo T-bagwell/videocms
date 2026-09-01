@@ -124,6 +124,13 @@
     "fieldGenres": "Genres (durch Kommas getrennt)",
     "fieldContentRating": "Einstufung",
     "fieldSynopsis": "Beschreibung",
+    "visibility": "Sichtbarkeit",
+    "visibilityPrivate": "Privat",
+    "visibilityPublic": "Öffentlich",
+    "visibilityUnlisted": "Nicht gelistet",
+    "visibilityPassword": "Passwortgeschützt",
+    "accessPassword": "Zugriffspasswort",
+    "accessPasswordPlaceholder": "Leer lassen, um das aktuelle Passwort beizubehalten",
     "share": "Teilen",
     "shareTitle": "Dieses Video teilen",
     "shareHours": "Gültigkeit (Stunden)",
@@ -541,5 +548,12 @@
     "prev": "Zurück",
     "next": "Weiter",
     "of": "{{current}} / {{total}}"
+  },
+  "public": {
+    "title": "Öffentliche Mediathek",
+    "empty": "Noch keine öffentlichen Videos",
+    "passwordTitle": "Dieses Video ist passwortgeschützt",
+    "passwordPlaceholder": "Passwort",
+    "unlock": "Entsperren"
   }
 }

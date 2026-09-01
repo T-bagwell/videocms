@@ -299,6 +299,8 @@ export default function VideoDetailPage() {
             .split(',')
             .map((g) => g.trim())
             .filter(Boolean),
+          visibility: form.visibility,
+          access_password: form.access_password,
         },
       });
       setEditing(false);
@@ -311,6 +313,7 @@ export default function VideoDetailPage() {
           .split(',')
           .map((g) => g.trim())
           .filter(Boolean),
+        visibility: form.visibility,
       });
       setMsg(t('video.metaUpdated'));
     } catch (e2) {
@@ -422,6 +425,11 @@ export default function VideoDetailPage() {
           <div className="detail-meta-top">
             <span className="library-tag">{video.library_name}</span>
             {video.year > 0 && <span className="year-tag">{video.year}</span>}
+            {video.visibility && video.visibility !== 'private' && (
+              <span className={`visibility-badge visibility-${video.visibility}`}>
+                {t(`video.visibility${video.visibility.charAt(0).toUpperCase()}${video.visibility.slice(1)}`)}
+              </span>
+            )}
             {video.is_favorite && <span className="fav-star">{t('video.favorited')}</span>}
           </div>
           <h1>{video.title}</h1>
@@ -657,6 +665,8 @@ export default function VideoDetailPage() {
                       synopsis: video.synopsis,
                       year: video.year || '',
                       genres: (video.genres || []).join(', '),
+                      visibility: video.visibility || 'private',
+                      access_password: '',
                     });
                     setEditing(true);
                   }}
@@ -843,6 +853,30 @@ export default function VideoDetailPage() {
                 onChange={(e) => setForm({ ...form, synopsis: e.target.value })}
               />
             </label>
+            <label>
+              {t('video.visibility')}
+              <select
+                value={form.visibility}
+                onChange={(e) => setForm({ ...form, visibility: e.target.value })}
+              >
+                <option value="private">{t('video.visibilityPrivate')}</option>
+                <option value="public">{t('video.visibilityPublic')}</option>
+                <option value="unlisted">{t('video.visibilityUnlisted')}</option>
+                <option value="password">{t('video.visibilityPassword')}</option>
+              </select>
+            </label>
+            {form.visibility === 'password' && (
+              <label>
+                {t('video.accessPassword')}
+                <input
+                  type="password"
+                  value={form.access_password}
+                  onChange={(e) => setForm({ ...form, access_password: e.target.value })}
+                  placeholder={t('video.accessPasswordPlaceholder')}
+                  autoComplete="new-password"
+                />
+              </label>
+            )}
             <div className="modal-actions">
               <button type="submit" className="btn primary">{t('common.save')}</button>
               <button type="button" className="btn ghost" onClick={() => setEditing(false)}>

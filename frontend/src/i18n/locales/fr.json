@@ -124,6 +124,13 @@
     "fieldGenres": "Genres (séparés par des virgules)",
     "fieldContentRating": "Classification",
     "fieldSynopsis": "Synopsis",
+    "visibility": "Visibilité",
+    "visibilityPrivate": "Privé",
+    "visibilityPublic": "Public",
+    "visibilityUnlisted": "Non listé",
+    "visibilityPassword": "Protégé par mot de passe",
+    "accessPassword": "Mot de passe d'accès",
+    "accessPasswordPlaceholder": "Laisser vide pour conserver le mot de passe actuel",
     "share": "Partager",
     "shareTitle": "Partager cette vidéo",
     "shareHours": "Validité (heures)",
@@ -541,5 +548,12 @@
     "prev": "Précédent",
     "next": "Suivant",
     "of": "{{current}} / {{total}}"
+  },
+  "public": {
+    "title": "Médiathèque publique",
+    "empty": "Aucune vidéo publique pour l'instant",
+    "passwordTitle": "Cette vidéo est protégée par mot de passe",
+    "passwordPlaceholder": "Mot de passe",
+    "unlock": "Déverrouiller"
   }
 }

@@ -13,6 +13,8 @@ import MusicPage from './pages/MusicPage.jsx';
 import BooksPage from './pages/BooksPage.jsx';
 import BookReaderPage from './pages/BookReaderPage.jsx';
 import PhotosPage from './pages/PhotosPage.jsx';
+import PublicPage from './pages/PublicPage.jsx';
+import PublicVideoPage from './pages/PublicVideoPage.jsx';
 import AdminPage from './pages/AdminPage.jsx';
 import LivePage from './pages/LivePage.jsx';
 import SharePage from './pages/SharePage.jsx';
@@ -36,6 +38,8 @@ export default function App() {
       <main className="main">
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/public" element={<PublicPage />} />
+          <Route path="/public/v/:id" element={<PublicVideoPage />} />
           <Route path="/share/:token" element={<SharePage />} />
           <Route
             path="/"

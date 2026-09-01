@@ -172,6 +172,11 @@ func (a *App) Routes() http.Handler {
 	mux.HandleFunc("DELETE /api/admin/blocked-titles/{id}", authAdmin(a.deleteBlockedTitle))
 
 	mux.HandleFunc("GET /api/videos", authUser(a.listVideos))
+	mux.HandleFunc("GET /api/public/videos", a.listPublicLibrary)
+	mux.HandleFunc("GET /api/public/videos/{id}", a.getPublicVideo)
+	mux.HandleFunc("POST /api/public/videos/{id}/unlock", a.unlockPublicVideo)
+	mux.HandleFunc("GET /api/public/videos/{id}/stream", a.streamPublicVideo)
+	mux.HandleFunc("GET /api/public/videos/{id}/poster", a.publicVideoPoster)
 	mux.HandleFunc("GET /api/videos/{id}", authUser(a.getVideo))
 	mux.HandleFunc("GET /api/albums", authUser(a.listAlbums))
 	mux.HandleFunc("GET /api/albums/{id}", authUser(a.getAlbum))
