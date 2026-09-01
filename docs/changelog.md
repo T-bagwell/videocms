@@ -59,6 +59,10 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- IPTV channels: channels can be imported from M3U playlists or generated from
+  a library (streamed as a continuous MPEG-TS feed via ffmpeg concat), with
+  token-protected M3U and XMLTV EPG outputs and an XMLTV EPG importer; an IPTV
+  admin tab manages channels and outputs
 - Per-item visibility: each video can be public (anonymous access via a public
   library page), private (default), unlisted (link-only, hidden from listings)
   or password-protected with a bcrypt access password and short-lived unlock
