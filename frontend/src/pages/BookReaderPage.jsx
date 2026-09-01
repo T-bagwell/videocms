@@ -67,6 +67,7 @@ export default function BookReaderPage() {
 
   const isCbz = book.format === 'cbz' && pages.length > 0;
   const isEpub = book.format === 'epub' && spine.length > 0;
+  const isPdf = book.format === 'pdf';
 
   return (
     <div className="container">
@@ -121,7 +122,10 @@ export default function BookReaderPage() {
             </div>
           </>
         )}
-        {!isCbz && !isEpub && <div className="empty">{t('books.unreadable')}</div>}
+        {isPdf && (
+          <iframe className="reader-frame" title={book.title} src={mediaUrl(`/books/${id}/file`)} />
+        )}
+        {!isCbz && !isEpub && !isPdf && <div className="empty">{t('books.unreadable')}</div>}
       </div>
     </div>
   );

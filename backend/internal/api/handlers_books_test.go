@@ -85,6 +85,15 @@ func TestBooksFromScan(t *testing.T) {
 	pngData := makeValidPNG(t)
 	makeTestCBZ(t, filepath.Join(libDir, "Comic.cbz"))
 	makeTestEPUB(t, filepath.Join(libDir, "Novel.epub"))
+	pdfData := []byte("%PDF-1.4\n" +
+		"1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n" +
+		"2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n" +
+		"3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 200 200] /Contents 4 0 R >>\nendobj\n" +
+		"4 0 obj\n<< /Length 8 >>\nstream\nHello!\nendstream\nendobj\n" +
+		"xref\n0 5\ntrailer\n<< /Root 1 0 R /Size 5 >>\n%%EOF\n")
+	if err := os.WriteFile(filepath.Join(libDir, "Guide.pdf"), pdfData, 0o644); err != nil {
+		t.Fatal(err)
+	}
 
 	var libID uuid.UUID
 	if err := env.pool.QueryRow(ctx,
@@ -112,8 +121,8 @@ func TestBooksFromScan(t *testing.T) {
 		`SELECT count(*) FROM books WHERE library_id=$1 AND available`, libID).Scan(&n); err != nil {
 		t.Fatal(err)
 	}
-	if n != 2 {
-		t.Fatalf("books scanned = %d, want 2", n)
+	if n != 3 {
+		t.Fatalf("books scanned = %d, want 3", n)
 	}
 
 	token := loginAdmin(t, env)
@@ -121,7 +130,7 @@ func TestBooksFromScan(t *testing.T) {
 		Items []book `json:"items"`
 	}
 	resp := env.doJSON(t, http.MethodGet, "/api/books", nil, token, &books)
-	if resp.StatusCode != http.StatusOK || len(books.Items) != 2 {
+	if resp.StatusCode != http.StatusOK || len(books.Items) != 3 {
 		t.Fatalf("books list status = %d items = %d", resp.StatusCode, len(books.Items))
 	}
 	var cbzID, epubID uuid.UUID
@@ -131,6 +140,21 @@ func TestBooksFromScan(t *testing.T) {
 		}
 		if b.Format == "epub" {
 			epubID = b.ID
+		}
+		if b.Format == "pdf" {
+			pdfID := b.ID
+			req, _ := http.NewRequest(http.MethodGet, env.server.URL+"/api/books/"+pdfID.String()+"/file", nil)
+			req.Header.Set("Authorization", "Bearer "+token)
+			resp2, err := http.DefaultClient.Do(req)
+			if err != nil {
+				t.Fatal(err)
+			}
+			body, _ := io.ReadAll(resp2.Body)
+			_ = resp2.Body.Close()
+			if resp2.StatusCode != http.StatusOK || resp2.Header.Get("Content-Type") != "application/pdf" ||
+				!bytes.Equal(body, pdfData) {
+				t.Fatalf("pdf file status = %d ct = %q", resp2.StatusCode, resp2.Header.Get("Content-Type"))
+			}
 		}
 	}
 	if cbzID == uuid.Nil || epubID == uuid.Nil {

@@ -24,7 +24,9 @@ export default function BooksPage() {
         {books.map((b) => (
           <Link key={b.id} to={`/books/${b.id}`} className="poster-link">
             <div className="album-card">
-              <div className="book-cover">{b.format === 'cbz' ? '🗯' : '📖'}</div>
+              <div className="book-cover">
+                {b.format === 'cbz' ? '🗯' : b.format === 'pdf' ? '📄' : '📖'}
+              </div>
               <div className="album-name">{b.title}</div>
               <div className="muted small">
                 {b.format.toUpperCase()} · {fmtBytes(b.size_bytes)}

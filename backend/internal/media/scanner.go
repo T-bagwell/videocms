@@ -47,7 +47,7 @@ var audioExts = map[string]bool{
 
 // bookExts are indexed as books/comics (EPUB, CBZ) without media probing.
 var bookExts = map[string]bool{
-	".epub": true, ".cbz": true,
+	".epub": true, ".cbz": true, ".pdf": true,
 }
 
 // photoExts are indexed as photos with EXIF metadata (no media probe).

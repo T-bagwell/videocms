@@ -117,6 +117,8 @@ func (a *App) bookFile(w http.ResponseWriter, r *http.Request) {
 		ct = "application/epub+zip"
 	} else if b.Format == "cbz" {
 		ct = "application/vnd.comicbook+zip"
+	} else if b.Format == "pdf" {
+		ct = "application/pdf"
 	}
 	w.Header().Set("Content-Type", ct)
 	http.ServeFile(w, r, fp)
