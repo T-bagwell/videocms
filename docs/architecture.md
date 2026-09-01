@@ -289,7 +289,11 @@ The `HLSManager`:
   `h264_qsv` / `h264_vaapi`), with VAAPI taking its device from
   `HLS_VAAPI_DEVICE` and running the `hwupload`/`scale_vaapi` pipeline.
   `HLS_TONE_MAP=1` prepends a software `zscale`+`tonemap` chain for HDR→SDR
-  playback; invalid accel values fail the session instead of silently degrading
+  playback. Software transcodes can use `HLS_VCODEC=libx265|libsvtav1|libvpx-vp9`
+  for HEVC/AV1/VP9 output, and `HLS_PASSTHROUGH_HDR=1` (default) keeps
+  Dolby Vision / HDR10+ signal on 10-bit-capable encoders, falling back to tone
+  mapping for 8-bit encoders; invalid accel values fail the session instead of
+  silently degrading
 - Each rendition is written to `data/hls/<video-id>/v<width>/`; the server
   writes a master playlist referencing every rendition and one
   `#EXT-X-MEDIA` subtitle entry per track (`subs/<track-id>/playlist.m3u8`,
@@ -685,7 +689,7 @@ The backend binds all interfaces (`:8080`), so LAN clients reach the UI directly
 | `WATCH_INTERVAL` | `30` | Fallback incremental-scan interval (seconds); fsnotify indexes immediately |
 | `YTDLP_PATH` | `yt-dlp` on PATH | yt-dlp binary for the Downloads queue |
 | `WEB_ROOT` | auto (`frontend/dist`) | Built frontend for production mode |
-| `HLS_HW_ACCEL` / `HLS_VAAPI_DEVICE` / `HLS_TONE_MAP` | empty / `/dev/dri/renderD128` / `0` | Hardware HLS encoding (videotoolbox/nvenc/qsv/vaapi), VAAPI device, HDR→SDR tone mapping |
+| `HLS_HW_ACCEL` / `HLS_VAAPI_DEVICE` / `HLS_TONE_MAP` / `HLS_VCODEC` / `HLS_PASSTHROUGH_HDR` | empty / `/dev/dri/renderD128` / `0` / empty (libx264) / `1` | Hardware HLS encoding (videotoolbox/nvenc/qsv/vaapi), VAAPI device, HDR→SDR tone mapping, software codec (libx264/libx265/libsvtav1/libvpx-vp9), HDR passthrough |
 | `SUBTITLE_OS_USERNAME` / `SUBTITLE_OS_PASSWORD` / `SUBTITLE_OS_API_KEY` | empty | OpenSubtitles credentials for online subtitle search |
 | `RTMP_INGEST_URL` | `rtmp://localhost:1935/live` | Base RTMP ingest URL for live streams |
 | `WHISPER_BIN` / `WHISPER_MODEL` | empty | whisper.cpp CLI + model for transcription |

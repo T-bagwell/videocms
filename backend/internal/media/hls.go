@@ -150,6 +150,8 @@ type HLSManager struct {
 	hwAccel     string
 	vaapiDevice string
 	toneMap     bool
+	vcodec      string
+	hdrPass     bool
 	mu          sync.Mutex
 	sessions    map[uuid.UUID]*HLSSession
 }
@@ -163,6 +165,8 @@ func NewHLSManager(dataDir, ffmpegBin string, hwAccel ...string) *HLSManager {
 		dataDir:  filepath.Join(dataDir, "hls"),
 		ffmpeg:   ffmpegBin,
 		hwAccel:  accel,
+		vcodec:   "libx264",
+		hdrPass:  true,
 		sessions: make(map[uuid.UUID]*HLSSession),
 	}
 	_ = os.MkdirAll(m.dataDir, 0o755)
@@ -180,6 +184,21 @@ func (m *HLSManager) SetToneMap(enabled bool) {
 	m.toneMap = enabled
 }
 
+// SetVCodec selects the software transcode encoder (libx264, libx265,
+// libsvtav1, libvpx-vp9). Unknown values fall back to libx264.
+func (m *HLSManager) SetVCodec(v string) {
+	if strings.TrimSpace(v) != "" {
+		m.vcodec = strings.ToLower(strings.TrimSpace(v))
+	}
+}
+
+// SetHDRPassthrough controls whether HDR content keeps its HDR signal when
+// the encoder supports 10-bit output; 8-bit encoders fall back to tone
+// mapping so the picture is not washed out.
+func (m *HLSManager) SetHDRPassthrough(enabled bool) {
+	m.hdrPass = enabled
+}
+
 // encodePlan describes how to encode video renditions.
 type encodePlan struct {
 	global []string // options that must appear before -i (VAAPI device init)
@@ -188,30 +207,32 @@ type encodePlan struct {
 }
 
 func hwEncodePlan(accel, vaapiDevice string, toneMap bool) (encodePlan, error) {
-	tone := ""
-	if toneMap {
-		tone = "zscale=t=linear:npl=100,tonemap=hable,zscale=p=bt709,"
-	}
+	return hwEncodePlanFull(accel, vaapiDevice, "libx264", toneMap, false, false)
+}
+
+// hwEncodePlanFull builds the encode plan for the configured acceleration,
+// software codec and HDR policy. hdrPassthrough only matters when the source
+// is HDR (isHDR): 10-bit-capable encoders carry the HDR signal, while 8-bit
+// encoders fall back to tone mapping so colors stay correct.
+func hwEncodePlanFull(accel, vaapiDevice, vcodec string, toneMap, hdrPassthrough, isHDR bool) (encodePlan, error) {
+	hdr := isHDR && hdrPassthrough && !toneMap
 	switch strings.ToLower(strings.TrimSpace(accel)) {
 	case "", "software", "libx264":
-		return encodePlan{
-			codec: []string{"-c:v", "libx264", "-preset", "veryfast", "-crf", "23"},
-			scale: tone + "scale=W:-2",
-		}, nil
+		return softwareEncodePlan(vcodec, toneMap, hdr), nil
 	case "videotoolbox":
 		return encodePlan{
 			codec: []string{"-c:v", "h264_videotoolbox", "-b:v", "3000k", "-allow_sw", "1"},
-			scale: tone + "scale=W:-2",
+			scale: hdrScale(toneMap, hdr) + "scale=W:-2",
 		}, nil
 	case "nvenc":
 		return encodePlan{
 			codec: []string{"-c:v", "h264_nvenc", "-preset", "p4", "-b:v", "3000k"},
-			scale: tone + "scale=W:-2",
+			scale: hdrScale(toneMap, hdr) + "scale=W:-2",
 		}, nil
 	case "qsv":
 		return encodePlan{
 			codec: []string{"-c:v", "h264_qsv", "-b:v", "3000k"},
-			scale: tone + "scale=W:-2",
+			scale: hdrScale(toneMap, hdr) + "scale=W:-2",
 		}, nil
 	case "vaapi":
 		if vaapiDevice == "" {
@@ -220,10 +241,55 @@ func hwEncodePlan(accel, vaapiDevice string, toneMap bool) (encodePlan, error) {
 		return encodePlan{
 			global: []string{"-vaapi_device", vaapiDevice, "-hwaccel", "vaapi", "-hwaccel_output_format", "vaapi"},
 			codec:  []string{"-c:v", "h264_vaapi", "-b:v", "3000k"},
-			scale:  tone + "format=nv12,hwupload,scale_vaapi=w=W:h=-2",
+			scale:  hdrScale(toneMap, hdr) + "format=nv12,hwupload,scale_vaapi=w=W:h=-2",
 		}, nil
 	default:
 		return encodePlan{}, fmt.Errorf("unsupported HLS_HW_ACCEL %q (use videotoolbox, nvenc, qsv, vaapi or leave empty)", accel)
+	}
+}
+
+// hdrScale picks the tone-mapping filter chain when HDR content must be
+// converted to SDR (explicit tone mapping or an 8-bit encoder).
+func hdrScale(tone, hdrFallback bool) string {
+	if tone || hdrFallback {
+		return "zscale=t=linear:npl=100,tonemap=hable,zscale=p=bt709,"
+	}
+	return ""
+}
+
+// softwareEncodePlan configures a software encoder (x264/x265/SVT-AV1/VP9).
+// 10-bit-capable codecs carry HDR metadata through; x264 falls back to tone
+// mapping for HDR sources.
+func softwareEncodePlan(vcodec string, toneMap, hdr bool) encodePlan {
+	var codec []string
+	tenBit := false
+	switch strings.ToLower(strings.TrimSpace(vcodec)) {
+	case "", "libx264":
+		codec = []string{"-c:v", "libx264", "-preset", "veryfast", "-crf", "23"}
+	case "libx265":
+		codec = []string{"-c:v", "libx265", "-preset", "veryfast", "-crf", "25", "-tag:v", "hvc1"}
+		tenBit = true
+	case "libsvtav1":
+		codec = []string{"-c:v", "libsvtav1", "-preset", "8", "-crf", "32"}
+		tenBit = true
+	case "libvpx-vp9":
+		codec = []string{"-c:v", "libvpx-vp9", "-deadline", "realtime", "-cpu-used", "8", "-crf", "34", "-b:v", "0"}
+		tenBit = true
+	default:
+		log.Printf("unsupported HLS_VCODEC %q, falling back to libx264", vcodec)
+		codec = []string{"-c:v", "libx264", "-preset", "veryfast", "-crf", "23"}
+	}
+	if hdr && tenBit {
+		codec = append(codec,
+			"-pix_fmt", "yuv420p10le",
+			"-colorspace", "bt2020nc",
+			"-color_primaries", "bt2020",
+			"-color_trc", "smpte2084",
+		)
+	}
+	return encodePlan{
+		codec: codec,
+		scale: hdrScale(toneMap, hdr && !tenBit) + "scale=W:-2",
 	}
 }
 
@@ -244,7 +310,7 @@ func (m *HLSManager) sessionDir(videoID uuid.UUID) string {
 // Playlist ensures a transcode session exists for the video and returns the
 // path of its master manifest. If startSec differs from the running session's
 // offset by more than one segment, the session is restarted at that position.
-func (m *HLSManager) Playlist(ctx context.Context, videoID uuid.UUID, input string, startSec float64, srcWidth, srcHeight int, subs []HLSSubtitle, audios ...HLSAudio) (string, error) {
+func (m *HLSManager) Playlist(ctx context.Context, videoID uuid.UUID, input string, startSec float64, srcWidth, srcHeight int, isHDR bool, subs []HLSSubtitle, audios ...HLSAudio) (string, error) {
 	if startSec < 0 {
 		startSec = 0
 	}
@@ -271,7 +337,7 @@ func (m *HLSManager) Playlist(ctx context.Context, videoID uuid.UUID, input stri
 	}
 
 	rends := renditionPlan(srcWidth, srcHeight)
-	enc, err := hwEncodePlan(m.hwAccel, m.vaapiDevice, m.toneMap)
+	enc, err := hwEncodePlanFull(m.hwAccel, m.vaapiDevice, m.vcodec, m.toneMap, m.hdrPass, isHDR)
 	if err != nil {
 		return "", err
 	}

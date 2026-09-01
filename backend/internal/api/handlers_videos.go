@@ -553,6 +553,7 @@ type hlsVideo struct {
 	FilePath     string
 	Width        int
 	Height       int
+	HDR          bool
 	SubtitlePath string
 	Available    bool
 	Subs         []media.HLSSubtitle
@@ -562,8 +563,8 @@ type hlsVideo struct {
 func (a *App) videoForHLS(ctx context.Context, id uuid.UUID) (hlsVideo, bool) {
 	var v hlsVideo
 	err := a.pool.QueryRow(ctx,
-		`SELECT file_path, width, height, subtitle_path, available FROM videos WHERE id=$1`, id,
-	).Scan(&v.FilePath, &v.Width, &v.Height, &v.SubtitlePath, &v.Available)
+		`SELECT file_path, width, height, hdr, subtitle_path, available FROM videos WHERE id=$1`, id,
+	).Scan(&v.FilePath, &v.Width, &v.Height, &v.HDR, &v.SubtitlePath, &v.Available)
 	if err != nil || !v.Available {
 		return hlsVideo{}, false
 	}
@@ -633,7 +634,7 @@ func (a *App) serveHLS(w http.ResponseWriter, r *http.Request, id uuid.UUID, v h
 		if s := r.URL.Query().Get("start"); s != "" {
 			start, _ = strconv.ParseFloat(s, 64)
 		}
-		manifest, err := a.hls.Playlist(r.Context(), id, v.FilePath, start, v.Width, v.Height, v.Subs, v.Audios...)
+		manifest, err := a.hls.Playlist(r.Context(), id, v.FilePath, start, v.Width, v.Height, v.HDR, v.Subs, v.Audios...)
 		if err != nil {
 			log.Printf("[hls] %v", err)
 			writeErr(w, http.StatusInternalServerError, "failed to start transcode session: "+err.Error())

@@ -255,6 +255,8 @@ make serve                              # http://<局域网IP>:8080
 | `HLS_HW_ACCEL` | 空（软件 x264） | HLS 视频编码器：videotoolbox、nvenc、qsv 或 vaapi；留空用 libx264 |
 | `HLS_VAAPI_DEVICE` | `/dev/dri/renderD128` | VAAPI 渲染设备（配合 `HLS_HW_ACCEL=vaapi`） |
 | `HLS_TONE_MAP` | `0` | `1` 在 HLS 转码中启用 HDR→SDR 色调映射 |
+| `HLS_VCODEC` | 空（libx264） | 软件转码编码器（`HLS_HW_ACCEL` 为空时）：libx264、libx265、libsvtav1 或 libvpx-vp9 |
+| `HLS_PASSTHROUGH_HDR` | `1` | 转码时保留 HDR（Dolby Vision / HDR10+）：10-bit 编码器直接直通，8-bit 编码器回退为色调映射 |
 | `SUBTITLE_OS_USERNAME` / `SUBTITLE_OS_PASSWORD` / `SUBTITLE_OS_API_KEY` | 空 | 在线字幕搜索用的 OpenSubtitles 凭证 |
 | `RTMP_INGEST_URL` | `rtmp://localhost:1935/live` | RTMP 推流基础地址（nginx-rtmp 或等价服务） |
 | `WHISPER_BIN` / `WHISPER_MODEL` | 空 | whisper.cpp 可执行文件与模型（语音转写用） |

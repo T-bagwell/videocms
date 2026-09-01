@@ -299,6 +299,8 @@ most important ones:
 | `HLS_HW_ACCEL` | empty (software x264) | HLS video encoder: videotoolbox, nvenc, qsv or vaapi; empty uses libx264 |
 | `HLS_VAAPI_DEVICE` | `/dev/dri/renderD128` | VAAPI render device (with `HLS_HW_ACCEL=vaapi`) |
 | `HLS_TONE_MAP` | `0` | `1` enables HDR→SDR tone mapping in HLS transcoding |
+| `HLS_VCODEC` | empty (libx264) | Software transcode encoder (when `HLS_HW_ACCEL` is empty): libx264, libx265, libsvtav1 or libvpx-vp9 |
+| `HLS_PASSTHROUGH_HDR` | `1` | Keep HDR (Dolby Vision / HDR10+) in transcodes when the encoder supports 10-bit output; 8-bit encoders fall back to tone mapping |
 | `SUBTITLE_OS_USERNAME` / `SUBTITLE_OS_PASSWORD` / `SUBTITLE_OS_API_KEY` | empty | OpenSubtitles credentials for the online subtitle search |
 | `RTMP_INGEST_URL` | `rtmp://localhost:1935/live` | Base RTMP ingest URL (nginx-rtmp or equivalent) |
 | `WHISPER_BIN` / `WHISPER_MODEL` | empty | whisper.cpp CLI and model for speech transcription |

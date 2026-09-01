@@ -320,6 +320,8 @@ Tout se configure par variables d’environnement (table complète dans le READM
 | `HLS_HW_ACCEL` | vide (x264 logiciel) | Codec vidéo HLS : videotoolbox, nvenc, qsv ou vaapi ; vide = libx264 |
 | `HLS_VAAPI_DEVICE` | `/dev/dri/renderD128` | Périphérique VAAPI (avec `HLS_HW_ACCEL=vaapi`) |
 | `HLS_TONE_MAP` | `0` | `1` active le mappage de tons HDR→SDR dans le transcodage HLS |
+| `HLS_VCODEC` | vide (libx264) | Codec logiciel de transcodage (si `HLS_HW_ACCEL` est vide) : libx264, libx265, libsvtav1 ou libvpx-vp9 |
+| `HLS_PASSTHROUGH_HDR` | `1` | Conserve le HDR (Dolby Vision / HDR10+) quand l'encodeur gère la 10 bits ; sinon repli sur le mappage de tons |
 | `SUBTITLE_OS_USERNAME` / `SUBTITLE_OS_PASSWORD` / `SUBTITLE_OS_API_KEY` | vide | Identifiants OpenSubtitles pour la recherche de sous-titres |
 | `RTMP_INGEST_URL` | `rtmp://localhost:1935/live` | URL d’ingestion RTMP de base (nginx-rtmp ou équivalent) |
 | `WHISPER_BIN` / `WHISPER_MODEL` | vide | CLI whisper.cpp et modèle pour la transcription vocale |

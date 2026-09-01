@@ -149,6 +149,7 @@ type probeInfo struct {
 	Height    int
 	Codec     string
 	Container string
+	HDR       bool
 	Subs      []probeSubtitle // text subtitle streams inside the container
 	Chapters  []probeChapter
 }
@@ -917,9 +918,9 @@ func (s *Scanner) upsert(ctx context.Context, libID uuid.UUID, path string, info
 		INSERT INTO videos (
 			library_id, title, filename, file_path, size_bytes, duration_sec,
 			width, height, video_codec, container, year, subtitle_path,
-			version_key, version_label, version_rank,
+			version_key, version_label, version_rank, hdr,
 			available, updated_at, last_scanned_at
-		) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,true,now(),now())
+		) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,true,now(),now())
 		ON CONFLICT (file_path) DO UPDATE SET
 			library_id = EXCLUDED.library_id,
 			title = EXCLUDED.title,
@@ -935,13 +936,14 @@ func (s *Scanner) upsert(ctx context.Context, libID uuid.UUID, path string, info
 			version_key = EXCLUDED.version_key,
 			version_label = EXCLUDED.version_label,
 			version_rank = EXCLUDED.version_rank,
+			hdr = EXCLUDED.hdr,
 			available = true,
 			updated_at = now(),
 			last_scanned_at = now()
 		RETURNING id, poster_path`,
 		libID, title, filename, path, info.Size, info.Duration,
 		info.Width, info.Height, info.Codec, info.Container, year, subtitle,
-		versionKey, versionLabel, versionRank,
+		versionKey, versionLabel, versionRank, info.HDR,
 	).Scan(&id, &posterPath)
 	if err != nil {
 		return fmt.Errorf("upsert video: %w", err)
@@ -1001,12 +1003,16 @@ func (s *Scanner) probe(ctx context.Context, path string) (probeInfo, error) {
 
 	var raw struct {
 		Streams []struct {
-			CodecType string `json:"codec_type"`
-			CodecName string `json:"codec_name"`
-			Width     int    `json:"width"`
-			Height    int    `json:"height"`
-			Index     int    `json:"index"`
-			Tags      struct {
+			CodecType     string `json:"codec_type"`
+			CodecName     string `json:"codec_name"`
+			Width         int    `json:"width"`
+			Height        int    `json:"height"`
+			Index         int    `json:"index"`
+			ColorTransfer string `json:"color_transfer"`
+			SideData      []struct {
+				Type string `json:"side_data_type"`
+			} `json:"side_data_list"`
+			Tags struct {
 				Language string `json:"language"`
 				Title    string `json:"title"`
 			} `json:"tags"`
@@ -1030,6 +1036,22 @@ func (s *Scanner) probe(ctx context.Context, path string) (probeInfo, error) {
 	info.Duration, _ = strconv.ParseFloat(raw.Format.Duration, 64)
 	info.Size, _ = strconv.ParseInt(raw.Format.Size, 10, 64)
 	info.Container = raw.Format.FormatName
+	for _, st := range raw.Streams {
+		if st.CodecType != "video" {
+			continue
+		}
+		if st.ColorTransfer == "smpte2084" || st.ColorTransfer == "arib-std-b67" {
+			info.HDR = true
+		}
+		for _, sd := range st.SideData {
+			if strings.Contains(strings.ToLower(sd.Type), "dovi") {
+				info.HDR = true
+			}
+		}
+		if info.HDR {
+			break
+		}
+	}
 	for _, ch := range raw.Chapters {
 		start, _ := strconv.ParseFloat(ch.StartTime, 64)
 		end, _ := strconv.ParseFloat(ch.EndTime, 64)

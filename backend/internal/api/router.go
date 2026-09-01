@@ -70,6 +70,8 @@ func New(cfg config.Config, pool *pgxpool.Pool) (*App, error) {
 	}
 	app.hls.SetVAAPIDevice(cfg.HLSVAAPIDevice)
 	app.hls.SetToneMap(cfg.HLSToneMap)
+	app.hls.SetVCodec(cfg.HLSVCodec)
+	app.hls.SetHDRPassthrough(cfg.HLSPassthroughHDR)
 	scanner.SetEnricher(app.scraper)
 	scanner.SetNotify(func(name, status string) {
 		event := "scan.completed"

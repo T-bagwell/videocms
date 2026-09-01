@@ -195,6 +195,79 @@ func TestHWEncodePlan(t *testing.T) {
 	}
 }
 
+func TestSoftwareEncodePlanVCodecs(t *testing.T) {
+	cases := []struct {
+		vcodec string
+		want   []string
+	}{
+		{"", []string{"-c:v", "libx264", "-preset", "veryfast", "-crf", "23"}},
+		{"libx265", []string{"-c:v", "libx265", "-preset", "veryfast", "-crf", "25", "-tag:v", "hvc1"}},
+		{"libsvtav1", []string{"-c:v", "libsvtav1", "-preset", "8", "-crf", "32"}},
+		{"libvpx-vp9", []string{"-c:v", "libvpx-vp9", "-deadline", "realtime", "-cpu-used", "8", "-crf", "34", "-b:v", "0"}},
+	}
+	for _, c := range cases {
+		plan, err := hwEncodePlanFull("", "", c.vcodec, false, false, false)
+		if err != nil {
+			t.Fatalf("plan for %q: %v", c.vcodec, err)
+		}
+		if !reflect.DeepEqual(plan.codec, c.want) {
+			t.Errorf("codec for %q = %v, want %v", c.vcodec, plan.codec, c.want)
+		}
+		if strings.Contains(plan.scale, "tonemap") {
+			t.Errorf("scale for %q should not tonemap: %q", c.vcodec, plan.scale)
+		}
+	}
+	if plan, err := hwEncodePlanFull("", "", "bogus", false, false, false); err != nil ||
+		!strings.Contains(strings.Join(plan.codec, " "), "libx264") {
+		t.Errorf("unknown vcodec should fall back to libx264, got %v (%v)", plan.codec, err)
+	}
+}
+
+func TestHDRPassthroughPlan(t *testing.T) {
+	// 10-bit encoders carry the HDR signal through.
+	plan, err := hwEncodePlanFull("", "", "libsvtav1", false, true, true)
+	if err != nil {
+		t.Fatalf("svtav1 hdr plan: %v", err)
+	}
+	codec := strings.Join(plan.codec, " ")
+	if !strings.Contains(codec, "yuv420p10le") || !strings.Contains(codec, "smpte2084") {
+		t.Errorf("hdr passthrough codec = %q, want 10-bit + bt2020 metadata", codec)
+	}
+	if strings.Contains(plan.scale, "tonemap") {
+		t.Errorf("hdr passthrough should not tonemap: %q", plan.scale)
+	}
+
+	// 8-bit encoders fall back to tone mapping.
+	plan, err = hwEncodePlanFull("", "", "libx264", false, true, true)
+	if err != nil {
+		t.Fatalf("x264 hdr plan: %v", err)
+	}
+	if !strings.Contains(plan.scale, "tonemap=hable") {
+		t.Errorf("x264 hdr fallback scale = %q, want tone mapping", plan.scale)
+	}
+	if strings.Contains(strings.Join(plan.codec, " "), "yuv420p10le") {
+		t.Error("x264 plan must stay 8-bit")
+	}
+
+	// Passthrough disabled: plain SDR transcode.
+	plan, err = hwEncodePlanFull("", "", "libvpx-vp9", false, false, true)
+	if err != nil {
+		t.Fatalf("vp9 non-passthrough plan: %v", err)
+	}
+	if strings.Contains(strings.Join(plan.codec, " "), "yuv420p10le") {
+		t.Error("passthrough disabled should not request 10-bit output")
+	}
+
+	// Explicit tone mapping wins over passthrough.
+	plan, err = hwEncodePlanFull("", "", "libsvtav1", true, true, true)
+	if err != nil {
+		t.Fatalf("svtav1 tonemap plan: %v", err)
+	}
+	if !strings.Contains(plan.scale, "tonemap") {
+		t.Errorf("explicit tonemap scale = %q", plan.scale)
+	}
+}
+
 func TestIsImageSubtitleCodec(t *testing.T) {
 	for _, c := range []string{"hdmv_pgs_subtitle", "DVD_SUBTITLE", "dvb_subtitle"} {
 		if !IsImageSubtitleCodec(c) {

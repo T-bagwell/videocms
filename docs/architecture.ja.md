@@ -283,7 +283,10 @@ erDiagram
   `h264_vaapi`）に切替可能。VAAPI は `HLS_VAAPI_DEVICE` でデバイスを指定し、
   `hwupload`/`scale_vaapi` パイプラインを使用。`HLS_TONE_MAP=1` でソフトウェア
   `zscale`+`tonemap` による HDR→SDR 変換を有効化。不正な値は静かに劣化させるのでは
-  なくセッション開始を失敗させます
+  なくセッション開始を失敗させます。ソフトウェア変換は
+  `HLS_VCODEC=libx265|libsvtav1|libvpx-vp9` で HEVC/AV1/VP9 出力が可能で、
+  `HLS_PASSTHROUGH_HDR=1`（既定）は 10-bit 対応エンコーダーで Dolby Vision /
+  HDR10+ 信号を直通し、8-bit エンコーダーではトーンマッピングにフォールバックします
 - 各レンディションは `data/hls/<video-id>/v<幅>/` に書き込み。サーバーは全
   レンディションと、字幕トラックごとに `#EXT-X-MEDIA` エントリ
   （`subs/<トラックid>/playlist.m3u8`、内蔵トラックは初回リクエスト時に遅延抽出）を
@@ -668,7 +671,7 @@ sequenceDiagram
 | `WATCH_INTERVAL` | `30` | 増分スキャンのフォールバック間隔（秒）。fsnotify は即時索引 |
 | `YTDLP_PATH` | PATH 上の yt-dlp | ダウンロードキューの yt-dlp バイナリ |
 | `WEB_ROOT` | 自動（`frontend/dist`） | 本番モードのフロントエンドディレクトリ |
-| `HLS_HW_ACCEL` / `HLS_VAAPI_DEVICE` / `HLS_TONE_MAP` | 空 / `/dev/dri/renderD128` / `0` | ハードウェア HLS エンコード（videotoolbox/nvenc/qsv/vaapi）、VAAPI デバイス、HDR→SDR トーンマッピング |
+| `HLS_HW_ACCEL` / `HLS_VAAPI_DEVICE` / `HLS_TONE_MAP` / `HLS_VCODEC` / `HLS_PASSTHROUGH_HDR` | 空 / `/dev/dri/renderD128` / `0` / 空（libx264）/ `1` | ハードウェア HLS エンコード（videotoolbox/nvenc/qsv/vaapi）、VAAPI デバイス、HDR→SDR トーンマッピング、ソフトウェアコーデック（libx264/libx265/libsvtav1/libvpx-vp9）、HDR パススルー |
 | `SUBTITLE_OS_USERNAME` / `SUBTITLE_OS_PASSWORD` / `SUBTITLE_OS_API_KEY` | 空 | OpenSubtitles オンライン字幕検索の認証情報 |
 | `RTMP_INGEST_URL` | `rtmp://localhost:1935/live` | ライブ配信の RTMP 取り込みベース URL |
 | `WHISPER_BIN` / `WHISPER_MODEL` | 空 | whisper.cpp CLI + モデル（文字起こし） |

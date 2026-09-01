@@ -290,6 +290,8 @@ make serve                              # http://<LAN IP>:8080
 | `HLS_HW_ACCEL` | 空（ソフトウェア x264） | HLS ビデオエンコーダー：videotoolbox、nvenc、qsv または vaapi。空なら libx264 |
 | `HLS_VAAPI_DEVICE` | `/dev/dri/renderD128` | VAAPI レンダーデバイス（`HLS_HW_ACCEL=vaapi` 時） |
 | `HLS_TONE_MAP` | `0` | `1` で HLS トランスコードに HDR→SDR トーンマッピングを有効化 |
+| `HLS_VCODEC` | 空（libx264） | ソフトウェア変換エンコーダー（`HLS_HW_ACCEL` が空のとき）：libx264、libx265、libsvtav1、libvpx-vp9 |
+| `HLS_PASSTHROUGH_HDR` | `1` | 10-bit 対応エンコーダーでは HDR（Dolby Vision / HDR10+）を直通し、8-bit エンコーダーではトーンマッピングへフォールバック |
 | `SUBTITLE_OS_USERNAME` / `SUBTITLE_OS_PASSWORD` / `SUBTITLE_OS_API_KEY` | 空 | オンライン字幕検索用の OpenSubtitles 認証情報 |
 | `RTMP_INGEST_URL` | `rtmp://localhost:1935/live` | RTMP 取り込みのベース URL（nginx-rtmp 等） |
 | `WHISPER_BIN` / `WHISPER_MODEL` | 空 | whisper.cpp のバイナリとモデル（文字起こし用） |

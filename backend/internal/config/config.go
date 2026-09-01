@@ -23,6 +23,8 @@ type Config struct {
 	HLSHWAccel         string
 	HLSVAAPIDevice     string
 	HLSToneMap         bool
+	HLSVCodec          string
+	HLSPassthroughHDR  bool
 	SubtitleOSUser     string
 	SubtitleOSPassword string
 	SubtitleOSAPIKey   string
@@ -72,6 +74,8 @@ func Load() Config {
 		HLSHWAccel:         os.Getenv("HLS_HW_ACCEL"),
 		HLSVAAPIDevice:     os.Getenv("HLS_VAAPI_DEVICE"),
 		HLSToneMap:         envBool("HLS_TONE_MAP"),
+		HLSVCodec:          os.Getenv("HLS_VCODEC"),
+		HLSPassthroughHDR:  os.Getenv("HLS_PASSTHROUGH_HDR") != "0",
 		SubtitleOSUser:     os.Getenv("SUBTITLE_OS_USERNAME"),
 		SubtitleOSPassword: os.Getenv("SUBTITLE_OS_PASSWORD"),
 		SubtitleOSAPIKey:   os.Getenv("SUBTITLE_OS_API_KEY"),

@@ -281,7 +281,9 @@ erDiagram
   硬件编码器（`h264_videotoolbox` / `h264_nvenc` / `h264_qsv` / `h264_vaapi`），
   VAAPI 设备由 `HLS_VAAPI_DEVICE` 指定并使用 `hwupload`/`scale_vaapi` 管线；
   `HLS_TONE_MAP=1` 会在 filter 链前置软件 `zscale`+`tonemap` 做 HDR→SDR；
-  非法取值直接使会话启动失败，而不是静默降级
+  软件转码可用 `HLS_VCODEC=libx265|libsvtav1|libvpx-vp9` 输出 HEVC/AV1/VP9，
+  `HLS_PASSTHROUGH_HDR=1`（默认）在 10-bit 编码器上保留 Dolby Vision / HDR10+
+  信号，8-bit 编码器回退为色调映射；非法取值直接使会话启动失败，而不是静默降级
 - 每档写入 `data/hls/<video-id>/v<宽度>/`；服务端生成引用所有档位、并为每条字幕轨
   输出一个 `#EXT-X-MEDIA` 条目（`subs/<轨道id>/playlist.m3u8`，内嵌轨首次请求时
   按需提取）的 master 播放列表。清单随转码增长，ffmpeg 结束后由服务端追加
@@ -629,7 +631,7 @@ sequenceDiagram
 | `WATCH_INTERVAL` | `30` | 增量扫描兜底间隔（秒）；fsnotify 事件即时索引 |
 | `YTDLP_PATH` | PATH 上的 yt-dlp | 下载队列使用的 yt-dlp 二进制 |
 | `WEB_ROOT` | 自动（`frontend/dist`） | 生产模式下内置的前端目录 |
-| `HLS_HW_ACCEL` / `HLS_VAAPI_DEVICE` / `HLS_TONE_MAP` | 空 / `/dev/dri/renderD128` / `0` | 硬件 HLS 编码（videotoolbox/nvenc/qsv/vaapi）、VAAPI 设备、HDR→SDR 色调映射 |
+| `HLS_HW_ACCEL` / `HLS_VAAPI_DEVICE` / `HLS_TONE_MAP` / `HLS_VCODEC` / `HLS_PASSTHROUGH_HDR` | 空 / `/dev/dri/renderD128` / `0` / 空（libx264）/ `1` | 硬件 HLS 编码（videotoolbox/nvenc/qsv/vaapi）、VAAPI 设备、HDR→SDR 色调映射、软件编码器（libx264/libx265/libsvtav1/libvpx-vp9）、HDR 直通 |
 | `SUBTITLE_OS_USERNAME` / `SUBTITLE_OS_PASSWORD` / `SUBTITLE_OS_API_KEY` | 空 | OpenSubtitles 在线字幕搜索凭据 |
 | `RTMP_INGEST_URL` | `rtmp://localhost:1935/live` | 直播 RTMP 推流基础地址 |
 | `WHISPER_BIN` / `WHISPER_MODEL` | 空 | whisper.cpp CLI + 模型（转写） |
