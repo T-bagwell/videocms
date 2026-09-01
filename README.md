@@ -332,7 +332,7 @@ from the product's own perspective.
 
 **Discovery, requests & automation**
 
-- [ ] Request workflow: users search and request titles; admins approve and
+- [x] Request workflow: users search and request titles; admins approve and
       the request feeds the download queue
 - [ ] Quality profiles & automatic upgrades: the best matching file is
       preferred and new releases auto-upgrade; imports are moved/renamed into
