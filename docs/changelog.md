@@ -59,6 +59,10 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- First-class media types: audio (music library), images (photo library) and
+  PDF documents (scanned into the books index with a browser PDF viewer in the
+  reader page) are full library items with their own browse and playback
+  surfaces
 - Photo library: images (jpg/png/gif/webp/bmp) are scanned with dimensions and
   EXIF metadata (taken-at, camera), grouped into folder-based albums with a
   cover photo, and browsed on a Photos page with a keyboard-navigable
