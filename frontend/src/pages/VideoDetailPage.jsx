@@ -36,6 +36,10 @@ export default function VideoDetailPage() {
   const [featuretteTitle, setFeaturetteTitle] = useState('');
   const [featuretteBusy, setFeaturetteBusy] = useState(false);
   const featuretteFileRef = useRef(null);
+  const [themeSong, setThemeSong] = useState(null);
+  const [themeSongTitle, setThemeSongTitle] = useState('');
+  const [themeSongBusy, setThemeSongBusy] = useState(false);
+  const themeSongFileRef = useRef(null);
   const [scrapeProvider, setScrapeProvider] = useState('tmdb');
   const [scrapeForce, setScrapeForce] = useState(false);
   const [tags, setTags] = useState([]);
@@ -65,6 +69,9 @@ export default function VideoDetailPage() {
     api(`/videos/${id}/featurettes`)
       .then((d) => setFeaturettes(d.items || []))
       .catch(() => setFeaturettes([]));
+    api(`/videos/${id}/theme-song`)
+      .then(setThemeSong)
+      .catch(() => setThemeSong(null));
   }, [id]);
 
   function youtubeId(url) {
@@ -99,6 +106,37 @@ export default function VideoDetailPage() {
     try {
       await api(`/videos/${video.id}/featurettes/${ft.id}`, { method: 'DELETE' });
       setFeaturettes((prev) => prev.filter((x) => x.id !== ft.id));
+    } catch (e2) {
+      setErr(e2.message);
+    }
+  }
+
+  async function uploadThemeSong(e) {
+    e.preventDefault();
+    const file = themeSongFileRef.current?.files?.[0];
+    if (!file) return;
+    setThemeSongBusy(true);
+    setErr('');
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      if (themeSongTitle.trim()) fd.append('title', themeSongTitle.trim());
+      const created = await api(`/videos/${video.id}/theme-song`, { method: 'POST', form: fd });
+      setThemeSong(created);
+      if (themeSongFileRef.current) themeSongFileRef.current.value = '';
+      setThemeSongTitle('');
+      setMsg(t('video.themeSongUploaded'));
+    } catch (e2) {
+      setErr(e2.message);
+    } finally {
+      setThemeSongBusy(false);
+    }
+  }
+
+  async function removeThemeSong() {
+    try {
+      await api(`/videos/${video.id}/theme-song`, { method: 'DELETE' });
+      setThemeSong(null);
     } catch (e2) {
       setErr(e2.message);
     }
@@ -521,6 +559,49 @@ export default function VideoDetailPage() {
                   />
                   <button className="btn small primary" disabled={featuretteBusy}>
                     {featuretteBusy ? t('video.uploading') : t('video.featuretteUpload')}
+                  </button>
+                </form>
+              )}
+            </div>
+          )}
+          {(themeSong || user?.role === 'admin') && (
+            <div className="card versions-panel">
+              <h3>{t('video.themeSongTitle')}</h3>
+              {themeSong && (
+                <div className="version-row">
+                  <div className="version-info">
+                    <b>{themeSong.title}</b>
+                    <span className="muted small">{fmtBytes(themeSong.size_bytes)}</span>
+                  </div>
+                  <audio
+                    className="theme-song-audio"
+                    controls
+                    preload="none"
+                    src={mediaUrl(`/videos/${video.id}/theme-song/stream`)}
+                  />
+                  {user?.role === 'admin' && (
+                    <button className="btn small ghost" onClick={removeThemeSong}>
+                      {t('common.remove')}
+                    </button>
+                  )}
+                </div>
+              )}
+              {user?.role === 'admin' && (
+                <form className="inline-form featurette-upload" onSubmit={uploadThemeSong}>
+                  <input
+                    type="file"
+                    accept="audio/mpeg,audio/mp4,audio/ogg,audio/flac,audio/wav,.mp3,.m4a,.aac,.opus"
+                    ref={themeSongFileRef}
+                    required
+                  />
+                  <input
+                    placeholder={t('video.themeSongTitlePlaceholder')}
+                    value={themeSongTitle}
+                    onChange={(e) => setThemeSongTitle(e.target.value)}
+                    maxLength={200}
+                  />
+                  <button className="btn small primary" disabled={themeSongBusy}>
+                    {themeSongBusy ? t('video.uploading') : t('video.themeSongUpload')}
                   </button>
                 </form>
               )}
