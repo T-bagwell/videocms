@@ -10,6 +10,7 @@
     "music": "Musik",
     "books": "Bücher",
     "photos": "Fotos",
+    "requests": "Anfragen",
     "admin": "Verwaltung",
     "logout": "Abmelden",
     "parentalLock": "Kindersicherung",
@@ -299,6 +300,7 @@
     "tabJobs": "Aufträge",
     "tabWebhooks": "Webhooks",
     "tabIptv": "IPTV",
+    "tabRequests": "Anfragen",
     "statsVideos": "Videos",
     "statsLibraries": "Bibliotheken",
     "statsUsers": "Benutzer",
@@ -580,5 +582,26 @@
     "added": "Gespeichert",
     "imported": "Importiert",
     "deleted": "Gelöscht"
+  },
+  "requests": {
+    "submit": "Anfrage senden",
+    "titleField": "Titel",
+    "year": "Jahr",
+    "typeMovie": "Film",
+    "typeTv": "Serie",
+    "notes": "Notizen (optional)",
+    "submitted": "Anfrage gesendet",
+    "myRequests": "Meine Anfragen",
+    "all": "Alle Anfragen",
+    "empty": "Noch keine Anfragen",
+    "statusPending": "Ausstehend",
+    "statusApproved": "Genehmigt",
+    "statusRejected": "Abgelehnt",
+    "statusDownloading": "Wird geladen",
+    "approve": "Genehmigen",
+    "reject": "Ablehnen",
+    "downloadUrl": "Download-URL (optional)",
+    "targetPath": "Zielordner (optional)",
+    "decided": "Aktualisiert"
   }
 }

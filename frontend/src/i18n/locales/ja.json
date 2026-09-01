@@ -10,6 +10,7 @@
     "music": "音楽",
     "books": "本",
     "photos": "写真",
+    "requests": "リクエスト",
     "admin": "管理",
     "logout": "ログアウト",
     "parentalLock": "ペアレンタルロック",
@@ -299,6 +300,7 @@
     "tabJobs": "タスク",
     "tabWebhooks": "Webhook",
     "tabIptv": "IPTV",
+    "tabRequests": "リクエスト",
     "statsVideos": "動画数",
     "statsLibraries": "ライブラリ",
     "statsUsers": "ユーザー",
@@ -580,5 +582,26 @@
     "added": "保存しました",
     "imported": "インポートしました",
     "deleted": "削除しました"
+  },
+  "requests": {
+    "submit": "リクエストを送信",
+    "titleField": "タイトル",
+    "year": "年",
+    "typeMovie": "映画",
+    "typeTv": "ドラマ",
+    "notes": "メモ（任意）",
+    "submitted": "リクエストを送信しました",
+    "myRequests": "自分のリクエスト",
+    "all": "すべてのリクエスト",
+    "empty": "リクエストはまだありません",
+    "statusPending": "保留中",
+    "statusApproved": "承認済み",
+    "statusRejected": "却下",
+    "statusDownloading": "ダウンロード中",
+    "approve": "承認",
+    "reject": "却下",
+    "downloadUrl": "ダウンロードURL（任意）",
+    "targetPath": "保存先フォルダ（任意）",
+    "decided": "更新しました"
   }
 }

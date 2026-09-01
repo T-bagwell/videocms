@@ -15,6 +15,7 @@ import BookReaderPage from './pages/BookReaderPage.jsx';
 import PhotosPage from './pages/PhotosPage.jsx';
 import PublicPage from './pages/PublicPage.jsx';
 import PublicVideoPage from './pages/PublicVideoPage.jsx';
+import RequestsPage from './pages/RequestsPage.jsx';
 import AdminPage from './pages/AdminPage.jsx';
 import LivePage from './pages/LivePage.jsx';
 import SharePage from './pages/SharePage.jsx';
@@ -150,6 +151,14 @@ export default function App() {
             element={
               <RequireAuth>
                 <PhotosPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/requests"
+            element={
+              <RequireAuth>
+                <RequestsPage />
               </RequireAuth>
             }
           />

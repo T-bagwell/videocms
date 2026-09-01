@@ -338,6 +338,10 @@ label input, label textarea { margin-top: 6px; }
 .status-idle { background: var(--bg-soft); color: var(--muted); }
 .status-scanning { background: rgba(46,204,113,0.15); color: var(--ok); }
 .status-error { background: rgba(231,76,60,0.15); color: var(--danger); }
+.status-pending { background: rgba(243,156,18,0.15); color: var(--warn); }
+.status-approved { background: rgba(46,204,113,0.15); color: var(--ok); }
+.status-rejected { background: rgba(231,76,60,0.15); color: var(--danger); }
+.status-downloading { background: rgba(229,9,20,0.15); color: var(--accent); }
 .status-queued { background: rgba(243,156,18,0.15); color: var(--warn); }
 .status-downloading { background: rgba(52,152,219,0.15); color: #5dade2; }
 .status-completed { background: rgba(46,204,113,0.15); color: var(--ok); }

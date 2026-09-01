@@ -312,6 +312,11 @@ func (a *App) Routes() http.Handler {
 	mux.HandleFunc("POST /api/iptv/epg/import", authAdmin(a.importIptvEPG))
 	mux.HandleFunc("GET /api/iptv/library/{id}/stream", a.libraryChannelStream)
 
+	mux.HandleFunc("POST /api/requests", authUser(a.createContentRequest))
+	mux.HandleFunc("GET /api/requests", authUser(a.listMyRequests))
+	mux.HandleFunc("GET /api/requests/all", authAdmin(a.listAllRequests))
+	mux.HandleFunc("POST /api/requests/{id}/decide", authAdmin(a.decideContentRequest))
+
 	mux.HandleFunc("GET /api/playlists", authUser(a.listPlaylists))
 	mux.HandleFunc("POST /api/playlists", authUser(a.createPlaylist))
 	mux.HandleFunc("GET /api/playlists/{id}", authUser(a.getPlaylist))

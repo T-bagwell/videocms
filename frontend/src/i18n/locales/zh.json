@@ -10,6 +10,7 @@
     "music": "音乐",
     "books": "图书",
     "photos": "照片",
+    "requests": "点播请求",
     "admin": "管理",
     "logout": "退出",
     "parentalLock": "家长锁",
@@ -299,6 +300,7 @@
     "tabJobs": "任务",
     "tabWebhooks": "Webhook",
     "tabIptv": "IPTV",
+    "tabRequests": "点播请求",
     "statsVideos": "视频总数",
     "statsLibraries": "媒体库",
     "statsUsers": "用户",
@@ -580,5 +582,26 @@
     "added": "已保存",
     "imported": "已导入",
     "deleted": "已删除"
+  },
+  "requests": {
+    "submit": "提交请求",
+    "titleField": "片名/剧名",
+    "year": "年份",
+    "typeMovie": "电影",
+    "typeTv": "剧集",
+    "notes": "备注（可选）",
+    "submitted": "请求已提交",
+    "myRequests": "我的请求",
+    "all": "全部请求",
+    "empty": "暂无请求",
+    "statusPending": "待审批",
+    "statusApproved": "已批准",
+    "statusRejected": "已拒绝",
+    "statusDownloading": "下载中",
+    "approve": "批准",
+    "reject": "拒绝",
+    "downloadUrl": "下载地址（可选）",
+    "targetPath": "目标文件夹（可选）",
+    "decided": "已更新"
   }
 }
