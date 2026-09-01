@@ -59,6 +59,10 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Music library: audio files (mp3/m4a/flac/ogg/opus/wav/aac) are scanned with
+  their artist/album tags, embedded cover art is extracted as the album cover,
+  albums are grouped automatically, and a dedicated Music page (grid + album
+  track list) plays albums as a continuous queue in the player
 - Per-device playback policy: the player remembers each browser/device's
   preference (auto / prefer direct / prefer transcode) and automatically falls
   back to transcoding when direct playback fails
