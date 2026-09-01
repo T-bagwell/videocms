@@ -298,6 +298,7 @@
     "tabStorage": "Storage",
     "tabJobs": "Jobs",
     "tabWebhooks": "Webhooks",
+    "tabIptv": "IPTV",
     "statsVideos": "Videos",
     "statsLibraries": "Libraries",
     "statsUsers": "Users",
@@ -555,5 +556,29 @@
     "passwordTitle": "This video is password protected",
     "passwordPlaceholder": "Password",
     "unlock": "Unlock"
+  },
+  "iptv": {
+    "title": "IPTV",
+    "channels": "Channels",
+    "noChannels": "No channels yet",
+    "addChannel": "Add channel",
+    "name": "Name",
+    "sourceUrl": "Stream URL",
+    "logo": "Logo URL",
+    "group": "Group",
+    "add": "Add",
+    "importM3U": "Import from M3U",
+    "m3uUrl": "M3U playlist URL",
+    "import": "Import",
+    "libraryChannel": "Library channel",
+    "library": "Library",
+    "create": "Create",
+    "epgImport": "Import EPG (XMLTV)",
+    "epgUrl": "XMLTV URL",
+    "m3uOutput": "M3U output",
+    "epgOutput": "EPG output",
+    "added": "Saved",
+    "imported": "Imported",
+    "deleted": "Deleted"
   }
 }

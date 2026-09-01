@@ -298,6 +298,7 @@
     "tabStorage": "存储池",
     "tabJobs": "任务",
     "tabWebhooks": "Webhook",
+    "tabIptv": "IPTV",
     "statsVideos": "视频总数",
     "statsLibraries": "媒体库",
     "statsUsers": "用户",
@@ -555,5 +556,29 @@
     "passwordTitle": "该视频受密码保护",
     "passwordPlaceholder": "密码",
     "unlock": "解锁"
+  },
+  "iptv": {
+    "title": "IPTV",
+    "channels": "频道",
+    "noChannels": "暂无频道",
+    "addChannel": "添加频道",
+    "name": "名称",
+    "sourceUrl": "流地址",
+    "logo": "Logo 地址",
+    "group": "分组",
+    "add": "添加",
+    "importM3U": "从 M3U 导入",
+    "m3uUrl": "M3U 播放列表地址",
+    "import": "导入",
+    "libraryChannel": "库频道",
+    "library": "媒体库",
+    "create": "创建",
+    "epgImport": "导入 EPG（XMLTV）",
+    "epgUrl": "XMLTV 地址",
+    "m3uOutput": "M3U 输出",
+    "epgOutput": "EPG 输出",
+    "added": "已保存",
+    "imported": "已导入",
+    "deleted": "已删除"
   }
 }

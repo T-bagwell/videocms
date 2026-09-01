@@ -302,6 +302,16 @@ func (a *App) Routes() http.Handler {
 	mux.HandleFunc("GET /api/live/{id}/chat", authUser(a.listChatMessages))
 	mux.HandleFunc("POST /api/live/{id}/chat", authUser(a.sendChatMessage))
 
+	mux.HandleFunc("GET /api/iptv/channels", authAdmin(a.listIptvChannels))
+	mux.HandleFunc("POST /api/iptv/channels", authAdmin(a.createIptvChannel))
+	mux.HandleFunc("DELETE /api/iptv/channels/{id}", authAdmin(a.deleteIptvChannel))
+	mux.HandleFunc("POST /api/iptv/import", authAdmin(a.importIptvM3U))
+	mux.HandleFunc("POST /api/iptv/library-channel", authAdmin(a.createLibraryChannel))
+	mux.HandleFunc("GET /api/iptv/channels.m3u", a.iptvChannelsM3U)
+	mux.HandleFunc("GET /api/iptv/epg.xml", a.iptvEPGXML)
+	mux.HandleFunc("POST /api/iptv/epg/import", authAdmin(a.importIptvEPG))
+	mux.HandleFunc("GET /api/iptv/library/{id}/stream", a.libraryChannelStream)
+
 	mux.HandleFunc("GET /api/playlists", authUser(a.listPlaylists))
 	mux.HandleFunc("POST /api/playlists", authUser(a.createPlaylist))
 	mux.HandleFunc("GET /api/playlists/{id}", authUser(a.getPlaylist))

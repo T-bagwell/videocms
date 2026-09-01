@@ -298,6 +298,7 @@
     "tabStorage": "ストレージ",
     "tabJobs": "タスク",
     "tabWebhooks": "Webhook",
+    "tabIptv": "IPTV",
     "statsVideos": "動画数",
     "statsLibraries": "ライブラリ",
     "statsUsers": "ユーザー",
@@ -555,5 +556,29 @@
     "passwordTitle": "この動画はパスワードで保護されています",
     "passwordPlaceholder": "パスワード",
     "unlock": "ロック解除"
+  },
+  "iptv": {
+    "title": "IPTV",
+    "channels": "チャンネル",
+    "noChannels": "チャンネルがありません",
+    "addChannel": "チャンネルを追加",
+    "name": "名前",
+    "sourceUrl": "ストリームURL",
+    "logo": "ロゴURL",
+    "group": "グループ",
+    "add": "追加",
+    "importM3U": "M3U からインポート",
+    "m3uUrl": "M3U プレイリストURL",
+    "import": "インポート",
+    "libraryChannel": "ライブラリチャンネル",
+    "library": "ライブラリ",
+    "create": "作成",
+    "epgImport": "EPG（XMLTV）をインポート",
+    "epgUrl": "XMLTV URL",
+    "m3uOutput": "M3U 出力",
+    "epgOutput": "EPG 出力",
+    "added": "保存しました",
+    "imported": "インポートしました",
+    "deleted": "削除しました"
   }
 }

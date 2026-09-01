@@ -8,6 +8,7 @@ import BlockedAdmin from './BlockedAdmin.jsx';
 import UploadsAdmin from './UploadsAdmin.jsx';
 import DownloadsAdmin from './DownloadsAdmin.jsx';
 import LiveAdmin from './LiveAdmin.jsx';
+import IptvAdmin from './IptvAdmin.jsx';
 import StorageAdmin from './StorageAdmin.jsx';
 import JobsAdmin from './JobsAdmin.jsx';
 import WebhooksAdmin from './WebhooksAdmin.jsx';
@@ -53,6 +54,9 @@ export default function AdminPage() {
         <button className={tab === 'webhooks' ? 'tab active' : 'tab'} onClick={() => setTab('webhooks')}>
           {t('admin.tabWebhooks')}
         </button>
+        <button className={tab === 'iptv' ? 'tab active' : 'tab'} onClick={() => setTab('iptv')}>
+          {t('admin.tabIptv')}
+        </button>
       </div>
       {tab === 'overview' && <Overview />}
       {tab === 'libraries' && <Libraries />}
@@ -65,6 +69,7 @@ export default function AdminPage() {
       {tab === 'storage' && <StorageAdmin />}
       {tab === 'jobs' && <JobsAdmin />}
       {tab === 'webhooks' && <WebhooksAdmin />}
+      {tab === 'iptv' && <IptvAdmin />}
     </div>
   );
 }

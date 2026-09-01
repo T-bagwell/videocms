@@ -298,6 +298,7 @@
     "tabStorage": "Stockage",
     "tabJobs": "Tâches",
     "tabWebhooks": "Webhooks",
+    "tabIptv": "IPTV",
     "statsVideos": "Vidéos",
     "statsLibraries": "Bibliothèques",
     "statsUsers": "Utilisateurs",
@@ -555,5 +556,29 @@
     "passwordTitle": "Cette vidéo est protégée par mot de passe",
     "passwordPlaceholder": "Mot de passe",
     "unlock": "Déverrouiller"
+  },
+  "iptv": {
+    "title": "IPTV",
+    "channels": "Chaînes",
+    "noChannels": "Aucune chaîne pour l'instant",
+    "addChannel": "Ajouter une chaîne",
+    "name": "Nom",
+    "sourceUrl": "URL du flux",
+    "logo": "URL du logo",
+    "group": "Groupe",
+    "add": "Ajouter",
+    "importM3U": "Importer depuis M3U",
+    "m3uUrl": "URL de la playlist M3U",
+    "import": "Importer",
+    "libraryChannel": "Chaîne de bibliothèque",
+    "library": "Bibliothèque",
+    "create": "Créer",
+    "epgImport": "Importer EPG (XMLTV)",
+    "epgUrl": "URL XMLTV",
+    "m3uOutput": "Sortie M3U",
+    "epgOutput": "Sortie EPG",
+    "added": "Enregistré",
+    "imported": "Importé",
+    "deleted": "Supprimé"
   }
 }

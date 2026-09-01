@@ -318,6 +318,7 @@ label input, label textarea { margin-top: 6px; }
 .tab.active { color: var(--text); border-bottom-color: var(--accent); }
 .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; }
 .stat { text-align: center; padding: 20px 12px; }
+.iptv-url { font-size: 12px; word-break: break-all; }
 .stat-num { font-size: 26px; font-weight: 800; margin-bottom: 4px; }
 .stat.warn .stat-num { color: var(--warn); }
 .status-badge { margin-left: 10px; font-size: 11px; font-weight: 400; border-radius: 6px; padding: 2px 8px; vertical-align: middle; }
