@@ -59,6 +59,10 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Registration policies: `REGISTRATION_ENABLED` and `REGISTRATION_INVITE_ONLY`
+  control open / invite-only / closed signup, admins generate one-time invite
+  codes (admin Invites tab), and the login page hides signup when closed or
+  asks for an invite code when required
 - Backdrops/fanart: scraping pulls a wide hero backdrop (TMDB images or a
   custom provider's `backdrop_url`) and admins can upload one; the detail page
   renders it as a banner above the poster
