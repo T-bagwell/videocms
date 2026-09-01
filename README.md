@@ -296,7 +296,7 @@ from the product's own perspective.
 
 **Playback & subtitles**
 
-- [ ] Multi-version movies: files of the same film (1080p / 4K / extended cut)
+- [x] Multi-version movies: files of the same film (1080p / 4K / extended cut)
       are grouped automatically; the best version is chosen for playback and
       the detail page lets you switch manually
 - [ ] Trailers & featurettes: official trailers fetched during scraping and
