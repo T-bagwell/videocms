@@ -59,6 +59,9 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Theme songs: admins attach an audio theme song per movie/TV entry (stored
+  under `DATA_DIR/theme-songs/`); the detail page shows a preview player with
+  the title and stream link for every user
 - Trailers & featurettes: metadata scraping stores the official YouTube trailer
   on the video, the detail page plays it in an embedded modal, and admins can
   attach self-hosted featurette files (uploaded under `DATA_DIR/featurettes`)
