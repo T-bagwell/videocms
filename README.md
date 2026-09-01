@@ -299,7 +299,7 @@ from the product's own perspective.
 - [x] Multi-version movies: files of the same film (1080p / 4K / extended cut)
       are grouped automatically; the best version is chosen for playback and
       the detail page lets you switch manually
-- [ ] Trailers & featurettes: official trailers fetched during scraping and
+- [x] Trailers & featurettes: official trailers fetched during scraping and
       stored with the movie; self-hosted featurettes can be attached as well
 - [ ] Theme songs for movies and TV shows, with a preview entry on the detail
       page
