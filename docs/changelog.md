@@ -59,6 +59,10 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Multi-version movies: files of the same film (1080p / 4K / extended cut /
+  director's cut) are grouped automatically during scans, the best-scored copy
+  is the one shown in listings and playback, and the detail page lists every
+  version with a one-click switch to the player
 - Email notifications: an SMTP channel (`SMTP_HOST`/`SMTP_PORT`/`SMTP_USER`/
   `SMTP_PASSWORD`, `NOTIFY_EMAIL_FROM`/`NOTIFY_EMAIL_TO`) delivers the same
   scan/download/upload events as plain-text mail, with implicit TLS on 465 or
