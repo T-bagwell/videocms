@@ -81,6 +81,9 @@
   "video": {
     "adminTools": "管理工具",
     "play": "播放",
+    "versionsTitle": "版本",
+    "versionBest": "最佳",
+    "versionCurrent": "当前",
     "resume": "播放（继续）",
     "favorite": "收藏",
     "unfavorite": "取消收藏",

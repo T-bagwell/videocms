@@ -81,6 +81,9 @@
   "video": {
     "adminTools": "Admin tools",
     "play": "Play",
+    "versionsTitle": "Versions",
+    "versionBest": "Best",
+    "versionCurrent": "Current",
     "resume": "Play (resume)",
     "favorite": "Favorite",
     "unfavorite": "Unfavorite",

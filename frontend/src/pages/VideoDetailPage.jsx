@@ -29,6 +29,7 @@ export default function VideoDetailPage() {
   const [showSubSearch, setShowSubSearch] = useState(false);
   const [transcript, setTranscript] = useState(null);
   const [transcribing, setTranscribing] = useState(false);
+  const [versions, setVersions] = useState([]);
   const [scrapeProvider, setScrapeProvider] = useState('tmdb');
   const [scrapeForce, setScrapeForce] = useState(false);
   const [tags, setTags] = useState([]);
@@ -52,6 +53,9 @@ export default function VideoDetailPage() {
     api(`/videos/${id}/similar`).then((d) => setSimilar(d.items || [])).catch(() => setSimilar([]));
     api(`/videos/${id}/comments`).then((d) => setComments(d.items || [])).catch(() => setComments([]));
     api(`/videos/${id}/ratings`).then(setRatings).catch(() => {});
+    api(`/videos/${id}/versions`)
+      .then((d) => setVersions(d.versions || []))
+      .catch(() => setVersions([]));
   }, [id]);
 
   async function postComment(e) {
@@ -399,6 +403,32 @@ export default function VideoDetailPage() {
               {offlineBusy ? t('video.offlineSaving') : t('video.saveOffline')}
             </button>
           </div>
+          {versions.length > 1 && (
+            <div className="card versions-panel">
+              <h3>{t('video.versionsTitle')}</h3>
+              <div className="version-list">
+                {versions.map((v) => (
+                  <div key={v.id} className={`version-row${v.id === video.id ? ' current' : ''}`}>
+                    <div className="version-info">
+                      <b>{v.version_label || (v.width > 0 ? `${v.width}×${v.height}` : v.filename)}</b>
+                      {v.is_primary && <span className="version-best">{t('video.versionBest')}</span>}
+                      {v.id === video.id && (
+                        <span className="version-current">{t('video.versionCurrent')}</span>
+                      )}
+                      <span className="muted small">
+                        {v.width > 0 ? `${v.width}×${v.height} · ` : ''}
+                        {fmtBytes(v.size_bytes)}
+                      </span>
+                    </div>
+                    <button className="btn small primary" onClick={() => navigate(`/player/${v.id}`)}>
+                      <PlayIcon />
+                      {t('video.play')}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
           {user?.role === 'admin' && (
             <div className="admin-tools">
               <div className="admin-tools-head">{t('video.adminTools')}</div>

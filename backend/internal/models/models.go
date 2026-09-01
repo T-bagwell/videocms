@@ -69,6 +69,10 @@ type Video struct {
 	SeriesName    string     `json:"series_name,omitempty"`
 	Season        int        `json:"season,omitempty"`
 	Episode       int        `json:"episode,omitempty"`
+	VersionKey    string     `json:"version_key,omitempty"`
+	VersionLabel  string     `json:"version_label,omitempty"`
+	VersionCount  int        `json:"version_count"`
+	IsPrimary     bool       `json:"is_primary"`
 	CreatedAt     time.Time  `json:"created_at"`
 	UpdatedAt     time.Time  `json:"updated_at"`
 	ContentRating string     `json:"content_rating,omitempty"`

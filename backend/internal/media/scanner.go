@@ -203,6 +203,7 @@ func (s *Scanner) scan(ctx context.Context, lib models.Library) {
 	}
 	s.markMissing(ctx, lib.ID, scanStart)
 	s.rebuildSeries(ctx, lib)
+	s.rebuildMovieVersions(ctx, lib)
 
 	status := "idle"
 	scanErr := ""
@@ -748,6 +749,7 @@ func (s *Scanner) watchLibrary(ctx context.Context, lib models.Library) error {
 
 	if changed {
 		s.rebuildSeries(ctx, lib)
+		s.rebuildMovieVersions(ctx, lib)
 		if _, err := s.pool.Exec(ctx,
 			`UPDATE libraries SET video_count=(SELECT count(*) FROM videos WHERE library_id=$1 AND available=true) WHERE id=$2`,
 			lib.ID, lib.ID); err != nil {
@@ -849,6 +851,27 @@ func (s *Scanner) rebuildSeries(ctx context.Context, lib models.Library) {
 	log.Printf("series rebuilt for library %s: %d groups", lib.ID.String()[:8], len(byKey))
 }
 
+// rebuildMovieVersions groups available movies (videos without a series
+// assignment) into multi-version sets by their normalized version_key. A key
+// needs at least two files to form a group; singletons are reset so they never
+// appear as versions. Runs after every scan, mirroring rebuildSeries.
+func (s *Scanner) rebuildMovieVersions(ctx context.Context, lib models.Library) {
+	if _, err := s.pool.Exec(ctx, `
+		UPDATE videos SET version_key='', version_label='', version_rank=0
+		WHERE library_id=$1 AND available=true AND series_id IS NULL
+		  AND version_key <> ''
+		  AND version_key NOT IN (
+		      SELECT version_key FROM videos
+		      WHERE library_id=$1 AND available=true AND series_id IS NULL
+		        AND version_key <> ''
+		      GROUP BY version_key HAVING count(*) >= 2)`,
+		lib.ID); err != nil {
+		log.Printf("reset non-group movie versions: %v", err)
+		return
+	}
+	log.Printf("movie versions rebuilt for library %s", lib.ID.String()[:8])
+}
+
 func scanWorkers() int {
 	n := 4
 	if v := os.Getenv("SCAN_WORKERS"); v != "" {
@@ -871,6 +894,10 @@ func (s *Scanner) setStatus(ctx context.Context, libID uuid.UUID, status, scanEr
 func (s *Scanner) upsert(ctx context.Context, libID uuid.UUID, path string, info probeInfo) error {
 	filename := filepath.Base(path)
 	title, year := deriveTitle(filename)
+	versionKey, versionLabel, versionRank := "", "", 0
+	if _, _, episode := parseEpisode(title); episode == 0 {
+		versionKey, versionLabel, versionRank = ParseMovieVersion(filename, TitleWithYear(title, year), info.Width, info.Height)
+	}
 	sidecars := findSidecarSubtitles(path)
 	subtitle := ""
 	if len(sidecars) > 0 {
@@ -883,8 +910,9 @@ func (s *Scanner) upsert(ctx context.Context, libID uuid.UUID, path string, info
 		INSERT INTO videos (
 			library_id, title, filename, file_path, size_bytes, duration_sec,
 			width, height, video_codec, container, year, subtitle_path,
+			version_key, version_label, version_rank,
 			available, updated_at, last_scanned_at
-		) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,true,now(),now())
+		) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,true,now(),now())
 		ON CONFLICT (file_path) DO UPDATE SET
 			library_id = EXCLUDED.library_id,
 			title = EXCLUDED.title,
@@ -897,12 +925,16 @@ func (s *Scanner) upsert(ctx context.Context, libID uuid.UUID, path string, info
 			container = EXCLUDED.container,
 			year = EXCLUDED.year,
 			subtitle_path = COALESCE(NULLIF(EXCLUDED.subtitle_path, ''), videos.subtitle_path),
+			version_key = EXCLUDED.version_key,
+			version_label = EXCLUDED.version_label,
+			version_rank = EXCLUDED.version_rank,
 			available = true,
 			updated_at = now(),
 			last_scanned_at = now()
 		RETURNING id, poster_path`,
 		libID, title, filename, path, info.Size, info.Duration,
 		info.Width, info.Height, info.Codec, info.Container, year, subtitle,
+		versionKey, versionLabel, versionRank,
 	).Scan(&id, &posterPath)
 	if err != nil {
 		return fmt.Errorf("upsert video: %w", err)

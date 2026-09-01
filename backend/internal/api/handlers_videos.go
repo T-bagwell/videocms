@@ -35,6 +35,19 @@ const videoColumns = `
 	v.duration_sec, v.width, v.height, v.video_codec, v.container, v.year,
 	v.synopsis, v.genres, v.poster_path, v.subtitle_path, v.available,
 	v.series_id, v.season, v.episode, COALESCE(s.name, ''),
+	v.version_key, v.version_label,
+	(SELECT count(*) FROM videos vv
+	 WHERE vv.version_key = v.version_key AND vv.version_key <> ''
+	   AND vv.available AND vv.series_id IS NULL
+	   AND NOT EXISTS (SELECT 1 FROM hidden_paths hp2
+	                   WHERE hp2.user_id=$1 AND (vv.file_path = hp2.path
+	                     OR starts_with(vv.file_path, hp2.path || '/')))
+	   AND NOT EXISTS (SELECT 1 FROM libraries lb2
+	                   WHERE lb2.id = vv.library_id AND lb2.blocked)) AS version_count,
+	NOT EXISTS (SELECT 1 FROM videos vv3
+	            WHERE vv3.version_key = v.version_key AND vv3.version_key <> ''
+	              AND (vv3.version_rank > v.version_rank
+	                   OR (vv3.version_rank = v.version_rank AND vv3.id < v.id))) AS is_primary,
 	COALESCE(bl.id::text, '') AS blocked_id,
 	v.created_at, v.updated_at, v.content_rating,
 	EXISTS(SELECT 1 FROM favorites f WHERE f.user_id=$1 AND f.video_id=v.id) AS is_fav,
@@ -70,12 +83,24 @@ func visibleEpisodes(userParam int) string {
 	return fmt.Sprintf(`%s AND %s`, visiblePaths(userParam), blockedTitlesCondition())
 }
 
+// primaryVersionCondition hides non-primary copies of a multi-version movie
+// from listings: only the best-scored file of each version group is shown.
+// Standalone movies (empty version_key) and series episodes are unaffected.
+func primaryVersionCondition() string {
+	return `(v.version_key = '' OR NOT EXISTS (
+		SELECT 1 FROM videos vv
+		WHERE vv.version_key = v.version_key
+		  AND (vv.version_rank > v.version_rank
+		       OR (vv.version_rank = v.version_rank AND vv.id < v.id))))`
+}
+
 func scanVideo(row pgx.Row) (models.Video, error) {
 	var v models.Video
 	err := row.Scan(&v.ID, &v.LibraryID, &v.LibraryName, &v.Title, &v.Filename, &v.FilePath,
 		&v.SizeBytes, &v.DurationSec, &v.Width, &v.Height, &v.VideoCodec, &v.Container,
 		&v.Year, &v.Synopsis, &v.Genres, &v.PosterPath, &v.SubtitlePath, &v.Available,
-		&v.SeriesID, &v.Season, &v.Episode, &v.SeriesName, &v.BlockedID,
+		&v.SeriesID, &v.Season, &v.Episode, &v.SeriesName, &v.VersionKey, &v.VersionLabel,
+		&v.VersionCount, &v.IsPrimary, &v.BlockedID,
 		&v.CreatedAt, &v.UpdatedAt, &v.ContentRating, &v.IsFavorite, &v.ProgressSec, &v.ProgressDur)
 	v.Blocked = v.BlockedID != ""
 	v.HasPoster = v.PosterPath != ""
@@ -110,6 +135,7 @@ func (a *App) listVideos(w http.ResponseWriter, r *http.Request) {
 		where = append(where, visiblePaths(1))
 	} else {
 		where = append(where, visibleEpisodes(1))
+		where = append(where, primaryVersionCondition())
 	}
 	argIdx := 2
 	// Parental rating filter: applies unless a valid unlock token is provided.
@@ -259,6 +285,59 @@ func (a *App) getVideo(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, v)
 }
 
+// GET /api/videos/{id}/versions returns every visible copy of the same film,
+// best first, so the detail page can let viewers switch manually.
+func (a *App) getVideoVersions(w http.ResponseWriter, r *http.Request) {
+	id, err := uuid.Parse(r.PathValue("id"))
+	if err != nil {
+		writeErr(w, http.StatusBadRequest, "invalid video id")
+		return
+	}
+	var key string
+	err = a.pool.QueryRow(r.Context(),
+		`SELECT version_key FROM videos WHERE id=$1`, id).Scan(&key)
+	if errors.Is(err, pgx.ErrNoRows) {
+		writeErr(w, http.StatusNotFound, "video not found")
+		return
+	}
+	if err != nil {
+		writeErr(w, http.StatusInternalServerError, "query video versions failed")
+		return
+	}
+	if key == "" {
+		writeJSON(w, http.StatusOK, map[string]any{"versions": []models.Video{}, "primary_id": nil})
+		return
+	}
+	rows, err := a.pool.Query(r.Context(), fmt.Sprintf(`
+		SELECT %s FROM videos v JOIN libraries l ON l.id=v.library_id
+		LEFT JOIN series s ON s.id = v.series_id
+		%s
+		WHERE v.version_key=$2 AND `+visibleEpisodes(1)+`
+		ORDER BY v.version_rank DESC, lower(v.title), v.id`,
+		videoColumns, blockedLateral), auth.UserFrom(r).ID, key)
+	if err != nil {
+		writeErr(w, http.StatusInternalServerError, "query video versions failed")
+		return
+	}
+	defer rows.Close()
+
+	items := []models.Video{}
+	var primaryID *uuid.UUID
+	for rows.Next() {
+		v, err := scanVideo(rows)
+		if err != nil {
+			writeErr(w, http.StatusInternalServerError, "scan video version failed")
+			return
+		}
+		if v.IsPrimary {
+			vid := v.ID
+			primaryID = &vid
+		}
+		items = append(items, v)
+	}
+	writeJSON(w, http.StatusOK, map[string]any{"versions": items, "primary_id": primaryID})
+}
+
 type updateVideoRequest struct {
 	Title         string   `json:"title"`
 	Synopsis      string   `json:"synopsis"`
@@ -283,9 +362,19 @@ func (a *App) updateVideo(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusBadRequest, "title cannot be empty")
 		return
 	}
+	var filename string
+	var width, height int
+	if err := a.pool.QueryRow(r.Context(),
+		`SELECT filename, width, height FROM videos WHERE id=$1`, id).Scan(&filename, &width, &height); err != nil {
+		writeErr(w, http.StatusNotFound, "video not found")
+		return
+	}
+	versionKey, versionLabel, versionRank := media.ParseMovieVersion(filename, media.TitleWithYear(req.Title, req.Year), width, height)
 	tag, err := a.pool.Exec(r.Context(),
-		`UPDATE videos SET title=$1, synopsis=$2, year=$3, genres=$4, content_rating=$5, updated_at=now() WHERE id=$6`,
-		req.Title, req.Synopsis, req.Year, req.Genres, strings.ToUpper(strings.TrimSpace(req.ContentRating)), id)
+		`UPDATE videos SET title=$1, synopsis=$2, year=$3, genres=$4, content_rating=$5,
+		       version_key=$6, version_label=$7, version_rank=$8, updated_at=now() WHERE id=$9`,
+		req.Title, req.Synopsis, req.Year, req.Genres, strings.ToUpper(strings.TrimSpace(req.ContentRating)),
+		versionKey, versionLabel, versionRank, id)
 	if err != nil {
 		writeErr(w, http.StatusInternalServerError, "update video failed")
 		return

@@ -81,6 +81,9 @@
   "video": {
     "adminTools": "Outils d'administration",
     "play": "Lecture",
+    "versionsTitle": "Versions",
+    "versionBest": "Meilleure",
+    "versionCurrent": "Actuelle",
     "resume": "Lecture (reprendre)",
     "favorite": "Favori",
     "unfavorite": "Retirer des favoris",

@@ -81,6 +81,9 @@
   "video": {
     "adminTools": "管理ツール",
     "play": "再生",
+    "versionsTitle": "バージョン",
+    "versionBest": "最適",
+    "versionCurrent": "現在",
     "resume": "再生（続きから）",
     "favorite": "お気に入り",
     "unfavorite": "お気に入り解除",

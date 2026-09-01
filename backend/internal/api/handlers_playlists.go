@@ -94,7 +94,7 @@ func (a *App) getPlaylist(w http.ResponseWriter, r *http.Request) {
 		JOIN libraries l ON l.id = v.library_id
 		LEFT JOIN series s ON s.id = v.series_id
 		%s
-		WHERE pi.playlist_id=$2 AND `+visibleEpisodes(1)+`
+		WHERE pi.playlist_id=$2 AND `+visibleEpisodes(1)+` AND `+primaryVersionCondition()+`
 		ORDER BY pi.position, pi.added_at`, videoColumns, blockedLateral), user.ID, id)
 	if err != nil {
 		writeErr(w, http.StatusInternalServerError, "load playlist items failed")
@@ -111,6 +111,7 @@ func (a *App) getPlaylist(w http.ResponseWriter, r *http.Request) {
 			&it.Video.VideoCodec, &it.Video.Container, &it.Video.Year, &it.Video.Synopsis,
 			&it.Video.Genres, &it.Video.PosterPath, &it.Video.SubtitlePath, &it.Video.Available,
 			&it.Video.SeriesID, &it.Video.Season, &it.Video.Episode, &it.Video.SeriesName,
+			&it.Video.VersionKey, &it.Video.VersionLabel, &it.Video.VersionCount, &it.Video.IsPrimary,
 			&it.Video.CreatedAt, &it.Video.UpdatedAt, &it.Video.IsFavorite,
 			&it.Video.ProgressSec, &it.Video.ProgressDur); err != nil {
 			writeErr(w, http.StatusInternalServerError, "scan item failed")

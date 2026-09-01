@@ -59,7 +59,7 @@ func (a *App) continueWatching(w http.ResponseWriter, r *http.Request) {
 		JOIN videos v ON v.id = wp.video_id
 		JOIN libraries l ON l.id = v.library_id
 		LEFT JOIN series s ON s.id = v.series_id
-		WHERE wp.user_id=$1 AND `+visibleEpisodes(1)+` AND wp.position_sec > 5
+		WHERE wp.user_id=$1 AND `+visibleEpisodes(1)+` AND `+primaryVersionCondition()+` AND wp.position_sec > 5
 		  AND wp.position_sec < wp.duration_sec * 0.95
 		ORDER BY wp.updated_at DESC
 		LIMIT 16`, user.ID)
@@ -133,7 +133,7 @@ func (a *App) listFavorites(w http.ResponseWriter, r *http.Request) {
 		JOIN libraries l ON l.id = v.library_id
 		LEFT JOIN series s ON s.id = v.series_id
 		%s
-		WHERE f.user_id=$2 AND `+visibleEpisodes(1)+`
+		WHERE f.user_id=$2 AND `+visibleEpisodes(1)+` AND `+primaryVersionCondition()+`
 		ORDER BY f.created_at DESC`, videoColumns, blockedLateral), user.ID, user.ID)
 	if err != nil {
 		writeErr(w, http.StatusInternalServerError, "query favorites failed")

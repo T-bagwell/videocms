@@ -81,6 +81,9 @@
   "video": {
     "adminTools": "Admin-Werkzeuge",
     "play": "Abspielen",
+    "versionsTitle": "Versionen",
+    "versionBest": "Beste",
+    "versionCurrent": "Aktuell",
     "resume": "Abspielen (fortsetzen)",
     "favorite": "Favorit",
     "unfavorite": "Favorit entfernen",

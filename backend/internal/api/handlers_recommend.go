@@ -27,7 +27,7 @@ func (a *App) similarVideos(w http.ResponseWriter, r *http.Request) {
 		JOIN libraries l ON l.id = v.library_id
 		LEFT JOIN series s ON s.id = v.series_id
 		%s, src
-		WHERE v.id <> src.id AND %s
+		WHERE v.id <> src.id AND %s AND %s
 		ORDER BY
 			(SELECT count(*) FROM unnest(v.genres) g WHERE g = ANY(src.genres))
 			+ CASE WHEN v.year = src.year THEN 1 ELSE 0 END
@@ -36,7 +36,7 @@ func (a *App) similarVideos(w http.ResponseWriter, r *http.Request) {
 			   WHERE vt1.video_id = v.id AND vt2.video_id = src.id)
 			DESC, v.created_at DESC
 		LIMIT 8`,
-		videoColumns, blockedLateral, visibleEpisodes(1))
+		videoColumns, blockedLateral, visibleEpisodes(1), primaryVersionCondition())
 	rows, err := a.pool.Query(r.Context(), query, user.ID, id)
 	if err != nil {
 		log.Printf("similar videos: %v", err)
