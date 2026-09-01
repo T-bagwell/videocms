@@ -196,6 +196,7 @@ func (s *Scraper) searchCustom(ctx context.Context, title string, year int) (*tm
 		Synopsis    string   `json:"synopsis"`
 		Genres      []string `json:"genres"`
 		PosterURL   string   `json:"poster_url"`
+		BackdropURL string   `json:"backdrop_url"`
 		TrailerURL  string   `json:"trailer_url"`
 		TrailerName string   `json:"trailer_title"`
 	}
@@ -204,7 +205,8 @@ func (s *Scraper) searchCustom(ctx context.Context, title string, year int) (*tm
 	}
 	info := &tmdbInfo{
 		Title: d.Title, Year: d.Year, Synopsis: d.Synopsis, Genres: d.Genres,
-		Poster: d.PosterURL, TrailerURL: d.TrailerURL, TrailerTitle: d.TrailerName,
+		Poster: d.PosterURL, Backdrop: d.BackdropURL,
+		TrailerURL: d.TrailerURL, TrailerTitle: d.TrailerName,
 	}
 	if info.Year == 0 {
 		info.Year = year
@@ -219,6 +221,7 @@ type tmdbInfo struct {
 	Synopsis     string
 	Genres       []string
 	Poster       string
+	Backdrop     string
 	TrailerURL   string
 	TrailerTitle string
 }
@@ -281,6 +284,18 @@ func (s *Scraper) searchTMDB(ctx context.Context, title string, year int) (*tmdb
 		Year:     yearFromDate(best.ReleaseDate),
 		Synopsis: best.Overview,
 		Poster:   best.PosterPath,
+	}
+
+	// backdrops for the detail-page hero banner
+	var imagesResp struct {
+		Backdrops []struct {
+			FilePath string `json:"file_path"`
+		} `json:"backdrops"`
+	}
+	iu := fmt.Sprintf("https://api.themoviedb.org/3/movie/%d/images?api_key=%s",
+		best.ID, s.apiKey)
+	if err := s.getJSON(ctx, iu, &imagesResp); err == nil && len(imagesResp.Backdrops) > 0 {
+		info.Backdrop = imagesResp.Backdrops[0].FilePath
 	}
 
 	// details for localized genre names
@@ -517,29 +532,49 @@ func (s *Scraper) apply(ctx context.Context, videoID uuid.UUID, info *tmdbInfo) 
 			log.Printf("[scrape:%s] poster download failed: %v", videoID.String()[:8], err)
 		}
 	}
-	var oldPoster string
-	err := s.pool.QueryRow(ctx, `SELECT poster_path FROM videos WHERE id=$1`, videoID).Scan(&oldPoster)
+	backdropPath := ""
+	if info.Backdrop != "" {
+		if p, err := s.downloadImage(ctx, videoID, info.Backdrop, "backdrops", "w1280"); err == nil {
+			backdropPath = p
+		} else {
+			log.Printf("[scrape:%s] backdrop download failed: %v", videoID.String()[:8], err)
+		}
+	}
+	var oldPoster, oldBackdrop string
+	err := s.pool.QueryRow(ctx,
+		`SELECT poster_path, backdrop_path FROM videos WHERE id=$1`, videoID).
+		Scan(&oldPoster, &oldBackdrop)
 	if err != nil {
 		return err
 	}
 	if _, err := s.pool.Exec(ctx, `
 		UPDATE videos SET title=$1, year=$2, synopsis=$3, genres=$4, poster_path=$5,
-			tmdb_id=$6, trailer_url=$7, trailer_title=$8, scraped_at=now(), updated_at=now() WHERE id=$9`,
-		info.Title, info.Year, info.Synopsis, info.Genres, posterPath, info.TmdbID,
-		info.TrailerURL, info.TrailerTitle, videoID); err != nil {
+			backdrop_path=$6, tmdb_id=$7, trailer_url=$8, trailer_title=$9,
+			scraped_at=now(), updated_at=now() WHERE id=$10`,
+		info.Title, info.Year, info.Synopsis, info.Genres, posterPath, backdropPath,
+		info.TmdbID, info.TrailerURL, info.TrailerTitle, videoID); err != nil {
 		return err
 	}
 	if oldPoster != "" && oldPoster != posterPath &&
 		filepath.Dir(oldPoster) == filepath.Join(s.dataDir, "posters") {
 		_ = os.Remove(oldPoster)
 	}
+	if oldBackdrop != "" && oldBackdrop != backdropPath &&
+		filepath.Dir(oldBackdrop) == filepath.Join(s.dataDir, "backdrops") {
+		_ = os.Remove(oldBackdrop)
+	}
 	return nil
 }
 
 func (s *Scraper) downloadPoster(ctx context.Context, videoID uuid.UUID, path string) (string, error) {
+	return s.downloadImage(ctx, videoID, path, "posters", "w500")
+}
+
+// downloadImage fetches a TMDB image path into DATA_DIR/<kind>/<videoID>.<ext>.
+func (s *Scraper) downloadImage(ctx context.Context, videoID uuid.UUID, path, kind, size string) (string, error) {
 	u := path
 	if !strings.HasPrefix(path, "http://") && !strings.HasPrefix(path, "https://") {
-		u = "https://image.tmdb.org/t/p/w500" + path
+		u = "https://image.tmdb.org/t/p/" + size + path
 	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
 	if err != nil {
@@ -564,7 +599,7 @@ func (s *Scraper) downloadPoster(ctx context.Context, videoID uuid.UUID, path st
 	case "image/webp":
 		ext = ".webp"
 	}
-	dir := filepath.Join(s.dataDir, "posters")
+	dir := filepath.Join(s.dataDir, kind)
 	_ = os.MkdirAll(dir, 0o755)
 	dst := filepath.Join(dir, videoID.String()+ext)
 	out, err := os.Create(dst)

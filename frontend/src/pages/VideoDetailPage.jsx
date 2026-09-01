@@ -40,6 +40,8 @@ export default function VideoDetailPage() {
   const [themeSongTitle, setThemeSongTitle] = useState('');
   const [themeSongBusy, setThemeSongBusy] = useState(false);
   const themeSongFileRef = useRef(null);
+  const [hasBackdrop, setHasBackdrop] = useState(false);
+  const [backdropBusy, setBackdropBusy] = useState(false);
   const [scrapeProvider, setScrapeProvider] = useState('tmdb');
   const [scrapeForce, setScrapeForce] = useState(false);
   const [tags, setTags] = useState([]);
@@ -72,6 +74,9 @@ export default function VideoDetailPage() {
     api(`/videos/${id}/theme-song`)
       .then(setThemeSong)
       .catch(() => setThemeSong(null));
+    api(`/videos/${id}/backdrop`)
+      .then(() => setHasBackdrop(true))
+      .catch(() => setHasBackdrop(false));
   }, [id]);
 
   function youtubeId(url) {
@@ -139,6 +144,25 @@ export default function VideoDetailPage() {
       setThemeSong(null);
     } catch (e2) {
       setErr(e2.message);
+    }
+  }
+
+  async function uploadBackdrop(e) {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    setBackdropBusy(true);
+    setErr('');
+    try {
+      const fd = new FormData();
+      fd.append('backdrop', file);
+      await api(`/videos/${video.id}/backdrop`, { method: 'POST', form: fd });
+      setHasBackdrop(true);
+      setMsg(t('video.backdropUploaded'));
+    } catch (e2) {
+      setErr(e2.message);
+    } finally {
+      setBackdropBusy(false);
     }
   }
 
@@ -419,6 +443,16 @@ export default function VideoDetailPage() {
 
   return (
     <div className="container">
+      {hasBackdrop && (
+        <div className="backdrop-banner">
+          <img
+            className="backdrop-img"
+            src={mediaUrl(`/videos/${video.id}/backdrop`)}
+            alt=""
+          />
+          <div className="backdrop-shade" />
+        </div>
+      )}
       <div className="detail">
         <Poster video={video} className="detail-poster" />
         <div className="detail-info">
@@ -652,6 +686,15 @@ export default function VideoDetailPage() {
                 <button className="btn tool-btn" onClick={() => setShowSubSearch(true)}>
                   {t('video.subtitleSearch')}
                 </button>
+                <label className="btn tool-btn" disabled={backdropBusy}>
+                  {backdropBusy ? t('video.uploading') : t('video.backdropUpload')}
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    hidden
+                    onChange={uploadBackdrop}
+                  />
+                </label>
                 {video.has_subtitle && (
                   <button className="btn tool-btn" onClick={removeSubtitle} disabled={subtitleBusy}>
                     {t('video.subtitleRemove')}

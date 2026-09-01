@@ -99,6 +99,8 @@
     "themeSongTitlePlaceholder": "标题（可选）",
     "themeSongUpload": "上传主题曲",
     "themeSongUploaded": "主题曲已保存",
+    "backdropUpload": "上传背景图",
+    "backdropUploaded": "背景图已保存",
     "resume": "播放（继续）",
     "favorite": "收藏",
     "unfavorite": "取消收藏",

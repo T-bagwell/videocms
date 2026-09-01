@@ -12,6 +12,7 @@ import (
 func TestCustomScraperProvider(t *testing.T) {
 	env := newIntegrationEnv(t)
 	hit := 0
+	var backdropURL string
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		hit++
 		w.Header().Set("Content-Type", "application/json")
@@ -20,9 +21,11 @@ func TestCustomScraperProvider(t *testing.T) {
 			"genres":        []string{"Sci-Fi"},
 			"trailer_url":   "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
 			"trailer_title": "Official Trailer",
+			"backdrop_url":  backdropURL,
 		})
 	}))
 	defer srv.Close()
+	backdropURL = srv.URL + "/backdrop.jpg"
 	env.app.scraper = media.NewScraper(env.pool, env.app.cfg.DataDir, "", srv.URL)
 	libID := env.insertLibrary(t, false)
 	videoID := env.insertVideo(t, libID, "Original", ".mkv")
@@ -39,6 +42,10 @@ func TestCustomScraperProvider(t *testing.T) {
 	}
 	if d["trailer_url"] != "https://www.youtube.com/watch?v=dQw4w9WgXcQ" {
 		t.Fatalf("trailer_url after scrape = %v, want youtube watch URL", d["trailer_url"])
+	}
+	status, d = doJSON(t, "GET", env.server.URL+"/api/videos/"+videoID.String()+"/backdrop", token, nil)
+	if status != http.StatusOK {
+		t.Fatalf("scraped backdrop status = %d body = %v", status, d)
 	}
 
 	// Without force, an already-enriched video is rejected with 409.

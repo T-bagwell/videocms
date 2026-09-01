@@ -546,6 +546,91 @@ func (a *App) servePoster(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, path)
 }
 
+// POST /api/videos/{id}/backdrop
+func (a *App) uploadBackdrop(w http.ResponseWriter, r *http.Request) {
+	id, err := uuid.Parse(r.PathValue("id"))
+	if err != nil {
+		writeErr(w, http.StatusBadRequest, "invalid video id")
+		return
+	}
+	var oldPath string
+	err = a.pool.QueryRow(r.Context(), `SELECT backdrop_path FROM videos WHERE id=$1`, id).Scan(&oldPath)
+	if errors.Is(err, pgx.ErrNoRows) {
+		writeErr(w, http.StatusNotFound, "video not found")
+		return
+	}
+	if err != nil {
+		writeErr(w, http.StatusInternalServerError, "load video failed")
+		return
+	}
+	r.Body = http.MaxBytesReader(w, r.Body, 30<<20)
+	file, _, err := r.FormFile("backdrop")
+	if err != nil {
+		writeErr(w, http.StatusBadRequest, "missing backdrop file (multipart field 'backdrop')")
+		return
+	}
+	defer func() { _ = file.Close() }()
+	head := make([]byte, 512)
+	n, _ := io.ReadFull(file, head)
+	ext := ""
+	switch http.DetectContentType(head[:n]) {
+	case "image/jpeg":
+		ext = ".jpg"
+	case "image/png":
+		ext = ".png"
+	case "image/webp":
+		ext = ".webp"
+	default:
+		writeErr(w, http.StatusBadRequest, "only jpg/png/webp images are supported")
+		return
+	}
+	dir := filepath.Join(a.cfg.DataDir, "backdrops")
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		writeErr(w, http.StatusInternalServerError, "cannot create backdrop dir")
+		return
+	}
+	dst := filepath.Join(dir, id.String()+ext)
+	out, err := os.Create(dst)
+	if err != nil {
+		writeErr(w, http.StatusInternalServerError, "cannot save backdrop")
+		return
+	}
+	defer func() { _ = out.Close() }()
+	if _, err := out.Write(head[:n]); err != nil {
+		writeErr(w, http.StatusInternalServerError, "cannot write backdrop")
+		return
+	}
+	if _, err := io.Copy(out, file); err != nil {
+		writeErr(w, http.StatusInternalServerError, "cannot write backdrop")
+		return
+	}
+	if oldPath != "" && oldPath != dst {
+		_ = os.Remove(oldPath)
+	}
+	if _, err := a.pool.Exec(r.Context(),
+		`UPDATE videos SET backdrop_path=$1, updated_at=now() WHERE id=$2`, dst, id); err != nil {
+		writeErr(w, http.StatusInternalServerError, "update video failed")
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]any{"message": "backdrop updated"})
+}
+
+// GET /api/videos/{id}/backdrop
+func (a *App) serveBackdrop(w http.ResponseWriter, r *http.Request) {
+	id, err := uuid.Parse(r.PathValue("id"))
+	if err != nil {
+		writeErr(w, http.StatusBadRequest, "invalid video id")
+		return
+	}
+	var path string
+	err = a.pool.QueryRow(r.Context(), `SELECT backdrop_path FROM videos WHERE id=$1`, id).Scan(&path)
+	if err != nil || path == "" {
+		writeErr(w, http.StatusNotFound, "backdrop not found")
+		return
+	}
+	http.ServeFile(w, r, path)
+}
+
 func (a *App) subtitles(w http.ResponseWriter, r *http.Request) {
 	id, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
