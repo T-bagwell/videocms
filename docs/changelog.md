@@ -59,6 +59,10 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Photo library: images (jpg/png/gif/webp/bmp) are scanned with dimensions and
+  EXIF metadata (taken-at, camera), grouped into folder-based albums with a
+  cover photo, and browsed on a Photos page with a keyboard-navigable
+  slideshow
 - Books & comics: EPUB and CBZ files are scanned into a books library, the
   reader page renders CBZ pages from the archive and EPUB chapters in order
   (with keyboard navigation), and backend endpoints serve the raw file, CBZ
