@@ -95,6 +95,10 @@ export default function PlayerPage() {
   });
   const speedRef = useRef(speed);
   speedRef.current = speed;
+  const [directPolicy, setDirectPolicy] = useState(
+    () => localStorage.getItem('videocms_directplay_policy') || 'auto',
+  );
+  const fallbackRef = useRef(false);
   const [hasCast, setHasCast] = useState(false);
   const [casting, setCasting] = useState(false);
 
@@ -123,6 +127,10 @@ export default function PlayerPage() {
   useEffect(() => {
     localStorage.setItem('videocms_playback_speed', String(speed));
   }, [speed]);
+
+  useEffect(() => {
+    localStorage.setItem('videocms_directplay_policy', directPolicy);
+  }, [directPolicy]);
 
   function changeSpeed(s) {
     setSpeed(s);
@@ -487,7 +495,16 @@ export default function PlayerPage() {
   useEffect(() => {
     if (!video) return;
     const ext = video.filename?.match(/\.[^.]+$/)?.[0]?.toLowerCase() || '';
-    const shouldTranscode = searchParams.get('transcode') === '1' || !BROWSER_PLAYABLE.includes(ext);
+    const playable = BROWSER_PLAYABLE.includes(ext);
+    let shouldTranscode;
+    if (searchParams.get('transcode') === '1' || directPolicy === 'transcode') {
+      shouldTranscode = true;
+    } else if (directPolicy === 'direct') {
+      shouldTranscode = false;
+    } else {
+      shouldTranscode = !playable;
+    }
+    fallbackRef.current = false;
     setUseTranscode(shouldTranscode);
     if (!shouldTranscode) return;
     const initialStart = video.progress_sec > 5 ? Math.floor(video.progress_sec) : 0;
@@ -499,7 +516,7 @@ export default function PlayerPage() {
         hlsRef.current = null;
       }
     };
-  }, [video, searchParams, startTranscode]);
+  }, [video, searchParams, directPolicy, startTranscode]);
 
   useEffect(() => {
     savedRef.current = null;
@@ -580,9 +597,13 @@ export default function PlayerPage() {
   }
 
   function onError() {
-    // native playback failed; offer transcode fallback
-    if (!useTranscode) {
-      setHlsErr(t('player.transcodeFailed', { detail: 'unsupported format' }));
+    // Native playback failed: automatically fall back to transcoding once,
+    // unless the user explicitly forced direct play via a non-fallback path.
+    if (!useTranscode && directPolicy !== 'transcode' && !fallbackRef.current) {
+      fallbackRef.current = true;
+      setTranscoding(true);
+      setUseTranscode(true);
+      startTranscode();
     }
   }
 
@@ -875,6 +896,14 @@ export default function PlayerPage() {
         <button className="btn small" onClick={togglePip} disabled={!('pictureInPictureEnabled' in document)}>
           {t('player.pip')}
         </button>
+        <label className="player-tool">
+          {t('player.directPolicy')}
+          <select value={directPolicy} onChange={(e) => setDirectPolicy(e.target.value)}>
+            <option value="auto">{t('player.directAuto')}</option>
+            <option value="direct">{t('player.directDirect')}</option>
+            <option value="transcode">{t('player.directTranscode')}</option>
+          </select>
+        </label>
       </div>
 
       {!useTranscode && tracks.length > 0 && (
