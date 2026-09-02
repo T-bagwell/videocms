@@ -29,6 +29,7 @@ export default function BrowsePage() {
   const [collectionName, setCollectionName] = useState('');
   const [savedFilters, setSavedFilters] = useState(null);
   const [feed, setFeed] = useState([]);
+  const [feedType, setFeedType] = useState('');
   const [series, setSeries] = useState([]);
   const [showFilter, setShowFilter] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -41,8 +42,10 @@ export default function BrowsePage() {
     api('/tags').then((d) => setCloudTags(d.items || [])).catch(() => setCloudTags([]));
     api('/collections').then((d) => setCollections(d.items || [])).catch(() => setCollections([]));
     api('/users/me/filters').then((d) => setSavedFilters(d.filters || null)).catch(() => {});
-    api('/feed').then((d) => setFeed(d.items || [])).catch(() => setFeed([]));
-  }, []);
+    api(`/feed${feedType ? `?type=${feedType}` : ''}`)
+      .then((d) => setFeed(d.items || []))
+      .catch(() => setFeed([]));
+  }, [feedType]);
 
   useEffect(() => {
     const params = new URLSearchParams();
@@ -164,13 +167,25 @@ export default function BrowsePage() {
       {feed.length > 0 && (
         <section className="section">
           <h2>{t('browse.recentActivity')}</h2>
+          <select value={feedType} onChange={(e) => setFeedType(e.target.value)} className="feed-filter">
+            <option value="">{t('browse.feedAll')}</option>
+            <option value="comment">{t('browse.feedComments')}</option>
+            <option value="favorite">{t('browse.feedFavorites')}</option>
+            <option value="rating">{t('browse.feedRatings')}</option>
+            <option value="subscription">{t('browse.feedSubscriptions')}</option>
+          </select>
           <div className="card feed-box">
             {feed.map((f, i) => (
               <div key={`${f.kind}-${f.created_at}-${i}`} className="feed-row">
                 {f.kind === 'comment'
                   ? t('browse.feedComment', { user: f.username, title: f.video_title, text: f.text })
-                  : t('browse.feedFavorite', { user: f.username, title: f.video_title })}
-                <Link className="section-more" to={`/video/${f.video_id}`}>→</Link>
+                  : f.kind === 'rating'
+                    ? t('browse.feedRating', { user: f.username, title: f.video_title, text: f.text })
+                    : f.kind === 'subscription'
+                      ? t('browse.feedSubscription', { user: f.username, series: f.series_name })
+                      : t('browse.feedFavorite', { user: f.username, title: f.video_title })}
+                {f.video_id && <Link className="section-more" to={`/video/${f.video_id}`}>→</Link>}
+                {f.series_id && <Link className="section-more" to={`/series/${f.series_id}`}>→</Link>}
               </div>
             ))}
           </div>

@@ -13,6 +13,7 @@
     "requests": "リクエスト",
     "stats": "統計",
     "subscriptions": "チャンネル登録",
+    "settings": "設定",
     "admin": "管理",
     "logout": "ログアウト",
     "parentalLock": "ペアレンタルロック",
@@ -75,6 +76,13 @@
     "recentActivity": "最近のアクティビティ",
     "feedComment": "{{user}} が {{title}} にコメント：{{text}}",
     "feedFavorite": "{{user}} が {{title}} をお気に入りに追加",
+    "feedRating": "{{user}} が {{title}} を {{text}} と評価",
+    "feedSubscription": "{{user}} が {{series}} を登録",
+    "feedAll": "すべてのアクティビティ",
+    "feedComments": "コメント",
+    "feedFavorites": "お気に入り",
+    "feedRatings": "評価",
+    "feedSubscriptions": "チャンネル登録",
     "sortFavorites": "お気に入り順",
     "sortFuzzy": "関連度順（あいまい）",
     "typeAll": "すべて",
@@ -721,5 +729,17 @@
     "statusReviewed": "対応済み",
     "statusDismissed": "却下",
     "updated": "更新しました"
+  },
+  "settings": {
+    "notifications": "通知",
+    "enabled": "有効",
+    "saved": "設定を保存しました",
+    "eventScan": "スキャン",
+    "eventDownload": "ダウンロード",
+    "eventComment": "コメント",
+    "eventFavorite": "お気に入り",
+    "eventRating": "評価",
+    "eventSubscription": "チャンネル登録",
+    "eventNew_episode": "新しいエピソード"
   }
 }

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -166,25 +167,41 @@ func (a *App) rateVideo(w http.ResponseWriter, r *http.Request) {
 }
 
 type feedItem struct {
-	Kind       string    `json:"kind"`
-	Username   string    `json:"username"`
-	Text       string    `json:"text"`
-	VideoID    uuid.UUID `json:"video_id"`
-	VideoTitle string    `json:"video_title"`
-	CreatedAt  time.Time `json:"created_at"`
+	Kind       string     `json:"kind"`
+	Username   string     `json:"username"`
+	Text       string     `json:"text"`
+	VideoID    *uuid.UUID `json:"video_id"`
+	VideoTitle string     `json:"video_title"`
+	SeriesID   *uuid.UUID `json:"series_id"`
+	SeriesName string     `json:"series_name"`
+	CreatedAt  time.Time  `json:"created_at"`
 }
 
-// GET /api/feed — recent comments and favorites across the server.
+// GET /api/feed — filterable recent activity (comments, favorites, ratings,
+// subscriptions). Optional ?type= filters by kind.
 func (a *App) feed(w http.ResponseWriter, r *http.Request) {
+	kind := strings.TrimSpace(r.URL.Query().Get("type"))
 	rows, err := a.pool.Query(r.Context(), `
+		SELECT t.kind, COALESCE(t.username,''), COALESCE(t.text,''), t.video_id,
+		       COALESCE(t.video_title,''), t.series_id, COALESCE(t.series_name,''), t.created_at
+		FROM (
 		(SELECT 'comment' AS kind, u.display_name AS username, c.body AS text,
-		        v.id AS video_id, v.title AS video_title, c.created_at AS created_at
+		        v.id AS video_id, v.title AS video_title,
+		        NULL::uuid AS series_id, NULL::text AS series_name, c.created_at AS created_at
 		 FROM comments c JOIN users u ON u.id=c.user_id JOIN videos v ON v.id=c.video_id)
 		UNION ALL
-		(SELECT 'favorite', u.display_name, '', v.id, v.title, f.created_at
+		(SELECT 'favorite', u.display_name, '', v.id, v.title, NULL, NULL, f.created_at
 		 FROM favorites f JOIN users u ON u.id=f.user_id JOIN videos v ON v.id=f.video_id)
-		ORDER BY created_at DESC LIMIT 30`)
+		UNION ALL
+		(SELECT 'rating', u.display_name, '★' || r.stars::text, v.id, v.title, NULL, NULL, r.created_at
+		 FROM ratings r JOIN users u ON u.id=r.user_id JOIN videos v ON v.id=r.video_id)
+		UNION ALL
+		(SELECT 'subscription', u.display_name, '', NULL, NULL, s.id, s.name, cs.created_at
+		 FROM channel_subscriptions cs JOIN users u ON u.id=cs.user_id JOIN series s ON s.id=cs.series_id)
+		) t WHERE ($1 = '' OR t.kind = $1)
+		ORDER BY created_at DESC LIMIT 30`, kind)
 	if err != nil {
+		log.Printf("feed query: %v", err)
 		writeErr(w, http.StatusInternalServerError, "feed failed")
 		return
 	}
@@ -192,7 +209,9 @@ func (a *App) feed(w http.ResponseWriter, r *http.Request) {
 	items := []feedItem{}
 	for rows.Next() {
 		var f feedItem
-		if err := rows.Scan(&f.Kind, &f.Username, &f.Text, &f.VideoID, &f.VideoTitle, &f.CreatedAt); err != nil {
+		if err := rows.Scan(&f.Kind, &f.Username, &f.Text, &f.VideoID, &f.VideoTitle,
+			&f.SeriesID, &f.SeriesName, &f.CreatedAt); err != nil {
+			log.Printf("feed scan: %v", err)
 			writeErr(w, http.StatusInternalServerError, "scan feed failed")
 			return
 		}

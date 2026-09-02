@@ -13,6 +13,7 @@
     "requests": "Demandes",
     "stats": "Statistiques",
     "subscriptions": "Abonnements",
+    "settings": "Paramètres",
     "admin": "Administration",
     "logout": "Se déconnecter",
     "parentalLock": "Contrôle parental",
@@ -75,6 +76,13 @@
     "recentActivity": "Activité récente",
     "feedComment": "{{user}} a commenté {{title}} : « {{text}} »",
     "feedFavorite": "{{user}} a mis {{title}} en favori",
+    "feedRating": "{{user}} a noté {{title}} {{text}}",
+    "feedSubscription": "{{user}} s'est abonné à {{series}}",
+    "feedAll": "Toute l'activité",
+    "feedComments": "Commentaires",
+    "feedFavorites": "Favoris",
+    "feedRatings": "Notes",
+    "feedSubscriptions": "Abonnements",
     "sortFavorites": "Par favoris",
     "sortFuzzy": "Par pertinence (floue)",
     "typeAll": "Tout",
@@ -721,5 +729,17 @@
     "statusReviewed": "Traité",
     "statusDismissed": "Rejeté",
     "updated": "Mis à jour"
+  },
+  "settings": {
+    "notifications": "Notifications",
+    "enabled": "Activé",
+    "saved": "Préférences enregistrées",
+    "eventScan": "Analyses",
+    "eventDownload": "Téléchargements",
+    "eventComment": "Commentaires",
+    "eventFavorite": "Favoris",
+    "eventRating": "Notes",
+    "eventSubscription": "Abonnements",
+    "eventNew_episode": "Nouveaux épisodes"
   }
 }

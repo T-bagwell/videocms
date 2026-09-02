@@ -13,6 +13,7 @@
     "requests": "点播请求",
     "stats": "统计",
     "subscriptions": "订阅",
+    "settings": "设置",
     "admin": "管理",
     "logout": "退出",
     "parentalLock": "家长锁",
@@ -75,6 +76,13 @@
     "recentActivity": "最近动态",
     "feedComment": "{{user}} 评论了 {{title}}：“{{text}}”",
     "feedFavorite": "{{user}} 收藏了 {{title}}",
+    "feedRating": "{{user}} 给 {{title}} 打了 {{text}}",
+    "feedSubscription": "{{user}} 订阅了 {{series}}",
+    "feedAll": "全部动态",
+    "feedComments": "评论",
+    "feedFavorites": "收藏",
+    "feedRatings": "评分",
+    "feedSubscriptions": "订阅",
     "sortFavorites": "按收藏数",
     "sortFuzzy": "按相关度（模糊）",
     "typeAll": "全部",
@@ -721,5 +729,17 @@
     "statusReviewed": "已处理",
     "statusDismissed": "已驳回",
     "updated": "已更新"
+  },
+  "settings": {
+    "notifications": "通知",
+    "enabled": "启用",
+    "saved": "偏好已保存",
+    "eventScan": "扫描",
+    "eventDownload": "下载",
+    "eventComment": "评论",
+    "eventFavorite": "收藏",
+    "eventRating": "评分",
+    "eventSubscription": "订阅",
+    "eventNew_episode": "新剧集"
   }
 }

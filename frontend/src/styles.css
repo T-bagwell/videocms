@@ -336,6 +336,10 @@ label input, label textarea { margin-top: 6px; }
 .weekly-col { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
 .weekly-bar { width: 100%; min-height: 4px; background: var(--accent); border-radius: 4px 4px 0 0; }
 .weekly-label { font-size: 10px; color: var(--muted); }
+.feed-filter {
+  background: var(--bg-soft); color: var(--text); border: 1px solid var(--border);
+  border-radius: 6px; padding: 5px 8px; font-size: 13px; margin-bottom: 10px;
+}
 .iptv-url { font-size: 12px; word-break: break-all; }
 .stat-num { font-size: 26px; font-weight: 800; margin-bottom: 4px; }
 .stat.warn .stat-num { color: var(--warn); }
