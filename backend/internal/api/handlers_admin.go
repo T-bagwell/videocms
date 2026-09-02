@@ -21,11 +21,13 @@ type adminUser struct {
 	Role          models.Role `json:"role"`
 	CreatedAt     time.Time   `json:"created_at"`
 	AllowedRating string      `json:"allowed_rating,omitempty"`
+	Muted         bool        `json:"muted"`
+	GlobalBlocked bool        `json:"global_blocked"`
 }
 
 func (a *App) listUsers(w http.ResponseWriter, r *http.Request) {
 	rows, err := a.pool.Query(r.Context(), `
-		SELECT id, username, display_name, role, created_at, allowed_rating
+		SELECT id, username, display_name, role, created_at, allowed_rating, muted, global_blocked
 		FROM users ORDER BY created_at ASC`)
 	if err != nil {
 		writeErr(w, http.StatusInternalServerError, "query users failed")
@@ -36,7 +38,8 @@ func (a *App) listUsers(w http.ResponseWriter, r *http.Request) {
 	users := []adminUser{}
 	for rows.Next() {
 		var u adminUser
-		if err := rows.Scan(&u.ID, &u.Username, &u.DisplayName, &u.Role, &u.CreatedAt, &u.AllowedRating); err != nil {
+		if err := rows.Scan(&u.ID, &u.Username, &u.DisplayName, &u.Role, &u.CreatedAt,
+			&u.AllowedRating, &u.Muted, &u.GlobalBlocked); err != nil {
 			writeErr(w, http.StatusInternalServerError, "scan user failed")
 			return
 		}

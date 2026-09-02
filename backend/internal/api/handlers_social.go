@@ -29,7 +29,8 @@ func (a *App) listComments(w http.ResponseWriter, r *http.Request) {
 	rows, err := a.pool.Query(r.Context(), `
 		SELECT c.id, c.video_id, c.user_id, u.display_name, c.body, c.created_at
 		FROM comments c JOIN users u ON u.id = c.user_id
-		WHERE c.video_id=$1 ORDER BY c.created_at LIMIT 200`, id)
+		WHERE c.video_id=$1 AND NOT u.muted AND NOT u.global_blocked
+		ORDER BY c.created_at LIMIT 200`, id)
 	if err != nil {
 		writeErr(w, http.StatusInternalServerError, "list comments failed")
 		return
@@ -65,6 +66,13 @@ func (a *App) addComment(w http.ResponseWriter, r *http.Request) {
 	req.Body = strings.TrimSpace(req.Body)
 	if req.Body == "" || len(req.Body) > 1000 {
 		writeErr(w, http.StatusBadRequest, "comment must be 1-1000 characters")
+		return
+	}
+	var muted, blocked bool
+	if err := a.pool.QueryRow(r.Context(),
+		`SELECT muted, global_blocked FROM users WHERE id=$1`, user.ID).Scan(&muted, &blocked); err == nil &&
+		(muted || blocked) {
+		writeErr(w, http.StatusForbidden, "your account is muted or blocked from commenting")
 		return
 	}
 	var c commentItem

@@ -143,6 +143,15 @@
     "accessPassword": "访问密码",
     "accessPasswordPlaceholder": "留空则保持当前密码",
     "share": "分享",
+    "report": "举报",
+    "reportReason": "原因",
+    "reportSpam": "垃圾内容",
+    "reportIllegal": "违法违规",
+    "reportOffensive": "冒犯性内容",
+    "reportOther": "其他",
+    "reportDetails": "详情（可选）",
+    "reportSubmit": "提交举报",
+    "reportSent": "举报已提交，感谢反馈",
     "shareTitle": "分享这个视频",
     "shareHours": "有效期（小时）",
     "shareTheme": "主题",
@@ -317,6 +326,7 @@
     "tabInvites": "邀请码",
     "tabRecordings": "录制",
     "tabTrakt": "Trakt",
+    "tabModeration": "审核",
     "statsVideos": "视频总数",
     "statsLibraries": "媒体库",
     "statsUsers": "用户",
@@ -689,5 +699,22 @@
   },
   "subscriptions": {
     "empty": "暂无订阅——从剧集页关注即可"
+  },
+  "moderation": {
+    "reports": "内容举报",
+    "noReports": "暂无举报",
+    "users": "用户管理",
+    "review": "已处理",
+    "dismiss": "驳回",
+    "mute": "禁言",
+    "unmute": "解除禁言",
+    "block": "拉黑",
+    "unblock": "解除拉黑",
+    "muted": "已禁言",
+    "blocked": "已拉黑",
+    "statusPending": "待处理",
+    "statusReviewed": "已处理",
+    "statusDismissed": "已驳回",
+    "updated": "已更新"
   }
 }

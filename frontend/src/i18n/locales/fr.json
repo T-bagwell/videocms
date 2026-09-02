@@ -143,6 +143,15 @@
     "accessPassword": "Mot de passe d'accès",
     "accessPasswordPlaceholder": "Laisser vide pour conserver le mot de passe actuel",
     "share": "Partager",
+    "report": "Signaler",
+    "reportReason": "Motif",
+    "reportSpam": "Spam",
+    "reportIllegal": "Contenu illégal",
+    "reportOffensive": "Contenu offensant",
+    "reportOther": "Autre",
+    "reportDetails": "Détails (facultatif)",
+    "reportSubmit": "Envoyer le signalement",
+    "reportSent": "Signalement envoyé — merci",
     "shareTitle": "Partager cette vidéo",
     "shareHours": "Validité (heures)",
     "shareTheme": "Thème",
@@ -317,6 +326,7 @@
     "tabInvites": "Invitations",
     "tabRecordings": "Enregistrements",
     "tabTrakt": "Trakt",
+    "tabModeration": "Modération",
     "statsVideos": "Vidéos",
     "statsLibraries": "Bibliothèques",
     "statsUsers": "Utilisateurs",
@@ -689,5 +699,22 @@
   },
   "subscriptions": {
     "empty": "Aucun abonnement — suivez une série depuis sa page"
+  },
+  "moderation": {
+    "reports": "Signalements",
+    "noReports": "Aucun signalement",
+    "users": "Modération des utilisateurs",
+    "review": "Traité",
+    "dismiss": "Rejeter",
+    "mute": "Muet",
+    "unmute": "Réactiver",
+    "block": "Bloquer",
+    "unblock": "Débloquer",
+    "muted": "muet",
+    "blocked": "bloqué",
+    "statusPending": "En attente",
+    "statusReviewed": "Traité",
+    "statusDismissed": "Rejeté",
+    "updated": "Mis à jour"
   }
 }

@@ -143,6 +143,15 @@
     "accessPassword": "アクセスパスワード",
     "accessPasswordPlaceholder": "空欄の場合は現在のパスワードを保持",
     "share": "共有",
+    "report": "通報",
+    "reportReason": "理由",
+    "reportSpam": "スパム",
+    "reportIllegal": "違法コンテンツ",
+    "reportOffensive": "不快なコンテンツ",
+    "reportOther": "その他",
+    "reportDetails": "詳細（任意）",
+    "reportSubmit": "通報を送信",
+    "reportSent": "通報を送信しました",
     "shareTitle": "この動画を共有",
     "shareHours": "有効期限（時間）",
     "shareTheme": "テーマ",
@@ -317,6 +326,7 @@
     "tabInvites": "招待",
     "tabRecordings": "録画",
     "tabTrakt": "Trakt",
+    "tabModeration": "モデレーション",
     "statsVideos": "動画数",
     "statsLibraries": "ライブラリ",
     "statsUsers": "ユーザー",
@@ -689,5 +699,22 @@
   },
   "subscriptions": {
     "empty": "登録はまだありません — ドラマページから登録できます"
+  },
+  "moderation": {
+    "reports": "コンテンツ通報",
+    "noReports": "通報はありません",
+    "users": "ユーザー管理",
+    "review": "対応済み",
+    "dismiss": "却下",
+    "mute": "ミュート",
+    "unmute": "ミュート解除",
+    "block": "ブロック",
+    "unblock": "ブロック解除",
+    "muted": "ミュート中",
+    "blocked": "ブロック中",
+    "statusPending": "保留中",
+    "statusReviewed": "対応済み",
+    "statusDismissed": "却下",
+    "updated": "更新しました"
   }
 }

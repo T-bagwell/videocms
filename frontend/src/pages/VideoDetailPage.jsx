@@ -42,6 +42,10 @@ export default function VideoDetailPage() {
   const themeSongFileRef = useRef(null);
   const [hasBackdrop, setHasBackdrop] = useState(false);
   const [backdropBusy, setBackdropBusy] = useState(false);
+  const [showReport, setShowReport] = useState(false);
+  const [reportReason, setReportReason] = useState('spam');
+  const [reportDetails, setReportDetails] = useState('');
+  const [reportBusy, setReportBusy] = useState(false);
   const [scrapeProvider, setScrapeProvider] = useState('tmdb');
   const [scrapeForce, setScrapeForce] = useState(false);
   const [tags, setTags] = useState([]);
@@ -163,6 +167,25 @@ export default function VideoDetailPage() {
       setErr(e2.message);
     } finally {
       setBackdropBusy(false);
+    }
+  }
+
+  async function submitReport(e) {
+    e.preventDefault();
+    setReportBusy(true);
+    setErr('');
+    try {
+      await api(`/videos/${video.id}/report`, {
+        method: 'POST',
+        body: { reason: reportReason, details: reportDetails },
+      });
+      setShowReport(false);
+      setReportDetails('');
+      setMsg(t('video.reportSent'));
+    } catch (e2) {
+      setErr(e2.message);
+    } finally {
+      setReportBusy(false);
     }
   }
 
@@ -529,6 +552,9 @@ export default function VideoDetailPage() {
             <button className="btn" onClick={() => setShowShare(true)}>
               <ShareIcon />
               {t('video.share')}
+            </button>
+            <button className="btn" onClick={() => setShowReport(true)}>
+              {t('video.report')}
             </button>
             <button className="btn" onClick={saveOffline} disabled={offlineBusy}>
               <OfflineIcon />
@@ -935,6 +961,39 @@ export default function VideoDetailPage() {
       )}
 
       {showShare && <ShareModal kind="videos" id={video.id} onClose={() => setShowShare(false)} />}
+      {showReport && (
+        <div className="modal-backdrop" onClick={() => setShowReport(false)}>
+          <form className="modal" onClick={(e) => e.stopPropagation()} onSubmit={submitReport}>
+            <h3>{t('video.report')}</h3>
+            <label>
+              {t('video.reportReason')}
+              <select value={reportReason} onChange={(e) => setReportReason(e.target.value)}>
+                <option value="spam">{t('video.reportSpam')}</option>
+                <option value="illegal">{t('video.reportIllegal')}</option>
+                <option value="offensive">{t('video.reportOffensive')}</option>
+                <option value="other">{t('video.reportOther')}</option>
+              </select>
+            </label>
+            <label>
+              {t('video.reportDetails')}
+              <textarea
+                rows={3}
+                value={reportDetails}
+                onChange={(e) => setReportDetails(e.target.value)}
+                maxLength={2000}
+              />
+            </label>
+            <div className="modal-actions">
+              <button type="submit" className="btn primary" disabled={reportBusy}>
+                {reportBusy ? t('common.loading') : t('video.reportSubmit')}
+              </button>
+              <button type="button" className="btn ghost" onClick={() => setShowReport(false)}>
+                {t('common.cancel')}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
       {showDownload && <DownloadDialog video={video} onClose={() => setShowDownload(false)} />}
       {showSubSearch && (
         <SubtitleSearchModal

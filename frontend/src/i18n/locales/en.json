@@ -143,6 +143,15 @@
     "accessPassword": "Access password",
     "accessPasswordPlaceholder": "Leave empty to keep the current password",
     "share": "Share",
+    "report": "Report",
+    "reportReason": "Reason",
+    "reportSpam": "Spam",
+    "reportIllegal": "Illegal content",
+    "reportOffensive": "Offensive content",
+    "reportOther": "Other",
+    "reportDetails": "Details (optional)",
+    "reportSubmit": "Submit report",
+    "reportSent": "Report submitted — thank you",
     "shareTitle": "Share this video",
     "shareHours": "Validity (hours)",
     "shareTheme": "Theme",
@@ -317,6 +326,7 @@
     "tabInvites": "Invites",
     "tabRecordings": "Recordings",
     "tabTrakt": "Trakt",
+    "tabModeration": "Moderation",
     "statsVideos": "Videos",
     "statsLibraries": "Libraries",
     "statsUsers": "Users",
@@ -689,5 +699,22 @@
   },
   "subscriptions": {
     "empty": "No subscriptions yet — follow a TV show from its page"
+  },
+  "moderation": {
+    "reports": "Content reports",
+    "noReports": "No reports yet",
+    "users": "User moderation",
+    "review": "Reviewed",
+    "dismiss": "Dismiss",
+    "mute": "Mute",
+    "unmute": "Unmute",
+    "block": "Block",
+    "unblock": "Unblock",
+    "muted": "muted",
+    "blocked": "blocked",
+    "statusPending": "Pending",
+    "statusReviewed": "Reviewed",
+    "statusDismissed": "Dismissed",
+    "updated": "Updated"
   }
 }

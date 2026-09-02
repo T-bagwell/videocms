@@ -143,6 +143,15 @@
     "accessPassword": "Zugriffspasswort",
     "accessPasswordPlaceholder": "Leer lassen, um das aktuelle Passwort beizubehalten",
     "share": "Teilen",
+    "report": "Melden",
+    "reportReason": "Grund",
+    "reportSpam": "Spam",
+    "reportIllegal": "Illegale Inhalte",
+    "reportOffensive": "Anstößige Inhalte",
+    "reportOther": "Sonstiges",
+    "reportDetails": "Details (optional)",
+    "reportSubmit": "Meldung senden",
+    "reportSent": "Meldung gesendet – danke",
     "shareTitle": "Dieses Video teilen",
     "shareHours": "Gültigkeit (Stunden)",
     "shareTheme": "Design",
@@ -317,6 +326,7 @@
     "tabInvites": "Einladungen",
     "tabRecordings": "Aufnahmen",
     "tabTrakt": "Trakt",
+    "tabModeration": "Moderation",
     "statsVideos": "Videos",
     "statsLibraries": "Bibliotheken",
     "statsUsers": "Benutzer",
@@ -689,5 +699,22 @@
   },
   "subscriptions": {
     "empty": "Noch keine Abonnements — folgen Sie einer Serie auf ihrer Seite"
+  },
+  "moderation": {
+    "reports": "Inhaltsmeldungen",
+    "noReports": "Noch keine Meldungen",
+    "users": "Benutzermoderation",
+    "review": "Bearbeitet",
+    "dismiss": "Ablehnen",
+    "mute": "Stummschalten",
+    "unmute": "Stummschaltung aufheben",
+    "block": "Blockieren",
+    "unblock": "Entsperren",
+    "muted": "stummgeschaltet",
+    "blocked": "blockiert",
+    "statusPending": "Ausstehend",
+    "statusReviewed": "Bearbeitet",
+    "statusDismissed": "Abgelehnt",
+    "updated": "Aktualisiert"
   }
 }
