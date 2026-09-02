@@ -340,6 +340,7 @@
     "tabRecordings": "Recordings",
     "tabTrakt": "Trakt",
     "tabModeration": "Moderation",
+    "tabScrapers": "Scrapers",
     "statsVideos": "Videos",
     "statsLibraries": "Libraries",
     "statsUsers": "Users",
@@ -753,5 +754,20 @@
     "eventRating": "Ratings",
     "eventSubscription": "Subscriptions",
     "eventNew_episode": "New episodes"
+  },
+  "scrapers": {
+    "hint": "Install external scrapers implementing the scraper JSON contract (see docs/scraper-sdk.md).",
+    "register": "Register scraper",
+    "name": "Name",
+    "url": "URL (POST, %s = title)",
+    "command": "Command (title year args)",
+    "empty": "No external scrapers registered",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "enable": "Enable",
+    "disable": "Disable",
+    "registered": "Scraper registered",
+    "updated": "Updated",
+    "deleted": "Deleted"
   }
 }

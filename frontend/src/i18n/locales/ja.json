@@ -340,6 +340,7 @@
     "tabRecordings": "録画",
     "tabTrakt": "Trakt",
     "tabModeration": "モデレーション",
+    "tabScrapers": "スクレイパー",
     "statsVideos": "動画数",
     "statsLibraries": "ライブラリ",
     "statsUsers": "ユーザー",
@@ -753,5 +754,20 @@
     "eventRating": "評価",
     "eventSubscription": "チャンネル登録",
     "eventNew_episode": "新しいエピソード"
+  },
+  "scrapers": {
+    "hint": "スクレイパー JSON 契約を実装した外部スクレイパーをインストールできます（docs/scraper-sdk.ja.md）。",
+    "register": "スクレイパーを登録",
+    "name": "名前",
+    "url": "URL（POST、%s = タイトル）",
+    "command": "コマンド（タイトル 年）",
+    "empty": "外部スクレイパーは未登録",
+    "enabled": "有効",
+    "disabled": "無効",
+    "enable": "有効化",
+    "disable": "無効化",
+    "registered": "スクレイパーを登録しました",
+    "updated": "更新しました",
+    "deleted": "削除しました"
   }
 }

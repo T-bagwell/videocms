@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -170,6 +171,16 @@ func (s *Scraper) ScrapeWith(ctx context.Context, videoID uuid.UUID, provider st
 		}
 		return s.apply(ctx, videoID, info)
 	}
+	if !isBuiltinScraperProvider(provider) {
+		info, err := s.searchExternal(ctx, provider, title, year)
+		if err != nil {
+			return err
+		}
+		if info.Title == "" {
+			return fmt.Errorf("no metadata match found for %q", title)
+		}
+		return s.apply(ctx, videoID, info)
+	}
 	if strings.EqualFold(provider, "omdb") {
 		if s.omdbKey == "" {
 			return errors.New("omdb provider not configured (set OMDB_API_KEY)")
@@ -238,6 +249,77 @@ func (s *Scraper) ScrapeWith(ctx context.Context, videoID uuid.UUID, provider st
 		return fmt.Errorf("no metadata match found for %q", title)
 	}
 	return s.apply(ctx, videoID, info)
+}
+
+func isBuiltinScraperProvider(provider string) bool {
+	switch strings.ToLower(strings.TrimSpace(provider)) {
+	case "", "tmdb", "tvmaze", "anilist", "wikipedia", "omdb", "custom":
+		return true
+	}
+	return false
+}
+
+// searchExternal invokes an admin-registered scraper (URL POST or local
+// command) that implements the scraper JSON contract.
+func (s *Scraper) searchExternal(ctx context.Context, name, title string, year int) (*tmdbInfo, error) {
+	var kind, command, endpoint string
+	err := s.pool.QueryRow(ctx,
+		`SELECT kind, command, url FROM scrapers WHERE name=$1 AND enabled=true`, name).
+		Scan(&kind, &command, &endpoint)
+	if err != nil {
+		return nil, fmt.Errorf("scraper %q not found or disabled", name)
+	}
+	var payload []byte
+	if kind == "url" {
+		u := strings.ReplaceAll(endpoint, "%s", url.QueryEscape(title))
+		body, _ := json.Marshal(map[string]any{"title": title, "year": year})
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, u, bytes.NewReader(body))
+		if err != nil {
+			return nil, err
+		}
+		req.Header.Set("Content-Type", "application/json")
+		resp, err := s.client.Do(req)
+		if err != nil {
+			return nil, err
+		}
+		defer func() { _ = resp.Body.Close() }()
+		if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+			return nil, fmt.Errorf("scraper %q: HTTP %d", name, resp.StatusCode)
+		}
+		payload, err = io.ReadAll(io.LimitReader(resp.Body, 2<<20))
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		cmd := exec.CommandContext(ctx, command, title, strconv.Itoa(year))
+		out, err := cmd.Output()
+		if err != nil {
+			return nil, fmt.Errorf("scraper %q: %w", name, err)
+		}
+		payload = out
+	}
+	var d struct {
+		Title       string   `json:"title"`
+		Year        int      `json:"year"`
+		Synopsis    string   `json:"synopsis"`
+		Genres      []string `json:"genres"`
+		PosterURL   string   `json:"poster_url"`
+		BackdropURL string   `json:"backdrop_url"`
+		TrailerURL  string   `json:"trailer_url"`
+		TrailerName string   `json:"trailer_title"`
+	}
+	if err := json.Unmarshal(payload, &d); err != nil {
+		return nil, fmt.Errorf("scraper %q returned invalid JSON: %w", name, err)
+	}
+	info := &tmdbInfo{
+		Title: d.Title, Year: d.Year, Synopsis: d.Synopsis, Genres: d.Genres,
+		Poster: d.PosterURL, Backdrop: d.BackdropURL,
+		TrailerURL: d.TrailerURL, TrailerTitle: d.TrailerName,
+	}
+	if info.Year == 0 {
+		info.Year = year
+	}
+	return info, nil
 }
 
 // searchCustom queries the configured SCRAPE_CUSTOM_URL template (with %s

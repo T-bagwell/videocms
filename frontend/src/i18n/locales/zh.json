@@ -340,6 +340,7 @@
     "tabRecordings": "录制",
     "tabTrakt": "Trakt",
     "tabModeration": "审核",
+    "tabScrapers": "刮削器",
     "statsVideos": "视频总数",
     "statsLibraries": "媒体库",
     "statsUsers": "用户",
@@ -753,5 +754,20 @@
     "eventRating": "评分",
     "eventSubscription": "订阅",
     "eventNew_episode": "新剧集"
+  },
+  "scrapers": {
+    "hint": "安装实现刮削 JSON 契约的外部刮削器（见 docs/scraper-sdk.zh-CN.md）。",
+    "register": "注册刮削器",
+    "name": "名称",
+    "url": "URL（POST，%s = 标题）",
+    "command": "命令（标题 年份 参数）",
+    "empty": "暂无外部刮削器",
+    "enabled": "已启用",
+    "disabled": "已停用",
+    "enable": "启用",
+    "disable": "停用",
+    "registered": "刮削器已注册",
+    "updated": "已更新",
+    "deleted": "已删除"
   }
 }

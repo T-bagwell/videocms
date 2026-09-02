@@ -365,6 +365,11 @@ func (a *App) Routes() http.Handler {
 
 	mux.HandleFunc("GET /api/admin/trakt/status", authAdmin(a.traktStatus))
 	mux.HandleFunc("POST /api/admin/trakt/sync", authAdmin(a.traktSync))
+
+	mux.HandleFunc("GET /api/admin/scrapers", authAdmin(a.listScrapers))
+	mux.HandleFunc("POST /api/admin/scrapers", authAdmin(a.registerScraper))
+	mux.HandleFunc("PATCH /api/admin/scrapers/{id}", authAdmin(a.updateScraper))
+	mux.HandleFunc("DELETE /api/admin/scrapers/{id}", authAdmin(a.deleteScraper))
 	mux.HandleFunc("GET /api/admin/stats/watch", authAdmin(a.adminWatchStats))
 	mux.HandleFunc("GET /api/admin/stats/watch/export", authAdmin(a.exportAdminWatchStats))
 

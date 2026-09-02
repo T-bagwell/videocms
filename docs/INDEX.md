@@ -37,6 +37,16 @@ API usage and CORS.
 | 中文 | [deployment.zh-CN.md](deployment.zh-CN.md) |
 | 日本語 | [deployment.ja.md](deployment.ja.md) |
 
+## Scraper SDK
+
+For developers: the installable external scraper contract and registration API.
+
+| Language | Link |
+| --- | --- |
+| English | [scraper-sdk.md](scraper-sdk.md) |
+| 中文 | [scraper-sdk.zh-CN.md](scraper-sdk.zh-CN.md) |
+| 日本語 | [scraper-sdk.ja.md](scraper-sdk.ja.md) |
+
 ## READMEs
 
 | Language | Link |
