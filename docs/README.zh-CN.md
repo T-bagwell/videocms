@@ -333,7 +333,7 @@ scripts/                 演示素材生成器
 **扩展与运维**
 
 - [ ] 插件/扩展系统与社区目录
-- [ ] 刮削器 SDK 与可安装的刮削器/任务市场
+- [x] 刮削器 SDK 与可安装的刮削器/任务市场
 - [x] REST API 的 OpenAPI/Swagger 文档
 - [x] 指标端点 + Prometheus/Grafana 看板与 OpenTelemetry 追踪
 - [x] 官方 Docker 镜像、compose 栈与支持多副本的 Helm Chart

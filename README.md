@@ -358,7 +358,7 @@ from the product's own perspective.
 **Extensibility & operations**
 
 - [ ] Plugin/extension system with a community directory
-- [ ] Scraper SDK and an installable scraper/task marketplace
+- [x] Scraper SDK and an installable scraper/task marketplace
 - [x] OpenAPI/Swagger documentation for the REST API
 - [x] Metrics endpoint with Prometheus/Grafana dashboards and OpenTelemetry
       traces
