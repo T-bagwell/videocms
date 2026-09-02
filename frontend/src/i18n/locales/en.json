@@ -342,6 +342,7 @@
     "tabModeration": "Moderation",
     "tabScrapers": "Scrapers",
     "tabPlugins": "Plugins",
+    "tabTranscode": "Transcode",
     "statsVideos": "Videos",
     "statsLibraries": "Libraries",
     "statsUsers": "Users",
@@ -785,5 +786,20 @@
     "installOk": "Plugin installed",
     "updated": "Updated",
     "uninstalled": "Plugin uninstalled"
+  },
+  "transcode": {
+    "hint": "Pre-transcode queue — {{workers}} local worker(s) claim jobs by priority.",
+    "enqueue": "Enqueue",
+    "video": "Video",
+    "jobs": "Jobs",
+    "empty": "No transcode jobs",
+    "priority": "Priority {{n}}",
+    "cancel": "Cancel",
+    "queued": "Queued",
+    "statusQueued": "Queued",
+    "statusRunning": "Running",
+    "statusDone": "Done",
+    "statusFailed": "Failed",
+    "cancelled": "Cancelled"
   }
 }

@@ -342,6 +342,7 @@
     "tabModeration": "モデレーション",
     "tabScrapers": "スクレイパー",
     "tabPlugins": "プラグイン",
+    "tabTranscode": "トランスコード",
     "statsVideos": "動画数",
     "statsLibraries": "ライブラリ",
     "statsUsers": "ユーザー",
@@ -785,5 +786,20 @@
     "installOk": "プラグインをインストールしました",
     "updated": "更新しました",
     "uninstalled": "プラグインをアンインストールしました"
+  },
+  "transcode": {
+    "hint": "事前トランスコードキュー — {{workers}} 台のローカルワーカーが優先度順に処理します。",
+    "enqueue": "キューに追加",
+    "video": "動画",
+    "jobs": "ジョブ",
+    "empty": "トランスコードジョブはありません",
+    "priority": "優先度 {{n}}",
+    "cancel": "キャンセル",
+    "queued": "キュー済み",
+    "statusQueued": "待機中",
+    "statusRunning": "実行中",
+    "statusDone": "完了",
+    "statusFailed": "失敗",
+    "cancelled": "キャンセル済み"
   }
 }

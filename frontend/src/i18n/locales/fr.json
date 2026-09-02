@@ -342,6 +342,7 @@
     "tabModeration": "Modération",
     "tabScrapers": "Scrapers",
     "tabPlugins": "Plugins",
+    "tabTranscode": "Transcodage",
     "statsVideos": "Vidéos",
     "statsLibraries": "Bibliothèques",
     "statsUsers": "Utilisateurs",
@@ -785,5 +786,20 @@
     "installOk": "Plugin installé",
     "updated": "Mis à jour",
     "uninstalled": "Plugin désinstallé"
+  },
+  "transcode": {
+    "hint": "File de pré-transcodage — {{workers}} worker(s) local(aux) prennent les tâches par priorité.",
+    "enqueue": "Mettre en file",
+    "video": "Vidéo",
+    "jobs": "Tâches",
+    "empty": "Aucune tâche de transcodage",
+    "priority": "Priorité {{n}}",
+    "cancel": "Annuler",
+    "queued": "En file",
+    "statusQueued": "En attente",
+    "statusRunning": "En cours",
+    "statusDone": "Terminé",
+    "statusFailed": "Échec",
+    "cancelled": "Annulé"
   }
 }

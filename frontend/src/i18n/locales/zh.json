@@ -342,6 +342,7 @@
     "tabModeration": "审核",
     "tabScrapers": "刮削器",
     "tabPlugins": "插件",
+    "tabTranscode": "转码",
     "statsVideos": "视频总数",
     "statsLibraries": "媒体库",
     "statsUsers": "用户",
@@ -785,5 +786,20 @@
     "installOk": "插件已安装",
     "updated": "已更新",
     "uninstalled": "插件已卸载"
+  },
+  "transcode": {
+    "hint": "预转码队列 —— {{workers}} 个本地 worker 按优先级领取任务。",
+    "enqueue": "入队",
+    "video": "视频",
+    "jobs": "任务",
+    "empty": "暂无转码任务",
+    "priority": "优先级 {{n}}",
+    "cancel": "取消",
+    "queued": "已入队",
+    "statusQueued": "排队中",
+    "statusRunning": "转码中",
+    "statusDone": "完成",
+    "statusFailed": "失败",
+    "cancelled": "已取消"
   }
 }

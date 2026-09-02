@@ -47,6 +47,7 @@ func main() {
 	app.StartMaintenance(ctx)
 	app.StartDLNA(ctx)
 	app.StartRecorder(ctx)
+	app.StartTranscoder(ctx)
 
 	tlsConfig := (*tls.Config)(nil)
 	if len(cfg.AutoTLSDomains) > 0 {

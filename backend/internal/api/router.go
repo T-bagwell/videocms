@@ -30,6 +30,7 @@ type App struct {
 	subProvider media.SubtitleProvider
 	live        *media.LiveManager
 	recorder    *media.Recorder
+	transcoder  *media.Transcoder
 	notify      *media.Notifier
 	dlna        *media.DLNAManager
 	metrics     *metricsRegistry
@@ -60,17 +61,19 @@ func New(cfg config.Config, pool *pgxpool.Pool) (*App, error) {
 		port = strings.TrimPrefix(port, ":")
 		dlnaMgr = media.NewDLNAManager(cfg.DLNAFriendlyName, port, cfg.DLNAAllowedIPs)
 	}
+	hlsMgr := media.NewHLSManager(cfg.DataDir, media.ResolveTool("ffmpeg"), cfg.HLSHWAccel)
 	app := &App{
-		cfg:      cfg,
-		pool:     pool,
-		scanner:  scanner,
-		hls:      media.NewHLSManager(cfg.DataDir, media.ResolveTool("ffmpeg"), cfg.HLSHWAccel),
-		scraper:  media.NewScraper(pool, cfg.DataDir, cfg.TMDBAPIKey, cfg.ScrapeCustomURL),
-		dl:       media.NewDownloader(pool, cfg.YtDLPPath),
-		live:     media.NewLiveManager(cfg.DataDir, media.ResolveTool("ffmpeg")),
-		recorder: media.NewRecorder(pool, cfg.DataDir, media.ResolveTool("ffmpeg")),
-		notify:   notify,
-		dlna:     dlnaMgr,
+		cfg:        cfg,
+		pool:       pool,
+		scanner:    scanner,
+		hls:        hlsMgr,
+		scraper:    media.NewScraper(pool, cfg.DataDir, cfg.TMDBAPIKey, cfg.ScrapeCustomURL),
+		dl:         media.NewDownloader(pool, cfg.YtDLPPath),
+		live:       media.NewLiveManager(cfg.DataDir, media.ResolveTool("ffmpeg")),
+		recorder:   media.NewRecorder(pool, cfg.DataDir, media.ResolveTool("ffmpeg")),
+		transcoder: media.NewTranscoder(pool, hlsMgr),
+		notify:     notify,
+		dlna:       dlnaMgr,
 	}
 	app.hls.SetVAAPIDevice(cfg.HLSVAAPIDevice)
 	app.hls.SetToneMap(cfg.HLSToneMap)
@@ -117,6 +120,11 @@ func (a *App) StartDLNA(ctx context.Context) {
 // StartRecorder runs the scheduled-recording worker until ctx is done.
 func (a *App) StartRecorder(ctx context.Context) {
 	go a.recorder.Run(ctx)
+}
+
+// StartTranscoder runs the pre-transcode worker pool until ctx is done.
+func (a *App) StartTranscoder(ctx context.Context) {
+	go a.transcoder.Run(ctx, a.cfg.TranscodeWorkers)
 }
 
 func (a *App) Routes() http.Handler {
@@ -376,6 +384,10 @@ func (a *App) Routes() http.Handler {
 	mux.HandleFunc("POST /api/admin/plugins", authAdmin(a.installPlugin))
 	mux.HandleFunc("PATCH /api/admin/plugins/{id}", authAdmin(a.updatePlugin))
 	mux.HandleFunc("DELETE /api/admin/plugins/{id}", authAdmin(a.uninstallPlugin))
+
+	mux.HandleFunc("GET /api/admin/transcode/jobs", authAdmin(a.listTranscodeJobs))
+	mux.HandleFunc("POST /api/admin/transcode/queue", authAdmin(a.queueTranscode))
+	mux.HandleFunc("DELETE /api/admin/transcode/jobs/{id}", authAdmin(a.cancelTranscode))
 	mux.HandleFunc("GET /api/admin/stats/watch", authAdmin(a.adminWatchStats))
 	mux.HandleFunc("GET /api/admin/stats/watch/export", authAdmin(a.exportAdminWatchStats))
 

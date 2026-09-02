@@ -29,6 +29,7 @@ type Config struct {
 	TurnServer             string
 	TurnUsername           string
 	TurnPassword           string
+	TranscodeWorkers       int
 	WebRoot                string
 	WatchInterval          time.Duration
 	YtDLPPath              string
@@ -96,6 +97,7 @@ func Load() Config {
 		TurnServer:             os.Getenv("TURN_SERVER"),
 		TurnUsername:           os.Getenv("TURN_USERNAME"),
 		TurnPassword:           os.Getenv("TURN_PASSWORD"),
+		TranscodeWorkers:       envInt("TRANSCODE_WORKERS", 1),
 		WebRoot:                os.Getenv("WEB_ROOT"),
 		WatchInterval:          envDuration("WATCH_INTERVAL", 30*time.Second),
 		YtDLPPath:              os.Getenv("YTDLP_PATH"),
