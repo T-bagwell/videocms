@@ -29,6 +29,8 @@ type Scraper struct {
 	pool      *pgxpool.Pool
 	dataDir   string
 	apiKey    string
+	omdbKey   string
+	fanartKey string
 	lang      string
 	customURL string
 	client    *http.Client
@@ -64,7 +66,17 @@ func NewScraper(pool *pgxpool.Pool, dataDir, apiKey string, customURL ...string)
 func (s *Scraper) Enabled() bool {
 	// TMDB needs a key; without one we fall back to the keyless TVMaze, AniList
 	// and Wikipedia APIs (disable individually with the *_ENABLED vars).
-	return s.apiKey != "" || tvmazeEnabled() || anilistEnabled() || wikipediaEnabled()
+	return s.apiKey != "" || s.omdbKey != "" || tvmazeEnabled() || anilistEnabled() || wikipediaEnabled()
+}
+
+// SetOMDbKey configures the OMDb provider.
+func (s *Scraper) SetOMDbKey(key string) {
+	s.omdbKey = key
+}
+
+// SetFanartKey configures Fanart.tv artwork enrichment.
+func (s *Scraper) SetFanartKey(key string) {
+	s.fanartKey = key
 }
 
 func tvmazeEnabled() bool {
@@ -158,6 +170,60 @@ func (s *Scraper) ScrapeWith(ctx context.Context, videoID uuid.UUID, provider st
 		}
 		return s.apply(ctx, videoID, info)
 	}
+	if strings.EqualFold(provider, "omdb") {
+		if s.omdbKey == "" {
+			return errors.New("omdb provider not configured (set OMDB_API_KEY)")
+		}
+		info, err := s.searchOMDb(ctx, title, year)
+		if err != nil {
+			return err
+		}
+		if info.Title == "" {
+			return fmt.Errorf("no metadata match found for %q", title)
+		}
+		return s.apply(ctx, videoID, info)
+	}
+	switch strings.ToLower(strings.TrimSpace(provider)) {
+	case "tmdb":
+		if s.apiKey == "" {
+			return errors.New("tmdb provider not configured (set TMDB_API_KEY)")
+		}
+		info, err := s.searchTMDB(ctx, title, year)
+		if err != nil {
+			return err
+		}
+		if info.Title == "" {
+			return fmt.Errorf("no metadata match found for %q", title)
+		}
+		return s.apply(ctx, videoID, info)
+	case "tvmaze":
+		info, err := s.searchTVMaze(ctx, title, year)
+		if err != nil {
+			return err
+		}
+		if info.Title == "" {
+			return fmt.Errorf("no metadata match found for %q", title)
+		}
+		return s.apply(ctx, videoID, info)
+	case "anilist":
+		info, err := s.searchAniList(ctx, title, year)
+		if err != nil {
+			return err
+		}
+		if info.Title == "" {
+			return fmt.Errorf("no metadata match found for %q", title)
+		}
+		return s.apply(ctx, videoID, info)
+	case "wikipedia":
+		info, err := s.searchWikipedia(ctx, title, year)
+		if err != nil {
+			return err
+		}
+		if info.Title == "" {
+			return fmt.Errorf("no metadata match found for %q", title)
+		}
+		return s.apply(ctx, videoID, info)
+	}
 	if !s.Enabled() {
 		return errors.New("no metadata provider configured (set TMDB_API_KEY or keep TVMAZE_ENABLED/ANILIST_ENABLED=1)")
 	}
@@ -210,6 +276,36 @@ func (s *Scraper) searchCustom(ctx context.Context, title string, year int) (*tm
 	}
 	if info.Year == 0 {
 		info.Year = year
+	}
+	return info, nil
+}
+
+// searchOMDb queries the OMDb API (needs OMDB_API_KEY).
+func (s *Scraper) searchOMDb(ctx context.Context, title string, year int) (*tmdbInfo, error) {
+	u := fmt.Sprintf("https://www.omdbapi.com/?apikey=%s&t=%s&plot=full",
+		url.QueryEscape(s.omdbKey), url.QueryEscape(title))
+	if year > 0 {
+		u += "&y=" + strconv.Itoa(year)
+	}
+	var d struct {
+		Title  string `json:"Title"`
+		Year   string `json:"Year"`
+		Plot   string `json:"Plot"`
+		Genre  string `json:"Genre"`
+		Poster string `json:"Poster"`
+	}
+	if err := s.getJSON(ctx, u, &d); err != nil {
+		return nil, err
+	}
+	if d.Title == "" {
+		return &tmdbInfo{}, nil
+	}
+	info := &tmdbInfo{Title: d.Title, Synopsis: d.Plot, Poster: d.Poster}
+	info.Year = yearFromText(d.Year)
+	for _, g := range strings.Split(d.Genre, ",") {
+		if g = strings.TrimSpace(g); g != "" {
+			info.Genres = append(info.Genres, g)
+		}
 	}
 	return info, nil
 }
@@ -296,6 +392,28 @@ func (s *Scraper) searchTMDB(ctx context.Context, title string, year int) (*tmdb
 		best.ID, s.apiKey)
 	if err := s.getJSON(ctx, iu, &imagesResp); err == nil && len(imagesResp.Backdrops) > 0 {
 		info.Backdrop = imagesResp.Backdrops[0].FilePath
+	}
+
+	// Fanart.tv artwork enrichment (optional FANART_API_KEY)
+	if s.fanartKey != "" {
+		var fanartResp struct {
+			Backdrops []struct {
+				URL string `json:"url"`
+			} `json:"moviebackground"`
+			Posters []struct {
+				URL string `json:"url"`
+			} `json:"movieposter"`
+		}
+		fu := fmt.Sprintf("https://webservice.fanart.tv/v3/movies/%d?api_key=%s",
+			best.ID, url.QueryEscape(s.fanartKey))
+		if err := s.getJSON(ctx, fu, &fanartResp); err == nil {
+			if info.Backdrop == "" && len(fanartResp.Backdrops) > 0 {
+				info.Backdrop = fanartResp.Backdrops[0].URL
+			}
+			if info.Poster == "" && len(fanartResp.Posters) > 0 {
+				info.Poster = fanartResp.Posters[0].URL
+			}
+		}
 	}
 
 	// details for localized genre names

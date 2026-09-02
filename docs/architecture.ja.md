@@ -665,7 +665,7 @@ sequenceDiagram
 | `DATA_DIR` | `data` | ポスター + HLS セグメント |
 | `ADMIN_USERNAME` / `ADMIN_PASSWORD` | admin / admin123 | 初期管理者 |
 | `FFPROBE_BIN` / `FFMPEG_BIN` | 自動検出 | ツールパス（Homebrew フォールバック） |
-| `TMDB_API_KEY` / `TMDB_LANGUAGE` | 空 / zh-CN | スクレイピング |
+| `TMDB_API_KEY` / `TMDB_LANGUAGE` / `OMDB_API_KEY` / `FANART_API_KEY` | 空 / zh-CN / 空 / 空 | スクレイピング（TMDB + OMDb プロバイダー + Fanart.tv アート） |
 | `SCAN_WORKERS` | `4` | 並列プローブ数 |
 | `CORS_ORIGINS` | 空（`*`） | API 呼び出しを許可するブラウザオリジン |
 | `WATCH_INTERVAL` | `30` | 増分スキャンのフォールバック間隔（秒）。fsnotify は即時索引 |

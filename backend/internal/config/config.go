@@ -16,6 +16,8 @@ type Config struct {
 	AdminUsername          string
 	AdminPassword          string
 	TMDBAPIKey             string
+	OMDbAPIKey             string
+	FanartAPIKey           string
 	WebRoot                string
 	WatchInterval          time.Duration
 	YtDLPPath              string
@@ -70,6 +72,8 @@ func Load() Config {
 		AdminUsername:          os.Getenv("ADMIN_USERNAME"),
 		AdminPassword:          os.Getenv("ADMIN_PASSWORD"),
 		TMDBAPIKey:             os.Getenv("TMDB_API_KEY"),
+		OMDbAPIKey:             os.Getenv("OMDB_API_KEY"),
+		FanartAPIKey:           os.Getenv("FANART_API_KEY"),
 		WebRoot:                os.Getenv("WEB_ROOT"),
 		WatchInterval:          envDuration("WATCH_INTERVAL", 30*time.Second),
 		YtDLPPath:              os.Getenv("YTDLP_PATH"),

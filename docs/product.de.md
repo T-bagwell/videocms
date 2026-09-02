@@ -305,6 +305,8 @@ Alles wird über Umgebungsvariablen konfiguriert (vollständige Tabelle im READM
 | `DATABASE_URL` | `postgres://localhost:5432/videocms` | Datenbankverbindung |
 | `JWT_SECRET` | Dev-Wert | **In Produktion starkes Geheimnis setzen** |
 | `TMDB_API_KEY` | leer | Aktiviert Metadaten-Scraping |
+| `OMDB_API_KEY` | leer | Optionaler OMDb-Anbieter (benannte Scrape-Quelle) |
+| `FANART_API_KEY` | leer | Optionales Fanart.tv-Artwork (Poster/Hintergründe) |
 | `SCAN_WORKERS` | `4` | Parallele Scan-Worker |
 | `WATCH_INTERVAL` | `30` | Sekunden zwischen automatischen Inkrement-Scans; `0` deaktiviert |
 | `YTDLP_PATH` | `yt-dlp` im PATH | yt-dlp-Binary für die Download-Warteschlange |

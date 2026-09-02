@@ -74,6 +74,8 @@ func New(cfg config.Config, pool *pgxpool.Pool) (*App, error) {
 	app.hls.SetToneMap(cfg.HLSToneMap)
 	app.hls.SetVCodec(cfg.HLSVCodec)
 	app.hls.SetHDRPassthrough(cfg.HLSPassthroughHDR)
+	app.scraper.SetOMDbKey(cfg.OMDbAPIKey)
+	app.scraper.SetFanartKey(cfg.FanartAPIKey)
 	scanner.SetEnricher(app.scraper)
 	scanner.SetNotify(func(name, status string) {
 		event := "scan.completed"

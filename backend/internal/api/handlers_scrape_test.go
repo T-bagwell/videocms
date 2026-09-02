@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"videocms/backend/internal/media"
@@ -70,5 +71,28 @@ func TestCustomScraperNotConfigured(t *testing.T) {
 		env.server.URL+"/api/videos/"+videoID.String()+"/scrape?provider=custom", token, nil)
 	if status != http.StatusBadGateway {
 		t.Fatalf("unconfigured custom status = %d, body = %v", status, d)
+	}
+}
+
+func TestNamedScraperProviders(t *testing.T) {
+	env := newIntegrationEnv(t)
+	libID := env.insertLibrary(t, false)
+	videoID := env.insertVideo(t, libID, "x", ".mkv")
+	token := loginAdmin(t, env)
+	base := env.server.URL + "/api/videos/" + videoID.String() + "/scrape?provider="
+
+	// OMDb without a key is rejected explicitly.
+	status, d := doJSON(t, "POST", base+"omdb", token, nil)
+	if status != http.StatusBadGateway {
+		t.Fatalf("omdb without key status = %d body = %v", status, d)
+	}
+	if !strings.Contains(d["error"].(string), "OMDB_API_KEY") {
+		t.Fatalf("omdb error = %v, want OMDB_API_KEY hint", d["error"])
+	}
+
+	// TMDB without a key is rejected explicitly.
+	status, d = doJSON(t, "POST", base+"tmdb", token, nil)
+	if status != http.StatusBadGateway {
+		t.Fatalf("tmdb without key status = %d body = %v", status, d)
 	}
 }

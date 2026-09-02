@@ -284,6 +284,8 @@ make serve                              # http://<LAN IP>:8080
 | `DATABASE_URL` | `postgres://localhost:5432/videocms` | データベース接続 |
 | `JWT_SECRET` | 開発用値 | **本番では強力なシークレットを設定** |
 | `TMDB_API_KEY` | 空 | メタデータスクレイピングを有効化 |
+| `OMDB_API_KEY` | 空 | 任意の OMDb メタデータプロバイダー（指定スクレイプ先） |
+| `FANART_API_KEY` | 空 | 任意の Fanart.tv アートワーク補完（ポスター/背景） |
 | `SCAN_WORKERS` | `4` | 並列スキャンワーカー数 |
 | `WATCH_INTERVAL` | `30` | 自動インクリメンタルスキャンの間隔（秒）。`0` で無効 |
 | `YTDLP_PATH` | PATH 上の `yt-dlp` | ダウンロードキューが使う yt-dlp バイナリ |

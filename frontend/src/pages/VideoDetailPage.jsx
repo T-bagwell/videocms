@@ -658,6 +658,10 @@ export default function VideoDetailPage() {
                 </button>
                 <select className="tool-select" value={scrapeProvider} onChange={(e) => setScrapeProvider(e.target.value)}>
                   <option value="tmdb">{t('video.scrapeProviderTmdb')}</option>
+                  <option value="tvmaze">{t('video.scrapeProviderTvMaze')}</option>
+                  <option value="anilist">{t('video.scrapeProviderAniList')}</option>
+                  <option value="wikipedia">{t('video.scrapeProviderWikipedia')}</option>
+                  <option value="omdb">{t('video.scrapeProviderOmdb')}</option>
                   <option value="custom">{t('video.scrapeProviderCustom')}</option>
                 </select>
                 <label className="scrape-force">

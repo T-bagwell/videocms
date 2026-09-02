@@ -683,7 +683,7 @@ The backend binds all interfaces (`:8080`), so LAN clients reach the UI directly
 | `DATA_DIR` | `data` | Posters + HLS segments |
 | `ADMIN_USERNAME` / `ADMIN_PASSWORD` | admin / admin123 | Initial admin |
 | `FFPROBE_BIN` / `FFMPEG_BIN` | auto-detect | Tool paths (Homebrew fallback) |
-| `TMDB_API_KEY` / `TMDB_LANGUAGE` | empty / zh-CN | Scraping |
+| `TMDB_API_KEY` / `TMDB_LANGUAGE` / `OMDB_API_KEY` / `FANART_API_KEY` | empty / zh-CN / empty / empty | Scraping (TMDB + OMDb provider + Fanart.tv artwork) |
 | `SCAN_WORKERS` | `4` | Parallel probe workers |
 | `CORS_ORIGINS` | empty (`*`) | Browser origins allowed to call the API |
 | `WATCH_INTERVAL` | `30` | Fallback incremental-scan interval (seconds); fsnotify indexes immediately |
