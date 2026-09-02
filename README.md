@@ -349,7 +349,7 @@ from the product's own perspective.
       and export
 - [x] Channels & subscriptions: per-user channel pages, follow buttons and a
       "new uploads" feed
-- [ ] Moderation toolset: content reports, account muting, global allow/block
+- [x] Moderation toolset: content reports, account muting, global allow/block
       lists and bulk user actions
 - [x] Registration policies: open / invite-only / closed, with invite codes
 - [ ] Likes/dislikes and per-item policy toggles (download, comments, reports)
