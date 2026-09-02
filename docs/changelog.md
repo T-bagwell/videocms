@@ -59,6 +59,10 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- OpenAPI/Swagger documentation: `GET /api/openapi.json` now describes the
+  full REST surface (~170 paths across auth, media, series, users, shares,
+  IPTV, moderation and admin), and `GET /api/docs` serves an interactive
+  Swagger UI
 - Filterable activity feed and notification preferences: the browse feed now
   covers comments, favorites, ratings and series subscriptions with a type
   filter, and a Settings page stores per-user notification preferences
