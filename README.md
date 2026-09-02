@@ -341,7 +341,7 @@ from the product's own perspective.
       with per-library provider priority
 - [x] Backdrops/fanart/season artwork alongside posters
 - [x] Watch-history sync to external tracking services (Trakt, SIMKL)
-- [ ] More subtitle providers, with fuzzy matching and manual override
+- [x] More subtitle providers, with fuzzy matching and manual override
 
 **Users, social & analytics**
 
