@@ -1,21 +1,37 @@
 services:
-  db:
-    image: postgres:14-alpine
-    container_name: videocms-db
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
     environment:
-      POSTGRES_DB: videocms
       POSTGRES_USER: videocms
       POSTGRES_PASSWORD: videocms
-    ports:
-      - "5432:5432"
+      POSTGRES_DB: videocms
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U videocms -d videocms"]
+      test: ["CMD-SHELL", "pg_isready -U videocms"]
       interval: 5s
       timeout: 3s
       retries: 10
 
+  videocms:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://videocms:videocms@postgres:5432/videocms?sslmode=disable
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-production}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}
+      DATA_DIR: /data
+      WEB_ROOT: /srv/videocms
+    ports:
+      - "8080:8080"
+    volumes:
+      - media:/data
+
 volumes:
   pgdata:
-
+  media:

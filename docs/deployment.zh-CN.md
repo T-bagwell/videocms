@@ -126,6 +126,29 @@ npm run build        # 输出 frontend/dist
 
 完整路由表与数据流见 [architecture.zh-CN.md](architecture.zh-CN.md)。
 
+## Docker 与 Kubernetes
+
+官方容器镜像由仓库根目录 `Dockerfile` 构建（多阶段：Node 22 构建前端、Go 构建后端，
+`alpine` 运行镜像内置 ffmpeg、SPA 与 API，端口 8080）。`docker-compose.yml`
+一键运行 PostgreSQL 16 + VideoCMS，使用两个数据卷（数据库与媒体数据）：
+
+```bash
+JWT_SECRET="$(openssl rand -hex 32)" docker compose up -d --build
+```
+
+Kubernetes 使用 `videocms-helm/` 目录下的 Helm chart：
+
+```bash
+helm install videocms ./videocms-helm \
+  --set env.JWT_SECRET="$(openssl rand -hex 32)" \
+  --set ingress.enabled=true \
+  --set ingress.hosts[0].host=media.example.com
+```
+
+Chart 支持水平扩展（`autoscaling.enabled=true`、`replicaCount>1`），需要共享媒体卷
+（使用 NFS/SMB/CephFS 等 `ReadWriteMany` 存储类）。转码会话与文件监视器按副本独立运行：
+多副本部署时应将 `DATA_DIR` 指向共享存储，并只在一个副本上执行定时扫描，避免重复工作。
+
 ## 可选集成
 
 ### DLNA / Chromecast

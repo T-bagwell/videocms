@@ -131,6 +131,33 @@ Key endpoints (all admin endpoints require an admin account):
 See [architecture.md](architecture.md) for the full route table and data
 flows.
 
+## Docker & Kubernetes
+
+Official container images are built from the repository root `Dockerfile`
+(multi-stage: Node 22 builds the frontend, Go builds the backend, and the
+`alpine` runtime bundles ffmpeg, the SPA and the API on port 8080). The
+`docker-compose.yml` stack runs PostgreSQL 16 + VideoCMS with two volumes
+(database and media data):
+
+```bash
+JWT_SECRET="$(openssl rand -hex 32)" docker compose up -d --build
+```
+
+For Kubernetes, a Helm chart lives in `videocms-helm/`:
+
+```bash
+helm install videocms ./videocms-helm \
+  --set env.JWT_SECRET="$(openssl rand -hex 32)" \
+  --set ingress.enabled=true \
+  --set ingress.hosts[0].host=media.example.com
+```
+
+The chart supports horizontal scaling (`autoscaling.enabled=true`,
+`replicaCount>1`) with a shared media volume (use a `ReadWriteMany` storage
+class such as NFS/SMB/CephFS). Transcode sessions and file-system watchers are
+per-replica: point `DATA_DIR` at shared storage and keep scheduled scans on a
+single replica to avoid duplicate work.
+
 ## Optional integrations
 
 ### DLNA / Chromecast

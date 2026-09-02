@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "videocms.fullname" . }}
+  labels:
+    {{- include "videocms.labels" . | nindent 4 }}
+data:
+  DATABASE_URL: {{ printf "postgres://%s:%s@%s-postgresql:%s/%s?sslmode=disable" .Values.postgres.auth.username .Values.postgres.auth.password (include "videocms.fullname" .) (.Values.service.port | toString) .Values.postgres.auth.database | quote }}
+  DATA_DIR: {{ .Values.env.DATA_DIR | quote }}
+  WEB_ROOT: {{ .Values.env.WEB_ROOT | quote }}
+  ADMIN_USERNAME: {{ .Values.env.ADMIN_USERNAME | quote }}
+  TMDB_API_KEY: {{ .Values.env.TMDB_API_KEY | quote }}

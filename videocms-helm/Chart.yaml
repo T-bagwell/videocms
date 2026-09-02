@@ -1,0 +1,11 @@
+apiVersion: v2
+name: videocms
+description: Self-hosted video resource management system (multi-replica capable)
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+keywords:
+  - video
+  - media
+  - streaming
+home: https://github.com/T-bagwell/videocms

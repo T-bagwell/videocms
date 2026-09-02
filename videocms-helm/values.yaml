@@ -1,0 +1,76 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/t-bagwell/videocms
+  tag: latest
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  name: ""
+
+podAnnotations: {}
+podSecurityContext: {}
+securityContext:
+  readOnlyRootFilesystem: false
+
+service:
+  type: ClusterIP
+  port: 8080
+
+ingress:
+  enabled: false
+  className: ""
+  hosts:
+    - host: media.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+postgres:
+  external:
+    enabled: false
+  auth:
+    database: videocms
+    username: videocms
+    password: videocms
+  persistence:
+    enabled: true
+    size: 10Gi
+    storageClass: ""
+
+env:
+  JWT_SECRET: change-me
+  ADMIN_USERNAME: admin
+  ADMIN_PASSWORD: admin123
+  TMDB_API_KEY: ""
+  DATA_DIR: /data
+  WEB_ROOT: /srv/videocms
+
+persistence:
+  enabled: true
+  size: 50Gi
+  storageClass: ""
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: "2"
+    memory: 2Gi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

@@ -130,6 +130,32 @@ SPA から API を指す方法は 2 通りあります。
 
 完全なルート一覧とデータフローは [architecture.ja.md](architecture.ja.md) を参照。
 
+## Docker と Kubernetes
+
+公式コンテナイメージはリポジトリルートの `Dockerfile` でビルドされます（マルチステージ：
+Node 22 でフロントエンド、Go でバックエンドをビルドし、`alpine` ランタイムに ffmpeg・
+SPA・API を同梱、ポート 8080）。`docker-compose.yml` で PostgreSQL 16 + VideoCMS を
+データ用ボリューム 2 つ（DB とメディア）とともに起動できます：
+
+```bash
+JWT_SECRET="$(openssl rand -hex 32)" docker compose up -d --build
+```
+
+Kubernetes では `videocms-helm/` の Helm chart を使用します：
+
+```bash
+helm install videocms ./videocms-helm \
+  --set env.JWT_SECRET="$(openssl rand -hex 32)" \
+  --set ingress.enabled=true \
+  --set ingress.hosts[0].host=media.example.com
+```
+
+チャートは水平スケーリング（`autoscaling.enabled=true`、`replicaCount>1`）に対応しており、
+共有メディアボリューム（NFS/SMB/CephFS などの `ReadWriteMany` ストレージクラス）が必要です。
+トランスコードセッションとファイルウォッチャーはレプリカごとに独立しているため、
+複数レプリカでは `DATA_DIR` を共有ストレージに設定し、定期スキャンは単一レプリカで
+実行してください（重複作業の防止）。
+
 ## 任意の連携
 
 ### DLNA / Chromecast
