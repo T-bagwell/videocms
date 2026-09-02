@@ -345,7 +345,7 @@ from the product's own perspective.
 
 **Users, social & analytics**
 
-- [ ] Watch-statistics dashboard: plays, users, devices, time watched, charts
+- [x] Watch-statistics dashboard: plays, users, devices, time watched, charts
       and export
 - [ ] Channels & subscriptions: per-user channel pages, follow buttons and a
       "new uploads" feed
