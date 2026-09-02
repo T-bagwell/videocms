@@ -370,6 +370,12 @@ func (a *App) Routes() http.Handler {
 	mux.HandleFunc("POST /api/admin/scrapers", authAdmin(a.registerScraper))
 	mux.HandleFunc("PATCH /api/admin/scrapers/{id}", authAdmin(a.updateScraper))
 	mux.HandleFunc("DELETE /api/admin/scrapers/{id}", authAdmin(a.deleteScraper))
+
+	mux.HandleFunc("GET /api/plugins/directory", authAdmin(a.pluginDirectory))
+	mux.HandleFunc("GET /api/admin/plugins", authAdmin(a.listPlugins))
+	mux.HandleFunc("POST /api/admin/plugins", authAdmin(a.installPlugin))
+	mux.HandleFunc("PATCH /api/admin/plugins/{id}", authAdmin(a.updatePlugin))
+	mux.HandleFunc("DELETE /api/admin/plugins/{id}", authAdmin(a.uninstallPlugin))
 	mux.HandleFunc("GET /api/admin/stats/watch", authAdmin(a.adminWatchStats))
 	mux.HandleFunc("GET /api/admin/stats/watch/export", authAdmin(a.exportAdminWatchStats))
 

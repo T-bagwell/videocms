@@ -341,6 +341,7 @@
     "tabTrakt": "Trakt",
     "tabModeration": "Modération",
     "tabScrapers": "Scrapers",
+    "tabPlugins": "Plugins",
     "statsVideos": "Vidéos",
     "statsLibraries": "Bibliothèques",
     "statsUsers": "Utilisateurs",
@@ -769,5 +770,20 @@
     "registered": "Scraper enregistré",
     "updated": "Mis à jour",
     "deleted": "Supprimé"
+  },
+  "plugins": {
+    "directory": "Annuaire communautaire",
+    "emptyDirectory": "Annuaire vide",
+    "installed": "Plugins installés",
+    "empty": "Aucun plugin installé",
+    "install": "Installer",
+    "uninstall": "Désinstaller",
+    "enable": "Activer",
+    "disable": "Désactiver",
+    "enabled": "Activé",
+    "disabled": "Désactivé",
+    "installOk": "Plugin installé",
+    "updated": "Mis à jour",
+    "uninstalled": "Plugin désinstallé"
   }
 }

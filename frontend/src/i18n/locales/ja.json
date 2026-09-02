@@ -341,6 +341,7 @@
     "tabTrakt": "Trakt",
     "tabModeration": "モデレーション",
     "tabScrapers": "スクレイパー",
+    "tabPlugins": "プラグイン",
     "statsVideos": "動画数",
     "statsLibraries": "ライブラリ",
     "statsUsers": "ユーザー",
@@ -769,5 +770,20 @@
     "registered": "スクレイパーを登録しました",
     "updated": "更新しました",
     "deleted": "削除しました"
+  },
+  "plugins": {
+    "directory": "コミュニティディレクトリ",
+    "emptyDirectory": "ディレクトリは空です",
+    "installed": "インストール済みプラグイン",
+    "empty": "プラグインは未インストール",
+    "install": "インストール",
+    "uninstall": "アンインストール",
+    "enable": "有効化",
+    "disable": "無効化",
+    "enabled": "有効",
+    "disabled": "無効",
+    "installOk": "プラグインをインストールしました",
+    "updated": "更新しました",
+    "uninstalled": "プラグインをアンインストールしました"
   }
 }

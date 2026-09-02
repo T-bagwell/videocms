@@ -16,6 +16,7 @@ import RecordingsAdmin from './RecordingsAdmin.jsx';
 import TraktAdmin from './TraktAdmin.jsx';
 import ModerationAdmin from './ModerationAdmin.jsx';
 import ScrapersAdmin from './ScrapersAdmin.jsx';
+import PluginsAdmin from './PluginsAdmin.jsx';
 import StorageAdmin from './StorageAdmin.jsx';
 import JobsAdmin from './JobsAdmin.jsx';
 import WebhooksAdmin from './WebhooksAdmin.jsx';
@@ -85,6 +86,9 @@ export default function AdminPage() {
         <button className={tab === 'scrapers' ? 'tab active' : 'tab'} onClick={() => setTab('scrapers')}>
           {t('admin.tabScrapers')}
         </button>
+        <button className={tab === 'plugins' ? 'tab active' : 'tab'} onClick={() => setTab('plugins')}>
+          {t('admin.tabPlugins')}
+        </button>
       </div>
       {tab === 'overview' && <Overview />}
       {tab === 'libraries' && <Libraries />}
@@ -105,6 +109,7 @@ export default function AdminPage() {
       {tab === 'trakt' && <TraktAdmin />}
       {tab === 'moderation' && <ModerationAdmin />}
       {tab === 'scrapers' && <ScrapersAdmin />}
+      {tab === 'plugins' && <PluginsAdmin />}
     </div>
   );
 }

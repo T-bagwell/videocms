@@ -122,6 +122,7 @@ func (a *App) notifyEvent(event, title, body string, data map[string]any) {
 	}
 	raw, _ := json.Marshal(payload)
 	a.notify.Send(context.Background(), event, title, body, data)
+	a.deliverPluginEvents(raw, event)
 
 	rows, err := a.pool.Query(context.Background(), `
 		SELECT id, url, secret, events FROM webhook_subscriptions WHERE active=true`)
