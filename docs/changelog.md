@@ -59,6 +59,9 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Watch-statistics dashboard: a per-user Stats page shows time watched, plays,
+  movies/episodes, active days, a 14-day bar chart and top genres, plus CSV
+  export; admins get aggregate stats and a full export
 - More subtitle providers: searches merge OpenSubtitles with the keyless
   Podnapisi provider (candidates tagged with their source), fuzzy matching
   retries without year/quality tokens when exact search is empty, and the
