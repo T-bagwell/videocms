@@ -366,7 +366,7 @@ from the product's own perspective.
 - [ ] Distributed transcoding queue with priorities and worker scaling
 - [x] yt-dlp enhancements: quality presets, proxy/cookies/login support,
       channel/playlist subscription pulls
-- [ ] Remote-access helpers: TURN/WebRTC fallback and automatic TLS
+- [x] Remote-access helpers: TURN/WebRTC fallback and automatic TLS
       certificates
 
 ## Contributing

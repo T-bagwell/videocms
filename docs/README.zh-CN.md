@@ -339,7 +339,7 @@ scripts/                 演示素材生成器
 - [x] 官方 Docker 镜像、compose 栈与支持多副本的 Helm Chart
 - [ ] 分布式转码队列：优先级与工作节点扩缩
 - [x] yt-dlp 增强：质量预设、代理/cookies/登录、频道/播放列表订阅抓取
-- [ ] 远程访问辅助：TURN/WebRTC 兜底与自动 TLS 证书
+- [x] 远程访问辅助：TURN/WebRTC 兜底与自动 TLS 证书
 
 ## 贡献
 
