@@ -59,6 +59,10 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Filterable activity feed and notification preferences: the browse feed now
+  covers comments, favorites, ratings and series subscriptions with a type
+  filter, and a Settings page stores per-user notification preferences
+  (enabled + event list, migration 052)
 - Likes/dislikes and per-item policy toggles: videos show like/dislike counts
   with per-user state (migration 051), and admins can disable downloads,
   comments or reports per video — enforced on the download, comment and report
