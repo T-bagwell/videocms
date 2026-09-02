@@ -59,6 +59,10 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- More pluggable metadata sources: OMDb (`OMDB_API_KEY`) joins TMDB/TVMaze/
+  AniList/Wikipedia/custom as a named scrape provider, Fanart.tv
+  (`FANART_API_KEY`) enriches posters/backdrops during TMDB scrapes, and the
+  detail page lets admins pick the provider per video
 - Channel logos, catch-up and time-shifted playback: channels support uploaded
   logos (served to M3U players with absolute URLs), finished recordings are
   exposed per channel as catch-up TV and streamable as time-shifted playback
