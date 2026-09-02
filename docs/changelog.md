@@ -59,6 +59,10 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- yt-dlp enhancements: download jobs support quality presets, proxy, cookies
+  file, username/password login, and channel/playlist bulk downloads with a
+  per-job `--download-archive` (migration 053), all exposed in the admin
+  Downloads form
 - Official Docker packaging: a multi-stage `Dockerfile` (frontend + backend +
   ffmpeg runtime), a `docker-compose.yml` stack (PostgreSQL + VideoCMS), a
   multi-replica Helm chart under `videocms-helm/` (deployment, service,
