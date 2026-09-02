@@ -337,7 +337,7 @@ from the product's own perspective.
 - [x] Quality profiles & automatic upgrades: the best matching file is
       preferred and new releases auto-upgrade; imports are moved/renamed into
       place
-- [ ] More pluggable metadata sources (TVDB, AniDB, Fanart.tv, OMDb, Trakt, …)
+- [x] More pluggable metadata sources (TVDB, AniDB, Fanart.tv, OMDb, Trakt, …)
       with per-library provider priority
 - [x] Backdrops/fanart/season artwork alongside posters
 - [ ] Watch-history sync to external tracking services (Trakt, SIMKL)
