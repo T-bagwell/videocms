@@ -157,6 +157,7 @@ label input, label textarea { margin-top: 6px; }
   border-radius: 8px; padding: 8px 14px; font-size: 14px; cursor: pointer;
   transition: background 0.15s; white-space: nowrap;
 }
+.btn.active { outline: 1px solid var(--accent); }
 .btn:hover { background: #262b37; }
 .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
 .btn.primary:hover { background: var(--accent-hover); }

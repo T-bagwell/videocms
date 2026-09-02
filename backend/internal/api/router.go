@@ -361,6 +361,8 @@ func (a *App) Routes() http.Handler {
 	mux.HandleFunc("GET /api/admin/stats/watch/export", authAdmin(a.exportAdminWatchStats))
 
 	mux.HandleFunc("POST /api/videos/{id}/report", authUser(a.reportVideo))
+	mux.HandleFunc("PUT /api/videos/{id}/reaction", authUser(a.setVideoReaction))
+	mux.HandleFunc("GET /api/videos/{id}/reactions", authUser(a.videoReactions))
 	mux.HandleFunc("GET /api/admin/reports", authAdmin(a.listReports))
 	mux.HandleFunc("POST /api/admin/reports/{id}/decide", authAdmin(a.decideReport))
 	mux.HandleFunc("PATCH /api/admin/users/{id}/moderation", authAdmin(a.moderationUser))

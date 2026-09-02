@@ -56,6 +56,12 @@ func (a *App) addComment(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusBadRequest, "invalid video id")
 		return
 	}
+	var allowComments bool
+	if err := a.pool.QueryRow(r.Context(),
+		`SELECT allow_comments FROM videos WHERE id=$1`, id).Scan(&allowComments); err != nil || !allowComments {
+		writeErr(w, http.StatusForbidden, "comments are disabled for this video")
+		return
+	}
 	var req struct {
 		Body string `json:"body"`
 	}

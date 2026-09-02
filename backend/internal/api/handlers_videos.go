@@ -53,6 +53,11 @@ const videoColumns = `
 	(SELECT count(*) FROM featurettes ft WHERE ft.video_id=v.id) AS featurette_count,
 	COALESCE(bl.id::text, '') AS blocked_id,
 	v.created_at, v.updated_at, v.content_rating, v.visibility,
+	v.allow_downloads, v.allow_comments, v.allow_reports,
+	(SELECT count(*) FROM video_reactions vr WHERE vr.video_id=v.id AND vr.value=1) AS likes,
+	(SELECT count(*) FROM video_reactions vr2 WHERE vr2.video_id=v.id AND vr2.value=-1) AS dislikes,
+	COALESCE((SELECT vr3.value FROM video_reactions vr3
+	          WHERE vr3.video_id=v.id AND vr3.user_id=$1), 0) AS my_reaction,
 	EXISTS(SELECT 1 FROM favorites f WHERE f.user_id=$1 AND f.video_id=v.id) AS is_fav,
 	COALESCE((SELECT wp.position_sec FROM watch_progress wp WHERE wp.user_id=$1 AND wp.video_id=v.id), 0),
 	COALESCE((SELECT wp.duration_sec FROM watch_progress wp WHERE wp.user_id=$1 AND wp.video_id=v.id), 0)`
@@ -104,7 +109,9 @@ func scanVideo(row pgx.Row) (models.Video, error) {
 		&v.Year, &v.Synopsis, &v.Genres, &v.PosterPath, &v.SubtitlePath, &v.Available,
 		&v.SeriesID, &v.Season, &v.Episode, &v.SeriesName, &v.VersionKey, &v.VersionLabel,
 		&v.VersionCount, &v.IsPrimary, &v.TrailerURL, &v.TrailerTitle, &v.FeaturetteCount, &v.BlockedID,
-		&v.CreatedAt, &v.UpdatedAt, &v.ContentRating, &v.Visibility, &v.IsFavorite, &v.ProgressSec, &v.ProgressDur)
+		&v.CreatedAt, &v.UpdatedAt, &v.ContentRating, &v.Visibility,
+		&v.AllowDownloads, &v.AllowComments, &v.AllowReports, &v.Likes, &v.Dislikes, &v.MyReaction,
+		&v.IsFavorite, &v.ProgressSec, &v.ProgressDur)
 	v.Blocked = v.BlockedID != ""
 	v.HasPoster = v.PosterPath != ""
 	v.HasSubtitle = v.SubtitlePath != ""
@@ -351,6 +358,9 @@ type updateVideoRequest struct {
 	ContentRating  string   `json:"content_rating"`
 	Visibility     string   `json:"visibility"`
 	AccessPassword string   `json:"access_password"`
+	AllowDownloads *bool    `json:"allow_downloads"`
+	AllowComments  *bool    `json:"allow_comments"`
+	AllowReports   *bool    `json:"allow_reports"`
 }
 
 func (a *App) updateVideo(w http.ResponseWriter, r *http.Request) {
@@ -408,9 +418,14 @@ func (a *App) updateVideo(w http.ResponseWriter, r *http.Request) {
 	tag, err := a.pool.Exec(r.Context(),
 		`UPDATE videos SET title=$1, synopsis=$2, year=$3, genres=$4, content_rating=$5,
 		       version_key=$6, version_label=$7, version_rank=$8,
-		       visibility=$9, access_password_hash=$10, updated_at=now() WHERE id=$11`,
+		       visibility=$9, access_password_hash=$10,
+		       allow_downloads=COALESCE($11, allow_downloads),
+		       allow_comments=COALESCE($12, allow_comments),
+		       allow_reports=COALESCE($13, allow_reports),
+		       updated_at=now() WHERE id=$14`,
 		req.Title, req.Synopsis, req.Year, req.Genres, strings.ToUpper(strings.TrimSpace(req.ContentRating)),
-		versionKey, versionLabel, versionRank, visibility, passwordHash, id)
+		versionKey, versionLabel, versionRank, visibility, passwordHash,
+		req.AllowDownloads, req.AllowComments, req.AllowReports, id)
 	if err != nil {
 		log.Printf("update video %s: %v", id, err)
 		writeErr(w, http.StatusInternalServerError, "update video failed")
@@ -506,6 +521,17 @@ func (a *App) streamVideo(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *App) downloadVideo(w http.ResponseWriter, r *http.Request) {
+	id, err := uuid.Parse(r.PathValue("id"))
+	if err != nil {
+		writeErr(w, http.StatusBadRequest, "invalid video id")
+		return
+	}
+	var allowDownloads bool
+	if err := a.pool.QueryRow(r.Context(),
+		`SELECT allow_downloads FROM videos WHERE id=$1`, id).Scan(&allowDownloads); err != nil || !allowDownloads {
+		writeErr(w, http.StatusForbidden, "downloads are disabled for this video")
+		return
+	}
 	path, ok := a.videoFileFor(r)
 	if !ok {
 		writeErr(w, http.StatusNotFound, "video not found or unavailable")

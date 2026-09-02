@@ -46,6 +46,7 @@ export default function VideoDetailPage() {
   const [reportReason, setReportReason] = useState('spam');
   const [reportDetails, setReportDetails] = useState('');
   const [reportBusy, setReportBusy] = useState(false);
+  const [reactions, setReactions] = useState({ likes: 0, dislikes: 0, mine: 0 });
   const [scrapeProvider, setScrapeProvider] = useState('tmdb');
   const [scrapeForce, setScrapeForce] = useState(false);
   const [tags, setTags] = useState([]);
@@ -81,6 +82,9 @@ export default function VideoDetailPage() {
     api(`/videos/${id}/backdrop`)
       .then(() => setHasBackdrop(true))
       .catch(() => setHasBackdrop(false));
+    api(`/videos/${id}/reactions`)
+      .then(setReactions)
+      .catch(() => {});
   }, [id]);
 
   function youtubeId(url) {
@@ -186,6 +190,16 @@ export default function VideoDetailPage() {
       setErr(e2.message);
     } finally {
       setReportBusy(false);
+    }
+  }
+
+  async function react(value) {
+    try {
+      await api(`/videos/${video.id}/reaction`, { method: 'PUT', body: { value } });
+      const d = await api(`/videos/${video.id}/reactions`);
+      setReactions(d);
+    } catch (e2) {
+      setErr(e2.message);
     }
   }
 
@@ -348,6 +362,9 @@ export default function VideoDetailPage() {
             .filter(Boolean),
           visibility: form.visibility,
           access_password: form.access_password,
+          allow_downloads: form.allow_downloads,
+          allow_comments: form.allow_comments,
+          allow_reports: form.allow_reports,
         },
       });
       setEditing(false);
@@ -361,6 +378,9 @@ export default function VideoDetailPage() {
           .map((g) => g.trim())
           .filter(Boolean),
         visibility: form.visibility,
+        allow_downloads: form.allow_downloads,
+        allow_comments: form.allow_comments,
+        allow_reports: form.allow_reports,
       });
       setMsg(t('video.metaUpdated'));
     } catch (e2) {
@@ -541,21 +561,31 @@ export default function VideoDetailPage() {
               {video.is_favorite ? <StarFilledIcon /> : <StarIcon />}
               {video.is_favorite ? t('video.unfavorite') : t('video.favorite')}
             </button>
+            <button className={`btn${reactions.mine === 1 ? ' active' : ''}`} onClick={() => react(reactions.mine === 1 ? 0 : 1)}>
+              👍 {reactions.likes}
+            </button>
+            <button className={`btn${reactions.mine === -1 ? ' active' : ''}`} onClick={() => react(reactions.mine === -1 ? 0 : -1)}>
+              👎 {reactions.dislikes}
+            </button>
             <button className="btn" onClick={() => setShowPlaylistPicker((v) => !v)}>
               <PlusIcon />
               {t('video.addToPlaylist')}
             </button>
-            <button className="btn" onClick={() => setShowDownload(true)}>
-              <DownloadIcon />
-              {t('common.download')}
-            </button>
+            {video.allow_downloads !== false && (
+              <button className="btn" onClick={() => setShowDownload(true)}>
+                <DownloadIcon />
+                {t('common.download')}
+              </button>
+            )}
             <button className="btn" onClick={() => setShowShare(true)}>
               <ShareIcon />
               {t('video.share')}
             </button>
-            <button className="btn" onClick={() => setShowReport(true)}>
-              {t('video.report')}
-            </button>
+            {video.allow_reports !== false && (
+              <button className="btn" onClick={() => setShowReport(true)}>
+                {t('video.report')}
+              </button>
+            )}
             <button className="btn" onClick={saveOffline} disabled={offlineBusy}>
               <OfflineIcon />
               {offlineBusy ? t('video.offlineSaving') : t('video.saveOffline')}
@@ -740,6 +770,9 @@ export default function VideoDetailPage() {
                       genres: (video.genres || []).join(', '),
                       visibility: video.visibility || 'private',
                       access_password: '',
+                      allow_downloads: video.allow_downloads !== false,
+                      allow_comments: video.allow_comments !== false,
+                      allow_reports: video.allow_reports !== false,
                     });
                     setEditing(true);
                   }}
@@ -840,15 +873,17 @@ export default function VideoDetailPage() {
               )}
             </div>
           ))}
-          <form className="inline-form" onSubmit={postComment}>
-            <input
-              placeholder={t('video.commentPlaceholder')}
-              value={commentInput}
-              onChange={(e) => setCommentInput(e.target.value)}
-              maxLength={1000}
-            />
-            <button className="btn primary">{t('video.postComment')}</button>
-          </form>
+          {video.allow_comments !== false && (
+            <form className="inline-form" onSubmit={postComment}>
+              <input
+                placeholder={t('video.commentPlaceholder')}
+                value={commentInput}
+                onChange={(e) => setCommentInput(e.target.value)}
+                maxLength={1000}
+              />
+              <button className="btn primary">{t('video.postComment')}</button>
+            </form>
+          )}
         </div>
       </div>
 
@@ -950,6 +985,30 @@ export default function VideoDetailPage() {
                 />
               </label>
             )}
+            <label className="scrape-force">
+              <input
+                type="checkbox"
+                checked={form.allow_downloads}
+                onChange={(e) => setForm({ ...form, allow_downloads: e.target.checked })}
+              />
+              {t('video.allowDownloads')}
+            </label>
+            <label className="scrape-force">
+              <input
+                type="checkbox"
+                checked={form.allow_comments}
+                onChange={(e) => setForm({ ...form, allow_comments: e.target.checked })}
+              />
+              {t('video.allowComments')}
+            </label>
+            <label className="scrape-force">
+              <input
+                type="checkbox"
+                checked={form.allow_reports}
+                onChange={(e) => setForm({ ...form, allow_reports: e.target.checked })}
+              />
+              {t('video.allowReports')}
+            </label>
             <div className="modal-actions">
               <button type="submit" className="btn primary">{t('common.save')}</button>
               <button type="button" className="btn ghost" onClick={() => setEditing(false)}>

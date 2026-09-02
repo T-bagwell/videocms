@@ -82,6 +82,12 @@ type Video struct {
 	UpdatedAt       time.Time  `json:"updated_at"`
 	ContentRating   string     `json:"content_rating,omitempty"`
 	Visibility      string     `json:"visibility"`
+	AllowDownloads  bool       `json:"allow_downloads"`
+	AllowComments   bool       `json:"allow_comments"`
+	AllowReports    bool       `json:"allow_reports"`
+	Likes           int        `json:"likes"`
+	Dislikes        int        `json:"dislikes"`
+	MyReaction      int        `json:"my_reaction"`
 }
 
 type SubtitleTrack struct {

@@ -30,6 +30,12 @@ func (a *App) reportVideo(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusBadRequest, "invalid video id")
 		return
 	}
+	var allowReports bool
+	if err := a.pool.QueryRow(r.Context(),
+		`SELECT allow_reports FROM videos WHERE id=$1`, id).Scan(&allowReports); err != nil || !allowReports {
+		writeErr(w, http.StatusForbidden, "reports are disabled for this video")
+		return
+	}
 	var req struct {
 		Reason  string `json:"reason"`
 		Details string `json:"details"`

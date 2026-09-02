@@ -93,6 +93,17 @@ func (a *App) videoTracks(w http.ResponseWriter, r *http.Request) {
 // Streams a remuxed copy of the video with the selected audio and subtitle
 // tracks. No re-encoding happens: streams are copied into the target container.
 func (a *App) remuxDownload(w http.ResponseWriter, r *http.Request) {
+	id, err := uuid.Parse(r.PathValue("id"))
+	if err != nil {
+		writeErr(w, http.StatusBadRequest, "invalid video id")
+		return
+	}
+	var allowDownloads bool
+	if err := a.pool.QueryRow(r.Context(),
+		`SELECT allow_downloads FROM videos WHERE id=$1`, id).Scan(&allowDownloads); err != nil || !allowDownloads {
+		writeErr(w, http.StatusForbidden, "downloads are disabled for this video")
+		return
+	}
 	path, ok := a.videoFileFor(r)
 	if !ok {
 		writeErr(w, http.StatusNotFound, "video not found or unavailable")
