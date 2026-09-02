@@ -59,6 +59,11 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Official Docker packaging: a multi-stage `Dockerfile` (frontend + backend +
+  ffmpeg runtime), a `docker-compose.yml` stack (PostgreSQL + VideoCMS), a
+  multi-replica Helm chart under `videocms-helm/` (deployment, service,
+  ingress, PVC, HPA) and a Docker CI workflow that pushes images on main/tags
+  when registry credentials are configured
 - Metrics & tracing: `GET /metrics` exposes Prometheus text metrics (HTTP
   request counters by path/method/status plus library/user/download/recording
   gauges and uptime), and `OTEL_EXPORTER_OTLP_ENDPOINT` enables batched
