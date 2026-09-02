@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { api } from '../api.js';
+import { api, mediaUrl } from '../api.js';
 
 export default function RecordingsAdmin() {
   const { t } = useTranslation();
@@ -14,6 +14,7 @@ export default function RecordingsAdmin() {
   const [msg, setMsg] = useState('');
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
+  const [playing, setPlaying] = useState(null);
 
   function load() {
     api('/admin/recordings').then((d) => setItems(d.items || [])).catch((e) => setErr(e.message));
@@ -111,6 +112,11 @@ export default function RecordingsAdmin() {
             </div>
             <div className="version-actions">
               <span className={`status-badge status-${rec.status}`}>{t(`recordings.status${rec.status.charAt(0).toUpperCase()}${rec.status.slice(1)}`)}</span>
+              {rec.status === 'done' && (
+                <button className="btn small primary" onClick={() => setPlaying(rec)}>
+                  {t('recordings.play')}
+                </button>
+              )}
               <button
                 className="btn small ghost"
                 onClick={() => run(async () => {
@@ -123,6 +129,22 @@ export default function RecordingsAdmin() {
           </div>
         ))}
       </div>
+      {playing && (
+        <div className="modal-backdrop" onClick={() => setPlaying(null)}>
+          <div className="modal modal-wide" onClick={(e) => e.stopPropagation()}>
+            <h3>{playing.title}</h3>
+            <video
+              className="featurette-player"
+              src={mediaUrl(`/iptv/recordings/${playing.id}/stream`)}
+              controls
+              autoPlay
+            />
+            <div className="modal-actions">
+              <button className="btn ghost" onClick={() => setPlaying(null)}>{t('common.close')}</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

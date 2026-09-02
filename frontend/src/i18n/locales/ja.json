@@ -588,7 +588,9 @@
     "epgOutput": "EPG 出力",
     "added": "保存しました",
     "imported": "インポートしました",
-    "deleted": "削除しました"
+    "deleted": "削除しました",
+    "logoUpload": "ロゴをアップロード",
+    "logoUpdated": "ロゴを保存しました"
   },
   "requests": {
     "submit": "リクエストを送信",
@@ -653,6 +655,7 @@
     "statusFailed": "失敗",
     "scheduled": "録画を予約しました",
     "scanned": "チューナースキャン完了",
-    "deleted": "削除しました"
+    "deleted": "削除しました",
+    "play": "再生"
   }
 }

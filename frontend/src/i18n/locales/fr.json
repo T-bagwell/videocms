@@ -588,7 +588,9 @@
     "epgOutput": "Sortie EPG",
     "added": "Enregistré",
     "imported": "Importé",
-    "deleted": "Supprimé"
+    "deleted": "Supprimé",
+    "logoUpload": "Importer un logo",
+    "logoUpdated": "Logo enregistré"
   },
   "requests": {
     "submit": "Soumettre une demande",
@@ -653,6 +655,7 @@
     "statusFailed": "Échec",
     "scheduled": "Enregistrement planifié",
     "scanned": "Scan des tuners terminé",
-    "deleted": "Supprimé"
+    "deleted": "Supprimé",
+    "play": "Lire"
   }
 }

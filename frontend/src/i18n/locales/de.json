@@ -588,7 +588,9 @@
     "epgOutput": "EPG-Ausgabe",
     "added": "Gespeichert",
     "imported": "Importiert",
-    "deleted": "Gelöscht"
+    "deleted": "Gelöscht",
+    "logoUpload": "Logo hochladen",
+    "logoUpdated": "Logo gespeichert"
   },
   "requests": {
     "submit": "Anfrage senden",
@@ -653,6 +655,7 @@
     "statusFailed": "Fehlgeschlagen",
     "scheduled": "Aufnahme geplant",
     "scanned": "Tuner-Scan abgeschlossen",
-    "deleted": "Gelöscht"
+    "deleted": "Gelöscht",
+    "play": "Abspielen"
   }
 }

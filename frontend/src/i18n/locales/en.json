@@ -588,7 +588,9 @@
     "epgOutput": "EPG output",
     "added": "Saved",
     "imported": "Imported",
-    "deleted": "Deleted"
+    "deleted": "Deleted",
+    "logoUpload": "Upload logo",
+    "logoUpdated": "Logo saved"
   },
   "requests": {
     "submit": "Submit request",
@@ -653,6 +655,7 @@
     "statusFailed": "Failed",
     "scheduled": "Recording scheduled",
     "scanned": "Tuner scan complete",
-    "deleted": "Deleted"
+    "deleted": "Deleted",
+    "play": "Play"
   }
 }

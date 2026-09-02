@@ -1,8 +1,11 @@
 package api
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"io"
+	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -69,6 +72,73 @@ func TestRecordingsScheduler(t *testing.T) {
 	}
 	if _, err := os.Stat(filePath); err != nil {
 		t.Fatalf("recording file missing: %v", err)
+	}
+
+	// Catch-up: the finished recording is listed and streamable.
+	status, d = doJSON(t, http.MethodGet, env.server.URL+"/api/iptv/channels/"+channelID+"/catchup", token, nil)
+	if status != http.StatusOK || len(d["items"].([]any)) != 1 {
+		t.Fatalf("catchup status = %d body = %v", status, d)
+	}
+	req, _ := http.NewRequest(http.MethodGet,
+		env.server.URL+"/api/iptv/recordings/"+recID+"/stream", nil)
+	req.Header.Set("Authorization", "Bearer "+token)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	body, _ := io.ReadAll(resp.Body)
+	_ = resp.Body.Close()
+	if resp.StatusCode != http.StatusOK || len(body) == 0 {
+		t.Fatalf("recording stream status = %d len = %d", resp.StatusCode, len(body))
+	}
+
+	// Channel logo upload and serving.
+	pngData := makeValidPNG(t)
+	var buf bytes.Buffer
+	mw := multipart.NewWriter(&buf)
+	fw, err := mw.CreateFormFile("logo", "logo.png")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := fw.Write(pngData); err != nil {
+		t.Fatal(err)
+	}
+	if err := mw.Close(); err != nil {
+		t.Fatal(err)
+	}
+	req, _ = http.NewRequest(http.MethodPost,
+		env.server.URL+"/api/iptv/channels/"+channelID+"/logo", &buf)
+	req.Header.Set("Content-Type", mw.FormDataContentType())
+	req.Header.Set("Authorization", "Bearer "+token)
+	resp, err = http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, _ = io.Copy(io.Discard, resp.Body)
+	_ = resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		t.Fatalf("logo upload status = %d", resp.StatusCode)
+	}
+	req, _ = http.NewRequest(http.MethodGet,
+		env.server.URL+"/api/iptv/channels/"+channelID+"/logo", nil)
+	resp, err = http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	logoBody, _ := io.ReadAll(resp.Body)
+	_ = resp.Body.Close()
+	if resp.StatusCode != http.StatusOK || !bytes.Equal(logoBody, pngData) {
+		t.Fatalf("logo serve status = %d", resp.StatusCode)
+	}
+	req, _ = http.NewRequest(http.MethodGet, env.server.URL+"/api/iptv/channels.m3u?token="+token, nil)
+	resp, err = http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	m3uBody, _ := io.ReadAll(resp.Body)
+	_ = resp.Body.Close()
+	if !bytes.Contains(m3uBody, []byte("/api/iptv/channels/"+channelID+"/logo")) {
+		t.Fatalf("m3u missing absolute logo URL:\n%s", m3uBody)
 	}
 
 	status, d = doJSON(t, http.MethodGet, env.server.URL+"/api/admin/recordings", token, nil)

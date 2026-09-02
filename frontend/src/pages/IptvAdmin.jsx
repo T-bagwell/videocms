@@ -169,6 +169,24 @@ export default function IptvAdmin() {
             >
               {t('common.remove')}
             </button>
+            <label className="btn small ghost">
+              {t('iptv.logoUpload')}
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                hidden
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  e.target.value = '';
+                  if (!file) return;
+                  const fd = new FormData();
+                  fd.append('logo', file);
+                  await run(async () => {
+                    await api(`/iptv/channels/${c.id}/logo`, { method: 'POST', form: fd });
+                  }, 'iptv.logoUpdated');
+                }}
+              />
+            </label>
           </div>
         ))}
       </div>

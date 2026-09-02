@@ -314,7 +314,12 @@ func (a *App) Routes() http.Handler {
 
 	mux.HandleFunc("GET /api/iptv/channels", authAdmin(a.listIptvChannels))
 	mux.HandleFunc("POST /api/iptv/channels", authAdmin(a.createIptvChannel))
+	mux.HandleFunc("PATCH /api/iptv/channels/{id}", authAdmin(a.updateIptvChannel))
 	mux.HandleFunc("DELETE /api/iptv/channels/{id}", authAdmin(a.deleteIptvChannel))
+	mux.HandleFunc("POST /api/iptv/channels/{id}/logo", authAdmin(a.uploadIptvLogo))
+	mux.HandleFunc("GET /api/iptv/channels/{id}/logo", a.serveIptvLogo)
+	mux.HandleFunc("GET /api/iptv/channels/{id}/catchup", authUser(a.channelCatchup))
+	mux.HandleFunc("GET /api/iptv/recordings/{id}/stream", authUser(a.streamRecording))
 	mux.HandleFunc("POST /api/iptv/import", authAdmin(a.importIptvM3U))
 	mux.HandleFunc("POST /api/iptv/library-channel", authAdmin(a.createLibraryChannel))
 	mux.HandleFunc("GET /api/iptv/channels.m3u", a.iptvChannelsM3U)

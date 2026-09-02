@@ -588,7 +588,9 @@
     "epgOutput": "EPG 输出",
     "added": "已保存",
     "imported": "已导入",
-    "deleted": "已删除"
+    "deleted": "已删除",
+    "logoUpload": "上传台标",
+    "logoUpdated": "台标已保存"
   },
   "requests": {
     "submit": "提交请求",
@@ -653,6 +655,7 @@
     "statusFailed": "失败",
     "scheduled": "已预约录制",
     "scanned": "调谐器扫描完成",
-    "deleted": "已删除"
+    "deleted": "已删除",
+    "play": "播放"
   }
 }

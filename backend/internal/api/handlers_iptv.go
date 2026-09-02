@@ -111,6 +111,173 @@ func (a *App) deleteIptvChannel(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]any{"message": "deleted"})
 }
 
+// PATCH /api/iptv/channels/{id} updates channel metadata.
+func (a *App) updateIptvChannel(w http.ResponseWriter, r *http.Request) {
+	id, err := uuid.Parse(r.PathValue("id"))
+	if err != nil {
+		writeErr(w, http.StatusBadRequest, "invalid channel id")
+		return
+	}
+	var req struct {
+		Name       string `json:"name"`
+		TvgID      string `json:"tvg_id"`
+		TvgName    string `json:"tvg_name"`
+		Logo       string `json:"logo"`
+		GroupTitle string `json:"group_title"`
+		SourceURL  string `json:"source_url"`
+	}
+	if err := readJSON(w, r, &req); err != nil {
+		writeErr(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	if strings.TrimSpace(req.Name) == "" {
+		writeErr(w, http.StatusBadRequest, "name is required")
+		return
+	}
+	if _, err := a.pool.Exec(r.Context(), `
+		UPDATE iptv_channels SET name=$1, tvg_id=$2, tvg_name=$3, logo=$4,
+		       group_title=$5, source_url=$6, updated_at=now() WHERE id=$7`,
+		strings.TrimSpace(req.Name), strings.TrimSpace(req.TvgID), strings.TrimSpace(req.TvgName),
+		strings.TrimSpace(req.Logo), strings.TrimSpace(req.GroupTitle), strings.TrimSpace(req.SourceURL), id); err != nil {
+		writeErr(w, http.StatusInternalServerError, "update channel failed")
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]any{"message": "updated"})
+}
+
+// POST /api/iptv/channels/{id}/logo uploads a channel logo.
+func (a *App) uploadIptvLogo(w http.ResponseWriter, r *http.Request) {
+	id, err := uuid.Parse(r.PathValue("id"))
+	if err != nil {
+		writeErr(w, http.StatusBadRequest, "invalid channel id")
+		return
+	}
+	var exists bool
+	if err := a.pool.QueryRow(r.Context(),
+		`SELECT EXISTS(SELECT 1 FROM iptv_channels WHERE id=$1)`, id).Scan(&exists); err != nil || !exists {
+		writeErr(w, http.StatusNotFound, "channel not found")
+		return
+	}
+	r.Body = http.MaxBytesReader(w, r.Body, 5<<20)
+	file, _, err := r.FormFile("logo")
+	if err != nil {
+		writeErr(w, http.StatusBadRequest, "missing logo file (multipart field 'logo')")
+		return
+	}
+	defer func() { _ = file.Close() }()
+	head := make([]byte, 512)
+	n, _ := io.ReadFull(file, head)
+	ext := ""
+	switch http.DetectContentType(head[:n]) {
+	case "image/jpeg":
+		ext = ".jpg"
+	case "image/png":
+		ext = ".png"
+	case "image/webp":
+		ext = ".webp"
+	default:
+		writeErr(w, http.StatusBadRequest, "only jpg/png/webp images are supported")
+		return
+	}
+	dir := filepath.Join(a.cfg.DataDir, "iptv-logos")
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		writeErr(w, http.StatusInternalServerError, "cannot create logo dir")
+		return
+	}
+	dst := filepath.Join(dir, id.String()+ext)
+	out, err := os.Create(dst)
+	if err != nil {
+		writeErr(w, http.StatusInternalServerError, "cannot save logo")
+		return
+	}
+	defer func() { _ = out.Close() }()
+	if _, err := out.Write(head[:n]); err != nil {
+		writeErr(w, http.StatusInternalServerError, "cannot write logo")
+		return
+	}
+	if _, err := io.Copy(out, file); err != nil {
+		writeErr(w, http.StatusInternalServerError, "cannot write logo")
+		return
+	}
+	logoURL := "/api/iptv/channels/" + id.String() + "/logo" + ext
+	if _, err := a.pool.Exec(r.Context(),
+		`UPDATE iptv_channels SET logo=$1, updated_at=now() WHERE id=$2`, logoURL, id); err != nil {
+		writeErr(w, http.StatusInternalServerError, "update channel failed")
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]any{"message": "logo updated", "logo": logoURL})
+}
+
+// GET /api/iptv/channels/{id}/logo (public; logos appear in M3U playlists).
+func (a *App) serveIptvLogo(w http.ResponseWriter, r *http.Request) {
+	id, err := uuid.Parse(r.PathValue("id"))
+	if err != nil {
+		writeErr(w, http.StatusBadRequest, "invalid channel id")
+		return
+	}
+	var logo string
+	err = a.pool.QueryRow(r.Context(),
+		`SELECT logo FROM iptv_channels WHERE id=$1`, id).Scan(&logo)
+	if err != nil || logo == "" || !strings.HasPrefix(logo, "/api/iptv/channels/") {
+		writeErr(w, http.StatusNotFound, "logo not found")
+		return
+	}
+	http.ServeFile(w, r, filepath.Join(a.cfg.DataDir, "iptv-logos", id.String()+filepath.Ext(logo)))
+}
+
+// GET /api/iptv/channels/{id}/catchup lists finished recordings (catch-up TV).
+func (a *App) channelCatchup(w http.ResponseWriter, r *http.Request) {
+	id, err := uuid.Parse(r.PathValue("id"))
+	if err != nil {
+		writeErr(w, http.StatusBadRequest, "invalid channel id")
+		return
+	}
+	rows, err := a.pool.Query(r.Context(), `
+		SELECT id, title, start_utc, end_utc, file_path FROM recordings
+		WHERE channel_id=$1 AND status='done' AND file_path <> ''
+		ORDER BY start_utc DESC LIMIT 50`, id)
+	if err != nil {
+		writeErr(w, http.StatusInternalServerError, "query catchup failed")
+		return
+	}
+	defer rows.Close()
+	items := []map[string]any{}
+	for rows.Next() {
+		var rid uuid.UUID
+		var title string
+		var start, end time.Time
+		var fp string
+		if err := rows.Scan(&rid, &title, &start, &end, &fp); err != nil {
+			continue
+		}
+		items = append(items, map[string]any{
+			"id": rid, "title": title, "start_utc": start, "end_utc": end,
+		})
+	}
+	writeJSON(w, http.StatusOK, map[string]any{"items": items})
+}
+
+// GET /api/iptv/recordings/{id}/stream plays a finished recording.
+func (a *App) streamRecording(w http.ResponseWriter, r *http.Request) {
+	id, err := uuid.Parse(r.PathValue("id"))
+	if err != nil {
+		writeErr(w, http.StatusBadRequest, "invalid recording id")
+		return
+	}
+	var fp string
+	err = a.pool.QueryRow(r.Context(),
+		`SELECT file_path FROM recordings WHERE id=$1 AND status='done' AND file_path <> ''`, id).Scan(&fp)
+	if errors.Is(err, pgx.ErrNoRows) {
+		writeErr(w, http.StatusNotFound, "recording not found")
+		return
+	}
+	if err != nil {
+		writeErr(w, http.StatusInternalServerError, "query recording failed")
+		return
+	}
+	http.ServeFile(w, r, fp)
+}
+
 // POST /api/iptv/import parses an M3U playlist and upserts its channels.
 func (a *App) importIptvM3U(w http.ResponseWriter, r *http.Request) {
 	var req struct {
@@ -262,8 +429,12 @@ func (a *App) iptvChannelsM3U(w http.ResponseWriter, r *http.Request) {
 		if name == "" {
 			name = c.Name
 		}
+		logo := c.Logo
+		if strings.HasPrefix(logo, "/") {
+			logo = base + logo
+		}
 		fmt.Fprintf(&b, "#EXTINF:-1 tvg-id=\"%s\" tvg-name=\"%s\" tvg-logo=\"%s\" group-title=\"%s\",%s\n",
-			xmlEscape(c.TvgID), xmlEscape(name), xmlEscape(c.Logo), xmlEscape(c.GroupTitle), xmlEscape(c.Name))
+			xmlEscape(c.TvgID), xmlEscape(name), xmlEscape(logo), xmlEscape(c.GroupTitle), xmlEscape(c.Name))
 		if c.LibraryID != nil {
 			fmt.Fprintf(&b, "%s/api/iptv/library/%s/stream?token=%s\n", base, c.ID, token)
 		} else {
