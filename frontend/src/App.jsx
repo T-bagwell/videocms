@@ -17,6 +17,7 @@ import PublicPage from './pages/PublicPage.jsx';
 import PublicVideoPage from './pages/PublicVideoPage.jsx';
 import RequestsPage from './pages/RequestsPage.jsx';
 import StatsPage from './pages/StatsPage.jsx';
+import SubscriptionsPage from './pages/SubscriptionsPage.jsx';
 import AdminPage from './pages/AdminPage.jsx';
 import LivePage from './pages/LivePage.jsx';
 import SharePage from './pages/SharePage.jsx';
@@ -168,6 +169,14 @@ export default function App() {
             element={
               <RequireAuth>
                 <StatsPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/subscriptions"
+            element={
+              <RequireAuth>
+                <SubscriptionsPage />
               </RequireAuth>
             }
           />

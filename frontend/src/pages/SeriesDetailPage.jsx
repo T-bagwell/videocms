@@ -33,6 +33,19 @@ export default function SeriesDetailPage() {
     }
   }
 
+  async function toggleSubscribe() {
+    try {
+      if (series.is_subscribed) {
+        await api(`/series/${id}/subscribe`, { method: 'DELETE' });
+      } else {
+        await api(`/series/${id}/subscribe`, { method: 'PUT' });
+      }
+      setSeries({ ...series, is_subscribed: !series.is_subscribed });
+    } catch (e) {
+      setErr(e.message);
+    }
+  }
+
   useEffect(() => {
     api(`/series/${id}`)
       .then((d) => {
@@ -71,6 +84,9 @@ export default function SeriesDetailPage() {
               </button>
               <button className="btn" onClick={toggleFavorite}>
                 {series.is_favorite ? t('series.unfavorite') : t('series.favorite')}
+              </button>
+              <button className="btn" onClick={toggleSubscribe}>
+                {series.is_subscribed ? t('series.unsubscribe') : t('series.subscribe')}
               </button>
               <button className="btn" onClick={() => setShowShare(true)}>
                 {t('video.share')}

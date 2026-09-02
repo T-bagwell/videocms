@@ -12,6 +12,7 @@
     "photos": "写真",
     "requests": "リクエスト",
     "stats": "統計",
+    "subscriptions": "チャンネル登録",
     "admin": "管理",
     "logout": "ログアウト",
     "parentalLock": "ペアレンタルロック",
@@ -279,6 +280,8 @@
   },
   "series": {
     "title": "ドラマ",
+    "subscribe": "登録",
+    "unsubscribe": "登録済み",
     "episodes": "全{{count}}話",
     "season": "シーズン{{n}}",
     "empty": "ドラマはまだありません。スキャン後、連番ファイル（S01E01、EP1、第1集…）は自動的にドラマとしてグループ化されます。",
@@ -683,5 +686,8 @@
     "weekly": "過去14日",
     "genres": "人気ジャンル",
     "export": "CSV エクスポート"
+  },
+  "subscriptions": {
+    "empty": "登録はまだありません — ドラマページから登録できます"
   }
 }

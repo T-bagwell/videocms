@@ -12,6 +12,7 @@
     "photos": "Photos",
     "requests": "Demandes",
     "stats": "Statistiques",
+    "subscriptions": "Abonnements",
     "admin": "Administration",
     "logout": "Se déconnecter",
     "parentalLock": "Contrôle parental",
@@ -279,6 +280,8 @@
   },
   "series": {
     "title": "Séries TV",
+    "subscribe": "S'abonner",
+    "unsubscribe": "Abonné",
     "episodes": "{{count}} épisodes",
     "season": "Saison {{n}}",
     "empty": "Aucune série trouvée. Les fichiers numérotés (S01E01, E01, 第1集…) sont regroupés automatiquement après une analyse.",
@@ -683,5 +686,8 @@
     "weekly": "14 derniers jours",
     "genres": "Genres populaires",
     "export": "Exporter CSV"
+  },
+  "subscriptions": {
+    "empty": "Aucun abonnement — suivez une série depuis sa page"
   }
 }

@@ -103,6 +103,8 @@ type Series struct {
 	Season       int       `json:"season,omitempty"`
 	EpisodeCount int       `json:"episode_count"`
 	IsFavorite   bool      `json:"is_favorite"`
+	IsSubscribed bool      `json:"is_subscribed"`
+	Subscribers  int       `json:"subscribers"`
 	HasPoster    bool      `json:"has_poster"`
 	PosterPath   string    `json:"-"`
 	UpdatedAt    time.Time `json:"updated_at"`

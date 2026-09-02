@@ -12,6 +12,7 @@
     "photos": "Photos",
     "requests": "Requests",
     "stats": "Stats",
+    "subscriptions": "Subscriptions",
     "admin": "Admin",
     "logout": "Log out",
     "parentalLock": "Parental lock",
@@ -279,6 +280,8 @@
   },
   "series": {
     "title": "TV Shows",
+    "subscribe": "Subscribe",
+    "unsubscribe": "Subscribed",
     "episodes": "{{count}} episodes",
     "season": "Season {{n}}",
     "empty": "No TV series found. Numbered files (S01E01, E01, 第1集…) are grouped automatically after a scan.",
@@ -683,5 +686,8 @@
     "weekly": "Last 14 days",
     "genres": "Top genres",
     "export": "Export CSV"
+  },
+  "subscriptions": {
+    "empty": "No subscriptions yet — follow a TV show from its page"
   }
 }

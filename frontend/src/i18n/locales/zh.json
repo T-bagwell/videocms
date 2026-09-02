@@ -12,6 +12,7 @@
     "photos": "照片",
     "requests": "点播请求",
     "stats": "统计",
+    "subscriptions": "订阅",
     "admin": "管理",
     "logout": "退出",
     "parentalLock": "家长锁",
@@ -279,6 +280,8 @@
   },
   "series": {
     "title": "剧集",
+    "subscribe": "订阅",
+    "unsubscribe": "已订阅",
     "episodes": "{{count}} 集",
     "season": "第{{n}}季",
     "empty": "还没有剧集。扫描后，带序号的视频（S01E01、EP1、第1集…）会自动分组为剧集。",
@@ -683,5 +686,8 @@
     "weekly": "近 14 天",
     "genres": "热门类型",
     "export": "导出 CSV"
+  },
+  "subscriptions": {
+    "empty": "暂无订阅——从剧集页关注即可"
   }
 }
