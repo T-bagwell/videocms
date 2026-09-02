@@ -158,6 +158,16 @@ helm install videocms ./videocms-helm \
 
 ## 任意の連携
 
+## リモートアクセス
+
+公開運用では ACME（Let's Encrypt）による TLS 証明書の自動取得が可能です：
+`AUTOCERT_DOMAINS=media.example.com`（複数ドメインはカンマ区切り）を設定すると、
+80 番ポートで HTTP-01 チャレンジに応答し、`DATA_DIR/certs` にキャッシュした証明書で
+HTTPS を提供します。手動証明書は `TLS_CERT_FILE` / `TLS_KEY_FILE` で指定します。
+WebRTC フォールバック（NAT 越えの同時視聴など）には TURN サーバー
+（`TURN_SERVER` / `TURN_USERNAME` / `TURN_PASSWORD`）を設定し、クライアントは
+`GET /api/remote-access` から認証情報を取得します。
+
 ### DLNA / Chromecast
 
 LAN 内の UPnP/DLNA 対応テレビやプレイヤーにライブラリを公開する場合：

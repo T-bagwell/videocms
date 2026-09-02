@@ -253,6 +253,8 @@ make serve                              # http://<局域网IP>:8080
 | `FANART_API_KEY` | 空 | 可选 Fanart.tv 艺术图增强（海报/背景图） |
 | `TRAKT_CLIENT_ID` / `TRAKT_ACCESS_TOKEN` / `TRAKT_REFRESH_TOKEN` | 空 | 观看历史同步到 Trakt |
 | `METRICS_ENABLED` / `OTEL_EXPORTER_OTLP_ENDPOINT` | `1` / 空 | Prometheus /metrics 端点；OTLP 追踪导出端点 |
+| `AUTOCERT_DOMAINS` / `TLS_CERT_FILE` / `TLS_KEY_FILE` | 空 | 自动（ACME）或手动 TLS 证书 |
+| `TURN_SERVER` / `TURN_USERNAME` / `TURN_PASSWORD` | 空 | WebRTC 兜底用的 TURN 凭据 |
 | `SCAN_WORKERS` | `4` | 并行扫描工作数 |
 | `WATCH_INTERVAL` | `30` | 自动增量扫描间隔（秒），`0` 关闭 |
 | `YTDLP_PATH` | PATH 上的 `yt-dlp` | 「下载」队列使用的 yt-dlp 二进制 |

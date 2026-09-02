@@ -151,6 +151,15 @@ Chart 支持水平扩展（`autoscaling.enabled=true`、`replicaCount>1`），�
 
 ## 可选集成
 
+## 远程访问
+
+公网部署时可通过 ACME（Let's Encrypt）自动获取 TLS 证书：设置
+`AUTOCERT_DOMAINS=media.example.com`（多个域名用逗号分隔），服务器在 80 端口响应
+HTTP-01 挑战并以 HTTPS 提供服务，证书缓存于 `DATA_DIR/certs`；也可用
+`TLS_CERT_FILE` / `TLS_KEY_FILE` 指定手动证书。WebRTC 兜底（如跨 NAT 的同步观影）
+可配置 TURN 服务器（`TURN_SERVER` / `TURN_USERNAME` / `TURN_PASSWORD`），客户端从
+`GET /api/remote-access` 读取凭据。
+
 ### DLNA / Chromecast
 
 把媒体库开放给局域网内 UPnP/DLNA 电视与播放器：

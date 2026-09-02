@@ -405,6 +405,7 @@ func (a *App) Routes() http.Handler {
 	mux.HandleFunc("GET /api/healthz", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
 	})
+	mux.HandleFunc("GET /api/remote-access", authUser(a.remoteAccess))
 	mux.HandleFunc("GET /metrics", a.metricsHandler)
 
 	webRoot := a.webRoot()

@@ -23,6 +23,12 @@ type Config struct {
 	TraktRefreshToken      string
 	MetricsEnabled         bool
 	OTelEndpoint           string
+	AutoTLSDomains         []string
+	TLSCertFile            string
+	TLSKeyFile             string
+	TurnServer             string
+	TurnUsername           string
+	TurnPassword           string
 	WebRoot                string
 	WatchInterval          time.Duration
 	YtDLPPath              string
@@ -84,6 +90,12 @@ func Load() Config {
 		TraktRefreshToken:      os.Getenv("TRAKT_REFRESH_TOKEN"),
 		MetricsEnabled:         os.Getenv("METRICS_ENABLED") != "0",
 		OTelEndpoint:           os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT"),
+		AutoTLSDomains:         envList("AUTOCERT_DOMAINS"),
+		TLSCertFile:            os.Getenv("TLS_CERT_FILE"),
+		TLSKeyFile:             os.Getenv("TLS_KEY_FILE"),
+		TurnServer:             os.Getenv("TURN_SERVER"),
+		TurnUsername:           os.Getenv("TURN_USERNAME"),
+		TurnPassword:           os.Getenv("TURN_PASSWORD"),
 		WebRoot:                os.Getenv("WEB_ROOT"),
 		WatchInterval:          envDuration("WATCH_INTERVAL", 30*time.Second),
 		YtDLPPath:              os.Getenv("YTDLP_PATH"),

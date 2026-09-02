@@ -318,6 +318,8 @@ Tout se configure par variables d’environnement (table complète dans le READM
 | `FANART_API_KEY` | vide | Enrichissement Fanart.tv facultatif (affiches/fonds) |
 | `TRAKT_CLIENT_ID` / `TRAKT_ACCESS_TOKEN` / `TRAKT_REFRESH_TOKEN` | vide | Synchronisation de l'historique vers Trakt |
 | `METRICS_ENABLED` / `OTEL_EXPORTER_OTLP_ENDPOINT` | `1` / vide | Endpoint Prometheus /metrics ; export de traces OTLP |
+| `AUTOCERT_DOMAINS` / `TLS_CERT_FILE` / `TLS_KEY_FILE` | vide | Certificats TLS automatiques (ACME) ou manuels |
+| `TURN_SERVER` / `TURN_USERNAME` / `TURN_PASSWORD` | vide | Identifiants TURN pour le repli WebRTC |
 | `SCAN_WORKERS` | `4` | Workers d’analyse parallèles |
 | `WATCH_INTERVAL` | `30` | Secondes entre analyses incrémentales automatiques ; `0` désactive |
 | `YTDLP_PATH` | `yt-dlp` dans le PATH | Binaire yt-dlp utilisé par la file de téléchargements |

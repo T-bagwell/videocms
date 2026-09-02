@@ -160,6 +160,17 @@ single replica to avoid duplicate work.
 
 ## Optional integrations
 
+## Remote access
+
+For public deployments, VideoCMS can obtain TLS certificates automatically via
+ACME (Let's Encrypt): set `AUTOCERT_DOMAINS=media.example.com` (comma-separated
+for several domains); the server answers HTTP-01 challenges on port 80 and
+serves HTTPS with cached certificates under `DATA_DIR/certs`. Alternatively
+provide `TLS_CERT_FILE` / `TLS_KEY_FILE` for manual certificates. For WebRTC
+fallback (e.g. watch rooms across NAT), configure a TURN server with
+`TURN_SERVER` / `TURN_USERNAME` / `TURN_PASSWORD`; clients read the credentials
+from `GET /api/remote-access`.
+
 ### DLNA / Chromecast
 
 To expose the library to UPnP/DLNA TVs and players on your LAN:

@@ -2,12 +2,16 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 	"time"
+
+	"golang.org/x/crypto/acme/autocert"
 
 	"videocms/backend/internal/api"
 	"videocms/backend/internal/config"
@@ -44,15 +48,58 @@ func main() {
 	app.StartDLNA(ctx)
 	app.StartRecorder(ctx)
 
+	tlsConfig := (*tls.Config)(nil)
+	if len(cfg.AutoTLSDomains) > 0 {
+		certDir := filepath.Join(cfg.DataDir, "certs")
+		if err := os.MkdirAll(certDir, 0o755); err != nil {
+			log.Fatalf("create cert cache dir: %v", err)
+		}
+		m := &autocert.Manager{
+			Prompt:     autocert.AcceptTOS,
+			HostPolicy: autocert.HostWhitelist(cfg.AutoTLSDomains...),
+			Cache:      autocert.DirCache(certDir),
+		}
+		go func() {
+			log.Printf("autocert ACME challenge listener on :80 for %v", cfg.AutoTLSDomains)
+			if err := http.ListenAndServe(":80", m.HTTPHandler(nil)); err != nil && err != http.ErrServerClosed {
+				log.Printf("autocert :80 listener: %v", err)
+			}
+		}()
+		tlsConfig = &tls.Config{
+			GetCertificate: m.GetCertificate,
+			MinVersion:     tls.VersionTLS12,
+		}
+	} else if cfg.TLSCertFile != "" && cfg.TLSKeyFile != "" {
+		cert, err := tls.LoadX509KeyPair(cfg.TLSCertFile, cfg.TLSKeyFile)
+		if err != nil {
+			log.Fatalf("load TLS certificate: %v", err)
+		}
+		tlsConfig = &tls.Config{
+			Certificates: []tls.Certificate{cert},
+			MinVersion:   tls.VersionTLS12,
+		}
+	}
+
 	srv := &http.Server{
 		Addr:              cfg.Addr,
 		Handler:           app.Routes(),
+		TLSConfig:         tlsConfig,
 		ReadHeaderTimeout: 10 * time.Second,
 	}
 
 	go func() {
-		log.Printf("videocms server listening on %s", cfg.Addr)
-		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		mode := "http"
+		if tlsConfig != nil {
+			mode = "https"
+		}
+		log.Printf("videocms server listening on %s (%s)", cfg.Addr, mode)
+		var err error
+		if tlsConfig != nil {
+			err = srv.ListenAndServeTLS("", "")
+		} else {
+			err = srv.ListenAndServe()
+		}
+		if err != nil && err != http.ErrServerClosed {
 			log.Fatalf("server: %v", err)
 		}
 	}()
