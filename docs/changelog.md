@@ -59,6 +59,10 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Watch-history sync: a Trakt admin tab pushes watched movies (deduped by TMDB
+  id, latest watch time) to Trakt with optional token refresh
+  (`TRAKT_CLIENT_ID` / `TRAKT_ACCESS_TOKEN` / `TRAKT_REFRESH_TOKEN`), with a
+  sync audit log
 - More pluggable metadata sources: OMDb (`OMDB_API_KEY`) joins TMDB/TVMaze/
   AniList/Wikipedia/custom as a named scrape provider, Fanart.tv
   (`FANART_API_KEY`) enriches posters/backdrops during TMDB scrapes, and the
