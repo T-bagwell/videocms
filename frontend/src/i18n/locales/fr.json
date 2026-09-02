@@ -11,6 +11,7 @@
     "books": "Livres",
     "photos": "Photos",
     "requests": "Demandes",
+    "stats": "Statistiques",
     "admin": "Administration",
     "logout": "Se déconnecter",
     "parentalLock": "Contrôle parental",
@@ -672,5 +673,15 @@
     "syncing": "Synchronisation…",
     "synced": "{{count}} éléments envoyés",
     "lastSync": "Dernière synchro"
+  },
+  "stats": {
+    "totalTime": "Temps de visionnage",
+    "plays": "Lectures",
+    "movies": "Films",
+    "episodes": "Épisodes",
+    "daysActive": "Jours actifs",
+    "weekly": "14 derniers jours",
+    "genres": "Genres populaires",
+    "export": "Exporter CSV"
   }
 }

@@ -16,6 +16,7 @@ import PhotosPage from './pages/PhotosPage.jsx';
 import PublicPage from './pages/PublicPage.jsx';
 import PublicVideoPage from './pages/PublicVideoPage.jsx';
 import RequestsPage from './pages/RequestsPage.jsx';
+import StatsPage from './pages/StatsPage.jsx';
 import AdminPage from './pages/AdminPage.jsx';
 import LivePage from './pages/LivePage.jsx';
 import SharePage from './pages/SharePage.jsx';
@@ -159,6 +160,14 @@ export default function App() {
             element={
               <RequireAuth>
                 <RequestsPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/stats"
+            element={
+              <RequireAuth>
+                <StatsPage />
               </RequireAuth>
             }
           />

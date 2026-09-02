@@ -11,6 +11,7 @@
     "books": "本",
     "photos": "写真",
     "requests": "リクエスト",
+    "stats": "統計",
     "admin": "管理",
     "logout": "ログアウト",
     "parentalLock": "ペアレンタルロック",
@@ -672,5 +673,15 @@
     "syncing": "同期中…",
     "synced": "{{count}} 件を送信しました",
     "lastSync": "最終同期"
+  },
+  "stats": {
+    "totalTime": "視聴時間",
+    "plays": "再生数",
+    "movies": "映画",
+    "episodes": "エピソード",
+    "daysActive": "アクティブ日数",
+    "weekly": "過去14日",
+    "genres": "人気ジャンル",
+    "export": "CSV エクスポート"
   }
 }

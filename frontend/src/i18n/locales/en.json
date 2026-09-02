@@ -11,6 +11,7 @@
     "books": "Books",
     "photos": "Photos",
     "requests": "Requests",
+    "stats": "Stats",
     "admin": "Admin",
     "logout": "Log out",
     "parentalLock": "Parental lock",
@@ -672,5 +673,15 @@
     "syncing": "Syncing…",
     "synced": "Pushed {{count}} items",
     "lastSync": "Last sync"
+  },
+  "stats": {
+    "totalTime": "Time watched",
+    "plays": "Plays",
+    "movies": "Movies",
+    "episodes": "Episodes",
+    "daysActive": "Active days",
+    "weekly": "Last 14 days",
+    "genres": "Top genres",
+    "export": "Export CSV"
   }
 }

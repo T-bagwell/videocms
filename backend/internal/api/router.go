@@ -287,6 +287,8 @@ func (a *App) Routes() http.Handler {
 	mux.HandleFunc("DELETE /api/admin/users/{id}", authAdmin(a.deleteUser))
 
 	mux.HandleFunc("PUT /api/users/me/progress", authUser(a.saveProgress))
+	mux.HandleFunc("GET /api/users/me/stats", authUser(a.userWatchStats))
+	mux.HandleFunc("GET /api/users/me/stats/export", authUser(a.exportUserWatchStats))
 	mux.HandleFunc("GET /api/users/me/playback-speed/{videoId}", authUser(a.getPlaybackSpeed))
 	mux.HandleFunc("GET /api/users/me/continue", authUser(a.continueWatching))
 	mux.HandleFunc("POST /api/users/me/favorites", authUser(a.addFavorite))
@@ -352,6 +354,8 @@ func (a *App) Routes() http.Handler {
 
 	mux.HandleFunc("GET /api/admin/trakt/status", authAdmin(a.traktStatus))
 	mux.HandleFunc("POST /api/admin/trakt/sync", authAdmin(a.traktSync))
+	mux.HandleFunc("GET /api/admin/stats/watch", authAdmin(a.adminWatchStats))
+	mux.HandleFunc("GET /api/admin/stats/watch/export", authAdmin(a.exportAdminWatchStats))
 
 	mux.HandleFunc("GET /api/playlists", authUser(a.listPlaylists))
 	mux.HandleFunc("POST /api/playlists", authUser(a.createPlaylist))

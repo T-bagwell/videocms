@@ -11,6 +11,7 @@
     "books": "图书",
     "photos": "照片",
     "requests": "点播请求",
+    "stats": "统计",
     "admin": "管理",
     "logout": "退出",
     "parentalLock": "家长锁",
@@ -672,5 +673,15 @@
     "syncing": "同步中…",
     "synced": "已推送 {{count}} 条",
     "lastSync": "上次同步"
+  },
+  "stats": {
+    "totalTime": "观看时长",
+    "plays": "播放次数",
+    "movies": "电影",
+    "episodes": "剧集",
+    "daysActive": "活跃天数",
+    "weekly": "近 14 天",
+    "genres": "热门类型",
+    "export": "导出 CSV"
   }
 }

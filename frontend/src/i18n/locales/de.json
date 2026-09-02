@@ -11,6 +11,7 @@
     "books": "Bücher",
     "photos": "Fotos",
     "requests": "Anfragen",
+    "stats": "Statistiken",
     "admin": "Verwaltung",
     "logout": "Abmelden",
     "parentalLock": "Kindersicherung",
@@ -672,5 +673,15 @@
     "syncing": "Wird synchronisiert…",
     "synced": "{{count}} Einträge übertragen",
     "lastSync": "Letzte Synchronisierung"
+  },
+  "stats": {
+    "totalTime": "Sehdauer",
+    "plays": "Wiedergaben",
+    "movies": "Filme",
+    "episodes": "Episoden",
+    "daysActive": "Aktive Tage",
+    "weekly": "Letzte 14 Tage",
+    "genres": "Top-Genres",
+    "export": "CSV exportieren"
   }
 }
