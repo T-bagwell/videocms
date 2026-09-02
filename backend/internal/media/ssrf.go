@@ -27,14 +27,16 @@ func SafeHTTPURL(raw string, allowLocal bool) (string, error) {
 		return "", err
 	}
 	for _, ip := range ips {
-		if isUnsafeIP(ip) {
+		if IsUnsafeIP(ip) {
 			return "", errors.New("url resolves to a private or loopback address")
 		}
 	}
 	return u.String(), nil
 }
 
-func isUnsafeIP(ip net.IP) bool {
+// IsUnsafeIP reports whether an IP address should never be contacted by
+// server-side fetches (loopback, private, link-local, multicast, unspecified).
+func IsUnsafeIP(ip net.IP) bool {
 	return ip.IsLoopback() || ip.IsPrivate() || ip.IsLinkLocalUnicast() ||
 		ip.IsLinkLocalMulticast() || ip.IsMulticast() || ip.IsUnspecified()
 }

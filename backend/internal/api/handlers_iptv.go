@@ -7,7 +7,9 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net"
 	"net/http"
+	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -692,16 +694,50 @@ func (a *App) iptvAuthed(r *http.Request) bool {
 	return err == nil
 }
 
-func (a *App) fetchText(ctx context.Context, url string, limit int64) ([]byte, error) {
-	safe, err := media.SafeHTTPURL(url, a.cfg.AllowLocalFetch)
+func (a *App) fetchText(ctx context.Context, rawURL string, limit int64) ([]byte, error) {
+	u, err := url.Parse(strings.TrimSpace(rawURL))
+	if err != nil || (u.Scheme != "http" && u.Scheme != "https") || u.Host == "" {
+		return nil, errors.New("invalid http(s) url")
+	}
+	host := strings.Trim(u.Host, "[]")
+	port := u.Port()
+	if port == "" {
+		if u.Scheme == "https" {
+			port = "443"
+		} else {
+			port = "80"
+		}
+	}
+	client := http.DefaultClient
+	if !a.cfg.AllowLocalFetch {
+		ips, err := net.LookupIP(host)
+		if err != nil {
+			return nil, err
+		}
+		if len(ips) == 0 {
+			return nil, errors.New("url does not resolve")
+		}
+		for _, ip := range ips {
+			if media.IsUnsafeIP(ip) {
+				return nil, errors.New("url resolves to a private or loopback address")
+			}
+		}
+		// Pin the connection to the validated address to prevent DNS
+		// rebinding between validation and the actual request.
+		pinned := ips[0]
+		transport := &http.Transport{
+			DialContext: func(ctx context.Context, network, _ string) (net.Conn, error) {
+				var d net.Dialer
+				return d.DialContext(ctx, "tcp", net.JoinHostPort(pinned.String(), port))
+			},
+		}
+		client = &http.Client{Transport: transport, Timeout: 20 * time.Second}
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil {
 		return nil, err
 	}
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, safe, nil)
-	if err != nil {
-		return nil, err
-	}
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
