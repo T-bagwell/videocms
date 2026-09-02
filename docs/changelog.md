@@ -59,6 +59,10 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- More subtitle providers: searches merge OpenSubtitles with the keyless
+  Podnapisi provider (candidates tagged with their source), fuzzy matching
+  retries without year/quality tokens when exact search is empty, and the
+  search modal keeps the manual per-file override flow
 - Watch-history sync: a Trakt admin tab pushes watched movies (deduped by TMDB
   id, latest watch time) to Trakt with optional token refresh
   (`TRAKT_CLIENT_ID` / `TRAKT_ACCESS_TOKEN` / `TRAKT_REFRESH_TOKEN`), with a
