@@ -59,6 +59,9 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Channel logos, catch-up and time-shifted playback: channels support uploaded
+  logos (served to M3U players with absolute URLs), finished recordings are
+  exposed per channel as catch-up TV and streamable as time-shifted playback
 - Tuner-based live TV: HDHomeRun devices (`HDHOMERUN_URLS`) are scanned into
   channels from their lineup, and a recording scheduler captures any channel
   stream with ffmpeg on a start/end schedule into `DATA_DIR/recordings/`; an
