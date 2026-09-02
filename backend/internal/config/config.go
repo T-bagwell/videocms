@@ -21,6 +21,8 @@ type Config struct {
 	TraktClientID          string
 	TraktAccessToken       string
 	TraktRefreshToken      string
+	MetricsEnabled         bool
+	OTelEndpoint           string
 	WebRoot                string
 	WatchInterval          time.Duration
 	YtDLPPath              string
@@ -80,6 +82,8 @@ func Load() Config {
 		TraktClientID:          os.Getenv("TRAKT_CLIENT_ID"),
 		TraktAccessToken:       os.Getenv("TRAKT_ACCESS_TOKEN"),
 		TraktRefreshToken:      os.Getenv("TRAKT_REFRESH_TOKEN"),
+		MetricsEnabled:         os.Getenv("METRICS_ENABLED") != "0",
+		OTelEndpoint:           os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT"),
 		WebRoot:                os.Getenv("WEB_ROOT"),
 		WatchInterval:          envDuration("WATCH_INTERVAL", 30*time.Second),
 		YtDLPPath:              os.Getenv("YTDLP_PATH"),

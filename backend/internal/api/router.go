@@ -32,6 +32,8 @@ type App struct {
 	recorder    *media.Recorder
 	notify      *media.Notifier
 	dlna        *media.DLNAManager
+	metrics     *metricsRegistry
+	tracer      *otelExporter
 	samlMu      sync.Mutex
 	samlSP      *saml.ServiceProvider
 }
@@ -76,6 +78,10 @@ func New(cfg config.Config, pool *pgxpool.Pool) (*App, error) {
 	app.hls.SetHDRPassthrough(cfg.HLSPassthroughHDR)
 	app.scraper.SetOMDbKey(cfg.OMDbAPIKey)
 	app.scraper.SetFanartKey(cfg.FanartAPIKey)
+	app.metrics = newMetricsRegistry()
+	if cfg.OTelEndpoint != "" {
+		app.tracer = newOTelExporter(cfg.OTelEndpoint)
+	}
 	scanner.SetEnricher(app.scraper)
 	scanner.SetNotify(func(name, status string) {
 		event := "scan.completed"
@@ -399,21 +405,22 @@ func (a *App) Routes() http.Handler {
 	mux.HandleFunc("GET /api/healthz", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
 	})
+	mux.HandleFunc("GET /metrics", a.metricsHandler)
 
 	webRoot := a.webRoot()
 	if webRoot == "" {
-		return a.recoverer(a.logger(a.cors(mux)))
+		return a.withMetrics(a.recoverer(a.logger(a.cors(mux))))
 	}
 
 	// production mode: serve the built React app from the Go server
 	apiMux := mux
-	return a.recoverer(a.logger(a.cors(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return a.withMetrics(a.recoverer(a.logger(a.cors(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if strings.HasPrefix(r.URL.Path, "/api") {
 			apiMux.ServeHTTP(w, r)
 			return
 		}
 		serveSPA(w, r, webRoot)
-	}))))
+	})))))
 }
 
 func (a *App) webRoot() string {

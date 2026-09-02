@@ -287,6 +287,7 @@ make serve                              # http://<LAN IP>:8080
 | `OMDB_API_KEY` | 空 | 任意の OMDb メタデータプロバイダー（指定スクレイプ先） |
 | `FANART_API_KEY` | 空 | 任意の Fanart.tv アートワーク補完（ポスター/背景） |
 | `TRAKT_CLIENT_ID` / `TRAKT_ACCESS_TOKEN` / `TRAKT_REFRESH_TOKEN` | 空 | Trakt への視聴履歴同期 |
+| `METRICS_ENABLED` / `OTEL_EXPORTER_OTLP_ENDPOINT` | `1` / 空 | Prometheus /metrics エンドポイント；OTLP トレース出力先 |
 | `SCAN_WORKERS` | `4` | 並列スキャンワーカー数 |
 | `WATCH_INTERVAL` | `30` | 自動インクリメンタルスキャンの間隔（秒）。`0` で無効 |
 | `YTDLP_PATH` | PATH 上の `yt-dlp` | ダウンロードキューが使う yt-dlp バイナリ |

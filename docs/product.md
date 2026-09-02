@@ -296,6 +296,7 @@ most important ones:
 | `OMDB_API_KEY` | empty | Optional OMDb metadata provider (named scrape provider) |
 | `FANART_API_KEY` | empty | Optional Fanart.tv artwork enrichment (posters/backdrops) |
 | `TRAKT_CLIENT_ID` / `TRAKT_ACCESS_TOKEN` / `TRAKT_REFRESH_TOKEN` | empty | Watch-history sync to Trakt |
+| `METRICS_ENABLED` / `OTEL_EXPORTER_OTLP_ENDPOINT` | `1` / empty | Prometheus /metrics endpoint; OTLP trace export endpoint |
 | `SCAN_WORKERS` | `4` | Parallel scanning workers |
 | `WATCH_INTERVAL` | `30` | Seconds between automatic incremental scans; `0` disables |
 | `YTDLP_PATH` | `yt-dlp` on PATH | yt-dlp binary used by the Downloads queue |
