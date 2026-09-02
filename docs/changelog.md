@@ -59,6 +59,10 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Scraper SDK: admins register external scrapers (URL POST or local command)
+  that implement a documented JSON contract, selectable per video like the
+  built-in providers; a Scrapers admin tab manages them and
+  `docs/scraper-sdk*.md` (en/zh-CN/ja) documents the contract and API
 - Remote-access helpers: automatic TLS certificates via ACME
   (`AUTOCERT_DOMAINS` with autocert, or manual `TLS_CERT_FILE`/`TLS_KEY_FILE`),
   and a `GET /api/remote-access` endpoint exposing TURN server credentials for
