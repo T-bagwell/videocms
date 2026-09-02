@@ -350,7 +350,7 @@ scripts/                 デモ素材ジェネレーター
 - [x] REST API の OpenAPI/Swagger ドキュメント
 - [x] メトリクスエンドポイント + Prometheus/Grafana ダッシュボード、
       OpenTelemetry トレース
-- [ ] 公式 Docker イメージ、compose スタック、マルチレプリカ対応の Helm Chart
+- [x] 公式 Docker イメージ、compose スタック、マルチレプリカ対応の Helm Chart
 - [ ] 分散トランスコードキュー（優先度付き、ワーカー自動スケール）
 - [ ] yt-dlp 拡張：品質プリセット、プロキシ/cookies/ログイン、チャンネル/
       プレイリスト購読の自動取得

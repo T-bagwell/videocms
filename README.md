@@ -362,7 +362,7 @@ from the product's own perspective.
 - [x] OpenAPI/Swagger documentation for the REST API
 - [x] Metrics endpoint with Prometheus/Grafana dashboards and OpenTelemetry
       traces
-- [ ] Official Docker images, compose stack and a multi-replica Helm chart
+- [x] Official Docker images, compose stack and a multi-replica Helm chart
 - [ ] Distributed transcoding queue with priorities and worker scaling
 - [ ] yt-dlp enhancements: quality presets, proxy/cookies/login support,
       channel/playlist subscription pulls
