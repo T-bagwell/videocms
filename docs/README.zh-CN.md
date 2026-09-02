@@ -334,7 +334,7 @@ scripts/                 演示素材生成器
 
 - [ ] 插件/扩展系统与社区目录
 - [ ] 刮削器 SDK 与可安装的刮削器/任务市场
-- [ ] REST API 的 OpenAPI/Swagger 文档
+- [x] REST API 的 OpenAPI/Swagger 文档
 - [ ] 指标端点 + Prometheus/Grafana 看板与 OpenTelemetry 追踪
 - [ ] 官方 Docker 镜像、compose 栈与支持多副本的 Helm Chart
 - [ ] 分布式转码队列：优先级与工作节点扩缩

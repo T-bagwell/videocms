@@ -359,7 +359,7 @@ from the product's own perspective.
 
 - [ ] Plugin/extension system with a community directory
 - [ ] Scraper SDK and an installable scraper/task marketplace
-- [ ] OpenAPI/Swagger documentation for the REST API
+- [x] OpenAPI/Swagger documentation for the REST API
 - [ ] Metrics endpoint with Prometheus/Grafana dashboards and OpenTelemetry
       traces
 - [ ] Official Docker images, compose stack and a multi-replica Helm chart
