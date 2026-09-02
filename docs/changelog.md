@@ -59,6 +59,9 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Channels & subscriptions: TV shows act as channels with a follow button on
+  the detail page, per-user subscription counts, and a Subscriptions page
+  listing followed series for a "new uploads" feed
 - Watch-statistics dashboard: a per-user Stats page shows time watched, plays,
   movies/episodes, active days, a 14-day bar chart and top genres, plus CSV
   export; admins get aggregate stats and a full export
