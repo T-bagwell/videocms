@@ -364,7 +364,7 @@ from the product's own perspective.
       traces
 - [x] Official Docker images, compose stack and a multi-replica Helm chart
 - [ ] Distributed transcoding queue with priorities and worker scaling
-- [ ] yt-dlp enhancements: quality presets, proxy/cookies/login support,
+- [x] yt-dlp enhancements: quality presets, proxy/cookies/login support,
       channel/playlist subscription pulls
 - [ ] Remote-access helpers: TURN/WebRTC fallback and automatic TLS
       certificates
