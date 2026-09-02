@@ -353,7 +353,7 @@ from the product's own perspective.
       lists and bulk user actions
 - [x] Registration policies: open / invite-only / closed, with invite codes
 - [x] Likes/dislikes and per-item policy toggles (download, comments, reports)
-- [ ] Filterable activity feed and per-user notification preferences
+- [x] Filterable activity feed and per-user notification preferences
 
 **Extensibility & operations**
 
