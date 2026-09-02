@@ -363,7 +363,7 @@ from the product's own perspective.
 - [x] Metrics endpoint with Prometheus/Grafana dashboards and OpenTelemetry
       traces
 - [x] Official Docker images, compose stack and a multi-replica Helm chart
-- [ ] Distributed transcoding queue with priorities and worker scaling
+- [x] Distributed transcoding queue with priorities and worker scaling
 - [x] yt-dlp enhancements: quality presets, proxy/cookies/login support,
       channel/playlist subscription pulls
 - [x] Remote-access helpers: TURN/WebRTC fallback and automatic TLS
