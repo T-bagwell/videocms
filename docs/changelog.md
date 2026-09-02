@@ -59,6 +59,10 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Moderation toolset: users can report videos (deduped per user), a
+  moderation admin tab reviews/dismisses reports and mutes or globally blocks
+  accounts (muted/blocked users cannot comment and their comments are hidden),
+  with a bulk user-action endpoint
 - Channels & subscriptions: TV shows act as channels with a follow button on
   the detail page, per-user subscription counts, and a Subscriptions page
   listing followed series for a "new uploads" feed
