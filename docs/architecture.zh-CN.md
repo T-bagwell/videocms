@@ -625,7 +625,7 @@ sequenceDiagram
 | `DATA_DIR` | `data` | 海报 + HLS 分片 |
 | `ADMIN_USERNAME` / `ADMIN_PASSWORD` | admin / admin123 | 初始管理员 |
 | `FFPROBE_BIN` / `FFMPEG_BIN` | 自动探测 | 工具路径（含 Homebrew 回退） |
-| `TMDB_API_KEY` / `TMDB_LANGUAGE` / `OMDB_API_KEY` / `FANART_API_KEY` | 空 / zh-CN / 空 / 空 | 刮削（TMDB + OMDb 提供方 + Fanart.tv 艺术图） |
+| `TMDB_API_KEY` / `TMDB_LANGUAGE` / `OMDB_API_KEY` / `FANART_API_KEY` / `TRAKT_CLIENT_ID` / `TRAKT_ACCESS_TOKEN` | 空 / zh-CN / 空 / 空 / 空 / 空 | 刮削（TMDB + OMDb + Fanart.tv）、Trakt 观看历史同步 |
 | `SCAN_WORKERS` | `4` | 并行探测工作数 |
 | `CORS_ORIGINS` | 空（`*`） | 允许调用 API 的浏览器来源 |
 | `WATCH_INTERVAL` | `30` | 增量扫描兜底间隔（秒）；fsnotify 事件即时索引 |

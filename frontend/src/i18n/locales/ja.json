@@ -312,6 +312,7 @@
     "tabQuality": "品質",
     "tabInvites": "招待",
     "tabRecordings": "録画",
+    "tabTrakt": "Trakt",
     "statsVideos": "動画数",
     "statsLibraries": "ライブラリ",
     "statsUsers": "ユーザー",
@@ -661,5 +662,15 @@
     "scanned": "チューナースキャン完了",
     "deleted": "削除しました",
     "play": "再生"
+  },
+  "trakt": {
+    "title": "Trakt 同期",
+    "hint": "TRAKT_CLIENT_ID / TRAKT_ACCESS_TOKEN / TRAKT_REFRESH_TOKEN を設定すると視聴履歴を同期します。",
+    "configured": "設定済み",
+    "notConfigured": "未設定",
+    "syncNow": "今すぐ同期",
+    "syncing": "同期中…",
+    "synced": "{{count}} 件を送信しました",
+    "lastSync": "最終同期"
   }
 }

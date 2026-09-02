@@ -350,6 +350,9 @@ func (a *App) Routes() http.Handler {
 	mux.HandleFunc("GET /api/admin/tuners", authAdmin(a.listTuners))
 	mux.HandleFunc("POST /api/admin/tuners/scan", authAdmin(a.scanTuners))
 
+	mux.HandleFunc("GET /api/admin/trakt/status", authAdmin(a.traktStatus))
+	mux.HandleFunc("POST /api/admin/trakt/sync", authAdmin(a.traktSync))
+
 	mux.HandleFunc("GET /api/playlists", authUser(a.listPlaylists))
 	mux.HandleFunc("POST /api/playlists", authUser(a.createPlaylist))
 	mux.HandleFunc("GET /api/playlists/{id}", authUser(a.getPlaylist))

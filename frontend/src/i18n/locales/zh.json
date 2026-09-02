@@ -312,6 +312,7 @@
     "tabQuality": "质量档",
     "tabInvites": "邀请码",
     "tabRecordings": "录制",
+    "tabTrakt": "Trakt",
     "statsVideos": "视频总数",
     "statsLibraries": "媒体库",
     "statsUsers": "用户",
@@ -661,5 +662,15 @@
     "scanned": "调谐器扫描完成",
     "deleted": "已删除",
     "play": "播放"
+  },
+  "trakt": {
+    "title": "Trakt 同步",
+    "hint": "设置 TRAKT_CLIENT_ID / TRAKT_ACCESS_TOKEN / TRAKT_REFRESH_TOKEN 以同步观看历史。",
+    "configured": "已配置",
+    "notConfigured": "未配置",
+    "syncNow": "立即同步",
+    "syncing": "同步中…",
+    "synced": "已推送 {{count}} 条",
+    "lastSync": "上次同步"
   }
 }

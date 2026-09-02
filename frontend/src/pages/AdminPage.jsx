@@ -13,6 +13,7 @@ import { AdminRequests } from './RequestsPage.jsx';
 import QualityProfiles from './QualityProfiles.jsx';
 import Invites from './Invites.jsx';
 import RecordingsAdmin from './RecordingsAdmin.jsx';
+import TraktAdmin from './TraktAdmin.jsx';
 import StorageAdmin from './StorageAdmin.jsx';
 import JobsAdmin from './JobsAdmin.jsx';
 import WebhooksAdmin from './WebhooksAdmin.jsx';
@@ -73,6 +74,9 @@ export default function AdminPage() {
         <button className={tab === 'recordings' ? 'tab active' : 'tab'} onClick={() => setTab('recordings')}>
           {t('admin.tabRecordings')}
         </button>
+        <button className={tab === 'trakt' ? 'tab active' : 'tab'} onClick={() => setTab('trakt')}>
+          {t('admin.tabTrakt')}
+        </button>
       </div>
       {tab === 'overview' && <Overview />}
       {tab === 'libraries' && <Libraries />}
@@ -90,6 +94,7 @@ export default function AdminPage() {
       {tab === 'quality' && <QualityProfiles />}
       {tab === 'invites' && <Invites />}
       {tab === 'recordings' && <RecordingsAdmin />}
+      {tab === 'trakt' && <TraktAdmin />}
     </div>
   );
 }

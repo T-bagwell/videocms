@@ -18,6 +18,9 @@ type Config struct {
 	TMDBAPIKey             string
 	OMDbAPIKey             string
 	FanartAPIKey           string
+	TraktClientID          string
+	TraktAccessToken       string
+	TraktRefreshToken      string
 	WebRoot                string
 	WatchInterval          time.Duration
 	YtDLPPath              string
@@ -74,6 +77,9 @@ func Load() Config {
 		TMDBAPIKey:             os.Getenv("TMDB_API_KEY"),
 		OMDbAPIKey:             os.Getenv("OMDB_API_KEY"),
 		FanartAPIKey:           os.Getenv("FANART_API_KEY"),
+		TraktClientID:          os.Getenv("TRAKT_CLIENT_ID"),
+		TraktAccessToken:       os.Getenv("TRAKT_ACCESS_TOKEN"),
+		TraktRefreshToken:      os.Getenv("TRAKT_REFRESH_TOKEN"),
 		WebRoot:                os.Getenv("WEB_ROOT"),
 		WatchInterval:          envDuration("WATCH_INTERVAL", 30*time.Second),
 		YtDLPPath:              os.Getenv("YTDLP_PATH"),

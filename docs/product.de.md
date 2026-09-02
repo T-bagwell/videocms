@@ -307,6 +307,7 @@ Alles wird über Umgebungsvariablen konfiguriert (vollständige Tabelle im READM
 | `TMDB_API_KEY` | leer | Aktiviert Metadaten-Scraping |
 | `OMDB_API_KEY` | leer | Optionaler OMDb-Anbieter (benannte Scrape-Quelle) |
 | `FANART_API_KEY` | leer | Optionales Fanart.tv-Artwork (Poster/Hintergründe) |
+| `TRAKT_CLIENT_ID` / `TRAKT_ACCESS_TOKEN` / `TRAKT_REFRESH_TOKEN` | leer | Verlaufs-Synchronisierung mit Trakt |
 | `SCAN_WORKERS` | `4` | Parallele Scan-Worker |
 | `WATCH_INTERVAL` | `30` | Sekunden zwischen automatischen Inkrement-Scans; `0` deaktiviert |
 | `YTDLP_PATH` | `yt-dlp` im PATH | yt-dlp-Binary für die Download-Warteschlange |

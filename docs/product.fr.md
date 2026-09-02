@@ -316,6 +316,7 @@ Tout se configure par variables d’environnement (table complète dans le READM
 | `TMDB_API_KEY` | vide | Active le scraping de métadonnées |
 | `OMDB_API_KEY` | vide | Fournisseur OMDb facultatif (scraping nommé) |
 | `FANART_API_KEY` | vide | Enrichissement Fanart.tv facultatif (affiches/fonds) |
+| `TRAKT_CLIENT_ID` / `TRAKT_ACCESS_TOKEN` / `TRAKT_REFRESH_TOKEN` | vide | Synchronisation de l'historique vers Trakt |
 | `SCAN_WORKERS` | `4` | Workers d’analyse parallèles |
 | `WATCH_INTERVAL` | `30` | Secondes entre analyses incrémentales automatiques ; `0` désactive |
 | `YTDLP_PATH` | `yt-dlp` dans le PATH | Binaire yt-dlp utilisé par la file de téléchargements |

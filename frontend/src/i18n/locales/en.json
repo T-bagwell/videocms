@@ -312,6 +312,7 @@
     "tabQuality": "Quality",
     "tabInvites": "Invites",
     "tabRecordings": "Recordings",
+    "tabTrakt": "Trakt",
     "statsVideos": "Videos",
     "statsLibraries": "Libraries",
     "statsUsers": "Users",
@@ -661,5 +662,15 @@
     "scanned": "Tuner scan complete",
     "deleted": "Deleted",
     "play": "Play"
+  },
+  "trakt": {
+    "title": "Trakt sync",
+    "hint": "Set TRAKT_CLIENT_ID / TRAKT_ACCESS_TOKEN / TRAKT_REFRESH_TOKEN to sync watch history.",
+    "configured": "Configured",
+    "notConfigured": "Not configured",
+    "syncNow": "Sync now",
+    "syncing": "Syncing…",
+    "synced": "Pushed {{count}} items",
+    "lastSync": "Last sync"
   }
 }
