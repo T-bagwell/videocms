@@ -59,6 +59,10 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Metrics & tracing: `GET /metrics` exposes Prometheus text metrics (HTTP
+  request counters by path/method/status plus library/user/download/recording
+  gauges and uptime), and `OTEL_EXPORTER_OTLP_ENDPOINT` enables batched
+  OTLP/JSON trace export per request
 - OpenAPI/Swagger documentation: `GET /api/openapi.json` now describes the
   full REST surface (~170 paths across auth, media, series, users, shares,
   IPTV, moderation and admin), and `GET /api/docs` serves an interactive
