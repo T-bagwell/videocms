@@ -328,7 +328,7 @@ from the product's own perspective.
       library, with M3U and EPG (XMLTV) output
 - [x] Tuner-based live TV (DVB/ATSC/HDHomeRun) with guide data and recording
       schedules
-- [ ] Channel logos, catch-up and time-shifted playback
+- [x] Channel logos, catch-up and time-shifted playback
 
 **Discovery, requests & automation**
 
