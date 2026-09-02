@@ -82,6 +82,7 @@ func newIntegrationEnv(t *testing.T, overrides ...func(*config.Config)) *integra
 		JWTSecret:           "integration-test-secret",
 		RegistrationEnabled: true,
 		TranscodeWorkers:    1,
+		AllowLocalFetch:     true,
 	}
 	for _, o := range overrides {
 		o(&cfg)

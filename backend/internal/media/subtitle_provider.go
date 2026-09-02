@@ -144,7 +144,10 @@ func (p *PodnapisiProvider) Search(ctx context.Context, query, language string) 
 }
 
 func (p *PodnapisiProvider) Download(ctx context.Context, fileID string) ([]byte, error) {
-	page := "https://podnapisi.net" + fileID
+	page, err := podnapisiPath(fileID)
+	if err != nil {
+		return nil, err
+	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, page, nil)
 	if err != nil {
 		return nil, err
@@ -163,7 +166,11 @@ func (p *PodnapisiProvider) Download(ctx context.Context, fileID string) ([]byte
 	if dl == nil {
 		return nil, fmt.Errorf("podnapisi download link not found")
 	}
-	dlReq, err := http.NewRequestWithContext(ctx, http.MethodGet, "https://podnapisi.net"+string(dl[1]), nil)
+	dlURL, err := podnapisiPath(string(dl[1]))
+	if err != nil {
+		return nil, err
+	}
+	dlReq, err := http.NewRequestWithContext(ctx, http.MethodGet, dlURL, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -177,6 +184,19 @@ func (p *PodnapisiProvider) Download(ctx context.Context, fileID string) ([]byte
 		return nil, fmt.Errorf("podnapisi download: HTTP %d", dlResp.StatusCode)
 	}
 	return io.ReadAll(io.LimitReader(dlResp.Body, 8<<20))
+}
+
+// podnapisiPath builds an absolute podnapisi.net URL from a relative path and
+// rejects anything that could escape the fixed host (SSRF guard).
+func podnapisiPath(path string) (string, error) {
+	if path == "" || strings.Contains(path, "://") || strings.HasPrefix(path, "//") ||
+		strings.Contains(path, "..") {
+		return "", fmt.Errorf("invalid podnapisi path")
+	}
+	if !strings.HasPrefix(path, "/") {
+		path = "/" + path
+	}
+	return "https://podnapisi.net" + path, nil
 }
 
 var (

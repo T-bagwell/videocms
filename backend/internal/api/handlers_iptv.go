@@ -19,6 +19,7 @@ import (
 	"github.com/jackc/pgx/v5"
 
 	"videocms/backend/internal/auth"
+	"videocms/backend/internal/media"
 )
 
 type iptvChannel struct {
@@ -692,10 +693,11 @@ func (a *App) iptvAuthed(r *http.Request) bool {
 }
 
 func (a *App) fetchText(ctx context.Context, url string, limit int64) ([]byte, error) {
-	if url == "" {
-		return nil, errors.New("empty url")
+	safe, err := media.SafeHTTPURL(url, a.cfg.AllowLocalFetch)
+	if err != nil {
+		return nil, err
 	}
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, safe, nil)
 	if err != nil {
 		return nil, err
 	}

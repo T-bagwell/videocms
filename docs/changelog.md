@@ -4,6 +4,13 @@ All notable changes to VideoCMS are documented here.
 
 ## [Unreleased]
 
+### Fixed
+
+- SSRF hardening: server-side fetches (M3U/XMLTV imports and the Podnapisi
+  subtitle provider) now reject URLs that resolve to private, loopback,
+  link-local or multicast addresses and refuse path escapes, closing the
+  go/request-forgery findings from GitHub code scanning
+
 ### Changed
 
 - Video detail page layout polished: rating and comments now sit side by side

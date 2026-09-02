@@ -49,3 +49,16 @@ func TestPodnapisiName(t *testing.T) {
 		t.Fatalf("name = %q", got)
 	}
 }
+
+func TestPodnapisiPathGuard(t *testing.T) {
+	for _, p := range []string{"/subtitles/en-123", "subtitles/en-123"} {
+		if _, err := podnapisiPath(p); err != nil {
+			t.Errorf("valid path %q rejected: %v", p, err)
+		}
+	}
+	for _, p := range []string{"", "//evil.com/x", "https://evil.com/x", "/a/../b"} {
+		if _, err := podnapisiPath(p); err == nil {
+			t.Errorf("unsafe path accepted: %q", p)
+		}
+	}
+}

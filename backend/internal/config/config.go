@@ -30,6 +30,7 @@ type Config struct {
 	TurnUsername           string
 	TurnPassword           string
 	TranscodeWorkers       int
+	AllowLocalFetch        bool
 	WebRoot                string
 	WatchInterval          time.Duration
 	YtDLPPath              string
@@ -98,6 +99,7 @@ func Load() Config {
 		TurnUsername:           os.Getenv("TURN_USERNAME"),
 		TurnPassword:           os.Getenv("TURN_PASSWORD"),
 		TranscodeWorkers:       envInt("TRANSCODE_WORKERS", 1),
+		AllowLocalFetch:        os.Getenv("ALLOW_LOCAL_FETCH") == "1",
 		WebRoot:                os.Getenv("WEB_ROOT"),
 		WatchInterval:          envDuration("WATCH_INTERVAL", 30*time.Second),
 		YtDLPPath:              os.Getenv("YTDLP_PATH"),
