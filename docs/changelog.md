@@ -59,6 +59,10 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Distributed transcoding queue: admins enqueue pre-transcode jobs with
+  priorities; a worker pool (`TRANSCODE_WORKERS`) claims jobs by priority and
+  warms HLS sessions (migration 056), with a Transcode admin tab for
+  queueing, monitoring and cancellation
 - Plugin/extension system: admins install webhook plugins from a built-in
   community directory (or register custom ones with matching event lists);
   enabled webhook plugins receive server events with an `X-Videocms-Plugin`
