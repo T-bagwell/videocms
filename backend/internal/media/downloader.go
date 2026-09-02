@@ -3,6 +3,7 @@ package media
 import (
 	"bufio"
 	"context"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"strconv"
@@ -22,6 +23,11 @@ type DownloadJob struct {
 	TargetPath   string
 	Format       string
 	IntervalSecs int64
+	Proxy        string
+	CookiesPath  string
+	Username     string
+	Password     string
+	Kind         string
 }
 
 // Downloader runs yt-dlp jobs from the downloads table one at a time and keeps
@@ -80,14 +86,16 @@ func (d *Downloader) ProcessNext(ctx context.Context) {
 	var job DownloadJob
 	var lastRun *time.Time
 	err := d.pool.QueryRow(ctx, `
-		SELECT id, url, target_path, format, interval_secs, last_run_at
+		SELECT id, url, target_path, format, interval_secs, last_run_at,
+		       proxy, cookies_path, username, password, kind
 		FROM downloads
 		WHERE status = 'queued'
 		   OR (status = 'completed' AND interval_secs > 0
 		       AND (last_run_at IS NULL OR last_run_at <= now() - (interval_secs * interval '1 second')))
 		ORDER BY created_at
 		LIMIT 1`,
-	).Scan(&job.ID, &job.URL, &job.TargetPath, &job.Format, &job.IntervalSecs, &lastRun)
+	).Scan(&job.ID, &job.URL, &job.TargetPath, &job.Format, &job.IntervalSecs, &lastRun,
+		&job.Proxy, &job.CookiesPath, &job.Username, &job.Password, &job.Kind)
 	if err != nil {
 		return // no due job (or query error; keep polling)
 	}
@@ -103,12 +111,7 @@ func (d *Downloader) ProcessNext(ctx context.Context) {
 
 func (d *Downloader) runJob(ctx context.Context, job DownloadJob) {
 	bin := d.ResolveBin()
-	args := []string{
-		"--newline",
-		"-f", job.Format,
-		"-o", filepath.Join(job.TargetPath, "%(title)s.%(ext)s"),
-		job.URL,
-	}
+	args := buildYtDlpArgs(job)
 	cmd := exec.CommandContext(ctx, bin, args...)
 	d.mu.Lock()
 	d.procs[job.ID] = cmd
@@ -175,6 +178,32 @@ func (d *Downloader) runJob(ctx context.Context, job DownloadJob) {
 	if d.onDone != nil {
 		d.onDone(job.URL, nil)
 	}
+}
+
+// buildYtDlpArgs assembles the yt-dlp command line for a job, including proxy,
+// cookies, credentials and channel/playlist archive options.
+func buildYtDlpArgs(job DownloadJob) []string {
+	args := []string{
+		"--newline",
+		"-f", job.Format,
+		"-o", filepath.Join(job.TargetPath, "%(title)s.%(ext)s"),
+	}
+	if job.Proxy != "" {
+		args = append(args, "--proxy", job.Proxy)
+	}
+	if job.CookiesPath != "" {
+		args = append(args, "--cookies", job.CookiesPath)
+	}
+	if job.Username != "" {
+		args = append(args, "--username", job.Username, "--password", job.Password)
+	}
+	if job.Kind == "channel" || job.Kind == "playlist" {
+		args = append(args, "--yes-playlist", "--no-overwrites")
+		archiveDir := filepath.Join(job.TargetPath, ".videocms-archive")
+		_ = os.MkdirAll(archiveDir, 0o755)
+		args = append(args, "--download-archive", filepath.Join(archiveDir, job.ID.String()+".txt"))
+	}
+	return append(args, job.URL)
 }
 
 func (d *Downloader) complete(job DownloadJob) {

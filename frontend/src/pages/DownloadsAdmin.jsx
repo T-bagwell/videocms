@@ -8,7 +8,13 @@ export default function DownloadsAdmin() {
   const [jobs, setJobs] = useState([]);
   const [url, setUrl] = useState('');
   const [format, setFormat] = useState('');
+  const [preset, setPreset] = useState('');
   const [intervalHours, setIntervalHours] = useState('');
+  const [kind, setKind] = useState('video');
+  const [proxy, setProxy] = useState('');
+  const [cookiesPath, setCookiesPath] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [target, setTarget] = useState('');
   const [pickerOpen, setPickerOpen] = useState(false);
   const [err, setErr] = useState('');
@@ -35,14 +41,24 @@ export default function DownloadsAdmin() {
     setMsg('');
     try {
       const body = { url: url.trim(), target_path: target };
-      if (format.trim()) body.format = format.trim();
+      body.format = format.trim() || preset;
+      body.kind = kind;
+      body.proxy = proxy.trim();
+      body.cookies_path = cookiesPath.trim();
+      body.username = username.trim();
+      body.password = password;
       const hours = parseInt(intervalHours, 10);
       if (hours > 0) body.interval_secs = hours * 3600;
       const d = await api('/downloads', { method: 'POST', body });
       setMsg(t('downloads.added', { url: d.url }));
       setUrl('');
       setFormat('');
+      setPreset('');
       setIntervalHours('');
+      setProxy('');
+      setCookiesPath('');
+      setUsername('');
+      setPassword('');
       refresh();
     } catch (e2) {
       setErr(e2.message);
@@ -95,6 +111,39 @@ export default function DownloadsAdmin() {
           placeholder={t('downloads.formatPlaceholder')}
           value={format}
           onChange={(e) => setFormat(e.target.value)}
+        />
+        <select value={preset} onChange={(e) => setPreset(e.target.value)}>
+          <option value="">{t('downloads.preset')}</option>
+          <option value="bestvideo+bestaudio/best">{t('downloads.presetBest')}</option>
+          <option value="bestvideo[height<=1080]+bestaudio/best[height<=1080]">{t('downloads.preset1080')}</option>
+          <option value="bestvideo[height<=720]+bestaudio/best[height<=720]">{t('downloads.preset720')}</option>
+          <option value="bestaudio/best">{t('downloads.presetAudio')}</option>
+        </select>
+        <select value={kind} onChange={(e) => setKind(e.target.value)}>
+          <option value="video">{t('downloads.kindVideo')}</option>
+          <option value="channel">{t('downloads.kindChannel')}</option>
+          <option value="playlist">{t('downloads.kindPlaylist')}</option>
+        </select>
+        <input
+          placeholder={t('downloads.proxy')}
+          value={proxy}
+          onChange={(e) => setProxy(e.target.value)}
+        />
+        <input
+          placeholder={t('downloads.cookies')}
+          value={cookiesPath}
+          onChange={(e) => setCookiesPath(e.target.value)}
+        />
+        <input
+          placeholder={t('downloads.username')}
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+        <input
+          type="password"
+          placeholder={t('downloads.password')}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
         />
         <input
           type="number"

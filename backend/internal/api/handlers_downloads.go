@@ -20,6 +20,11 @@ type downloadJob struct {
 	Progress     float64    `json:"progress"`
 	Error        string     `json:"error,omitempty"`
 	IntervalSecs int64      `json:"interval_secs"`
+	Proxy        string     `json:"proxy,omitempty"`
+	CookiesPath  string     `json:"cookies_path,omitempty"`
+	Username     string     `json:"username,omitempty"`
+	Password     string     `json:"password,omitempty"`
+	Kind         string     `json:"kind"`
 	LastRunAt    *time.Time `json:"last_run_at,omitempty"`
 	CreatedAt    time.Time  `json:"created_at"`
 }
@@ -29,15 +34,21 @@ type createDownloadRequest struct {
 	TargetPath   string `json:"target_path"`
 	Format       string `json:"format"`
 	IntervalSecs int64  `json:"interval_secs"`
+	Proxy        string `json:"proxy"`
+	CookiesPath  string `json:"cookies_path"`
+	Username     string `json:"username"`
+	Password     string `json:"password"`
+	Kind         string `json:"kind"`
 }
 
 const downloadColumns = `id, url, title, target_path, format, status, progress, error,
-	interval_secs, last_run_at, created_at`
+	interval_secs, last_run_at, created_at, proxy, cookies_path, username, password, kind`
 
 func scanDownload(rows interface{ Scan(...any) error }) (downloadJob, error) {
 	var j downloadJob
 	err := rows.Scan(&j.ID, &j.URL, &j.Title, &j.TargetPath, &j.Format, &j.Status,
-		&j.Progress, &j.Error, &j.IntervalSecs, &j.LastRunAt, &j.CreatedAt)
+		&j.Progress, &j.Error, &j.IntervalSecs, &j.LastRunAt, &j.CreatedAt,
+		&j.Proxy, &j.CookiesPath, &j.Username, &j.Password, &j.Kind)
 	return j, err
 }
 
@@ -99,15 +110,21 @@ func (a *App) createDownload(w http.ResponseWriter, r *http.Request) {
 	if req.IntervalSecs < 0 {
 		req.IntervalSecs = 0
 	}
+	if req.Kind == "" {
+		req.Kind = "video"
+	}
 
 	var j downloadJob
 	err := a.pool.QueryRow(r.Context(), `
-		INSERT INTO downloads (url, target_path, format, interval_secs)
-		VALUES ($1, $2, $3, $4)
+		INSERT INTO downloads (url, target_path, format, interval_secs, proxy, cookies_path, username, password, kind)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 		RETURNING `+downloadColumns,
-		req.URL, req.TargetPath, format, req.IntervalSecs).Scan(
+		req.URL, req.TargetPath, format, req.IntervalSecs,
+		strings.TrimSpace(req.Proxy), strings.TrimSpace(req.CookiesPath),
+		strings.TrimSpace(req.Username), req.Password, req.Kind).Scan(
 		&j.ID, &j.URL, &j.Title, &j.TargetPath, &j.Format, &j.Status,
-		&j.Progress, &j.Error, &j.IntervalSecs, &j.LastRunAt, &j.CreatedAt)
+		&j.Progress, &j.Error, &j.IntervalSecs, &j.LastRunAt, &j.CreatedAt,
+		&j.Proxy, &j.CookiesPath, &j.Username, &j.Password, &j.Kind)
 	if err != nil {
 		writeErr(w, http.StatusInternalServerError, "create download failed")
 		return

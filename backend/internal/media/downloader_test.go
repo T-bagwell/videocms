@@ -2,7 +2,11 @@ package media
 
 import (
 	"fmt"
+	"path/filepath"
+	"strings"
 	"testing"
+
+	"github.com/google/uuid"
 )
 
 func TestParseProgress(t *testing.T) {
@@ -21,5 +25,41 @@ func TestParseProgress(t *testing.T) {
 		if ok != c.ok || (ok && fmt.Sprintf("%.1f", got) != fmt.Sprintf("%.1f", c.want)) {
 			t.Errorf("case %d: parseProgress(%q) = %v, %v; want %v, %v", i, c.line, got, ok, c.want, c.ok)
 		}
+	}
+}
+
+func TestBuildYtDlpArgs(t *testing.T) {
+	job := DownloadJob{
+		ID:          uuid.New(),
+		URL:         "https://example.com/channel",
+		TargetPath:  "/tmp/dl",
+		Format:      "best",
+		Proxy:       "http://proxy:3128",
+		CookiesPath: "/tmp/cookies.txt",
+		Username:    "user",
+		Password:    "pass",
+		Kind:        "channel",
+	}
+	args := buildYtDlpArgs(job)
+	joined := strings.Join(args, " ")
+	for _, want := range []string{
+		"--proxy", "http://proxy:3128",
+		"--cookies", "/tmp/cookies.txt",
+		"--username", "user", "--password", "pass",
+		"--yes-playlist", "--no-overwrites",
+		"--download-archive",
+		"https://example.com/channel",
+	} {
+		if !strings.Contains(joined, want) {
+			t.Errorf("args missing %q: %s", want, joined)
+		}
+	}
+	if !strings.Contains(joined, filepath.Join("/tmp/dl", ".videocms-archive", job.ID.String()+".txt")) {
+		t.Errorf("archive path missing: %s", joined)
+	}
+
+	plain := buildYtDlpArgs(DownloadJob{URL: "https://x", TargetPath: "/tmp", Format: "best", Kind: "video"})
+	if strings.Contains(strings.Join(plain, " "), "--yes-playlist") {
+		t.Errorf("plain video should not use playlist flags: %v", plain)
 	}
 }
