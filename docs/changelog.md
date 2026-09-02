@@ -59,6 +59,11 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Tuner-based live TV: HDHomeRun devices (`HDHOMERUN_URLS`) are scanned into
+  channels from their lineup, and a recording scheduler captures any channel
+  stream with ffmpeg on a start/end schedule into `DATA_DIR/recordings/`; an
+  admin Recordings tab schedules, monitors and deletes recordings, and guide
+  data reuses the XMLTV EPG importer
 - Registration policies: `REGISTRATION_ENABLED` and `REGISTRATION_INVITE_ONLY`
   control open / invite-only / closed signup, admins generate one-time invite
   codes (admin Invites tab), and the login page hides signup when closed or
