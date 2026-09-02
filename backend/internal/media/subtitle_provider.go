@@ -96,10 +96,14 @@ func (m *MultiProvider) Download(ctx context.Context, fileID string) ([]byte, er
 // PodnapisiProvider searches the keyless Podnapisi.net site (best effort).
 type PodnapisiProvider struct {
 	client *http.Client
+	cache  sync.Map // candidate ID -> server-generated relative path
 }
 
 func NewPodnapisiProvider() *PodnapisiProvider {
-	return &PodnapisiProvider{client: &http.Client{Timeout: 30 * time.Second}}
+	return &PodnapisiProvider{
+		client: &http.Client{Timeout: 30 * time.Second},
+		cache:  sync.Map{},
+	}
 }
 
 func (p *PodnapisiProvider) Name() string { return "podnapisi" }
@@ -135,6 +139,7 @@ func (p *PodnapisiProvider) Search(ctx context.Context, query, language string) 
 			continue
 		}
 		seen[href] = true
+		p.cache.Store(href, href)
 		out = append(out, SubtitleCandidate{ID: href, Language: language, Title: query})
 		if len(out) >= 20 {
 			break
@@ -144,7 +149,14 @@ func (p *PodnapisiProvider) Search(ctx context.Context, query, language string) 
 }
 
 func (p *PodnapisiProvider) Download(ctx context.Context, fileID string) ([]byte, error) {
-	page, err := podnapisiPath(fileID)
+	// The candidate ID is only a key into the server-populated search cache;
+	// the fetched path is server-generated, so user input never reaches the
+	// request URL.
+	raw, ok := p.cache.Load(fileID)
+	if !ok {
+		return nil, fmt.Errorf("unknown subtitle candidate (run a search first)")
+	}
+	page, err := podnapisiPath(raw.(string))
 	if err != nil {
 		return nil, err
 	}
