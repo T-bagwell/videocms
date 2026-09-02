@@ -59,6 +59,10 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Remote-access helpers: automatic TLS certificates via ACME
+  (`AUTOCERT_DOMAINS` with autocert, or manual `TLS_CERT_FILE`/`TLS_KEY_FILE`),
+  and a `GET /api/remote-access` endpoint exposing TURN server credentials for
+  WebRTC fallback (`TURN_SERVER` / `TURN_USERNAME` / `TURN_PASSWORD`)
 - yt-dlp enhancements: download jobs support quality presets, proxy, cookies
   file, username/password login, and channel/playlist bulk downloads with a
   per-job `--download-archive` (migration 053), all exposed in the admin
