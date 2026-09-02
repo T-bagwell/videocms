@@ -59,6 +59,10 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Likes/dislikes and per-item policy toggles: videos show like/dislike counts
+  with per-user state (migration 051), and admins can disable downloads,
+  comments or reports per video — enforced on the download, comment and report
+  endpoints and reflected in the UI
 - Moderation toolset: users can report videos (deduped per user), a
   moderation admin tab reviews/dismisses reports and mutes or globally blocks
   accounts (muted/blocked users cannot comment and their comments are hidden),
