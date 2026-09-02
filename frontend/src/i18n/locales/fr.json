@@ -307,6 +307,7 @@
     "tabRequests": "Demandes",
     "tabQuality": "Qualité",
     "tabInvites": "Invitations",
+    "tabRecordings": "Enregistrements",
     "statsVideos": "Vidéos",
     "statsLibraries": "Bibliothèques",
     "statsUsers": "Utilisateurs",
@@ -636,5 +637,22 @@
     "revoke": "Révoquer",
     "generated": "Codes d'invitation générés",
     "revoked": "Invitation révoquée"
+  },
+  "recordings": {
+    "schedule": "Planifier un enregistrement",
+    "channel": "Chaîne",
+    "title": "Titre",
+    "tuners": "Tuners",
+    "scan": "Scanner les tuners",
+    "noTuners": "Aucun tuner configuré (HDHOMERUN_URLS)",
+    "list": "Enregistrements",
+    "empty": "Aucun enregistrement",
+    "statusPending": "En attente",
+    "statusRecording": "Enregistrement",
+    "statusDone": "Terminé",
+    "statusFailed": "Échec",
+    "scheduled": "Enregistrement planifié",
+    "scanned": "Scan des tuners terminé",
+    "deleted": "Supprimé"
   }
 }

@@ -307,6 +307,7 @@
     "tabRequests": "リクエスト",
     "tabQuality": "品質",
     "tabInvites": "招待",
+    "tabRecordings": "録画",
     "statsVideos": "動画数",
     "statsLibraries": "ライブラリ",
     "statsUsers": "ユーザー",
@@ -636,5 +637,22 @@
     "revoke": "失効",
     "generated": "招待コードを生成しました",
     "revoked": "招待を失効しました"
+  },
+  "recordings": {
+    "schedule": "録画予約",
+    "channel": "チャンネル",
+    "title": "タイトル",
+    "tuners": "チューナー",
+    "scan": "チューナーをスキャン",
+    "noTuners": "チューナー未設定（HDHOMERUN_URLS）",
+    "list": "録画一覧",
+    "empty": "録画はまだありません",
+    "statusPending": "予約中",
+    "statusRecording": "録画中",
+    "statusDone": "完了",
+    "statusFailed": "失敗",
+    "scheduled": "録画を予約しました",
+    "scanned": "チューナースキャン完了",
+    "deleted": "削除しました"
   }
 }

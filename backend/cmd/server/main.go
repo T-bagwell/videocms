@@ -42,6 +42,7 @@ func main() {
 	app.StartDownloadWorker(ctx)
 	app.StartMaintenance(ctx)
 	app.StartDLNA(ctx)
+	app.StartRecorder(ctx)
 
 	srv := &http.Server{
 		Addr:              cfg.Addr,

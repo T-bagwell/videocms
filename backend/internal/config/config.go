@@ -31,6 +31,7 @@ type Config struct {
 	RTMPIngestURL          string
 	WhisperBin             string
 	WhisperModel           string
+	HDHomeRunURLs          []string
 	RegistrationEnabled    bool
 	RegistrationInviteOnly bool
 	ScrapeCustomURL        string
@@ -84,6 +85,7 @@ func Load() Config {
 		RTMPIngestURL:          envOr("RTMP_INGEST_URL", "rtmp://localhost:1935/live"),
 		WhisperBin:             os.Getenv("WHISPER_BIN"),
 		WhisperModel:           os.Getenv("WHISPER_MODEL"),
+		HDHomeRunURLs:          envList("HDHOMERUN_URLS"),
 		RegistrationEnabled:    os.Getenv("REGISTRATION_ENABLED") != "0",
 		RegistrationInviteOnly: os.Getenv("REGISTRATION_INVITE_ONLY") == "1",
 		ScrapeCustomURL:        os.Getenv("SCRAPE_CUSTOM_URL"),

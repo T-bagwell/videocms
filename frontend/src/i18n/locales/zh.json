@@ -307,6 +307,7 @@
     "tabRequests": "点播请求",
     "tabQuality": "质量档",
     "tabInvites": "邀请码",
+    "tabRecordings": "录制",
     "statsVideos": "视频总数",
     "statsLibraries": "媒体库",
     "statsUsers": "用户",
@@ -636,5 +637,22 @@
     "revoke": "撤销",
     "generated": "邀请码已生成",
     "revoked": "邀请码已撤销"
+  },
+  "recordings": {
+    "schedule": "预约录制",
+    "channel": "频道",
+    "title": "标题",
+    "tuners": "调谐器设备",
+    "scan": "扫描调谐器",
+    "noTuners": "未配置调谐器（HDHOMERUN_URLS）",
+    "list": "录制列表",
+    "empty": "暂无录制",
+    "statusPending": "待开始",
+    "statusRecording": "录制中",
+    "statusDone": "已完成",
+    "statusFailed": "失败",
+    "scheduled": "已预约录制",
+    "scanned": "调谐器扫描完成",
+    "deleted": "已删除"
   }
 }

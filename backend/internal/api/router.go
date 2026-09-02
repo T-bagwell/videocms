@@ -29,6 +29,7 @@ type App struct {
 	dl          *media.Downloader
 	subProvider media.SubtitleProvider
 	live        *media.LiveManager
+	recorder    *media.Recorder
 	notify      *media.Notifier
 	dlna        *media.DLNAManager
 	samlMu      sync.Mutex
@@ -58,15 +59,16 @@ func New(cfg config.Config, pool *pgxpool.Pool) (*App, error) {
 		dlnaMgr = media.NewDLNAManager(cfg.DLNAFriendlyName, port, cfg.DLNAAllowedIPs)
 	}
 	app := &App{
-		cfg:     cfg,
-		pool:    pool,
-		scanner: scanner,
-		hls:     media.NewHLSManager(cfg.DataDir, media.ResolveTool("ffmpeg"), cfg.HLSHWAccel),
-		scraper: media.NewScraper(pool, cfg.DataDir, cfg.TMDBAPIKey, cfg.ScrapeCustomURL),
-		dl:      media.NewDownloader(pool, cfg.YtDLPPath),
-		live:    media.NewLiveManager(cfg.DataDir, media.ResolveTool("ffmpeg")),
-		notify:  notify,
-		dlna:    dlnaMgr,
+		cfg:      cfg,
+		pool:     pool,
+		scanner:  scanner,
+		hls:      media.NewHLSManager(cfg.DataDir, media.ResolveTool("ffmpeg"), cfg.HLSHWAccel),
+		scraper:  media.NewScraper(pool, cfg.DataDir, cfg.TMDBAPIKey, cfg.ScrapeCustomURL),
+		dl:       media.NewDownloader(pool, cfg.YtDLPPath),
+		live:     media.NewLiveManager(cfg.DataDir, media.ResolveTool("ffmpeg")),
+		recorder: media.NewRecorder(pool, cfg.DataDir, media.ResolveTool("ffmpeg")),
+		notify:   notify,
+		dlna:     dlnaMgr,
 	}
 	app.hls.SetVAAPIDevice(cfg.HLSVAAPIDevice)
 	app.hls.SetToneMap(cfg.HLSToneMap)
@@ -102,6 +104,11 @@ func (a *App) StartDLNA(ctx context.Context) {
 	if a.dlna != nil {
 		a.dlna.Start(ctx)
 	}
+}
+
+// StartRecorder runs the scheduled-recording worker until ctx is done.
+func (a *App) StartRecorder(ctx context.Context) {
+	go a.recorder.Run(ctx)
 }
 
 func (a *App) Routes() http.Handler {
@@ -329,6 +336,12 @@ func (a *App) Routes() http.Handler {
 	mux.HandleFunc("GET /api/admin/invites", authAdmin(a.listInvites))
 	mux.HandleFunc("POST /api/admin/invites", authAdmin(a.generateInvites))
 	mux.HandleFunc("DELETE /api/admin/invites/{id}", authAdmin(a.revokeInvite))
+
+	mux.HandleFunc("GET /api/admin/recordings", authAdmin(a.listRecordings))
+	mux.HandleFunc("POST /api/admin/recordings", authAdmin(a.createRecording))
+	mux.HandleFunc("DELETE /api/admin/recordings/{id}", authAdmin(a.deleteRecording))
+	mux.HandleFunc("GET /api/admin/tuners", authAdmin(a.listTuners))
+	mux.HandleFunc("POST /api/admin/tuners/scan", authAdmin(a.scanTuners))
 
 	mux.HandleFunc("GET /api/playlists", authUser(a.listPlaylists))
 	mux.HandleFunc("POST /api/playlists", authUser(a.createPlaylist))

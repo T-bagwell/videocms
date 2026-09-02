@@ -307,6 +307,7 @@
     "tabRequests": "Requests",
     "tabQuality": "Quality",
     "tabInvites": "Invites",
+    "tabRecordings": "Recordings",
     "statsVideos": "Videos",
     "statsLibraries": "Libraries",
     "statsUsers": "Users",
@@ -636,5 +637,22 @@
     "revoke": "Revoke",
     "generated": "Invite codes generated",
     "revoked": "Invite revoked"
+  },
+  "recordings": {
+    "schedule": "Schedule recording",
+    "channel": "Channel",
+    "title": "Title",
+    "tuners": "Tuner devices",
+    "scan": "Scan tuners",
+    "noTuners": "No tuner devices configured (HDHOMERUN_URLS)",
+    "list": "Recordings",
+    "empty": "No recordings yet",
+    "statusPending": "Pending",
+    "statusRecording": "Recording",
+    "statusDone": "Done",
+    "statusFailed": "Failed",
+    "scheduled": "Recording scheduled",
+    "scanned": "Tuner scan complete",
+    "deleted": "Deleted"
   }
 }
