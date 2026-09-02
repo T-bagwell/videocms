@@ -348,7 +348,7 @@ scripts/                 デモ素材ジェネレーター
 - [ ] プラグイン/拡張システムとコミュニティディレクトリ
 - [ ] スクレイパー SDK とインストール可能なスクレイパー/タスクマーケット
 - [x] REST API の OpenAPI/Swagger ドキュメント
-- [ ] メトリクスエンドポイント + Prometheus/Grafana ダッシュボード、
+- [x] メトリクスエンドポイント + Prometheus/Grafana ダッシュボード、
       OpenTelemetry トレース
 - [ ] 公式 Docker イメージ、compose スタック、マルチレプリカ対応の Helm Chart
 - [ ] 分散トランスコードキュー（優先度付き、ワーカー自動スケール）
