@@ -40,6 +40,16 @@ favorites, playlists — and numbered files automatically group into TV Shows.
 | 🏷️ Metadata | ffprobe extracts codec/resolution/duration; posters generated from the video; editable title/year/synopsis/genres; optional **TMDB scraping** |
 | 📺 TV Shows | Numbered files (`S01E01`, `EP1`, `第1集`, `Show01Title`…) auto-group into series sorted by episode; season-aware; play-all with continuous playback |
 | ▶️ Playback | H.264/WebM play natively (HTTP Range); **MKV/HEVC transcoded to adaptive multi-quality HLS on the fly** (quality selector); subtitles auto-detected (SRT→WebVTT), embedded-subtitle extraction, upload, **multi-language switching**, per-user preference and ASS styling; **intro/credits skip**; **Watch together**, **AirPlay/Chromecast casting** and **DLNA**; trick-play thumbnails; **download as MKV/MP4 with a chosen audio track and subtitles (remuxed, no re-encode)** |
+| 🎵 Music library | Audio files (mp3/m4a/flac/ogg/opus/wav/aac) scanned with artist/album tags, embedded cover art as album covers, albums playable as a continuous queue |
+| 🖼️ Photo library | Images grouped into folder albums with EXIF metadata and slideshows |
+| 📚 Books & comics | EPUB reader, CBZ comic viewer and PDF support in the library |
+| 📺 Live TV & IPTV | M3U channel import, library-generated channels, XMLTV EPG, HDHomeRun tuner scan, scheduled recordings with catch-up playback |
+| 🎬 Multi-version movies | Same-film files (1080p/4K/extended cut) auto-grouped; best copy plays, detail page switches versions |
+| 📊 Personal & discovery | Watch statistics with charts and CSV export, TV-show subscriptions, title requests that admins approve into the download queue |
+| ❤️ Social & moderation | Likes/dislikes, comments, ratings, reports and a moderation queue with account muting/blocking |
+| 🔓 Visibility | Per-video public/private/unlisted/password-protected with a public library page |
+| 🧩 Extensibility | Scraper SDK (installable scrapers), plugin directory with event webhooks, OpenAPI/Swagger docs, Prometheus metrics and OTLP traces |
+| 🚀 Operations | Docker/Helm packaging, priority pre-transcode queue, Trakt watch-history sync, automatic TLS and TURN helpers |
 | ⬆️ Uploads & downloads | Admin **Uploads** tab: chunked, resumable uploads into any server folder (auto-indexed inside libraries); **yt-dlp** download queue with optional scheduled repeats |
 | 🔗 Sharing | Short-lived public share links for **videos, TV shows and playlists** (signed, expiring, revocable, optional password and domain allow-list) — anyone with the link can watch without an account; content blocking is respected |
 | 👤 Personal | Continue watching, favorites (videos **and** series), playlists with sequential playback |
@@ -73,6 +83,14 @@ and reappears immediately when unblocked.
 ![TV Shows](docs/screenshots/series.png)
 ![Video detail](docs/screenshots/detail.png)
 ![Player](docs/screenshots/player.png)
+![Music](docs/screenshots/music.png)
+![Photos](docs/screenshots/photos.png)
+![Books](docs/screenshots/books.png)
+![Stats](docs/screenshots/stats.png)
+
+More screenshots — IPTV & recordings, moderation, plugins/scrapers, transcode,
+quality profiles and the rest of the admin console — are in the
+[product manuals](docs/INDEX.md).
 
 ## Documentation
 
@@ -161,6 +179,19 @@ All settings are environment variables:
 | `HLS_HW_ACCEL` | empty (software x264) | HLS video encoder: `videotoolbox`, `nvenc`, `qsv` or `vaapi`; empty uses libx264 |
 | `HLS_VAAPI_DEVICE` | `/dev/dri/renderD128` | VAAPI render device (used with `HLS_HW_ACCEL=vaapi`) |
 | `HLS_TONE_MAP` | `0` | Set `1` to enable HDR→SDR tone mapping in HLS transcoding |
+| `HLS_VCODEC` | empty (libx264) | Software transcode encoder when `HLS_HW_ACCEL` is empty: libx264, libx265, libsvtav1 or libvpx-vp9 |
+| `HLS_PASSTHROUGH_HDR` | `1` | Keep Dolby Vision / HDR10+ through 10-bit encoders; 8-bit encoders fall back to tone mapping |
+| `OMDB_API_KEY` | empty | Optional OMDb metadata provider (named scrape provider) |
+| `FANART_API_KEY` | empty | Optional Fanart.tv artwork enrichment (posters/backdrops) |
+| `TRAKT_CLIENT_ID` / `TRAKT_ACCESS_TOKEN` / `TRAKT_REFRESH_TOKEN` | empty | Watch-history sync to Trakt |
+| `HDHOMERUN_URLS` | empty | Comma-separated HDHomeRun device URLs scanned into IPTV channels |
+| `REGISTRATION_ENABLED` / `REGISTRATION_INVITE_ONLY` | `1` / `0` | Open registration switch; `1` requires invite codes |
+| `TRANSCODE_WORKERS` | `1` | Local pre-transcode worker pool size |
+| `ALLOW_LOCAL_FETCH` | `0` | Allow server-side M3U/XMLTV imports to reach private/loopback addresses (trusted local integrations only) |
+| `METRICS_ENABLED` / `OTEL_EXPORTER_OTLP_ENDPOINT` | `1` / empty | Prometheus `/metrics` endpoint; OTLP trace export endpoint |
+| `AUTOCERT_DOMAINS` | empty | Comma-separated domains for automatic ACME (Let's Encrypt) TLS certificates |
+| `TLS_CERT_FILE` / `TLS_KEY_FILE` | empty | Manual TLS certificate and key paths |
+| `TURN_SERVER` / `TURN_USERNAME` / `TURN_PASSWORD` | empty | TURN credentials for WebRTC fallback |
 | `SUBTITLE_OS_USERNAME` / `SUBTITLE_OS_PASSWORD` / `SUBTITLE_OS_API_KEY` | empty | OpenSubtitles credentials for the online subtitle search |
 | `RTMP_INGEST_URL` | `rtmp://localhost:1935/live` | Base RTMP ingest URL (nginx-rtmp or equivalent); streams append their key |
 | `WHISPER_BIN` / `WHISPER_MODEL` | empty | whisper.cpp CLI and model path for speech transcription |

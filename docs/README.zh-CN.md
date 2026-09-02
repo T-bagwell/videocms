@@ -49,6 +49,16 @@
 | 🚫 内容屏蔽 | 管理员可在后台按媒资名屏蔽——对所有人隐藏，文件和记录保留，可随时解除 |
 | 🚫 媒体库屏蔽 | 管理后台一键屏蔽整个媒体库——其媒资对所有人隐藏，不删除任何内容 |
 | 🚫 路径过滤 | 按用户隐藏任意服务器路径——首页、剧集、收藏、继续观看、播放列表全部生效 |
+| 🎵 音乐库 | 音频（mp3/m4a/flac/ogg/opus/wav/aac）带艺术家/专辑标签入库，内嵌封面即专辑封面，整张连续播放 |
+| 🖼️ 照片库 | 图片按文件夹成相册，支持 EXIF 元数据与幻灯片 |
+| 📚 图书与漫画 | 库内 EPUB 阅读器、CBZ 看图与 PDF 支持 |
+| 📺 直播与 IPTV | M3U 频道导入、媒体库生成频道、XMLTV EPG、HDHomeRun 调谐器扫描、预约录制与回看 |
+| 🎬 多版本影片 | 同片多文件（1080p/4K/加长版）自动归组；最佳副本播放，详情页切换版本 |
+| 📊 个人与发现 | 观看统计（图表 + CSV 导出）、剧集订阅、点播请求（管理员批准入下载队列） |
+| ❤️ 社交与审核 | 点赞/点踩、评论、评分、举报与含禁言/拉黑的审核队列 |
+| 🔓 可见性 | 逐条公开/私有/不公开/密码保护，含公开媒体库页 |
+| 🧩 可扩展性 | 刮削 SDK（可安装刮削器）、插件目录（事件 webhook）、OpenAPI/Swagger、Prometheus 指标与 OTLP 追踪 |
+| 🚀 运维 | Docker/Helm 打包、优先级预转码队列、Trakt 观看历史同步、自动 TLS 与 TURN |
 | 🌐 界面 | i18n：**English（默认）、中文、Français、日本語、Deutsch** |
 
 ## 内容管控
@@ -70,6 +80,13 @@
 ![剧集](screenshots/series.png)
 ![视频详情](screenshots/detail.png)
 ![播放器](screenshots/player.png)
+![音乐](screenshots/music.png)
+![照片](screenshots/photos.png)
+![图书](screenshots/books.png)
+![统计](screenshots/stats.png)
+
+更多截图（IPTV 与录制、审核、插件/刮削器、转码、质量档及管理端其他页面）见
+[产品手册](INDEX.md)。
 
 ## 文档
 
@@ -153,6 +170,19 @@ make serve                                 # 构建前端并统一在 :8080 提�
 | `HLS_HW_ACCEL` | 空（软件 x264） | HLS 视频编码器：`videotoolbox`、`nvenc`、`qsv` 或 `vaapi`；留空用 libx264 |
 | `HLS_VAAPI_DEVICE` | `/dev/dri/renderD128` | VAAPI 渲染设备（配合 `HLS_HW_ACCEL=vaapi` 使用） |
 | `HLS_TONE_MAP` | `0` | 设为 `1` 在 HLS 转码中启用 HDR→SDR 色调映射 |
+| `HLS_VCODEC` | 空（libx264） | `HLS_HW_ACCEL` 为空时的软件转码编码器：libx264、libx265、libsvtav1 或 libvpx-vp9 |
+| `HLS_PASSTHROUGH_HDR` | `1` | 10-bit 编码器保留 Dolby Vision / HDR10+；8-bit 编码器回退为色调映射 |
+| `OMDB_API_KEY` | 空 | 可选 OMDb 元数据提供方（命名刮削源） |
+| `FANART_API_KEY` | 空 | 可选 Fanart.tv 艺术图增强（海报/背景图） |
+| `TRAKT_CLIENT_ID` / `TRAKT_ACCESS_TOKEN` / `TRAKT_REFRESH_TOKEN` | 空 | 观看历史同步到 Trakt |
+| `HDHOMERUN_URLS` | 空 | 逗号分隔的 HDHomeRun 设备地址，扫描为 IPTV 频道 |
+| `REGISTRATION_ENABLED` / `REGISTRATION_INVITE_ONLY` | `1` / `0` | 开放注册开关；`1` 时需邀请码 |
+| `TRANSCODE_WORKERS` | `1` | 本地预转码 worker 池大小 |
+| `ALLOW_LOCAL_FETCH` | `0` | 允许服务端 M3U/XMLTV 导入访问私网/回环地址（仅限可信本地集成） |
+| `METRICS_ENABLED` / `OTEL_EXPORTER_OTLP_ENDPOINT` | `1` / 空 | Prometheus `/metrics` 端点；OTLP 追踪导出端点 |
+| `AUTOCERT_DOMAINS` | 空 | 逗号分隔域名，启用 ACME（Let's Encrypt）自动 TLS 证书 |
+| `TLS_CERT_FILE` / `TLS_KEY_FILE` | 空 | 手动 TLS 证书与私钥路径 |
+| `TURN_SERVER` / `TURN_USERNAME` / `TURN_PASSWORD` | 空 | WebRTC 兜底用的 TURN 凭据 |
 | `SUBTITLE_OS_USERNAME` / `SUBTITLE_OS_PASSWORD` / `SUBTITLE_OS_API_KEY` | 空 | 在线字幕搜索用的 OpenSubtitles 凭证 |
 | `RTMP_INGEST_URL` | `rtmp://localhost:1935/live` | RTMP 推流基础地址（nginx-rtmp 或等价服务）；直播会附加自己的 key |
 | `WHISPER_BIN` / `WHISPER_MODEL` | 空 | whisper.cpp 可执行文件与模型路径（语音转写用） |

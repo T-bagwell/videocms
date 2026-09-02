@@ -683,7 +683,7 @@ The backend binds all interfaces (`:8080`), so LAN clients reach the UI directly
 | `DATA_DIR` | `data` | Posters + HLS segments |
 | `ADMIN_USERNAME` / `ADMIN_PASSWORD` | admin / admin123 | Initial admin |
 | `FFPROBE_BIN` / `FFMPEG_BIN` | auto-detect | Tool paths (Homebrew fallback) |
-| `TMDB_API_KEY` / `TMDB_LANGUAGE` / `OMDB_API_KEY` / `FANART_API_KEY` / `TRAKT_CLIENT_ID` / `TRAKT_ACCESS_TOKEN` / `METRICS_ENABLED` / `OTEL_EXPORTER_OTLP_ENDPOINT` / `AUTOCERT_DOMAINS` / `TURN_SERVER` | empty / zh-CN / empty / empty / empty / empty / `1` / empty / empty / empty | Scraping, Trakt sync, metrics/OTLP, auto-TLS (ACME), TURN fallback |
+| `HDHOMERUN_URLS` / `REGISTRATION_ENABLED` / `REGISTRATION_INVITE_ONLY` / `TRANSCODE_WORKERS` / `ALLOW_LOCAL_FETCH` | empty / `1` / `0` / `1` / `0` | HDHomeRun scan, registration policy, transcode workers, local-fetch allowance |
 | `SCAN_WORKERS` | `4` | Parallel probe workers |
 | `CORS_ORIGINS` | empty (`*`) | Browser origins allowed to call the API |
 | `WATCH_INTERVAL` | `30` | Fallback incremental-scan interval (seconds); fsnotify indexes immediately |
@@ -752,3 +752,25 @@ The backend binds all interfaces (`:8080`), so LAN clients reach the UI directly
 - **DLNA / Chromecast** — the UPnP server (`/dlna/*`) and the Cast sender are
   self-contained; DLNA browsing can be extended with new object containers and
   the share-token flow can power other cast targets
+- **Scraper SDK** — admins register external scrapers (`scrapers` table) as a
+  URL endpoint (POST `{"title","year"}`) or a local command; both return the
+  documented scraper JSON contract, so a scraper is installable without code
+  changes and selectable per video (see `docs/scraper-sdk.md`)
+- **Plugin registry** — webhook plugins (`plugins` table) receive the same
+  event payloads as notifications (`X-Videocms-Plugin` header) filtered by
+  event list; the built-in directory lists installable entries
+- **Media types** — audio files index into `music` albums, images into
+  `photo_albums`/`photos` (EXIF), EPUB/CBZ/PDF into `books`, and ffprobe
+  chapters into `chapters`; every listing still funnels through the
+  `visibleEpisodes` visibility SQL
+- **IPTV & recordings** — channels (`iptv_channels`) come from M3U import,
+  manual entries or HDHomeRun `lineup.json`; the recorder worker captures any
+  channel on schedule and finished recordings stream as catch-up
+- **Pre-transcode queue** — `transcode_jobs` are claimed by `TRANSCODE_WORKERS`
+  workers by priority and warm HLS sessions; the same queue protocol can serve
+  remote worker agents
+- **Metrics & tracing** — the request middleware increments per-route counters
+  (`/metrics`, Prometheus text) and batches OTLP/JSON spans when
+  `OTEL_EXPORTER_OTLP_ENDPOINT` is set
+- **Remote access** — ACME auto-TLS (`AUTOCERT_DOMAINS`) or manual certs, plus
+  TURN credentials exposed at `/api/remote-access` for WebRTC fallback

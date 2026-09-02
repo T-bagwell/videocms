@@ -25,6 +25,13 @@ Hardware. Ihre Videos verlassen Ihr Netzwerk nie, außer Sie teilen sie bewusst.
 | Persönlich | Weiterschauen, Favoriten, Wiedergabelisten mit fortlaufender Wiedergabe |
 | Benutzer | Registrierung/Login, Admin-Rollen, Benutzerverwaltung |
 | Inhalts-Blockierung | Admins blockieren Medien per Titel — für alle ausgeblendet, Dateien und Einträge bleiben erhalten, jederzeit freigebbar |
+| Medienbibliotheken | **Musik** (Alben nach Künstler mit eingebetteten Covern), **Fotos** (Ordner-Alben, EXIF, Diashows), **Bücher & Comics** (EPUB-Reader, CBZ-Viewer, PDF) |
+| Entdecken & Anfragen | Persönliche **Sehstatistik**, **Abonnements** für Serien („Neuigkeiten“-Feed), **Titel-Anfragen** (Admin-Freigabe in DL-Warteschlange) |
+| Social & Moderation | **Likes/Dislikes**, Kommentare, Bewertungen und **Meldungen**; Moderationswarteschlange mit Stummschalten/Blockieren |
+| Sichtbarkeit | Pro Element: **öffentlich / privat / nicht gelistet / passwortgeschützt** mit öffentlicher Bibliotheksseite |
+| Live-TV & IPTV | **M3U-Import**, aus der Bibliothek erzeugte Kanäle, **EPG (XMLTV)**, HDHomeRun-Tuner-Scan, **geplante Aufnahmen** und Replay |
+| Erweiterbarkeit | **Scraper-SDK** (installierbare Scraper), **Plugin-Verzeichnis** (Event-Webhooks), OpenAPI, Prometheus **/metrics** und OTLP-Traces |
+| Betrieb | Docker/Helm-Paketierung, **Pre-Transcode-Warteschlange** mit Prioritäten, Trakt-Verlaufssync, automatisches TLS und TURN |
 | Oberfläche | 5 Sprachen: Englisch (Standard), 中文, Français, 日本語, Deutsch |
 
 ## Screenshots
@@ -56,6 +63,35 @@ Qualitätsauswahl, Gemeinsam ansehen, Streaming und Intro/Abspann-Überspringen:
 Downloads, Speicher, Jobs und Webhooks:
 
 ![Admin](screenshots/admin.png)
+
+**Musik** — Audiodateien werden zu Alben mit eingebetteten Covern gruppiert und
+fortlaufend abgespielt:
+
+![Musik](screenshots/music.png) ![Album](screenshots/music-album.png)
+
+**Fotos & Bücher** — Ordnerbasierte Fotoalben mit Diashows und EPUB-/CBZ-/PDF-
+Reader:
+
+![Fotos](screenshots/photos.png) ![Bücher](screenshots/books.png)
+![Reader](screenshots/book-reader.png)
+
+**Persönlich & Entdecken** — Statistiken, Abonnements, Anfragen und
+Benachrichtigungseinstellungen:
+
+![Statistiken](screenshots/stats.png) ![Abonnements](screenshots/subscriptions.png)
+![Anfragen](screenshots/requests.png) ![Einstellungen](screenshots/settings.png)
+
+**IPTV & Aufnahmen** — Kanäle, EPG-Import, geplante Aufnahmen und Replay:
+
+![IPTV](screenshots/admin-iptv.png) ![Aufnahmen](screenshots/admin-recordings.png)
+
+**Weitere Admin-Funktionen** — Qualitätsprofile, Einladungen, Trakt,
+Moderation, Scraper, Plugins und Transcode-Warteschlange:
+
+![Qualität](screenshots/admin-quality.png) ![Einladungen](screenshots/admin-invites.png)
+![Trakt](screenshots/admin-trakt.png) ![Moderation](screenshots/admin-moderation.png)
+![Scraper](screenshots/admin-scrapers.png) ![Plugins](screenshots/admin-plugins.png)
+![Transcode](screenshots/admin-transcode.png)
 
 ## 3. Schnellstart
 
@@ -193,6 +229,35 @@ Eine Gruppe braucht mindestens 2 Folgen, um eine Serie zu werden.
 - Geteilte Inhalte respektieren die Verwaltungskontrollen: blockierte Titel und
   Bibliotheken erscheinen nie in Teilen-Links
 
+### 4.7 Musik, Fotos und Bücher
+
+- **Musik**: Audiodateien (mp3/m4a/flac/ogg/opus/wav/aac) erscheinen im
+  **Musik**-Tab, gruppiert in Alben nach Künstler/Album; eingebettete Cover
+  werden zum Albumcover. Ein Album öffnet die Titel als fortlaufende
+  Wiedergabe.
+- **Fotos**: Bilder werden nach Ordnern in Alben gruppiert (Tab **Fotos**);
+  EXIF-Datum/-Kamera wird angezeigt und jedes Album kann als Diashow laufen
+  (Pfeiltasten, Leertaste für Autoplay).
+- **Bücher & Comics**: EPUB, CBZ und PDF öffnen im integrierten Reader —
+  Comics seitenweise, EPUBs kapitelweise (Pfeiltasten), PDFs im Browser-Viewer.
+
+### 4.8 Statistiken, Abonnements und Anfragen
+
+- Die **Statistiken**-Seite zeigt Sehdauer, Wiedergaben, Filme/Episoden, aktive
+  Tage, die letzten 14 Tage als Diagramm und Top-Genres, mit CSV-Export.
+- **Abonnements** folgen Serien: Öffnen Sie eine Serie und drücken Sie
+  *Abonnieren*; die Abo-Seite listet sie als „Neuigkeiten“-Feed.
+- **Anfragen** lassen Sie Titel wünschen; Admins genehmigen (optional in die
+  Download-Warteschlange) oder lehnen ab — Status live sichtbar.
+
+### 4.9 Einstellungen und Benachrichtigungen
+
+Die **Einstellungen**-Seite speichert Ihre Benachrichtigungspräferenzen
+(Hauptschalter + Ereignisliste: Scans, Downloads, Kommentare, Favoriten,
+Bewertungen, Abonnements, neue Episoden). Der Player merkt sich die
+Wiedergabegeschwindigkeit pro Video geräteübergreifend; Like/Dislike-Buttons
+und Kommentar-/Meldeformulare folgen den Richtlinien des jeweiligen Videos.
+
 ## 5. Administrationshandbuch
 
 ### 5.1 Übersicht
@@ -295,6 +360,59 @@ Statistiken: Videos, Bibliotheken, Benutzer, Wiedergabelisten, Favoriten, Serien
 - Fertige Dateien landen im gewählten Ordner und werden automatisch erfasst,
   wenn er Teil einer Bibliothek ist
 
+### 5.7 Zusatzfunktionen pro Video
+
+- **Multiversions-Filme**: Dateien desselben Films (1080p/4K/Extended Cut)
+  werden automatisch gruppiert; Listen zeigen die beste Kopie und die
+  Detailseite listet jede Version zum schnellen Wechsel
+- **Qualitätsprofile** (Qualität-Tab): min./max. Höhe und bevorzugter Codec;
+  Scans und *Jetzt anwenden* bewerten Multiversions-Filme neu
+- **Hintergrundbilder, Titellieder & Extras**: pro Video hochladbar und von der
+  Detailseite abspielbar (Scraping kann Hintergrund und Trailer automatisch
+  ergänzen)
+- **Kapitel und Intro/Abspann-Überspringen** versorgen die Player-Zeitleiste
+- **Sichtbarkeit & Richtlinien**: *öffentlich / privat / nicht gelistet /
+  passwortgeschützt* sowie Downloads, Kommentare und Meldungen pro Video
+  schaltbar
+- **Likes/Dislikes**: Zähler und die eigene Reaktion werden gespeichert
+
+### 5.8 IPTV und Aufnahmen
+
+- Der **IPTV**-Tab verwaltet Kanäle: manuell hinzufügen, M3U importieren oder
+  HDHomeRun-Tuner scannen (`HDHOMERUN_URLS`); Bibliothekskanäle streamen alle
+  Videos einer Bibliothek kontinuierlich
+- Ausgaben: `GET /api/iptv/channels.m3u` und `/api/iptv/epg.xml` (XMLTV) sowie
+  ein XMLTV-EPG-Import für Programmdaten
+- Der **Aufnahmen**-Tab plant Aufnahmen (Start/Ende), zeigt den Status und
+  spielt fertige Aufnahmen als Replay ab
+
+### 5.9 Moderation
+
+- Benutzer melden Videos (Grund + Details); der **Moderation**-Tab bearbeitet
+  oder lehnt Meldungen ab
+- Konten können **stummgeschaltet** (keine Kommentare, Verlauf ausgeblendet)
+  oder **global blockiert** werden; Massenaktionen sind möglich
+
+### 5.10 Plugins und Scraper
+
+- Der **Plugins**-Tab installiert Webhook-Plugins aus dem integrierten
+  Community-Verzeichnis (oder registriert eigene mit Ereignislisten); aktive
+  Plugins empfangen Serverereignisse
+- Der **Scraper**-Tab registriert externe Scraper nach dem Scraper-JSON-Vertrag
+  (URL-POST oder lokaler Befehl), pro Video wählbar — Vertrag in
+  `docs/scraper-sdk.md`
+
+### 5.11 Transcode-Warteschlange, Einladungen und Trakt
+
+- **Transcodierung**: Videos mit Priorität (1–10) vor-transcodieren; lokale
+  Worker (`TRANSCODE_WORKERS`) bereiten HLS vor, Aufträge sind abbrechbar
+- **Einladungen**: Einmal-Codes für die Registrierung auf Einladung
+  (`REGISTRATION_INVITE_ONLY=1`)
+- **Trakt**: Mit `TRAKT_*`-Zugangsdaten pusht ein Klick die Seh-Historie des
+  Servers zu Trakt (dedupliziert, Token-Refresh und Protokoll)
+- **Anfragen (Admin)**: genehmigen/ablehnen; eine Download-URL speist die
+  yt-dlp-Warteschlange
+
 ## 6. Konfiguration
 
 Alles wird über Umgebungsvariablen konfiguriert (vollständige Tabelle im README). Die wichtigsten:
@@ -311,6 +429,10 @@ Alles wird über Umgebungsvariablen konfiguriert (vollständige Tabelle im READM
 | `METRICS_ENABLED` / `OTEL_EXPORTER_OTLP_ENDPOINT` | `1` / leer | Prometheus-/metrics-Endpunkt; OTLP-Trace-Export |
 | `AUTOCERT_DOMAINS` / `TLS_CERT_FILE` / `TLS_KEY_FILE` | leer | Automatische (ACME) oder manuelle TLS-Zertifikate |
 | `TURN_SERVER` / `TURN_USERNAME` / `TURN_PASSWORD` | leer | TURN-Zugangsdaten für WebRTC-Fallback |
+| `HDHOMERUN_URLS` | leer | Kommagetrennte HDHomeRun-Geräte-URLs, in IPTV-Kanäle gescannt |
+| `REGISTRATION_ENABLED` / `REGISTRATION_INVITE_ONLY` | `1` / `0` | Registrierung geöffnet; `1` erfordert Einladungscodes |
+| `TRANSCODE_WORKERS` | `1` | Größe des lokalen Pre-Transcode-Worker-Pools |
+| `ALLOW_LOCAL_FETCH` | `0` | Erlaubt M3U/XMLTV-Importe zu privaten/Loopback-Adressen (nur vertrauenswürdige lokale Integrationen) |
 | `SCAN_WORKERS` | `4` | Parallele Scan-Worker |
 | `WATCH_INTERVAL` | `30` | Sekunden zwischen automatischen Inkrement-Scans; `0` deaktiviert |
 | `YTDLP_PATH` | `yt-dlp` im PATH | yt-dlp-Binary für die Download-Warteschlange |

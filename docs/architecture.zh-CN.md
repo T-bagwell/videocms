@@ -625,7 +625,7 @@ sequenceDiagram
 | `DATA_DIR` | `data` | 海报 + HLS 分片 |
 | `ADMIN_USERNAME` / `ADMIN_PASSWORD` | admin / admin123 | 初始管理员 |
 | `FFPROBE_BIN` / `FFMPEG_BIN` | 自动探测 | 工具路径（含 Homebrew 回退） |
-| `TMDB_API_KEY` / `TMDB_LANGUAGE` / `OMDB_API_KEY` / `FANART_API_KEY` / `TRAKT_CLIENT_ID` / `TRAKT_ACCESS_TOKEN` / `METRICS_ENABLED` / `OTEL_EXPORTER_OTLP_ENDPOINT` / `AUTOCERT_DOMAINS` / `TURN_SERVER` | 空 / zh-CN / 空 / 空 / 空 / 空 / `1` / 空 / 空 / 空 | 刮削、Trakt 同步、指标/OTLP、自动 TLS（ACME）、TURN 兜底 |
+| `HDHOMERUN_URLS` / `REGISTRATION_ENABLED` / `REGISTRATION_INVITE_ONLY` / `TRANSCODE_WORKERS` / `ALLOW_LOCAL_FETCH` | 空 / `1` / `0` / `1` / `0` | HDHomeRun 扫描、注册策略、转码 worker、本地抓取放行 |
 | `SCAN_WORKERS` | `4` | 并行探测工作数 |
 | `CORS_ORIGINS` | 空（`*`） | 允许调用 API 的浏览器来源 |
 | `WATCH_INTERVAL` | `30` | 增量扫描兜底间隔（秒）；fsnotify 事件即时索引 |
@@ -684,6 +684,22 @@ sequenceDiagram
   同一管线还能产出 WebVTT 字幕轨
 - **通知渠道** — `media.Notifier` 把同一事件分发到 webhook、Apprise 与
   SMTP；新增渠道就是在 `Send` 中加一个分支
+- **刮削 SDK** — 管理员可注册外部刮削器（`scrapers` 表）：URL 端点
+  （POST `{"title","year"}`）或本地命令，两者都返回文档化的刮削 JSON 契约，
+  无需改代码即可安装并在逐条刮削时选用（见 `docs/scraper-sdk.zh-CN.md`）
+- **插件注册表** — webhook 插件（`plugins` 表）按事件列表接收与通知相同的事件
+  载荷（`X-Videocms-Plugin` 头）；内置目录列出可安装条目
+- **媒体类型** — 音频入库为 `music` 专辑、图片入 `photo_albums`/`photos`
+  （EXIF）、EPUB/CBZ/PDF 入 `books`、ffprobe 章节入 `chapters`；所有列表仍经过
+  `visibleEpisodes` 可见性 SQL
+- **IPTV 与录制** — 频道（`iptv_channels`）来自 M3U 导入、手动录入或 HDHomeRun
+  `lineup.json`；recorder worker 按预约捕获频道流，完成的录制可回看
+- **预转码队列** — `transcode_jobs` 由 `TRANSCODE_WORKERS` 个 worker 按优先级领取
+  并预热 HLS；同一队列协议可服务远程 worker
+- **指标与追踪** — 请求中间件按路由累计计数（`/metrics`，Prometheus 文本），
+  配置 `OTEL_EXPORTER_OTLP_ENDPOINT` 时批量导出 OTLP/JSON span
+- **远程访问** — ACME 自动 TLS（`AUTOCERT_DOMAINS`）或手动证书，以及
+  `/api/remote-access` 暴露的 TURN 凭据（WebRTC 兜底）
 - **SSO 提供方** — OIDC 与 SAML 2.0 都归结到 `users.oauth_sub` 绑定；
   新提供方需要一对 start/callback 端点与 upsert 路径
 - **DLNA / Chromecast** — UPnP 服务器（`/dlna/*`）与 Cast sender 自成一体；

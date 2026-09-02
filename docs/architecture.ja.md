@@ -665,7 +665,7 @@ sequenceDiagram
 | `DATA_DIR` | `data` | ポスター + HLS セグメント |
 | `ADMIN_USERNAME` / `ADMIN_PASSWORD` | admin / admin123 | 初期管理者 |
 | `FFPROBE_BIN` / `FFMPEG_BIN` | 自動検出 | ツールパス（Homebrew フォールバック） |
-| `TMDB_API_KEY` / `TMDB_LANGUAGE` / `OMDB_API_KEY` / `FANART_API_KEY` / `TRAKT_CLIENT_ID` / `TRAKT_ACCESS_TOKEN` / `METRICS_ENABLED` / `OTEL_EXPORTER_OTLP_ENDPOINT` / `AUTOCERT_DOMAINS` / `TURN_SERVER` | 空 / zh-CN / 空 / 空 / 空 / 空 / `1` / 空 / 空 / 空 | スクレイピング、Trakt 同期、メトリクス/OTLP、自動 TLS（ACME）、TURN フォールバック |
+| `HDHOMERUN_URLS` / `REGISTRATION_ENABLED` / `REGISTRATION_INVITE_ONLY` / `TRANSCODE_WORKERS` / `ALLOW_LOCAL_FETCH` | 空 / `1` / `0` / `1` / `0` | HDHomeRun スキャン、登録ポリシー、トランスコードワーカー、ローカル取得の許可 |
 | `SCAN_WORKERS` | `4` | 並列プローブ数 |
 | `CORS_ORIGINS` | 空（`*`） | API 呼び出しを許可するブラウザオリジン |
 | `WATCH_INTERVAL` | `30` | 増分スキャンのフォールバック間隔（秒）。fsnotify は即時索引 |
@@ -726,6 +726,26 @@ sequenceDiagram
   1 行 1 タグを出力。タグは `tags`/`video_tags` とタグクラウドに反映
 - **音声文字起こし** — whisper.cpp（`WHISPER_BIN`）が音声を検索可能な文字起こし
   に変換。同じパイプラインで WebVTT 字幕トラックも生成
+- **スクレイパー SDK** — 管理者は外部スクレイパー（`scrapers` テーブル）を
+  URL エンドポイント（POST `{"title","year"}`）またはローカルコマンドとして登録。
+  どちらもドキュメント化されたスクレイパー JSON 契約を返すため、コード変更なしで
+  インストールし動画ごとに選択できます（`docs/scraper-sdk.ja.md`）
+- **プラグインレジストリ** — webhook プラグイン（`plugins` テーブル）が通知と
+  同じイベントペイロードをイベント一覧でフィルタして受信（`X-Videocms-Plugin` ヘッダー）。
+  内蔵ディレクトリがインストール候補を提供
+- **メディア種別** — 音声は `music` アルバム、画像は `photo_albums`/`photos`
+  （EXIF）、EPUB/CBZ/PDF は `books`、ffprobe チャプターは `chapters` に登録。
+  すべての一覧は引き続き `visibleEpisodes` の可視性 SQL を通ります
+- **IPTV と録画** — チャンネル（`iptv_channels`）は M3U 取り込み・手動・HDHomeRun
+  `lineup.json` から作成。recorder ワーカーが予約どおりにチャンネルをキャプチャし、
+  完了分はキャッチアップとして再生可能
+- **事前トランスコードキュー** — `transcode_jobs` を `TRANSCODE_WORKERS` の
+  ワーカーが優先度順に取得し HLS を準備。同じキューでリモートワーカーにも対応可能
+- **メトリクスとトレース** — リクエストミドルウェアがルート別カウンタ
+  （`/metrics`、Prometheus テキスト）を増やし、`OTEL_EXPORTER_OTLP_ENDPOINT`
+  設定時は OTLP/JSON スパンをバッチ送信
+- **リモートアクセス** — ACME 自動 TLS（`AUTOCERT_DOMAINS`）または手動証明書、
+  WebRTC フォールバック用の TURN 認証情報を `/api/remote-access` で公開
 - **通知チャンネル** — `media.Notifier` が同じイベントを webhook、Apprise、
   SMTP に送出。新しいチャンネルは `Send` に分岐を追加するだけ
 - **SSO プロバイダ** — OIDC と SAML 2.0 はどちらも `users.oauth_sub` への

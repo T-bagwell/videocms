@@ -38,6 +38,11 @@ everything you need to get started.
 
 - See [Documentation & localization](#documentation--localization) for the
   language matrix and the rules for touching docs.
+- UI screenshots in the docs are generated from the running app: generate
+  demo material with `scripts/make-demo-media.sh` and
+  `scripts/make-demo-media-extra.sh`, seed it as the "演示媒体库" library, start
+  the backend + Vite dev server, then run `scripts/screenshots.py` (Python +
+  Playwright) to refresh `docs/screenshots/`.
 
 ### Submit code
 

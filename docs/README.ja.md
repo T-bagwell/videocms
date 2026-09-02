@@ -50,6 +50,16 @@
 | 🚫 コンテンツブロック | 管理者がタイトル単位でブロック — 全ユーザーに非表示、ファイルとレコードは保持、いつでも解除可能 |
 | 🚫 ライブラリブロック | 管理画面からライブラリ全体をブロック — メディアは全ユーザーに非表示、何も削除されません |
 | 🚫 パスフィルター | サーバーパスをユーザーごとに非表示化 — ホーム・ドラマ・お気に入り・続きを見る・プレイリストすべてに反映 |
+| 🎵 音楽ライブラリ | 音声（mp3/m4a/flac/ogg/opus/wav/aac）をアーティスト/アルバムで登録、埋め込みカバーがアルバム画像になり連続再生可能 |
+| 🖼️ フォトライブラリ | 画像をフォルダ単位のアルバムに整理、EXIF とスライドショー対応 |
+| 📚 書籍・漫画 | EPUB リーダー、CBZ ビューア、PDF に対応 |
+| 📺 ライブ TV / IPTV | M3U チャンネル取り込み、ライブラリ生成チャンネル、XMLTV EPG、HDHomeRun スキャン、録画予約とキャッチアップ |
+| 🎬 マルチバージョン作品 | 同一作品の複数ファイルを自動グループ化、最適コピーを再生し詳細ページで切替 |
+| 📊 個人と発見 | 視聴統計（グラフ＋CSV）、チャンネル登録、タイトルリクエスト（管理者承認で DL キューへ） |
+| ❤️ ソーシャルとモデレーション | いいね/わるいね、コメント、評価、通報とミュート/ブロック対応のモデレーションキュー |
+| 🔓 公開設定 | 動画ごとに公開/非公開/限定公開/パスワード、公開ライブラリページ付き |
+| 🧩 拡張性 | スクレイパー SDK、プラグインディレクトリ（イベント webhook）、OpenAPI/Swagger、Prometheus メトリクスと OTLP トレース |
+| 🚀 運用 | Docker/Helm、優先度付き事前トランスコードキュー、Trakt 履歴同期、自動 TLS と TURN |
 | 🌐 インターフェース | i18n：**English（デフォルト）、中文、Français、日本語、Deutsch** |
 
 ## コンテンツ管理
@@ -72,6 +82,13 @@ SQL 評価され、ブロックされた項目は一斉に消え、解除する�
 ![ドラマ](screenshots/series.png)
 ![動画詳細](screenshots/detail.png)
 ![プレイヤー](screenshots/player.png)
+![音楽](screenshots/music.png)
+![写真](screenshots/photos.png)
+![書籍](screenshots/books.png)
+![統計](screenshots/stats.png)
+
+IPTV・録画、モデレーション、プラグイン/スクレイパー、トランスコード、品質、
+その他の管理機能のスクリーンショットは[製品マニュアル](INDEX.md)をご覧ください。
 
 ## ドキュメント
 
@@ -156,6 +173,19 @@ make serve                                 # UI をビルドし :8080 で一括�
 | `HLS_HW_ACCEL` | 空（ソフトウェア x264） | HLS ビデオエンコーダー：`videotoolbox`、`nvenc`、`qsv` または `vaapi`。空なら libx264 |
 | `HLS_VAAPI_DEVICE` | `/dev/dri/renderD128` | VAAPI レンダーデバイス（`HLS_HW_ACCEL=vaapi` で使用） |
 | `HLS_TONE_MAP` | `0` | `1` で HLS トランスコードに HDR→SDR トーンマッピングを有効化 |
+| `HLS_VCODEC` | 空（libx264） | `HLS_HW_ACCEL` が空のときのソフトウェア変換コーデック：libx264、libx265、libsvtav1、libvpx-vp9 |
+| `HLS_PASSTHROUGH_HDR` | `1` | 10-bit エンコーダーで Dolby Vision / HDR10+ を維持し、8-bit ではトーンマッピングへ |
+| `OMDB_API_KEY` | 空 | 任意の OMDb メタデータプロバイダー（指定スクレイプ先） |
+| `FANART_API_KEY` | 空 | 任意の Fanart.tv アートワーク補完（ポスター/背景） |
+| `TRAKT_CLIENT_ID` / `TRAKT_ACCESS_TOKEN` / `TRAKT_REFRESH_TOKEN` | 空 | Trakt への視聴履歴同期 |
+| `HDHOMERUN_URLS` | 空 | IPTV チャンネルへスキャンする HDHomeRun デバイス URL（カンマ区切り） |
+| `REGISTRATION_ENABLED` / `REGISTRATION_INVITE_ONLY` | `1` / `0` | 登録を開放；`1` で招待コード必須 |
+| `TRANSCODE_WORKERS` | `1` | ローカル事前トランスコード worker 数 |
+| `ALLOW_LOCAL_FETCH` | `0` | M3U/XMLTV 取り込みでプライベート/ループバック宛てを許可（信頼できるローカル連携のみ） |
+| `METRICS_ENABLED` / `OTEL_EXPORTER_OTLP_ENDPOINT` | `1` / 空 | Prometheus `/metrics` エンドポイント；OTLP トレース出力先 |
+| `AUTOCERT_DOMAINS` | 空 | ACME（Let's Encrypt）自動 TLS 証明書を有効化するドメイン（カンマ区切り） |
+| `TLS_CERT_FILE` / `TLS_KEY_FILE` | 空 | 手動 TLS 証明書と鍵のパス |
+| `TURN_SERVER` / `TURN_USERNAME` / `TURN_PASSWORD` | 空 | WebRTC フォールバック用 TURN 認証情報 |
 | `SUBTITLE_OS_USERNAME` / `SUBTITLE_OS_PASSWORD` / `SUBTITLE_OS_API_KEY` | 空 | オンライン字幕検索用の OpenSubtitles 認証情報 |
 | `RTMP_INGEST_URL` | `rtmp://localhost:1935/live` | RTMP 取り込みのベース URL（nginx-rtmp 等）。ストリームごとにキーが付与されます |
 | `WHISPER_BIN` / `WHISPER_MODEL` | 空 | whisper.cpp のバイナリとモデルパス（文字起こし用） |

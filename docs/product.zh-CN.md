@@ -24,6 +24,13 @@ VideoCMS 是一个自托管的视频资源管理系统。把服务器磁盘上�
 | 个性化 | 继续观看、收藏、可顺序播放的播放列表 |
 | 用户 | 注册/登录、管理员角色、管理员用户管理 |
 | 内容屏蔽 | 管理员按标题屏蔽媒资——对所有人隐藏，文件和记录保留，可随时解除 |
+| 媒体库 | **音乐**（按艺术家/专辑归组，内嵌封面）、**照片**（按文件夹成相册、EXIF、幻灯片）、**图书与漫画**（EPUB 阅读器、CBZ 看图、PDF） |
+| 发现与点播 | 个人**观看统计**、剧集**订阅**（"新内容"动态）、**点播请求**（管理员批准后接入下载队列） |
+| 社交与审核 | 逐条**点赞/点踩**、评论、评分与**举报**；审核队列支持账号禁言/拉黑 |
+| 可见性 | 逐条 **公开 / 私有 / 不公开 / 密码保护**，含公开媒体库页 |
+| 直播与 IPTV | **M3U 频道导入**、媒体库生成频道、**EPG（XMLTV）**、HDHomeRun 调谐器扫描、**预约录制**与回看 |
+| 可扩展性 | **刮削 SDK**（可安装刮削器）、**插件目录**（事件 webhook）、OpenAPI、Prometheus **/metrics** 与 OTLP 追踪 |
+| 运维 | Docker/Helm 打包、**预转码队列**（优先级）、Trakt 观看历史同步、自动 TLS 与 TURN |
 | 界面 | 5 种语言：English（默认）、中文、Français、日本語、Deutsch |
 
 ## 截图
@@ -52,6 +59,31 @@ VideoCMS 是一个自托管的视频资源管理系统。把服务器磁盘上�
 **管理后台** —— 概览、媒体库、视频、用户、上传、下载、存储、任务与 Webhooks：
 
 ![管理后台](screenshots/admin.png)
+
+**音乐** —— 音频按专辑归组，内嵌封面即专辑封面，可整张连续播放：
+
+![音乐](screenshots/music.png) ![专辑](screenshots/music-album.png)
+
+**照片与图书** —— 按文件夹成相册的幻灯片、以及 EPUB/CBZ/PDF 阅读器：
+
+![照片](screenshots/photos.png) ![图书](screenshots/books.png)
+![阅读器](screenshots/book-reader.png)
+
+**个人与发现** —— 观看统计、订阅、点播请求与通知设置：
+
+![统计](screenshots/stats.png) ![订阅](screenshots/subscriptions.png)
+![请求](screenshots/requests.png) ![设置](screenshots/settings.png)
+
+**IPTV 与录制** —— 频道管理、EPG 导入、预约录制与回看：
+
+![IPTV](screenshots/admin-iptv.png) ![录制](screenshots/admin-recordings.png)
+
+**管理端其他功能** —— 质量档、邀请码、Trakt、审核、刮削器、插件与转码队列：
+
+![质量档](screenshots/admin-quality.png) ![邀请码](screenshots/admin-invites.png)
+![Trakt](screenshots/admin-trakt.png) ![审核](screenshots/admin-moderation.png)
+![刮削器](screenshots/admin-scrapers.png) ![插件](screenshots/admin-plugins.png)
+![转码](screenshots/admin-transcode.png)
 
 ## 3. 快速开始
 
@@ -163,6 +195,30 @@ make serve                              # http://<局域网IP>:8080
 - 链接可限制允许访问的域名——来自其他主机的请求会被拒绝
 - 分享内容同样遵循管理控制：被屏蔽的标题和媒体库不会出现在分享链接中
 
+### 4.7 音乐、照片与图书
+
+- **音乐**：音频文件（mp3/m4a/flac/ogg/opus/wav/aac）出现在"音乐"页，按
+  艺术家/专辑标签归组；内嵌封面作为专辑封面，打开专辑可整张连续播放。
+- **照片**：图片按文件夹归入相册（"照片"页）；有 EXIF 时显示拍摄日期与相机，
+  每个相册可幻灯片播放（方向键翻页，空格切换自动播放）。
+- **图书与漫画**：EPUB、CBZ、PDF 在自带阅读器中打开——漫画逐页、EPUB 逐章
+  （键盘方向键）、PDF 用浏览器内置查看器。
+
+### 4.8 统计、订阅与请求
+
+- "统计"页展示观看总时长、播放次数、电影/剧集数、活跃天数、近 14 天图表与
+  热门类型，并可导出 CSV 观看历史。
+- "订阅"关注剧集：打开任一剧集点击*订阅*，"订阅"页列出你关注的剧集作为
+  "新内容"动态。
+- "点播请求"让你提交想看的内容；管理员可批准（可选接入下载队列）或拒绝，
+  状态实时可见。
+
+### 4.9 设置与通知
+
+"设置"页保存你的通知偏好（总开关 + 事件列表：扫描、下载、评论、收藏、评分、
+订阅、新剧集）。播放器会按影片跨设备记住播放速度；详情页的点赞/点踩、评论与
+举报表单会遵循每条视频的策略开关。
+
 ## 5. 管理指南
 
 ### 5.1 概览
@@ -239,6 +295,49 @@ make serve                              # http://<局域网IP>:8080
 - 实时进度，可取消，失败任务可重试
 - 完成后文件保存到所选文件夹；若位于媒体库内会自动收录
 
+### 5.7 单条视频的扩展能力
+
+- **多版本影片**：同一影片的多个文件（1080p/4K/加长版等）自动归组；列表展示
+  最佳副本，详情页列出全部版本可一键切换
+- **质量档**（管理端"质量档"）：设定最小/最大高度与优先编码；扫描与"立即应用"
+  会重新评分多版本影片，档位内副本胜出
+- **背景图 / 主题曲 / 花絮**：可为每条视频上传横幅背景、音频主题曲与花絮片段
+  （详情页均可播放）；刮削也可自动补齐背景图与预告片
+- **章节与片头片尾跳过** 支撑播放器时间轴
+- **可见性与策略**：逐条选择 *公开 / 私有 / 不公开 / 密码保护*，并可关闭下载、
+  评论与举报
+- **点赞/点踩**：计数并记住你自己的反应
+
+### 5.8 IPTV 与录制
+
+- 管理端"IPTV"标签管理频道：手动添加、导入 M3U 播放列表或扫描 HDHomeRun
+  调谐器（`HDHOMERUN_URLS`）；媒体库频道把库内视频作为连续流输出
+- 输出：`GET /api/iptv/channels.m3u` 与 `/api/iptv/epg.xml`（XMLTV），并支持
+  XMLTV EPG 导入作为节目指南
+- "录制"标签预约任意频道的录制（起止时间）、显示状态；完成后的录制可在原地
+  回看
+
+### 5.9 审核
+
+- 用户可举报视频（原因 + 详情）；管理端"审核"标签处理或驳回
+- 账号可**禁言**（无法再发评论、历史评论隐藏）或**全局拉黑**；支持批量操作
+
+### 5.10 插件与刮削器
+
+- "插件"标签从内置社区目录安装 webhook 插件（或注册自定义插件并指定事件列表）；
+  启用后服务器事件（scan、download 等）会投递到其地址
+- "刮削器"标签注册实现刮削 JSON 契约的外部刮削器（URL POST 或本地命令），
+  注册后可在逐条刮削时选择，契约见 `docs/scraper-sdk.zh-CN.md`
+
+### 5.11 转码队列、邀请码与 Trakt
+
+- **转码**：为视频入队预转码并设置优先级（1–10）；本地 worker
+  （`TRANSCODE_WORKERS`）预热 HLS，让首次播放即点即播，任务可取消
+- **邀请码**：生成一次性邀请码，配合邀请制注册（`REGISTRATION_INVITE_ONLY=1`）
+- **Trakt**：配置 `TRAKT_*` 后一键把服务器观看历史推送到 Trakt（去重、支持
+  token 刷新并记录日志）
+- **点播请求（管理侧）**：批准/拒绝用户请求；批准时填下载地址即可进入 yt-dlp 队列
+
 ## 6. 配置
 
 全部通过环境变量配置（完整表见 README）。常用项：
@@ -255,6 +354,10 @@ make serve                              # http://<局域网IP>:8080
 | `METRICS_ENABLED` / `OTEL_EXPORTER_OTLP_ENDPOINT` | `1` / 空 | Prometheus /metrics 端点；OTLP 追踪导出端点 |
 | `AUTOCERT_DOMAINS` / `TLS_CERT_FILE` / `TLS_KEY_FILE` | 空 | 自动（ACME）或手动 TLS 证书 |
 | `TURN_SERVER` / `TURN_USERNAME` / `TURN_PASSWORD` | 空 | WebRTC 兜底用的 TURN 凭据 |
+| `HDHOMERUN_URLS` | 空 | 逗号分隔的 HDHomeRun 设备地址，扫描为 IPTV 频道 |
+| `REGISTRATION_ENABLED` / `REGISTRATION_INVITE_ONLY` | `1` / `0` | 开放注册开关；`1` 时需邀请码 |
+| `TRANSCODE_WORKERS` | `1` | 本地预转码 worker 池大小 |
+| `ALLOW_LOCAL_FETCH` | `0` | 允许服务端 M3U/XMLTV 导入访问私网/回环地址（仅限可信本地集成） |
 | `SCAN_WORKERS` | `4` | 并行扫描工作数 |
 | `WATCH_INTERVAL` | `30` | 自动增量扫描间隔（秒），`0` 关闭 |
 | `YTDLP_PATH` | PATH 上的 `yt-dlp` | 「下载」队列使用的 yt-dlp 二进制 |

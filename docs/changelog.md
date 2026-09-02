@@ -13,6 +13,14 @@ All notable changes to VideoCMS are documented here.
 
 ### Changed
 
+- Documentation & manuals refreshed and extended: new feature screenshots
+  (music, photos, books, stats, subscriptions, requests, settings, IPTV,
+  recordings, moderation, plugins, scrapers, transcode, quality, invites,
+  Trakt) replace/augment the gallery, product manuals in all five languages
+  cover the new media libraries, discovery, visibility, moderation and
+  operations features, and the README (en/zh/ja), architecture (en/zh-CN/ja)
+  and contributing (en/zh-CN/ja) docs gained the missing configuration rows
+  and extension-point notes
 - Video detail page layout polished: rating and comments now sit side by side
   in compact panels on desktop (stacked on mobile), and the action buttons
   were regrouped into a consistent toolbar with admin tools (scrape,

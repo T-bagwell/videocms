@@ -30,6 +30,10 @@
 ### 完善文档与翻译
 
 - 语言矩阵和改动文档的规则参见[文档与本地化](#文档与本地化)。
+- 文档中的 UI 截图由运行中的程序生成：先用
+  `scripts/make-demo-media.sh` 与 `scripts/make-demo-media-extra.sh` 生成演示素材，
+  在"演示媒体库"中扫描入库，启动后端与 Vite 开发服务器后运行
+  `scripts/screenshots.py`（Python + Playwright）刷新 `docs/screenshots/`。
 
 ### 提交代码
 

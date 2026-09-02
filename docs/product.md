@@ -23,8 +23,15 @@ hardware. Your videos never leave your network unless you choose to share them.
 | Playback | In-browser H.264/WebM playback; automatic HLS transcoding for MKV/HEVC |
 | TV Shows | Numbered files (S01E01, EP1, 第1集…) auto-grouped into series sorted by episode |
 | Personal | Continue watching, favorites, playlists with sequential playback |
+| Media libraries | **Music** (artist/album grouping with embedded cover art), **Photos** (folder albums, EXIF, slideshows) and **Books & comics** (EPUB reader, CBZ viewer, PDF) alongside video |
 | Users | Register/login, admin roles, admin user management |
+| Discovery & requests | Per-user **watch statistics**, TV-show **subscriptions** ("new uploads" feed), **title requests** that admins approve into the download queue |
+| Social & moderation | Per-video **likes/dislikes**, comments, ratings and **reports**; moderation queue with account muting/blocking |
+| Visibility | Per-item **public / private / unlisted / password-protected** with a public library page |
 | Content blocking | Admins block media by title — hidden for everyone, files and records kept, unblock anytime |
+| Live TV & IPTV | **M3U channel import**, library-generated channels, **EPG (XMLTV)**, HDHomeRun tuner scan, **scheduled recordings** and catch-up playback |
+| Extensibility | **Scraper SDK** (installable scrapers), **plugin directory** with event webhooks, OpenAPI docs, Prometheus **/metrics** and OTLP traces |
+| Operations | Docker & Helm packaging, **pre-transcode queue** with priorities, Trakt watch-history sync, auto-TLS and TURN helpers |
 | Interface | 5 languages: English (default), 中文, Français, 日本語, Deutsch |
 
 ## Screenshots
@@ -55,6 +62,36 @@ quality selector, watch together, casting and intro/credits skip:
 storage, jobs and webhooks:
 
 ![Admin](screenshots/admin.png)
+
+**Music** — audio files are grouped into albums with embedded cover art and
+played as a continuous queue:
+
+![Music](screenshots/music.png) ![Album](screenshots/music-album.png)
+
+**Photos & books** — folder-based photo albums with slideshows, and an EPUB /
+CBZ / PDF reader:
+
+![Photos](screenshots/photos.png) ![Books](screenshots/books.png)
+![Reader](screenshots/book-reader.png)
+
+**Personal & discovery** — watch statistics, subscriptions, title requests
+and notification settings:
+
+![Stats](screenshots/stats.png) ![Subscriptions](screenshots/subscriptions.png)
+![Requests](screenshots/requests.png) ![Settings](screenshots/settings.png)
+
+**IPTV & recordings** — channel management, EPG import, scheduled recordings
+and catch-up:
+
+![IPTV](screenshots/admin-iptv.png) ![Recordings](screenshots/admin-recordings.png)
+
+**Admin extras** — quality profiles, invites, Trakt sync, moderation,
+scrapers, plugins and the transcode queue:
+
+![Quality](screenshots/admin-quality.png) ![Invites](screenshots/admin-invites.png)
+![Trakt](screenshots/admin-trakt.png) ![Moderation](screenshots/admin-moderation.png)
+![Scrapers](screenshots/admin-scrapers.png) ![Plugins](screenshots/admin-plugins.png)
+![Transcode](screenshots/admin-transcode.png)
 
 ## 3. Quick Start
 
@@ -188,6 +225,42 @@ as `1 (4)` or `-535`. A group needs at least 2 episodes to become a series.
 - Shared content still respects admin controls: blocked titles and blocked
   libraries never show up in share links
 
+Some videos can also be **public**: the admin can set a video to *public*
+(visible to anyone at `/public`), *unlisted* (link only, hidden from
+listings) or *password-protected* (a short-lived unlock token after entering
+the password). Private is the default.
+
+### 4.7 Music, photos & books
+
+- **Music**: audio files (mp3/m4a/flac/ogg/opus/wav/aac) appear in the
+  **Music** tab, grouped into albums by artist/album tags; embedded cover art
+  becomes the album cover. Open an album to play tracks as a continuous
+  queue.
+- **Photos**: images are grouped by folder into albums in the **Photos** tab;
+  EXIF date/camera metadata is shown where available and every album can run
+  as a slideshow (arrow keys navigate, space toggles autoplay).
+- **Books & comics**: EPUB, CBZ and PDF files open in the built-in reader —
+  comics page by page, EPUBs chapter by chapter (keyboard arrows) and PDFs in
+  the browser viewer.
+
+### 4.8 Stats, subscriptions & requests
+
+- The **Stats** page shows your total watch time, plays, movies/episodes,
+  active days, the last 14 days as a chart and your top genres, and can export
+  the history as CSV.
+- **Subscriptions** follows TV shows: open any show and press *Subscribe*;
+  the Subscriptions page lists them as your "new uploads" feed.
+- **Requests** lets you ask for titles; admins can approve (optionally feeding
+  the download queue) or reject, and you see the status live.
+
+### 4.9 Settings & notifications
+
+The **Settings** page stores your notification preferences (master switch +
+event list: scans, downloads, comments, favorites, ratings, subscriptions and
+new episodes). The player remembers per-video playback speed across devices,
+and the detail page's like/dislike buttons and comment/report forms respect
+each video's policy switches.
+
 ## 5. Admin Guide
 
 ### 5.1 Overview
@@ -282,6 +355,61 @@ Stats: videos, libraries, users, playlists, favorites, series and storage used.
 - Finished files land in the chosen folder and are indexed automatically if
   it is inside a library
 
+### 5.7 Per-video extras
+
+- **Multi-version movies**: files of the same film (1080p/4K/extended cut) are
+  grouped automatically; listings use the best copy and the detail page lists
+  every version for one-click switching
+- **Quality profiles** (Quality admin tab): choose min/max height and a
+  preferred codec; scans and *Apply now* re-score movie versions so in-range
+  copies win
+- **Backdrops, theme songs & featurettes**: upload a hero backdrop, an audio
+  theme song and featurette clips per video (all playable from the detail
+  page); metadata scraping can also fill backdrop and trailer automatically
+- **Chapters & skip intervals** power the player timeline
+- **Visibility & policy**: per video choose *public / private / unlisted /
+  password-protected* and toggle downloads, comments and reports
+- **Likes/dislikes** count and remember your own reaction
+
+### 5.8 IPTV & recordings
+
+- The **IPTV** admin tab manages channels: add manually, import an M3U
+  playlist or scan HDHomeRun tuners (`HDHOMERUN_URLS`); library channels
+  stream every video in a library as one continuous feed
+- Outputs: `GET /api/iptv/channels.m3u` and `/api/iptv/epg.xml` (XMLTV), plus
+  an XMLTV EPG importer for guide data
+- The **Recordings** tab schedules captures of any channel (start/end), shows
+  status, and finished recordings become catch-up with in-place playback
+
+### 5.9 Moderation
+
+- Users report videos (reason + details); the **Moderation** tab reviews or
+  dismisses them
+- Accounts can be **muted** (no new comments, history hidden) or **globally
+  blocked**; bulk actions apply to many users at once
+
+### 5.10 Plugins & scrapers
+
+- The **Plugins** tab installs webhook plugins from the built-in community
+  directory (or register custom ones with matching event lists); enabled
+  plugins receive server events (`scan`, `download`, …) at their URL
+- The **Scrapers** tab registers external scrapers that implement the scraper
+  JSON contract (URL POST or local command) — they become selectable providers
+  per video, documented in `docs/scraper-sdk.md`
+
+### 5.11 Transcode queue, invites & Trakt
+
+- **Transcode**: enqueue videos for pre-transcoding with a priority (1–10);
+  local workers (`TRANSCODE_WORKERS`) warm HLS sessions so first playback is
+  instant, and jobs can be cancelled
+- **Invites**: generate one-time invite codes for invite-only registration
+  (`REGISTRATION_INVITE_ONLY=1`)
+- **Trakt**: with `TRAKT_*` credentials configured, one click pushes the
+  server's watch history to Trakt (deduplicated, with token refresh and a sync
+  log)
+- **Requests** (admin side): approve or reject user requests; approving with a
+  download URL feeds the yt-dlp queue
+
 ## 6. Configuration
 
 All settings are environment variables (see the README for the full table). The
@@ -299,6 +427,10 @@ most important ones:
 | `METRICS_ENABLED` / `OTEL_EXPORTER_OTLP_ENDPOINT` | `1` / empty | Prometheus /metrics endpoint; OTLP trace export endpoint |
 | `AUTOCERT_DOMAINS` / `TLS_CERT_FILE` / `TLS_KEY_FILE` | empty | Automatic (ACME) or manual TLS certificates |
 | `TURN_SERVER` / `TURN_USERNAME` / `TURN_PASSWORD` | empty | TURN credentials for WebRTC fallback |
+| `HDHOMERUN_URLS` | empty | Comma-separated HDHomeRun device URLs scanned into IPTV channels |
+| `REGISTRATION_ENABLED` / `REGISTRATION_INVITE_ONLY` | `1` / `0` | Open registration switch; `1` requires invite codes |
+| `TRANSCODE_WORKERS` | `1` | Local pre-transcode worker pool size |
+| `ALLOW_LOCAL_FETCH` | `0` | Allow server-side M3U/XMLTV imports to reach private/loopback addresses (trusted local integrations only) |
 | `SCAN_WORKERS` | `4` | Parallel scanning workers |
 | `WATCH_INTERVAL` | `30` | Seconds between automatic incremental scans; `0` disables |
 | `YTDLP_PATH` | `yt-dlp` on PATH | yt-dlp binary used by the Downloads queue |

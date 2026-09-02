@@ -39,6 +39,11 @@ Go・React・PostgreSQL で構築されたセルフホスト型のビデオリ�
 - 言語構成とドキュメント変更時のルールは
   [ドキュメントとローカライズ](#ドキュメントとローカライズ) を参照して
   ください。
+- ドキュメントの UI スクリーンショットは動作中のアプリから生成します：
+  `scripts/make-demo-media.sh` と `scripts/make-demo-media-extra.sh` でデモ素材を
+  作り、「演示媒体库」ライブラリでスキャンし、バックエンドと Vite 開発サーバーを
+  起動してから `scripts/screenshots.py`（Python + Playwright）を実行し、
+  `docs/screenshots/` を更新します。
 
 ### コードの提出
 
