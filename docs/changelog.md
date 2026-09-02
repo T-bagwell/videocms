@@ -59,6 +59,10 @@ All notable changes to VideoCMS are documented here.
 
 ### Added
 
+- Plugin/extension system: admins install webhook plugins from a built-in
+  community directory (or register custom ones with matching event lists);
+  enabled webhook plugins receive server events with an `X-Videocms-Plugin`
+  header (migration 055), managed from a Plugins admin tab
 - Scraper SDK: admins register external scrapers (URL POST or local command)
   that implement a documented JSON contract, selectable per video like the
   built-in providers; a Scrapers admin tab manages them and
