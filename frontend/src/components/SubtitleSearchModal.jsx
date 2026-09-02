@@ -69,6 +69,9 @@ export default function SubtitleSearchModal({ video, onClose, onDownloaded }) {
                     <div className="playlist-name">{c.title || t('video.subtitleTrack')}</div>
                     <div className="muted">{c.language}</div>
                   </div>
+                  {c.provider && (
+                    <span className="status-badge status-idle">{c.provider}</span>
+                  )}
                 </div>
                 <div className="detail-actions">
                   <button className="btn ghost" disabled={busy} onClick={() => download(c)}>

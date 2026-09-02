@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
+	"regexp"
 	"strings"
 	"sync"
 	"time"
@@ -17,6 +19,7 @@ import (
 // SubtitleCandidate is one downloadable subtitle file from a provider.
 type SubtitleCandidate struct {
 	ID       string `json:"id"`
+	Provider string `json:"provider"`
 	Language string `json:"language"`
 	Title    string `json:"title"`
 }
@@ -52,6 +55,134 @@ func NewOpenSubtitlesProvider(username, password, apiKey string) *OpenSubtitlesP
 }
 
 func (p *OpenSubtitlesProvider) Name() string { return "opensubtitles" }
+
+// MultiProvider searches every configured provider and dispatches downloads by
+// the candidate's provider prefix.
+type MultiProvider struct {
+	Providers []SubtitleProvider
+}
+
+func (m *MultiProvider) Name() string { return "multi" }
+
+func (m *MultiProvider) Search(ctx context.Context, query, language string) ([]SubtitleCandidate, error) {
+	var out []SubtitleCandidate
+	for _, p := range m.Providers {
+		items, err := p.Search(ctx, query, language)
+		if err != nil {
+			continue
+		}
+		for _, it := range items {
+			it.Provider = p.Name()
+			it.ID = p.Name() + ":" + it.ID
+			out = append(out, it)
+		}
+	}
+	return out, nil
+}
+
+func (m *MultiProvider) Download(ctx context.Context, fileID string) ([]byte, error) {
+	provider, id, ok := strings.Cut(fileID, ":")
+	if !ok {
+		return nil, fmt.Errorf("invalid file id")
+	}
+	for _, p := range m.Providers {
+		if p.Name() == provider {
+			return p.Download(ctx, id)
+		}
+	}
+	return nil, fmt.Errorf("unknown subtitle provider %q", provider)
+}
+
+// PodnapisiProvider searches the keyless Podnapisi.net site (best effort).
+type PodnapisiProvider struct {
+	client *http.Client
+}
+
+func NewPodnapisiProvider() *PodnapisiProvider {
+	return &PodnapisiProvider{client: &http.Client{Timeout: 30 * time.Second}}
+}
+
+func (p *PodnapisiProvider) Name() string { return "podnapisi" }
+
+func (p *PodnapisiProvider) Search(ctx context.Context, query, language string) ([]SubtitleCandidate, error) {
+	u := "https://podnapisi.net/subtitles/search/advanced?keywords=" + url.QueryEscape(query)
+	if language != "" {
+		u += "&language=" + url.QueryEscape(language)
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("User-Agent", "VideoCMS/1.0")
+	resp, err := p.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = resp.Body.Close() }()
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("podnapisi search: HTTP %d", resp.StatusCode)
+	}
+	body, err := io.ReadAll(io.LimitReader(resp.Body, 8<<20))
+	if err != nil {
+		return nil, err
+	}
+	html := string(body)
+	seen := map[string]bool{}
+	var out []SubtitleCandidate
+	for _, m := range subtitleLinkRe.FindAllStringSubmatch(html, -1) {
+		href := m[1]
+		if seen[href] {
+			continue
+		}
+		seen[href] = true
+		out = append(out, SubtitleCandidate{ID: href, Language: language, Title: query})
+		if len(out) >= 20 {
+			break
+		}
+	}
+	return out, nil
+}
+
+func (p *PodnapisiProvider) Download(ctx context.Context, fileID string) ([]byte, error) {
+	page := "https://podnapisi.net" + fileID
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, page, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("User-Agent", "VideoCMS/1.0")
+	resp, err := p.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	body, err := io.ReadAll(io.LimitReader(resp.Body, 4<<20))
+	_ = resp.Body.Close()
+	if err != nil {
+		return nil, err
+	}
+	dl := subtitleDownloadRe.FindSubmatch(body)
+	if dl == nil {
+		return nil, fmt.Errorf("podnapisi download link not found")
+	}
+	dlReq, err := http.NewRequestWithContext(ctx, http.MethodGet, "https://podnapisi.net"+string(dl[1]), nil)
+	if err != nil {
+		return nil, err
+	}
+	dlReq.Header.Set("User-Agent", "VideoCMS/1.0")
+	dlResp, err := p.client.Do(dlReq)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = dlResp.Body.Close() }()
+	if dlResp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("podnapisi download: HTTP %d", dlResp.StatusCode)
+	}
+	return io.ReadAll(io.LimitReader(dlResp.Body, 8<<20))
+}
+
+var (
+	subtitleLinkRe     = regexp.MustCompile(`href="(/subtitles/[^"]+)"`)
+	subtitleDownloadRe = regexp.MustCompile(`href="(/download/[^"]+)"`)
+)
 
 func (p *OpenSubtitlesProvider) postJSON(ctx context.Context, path string, body, out any) error {
 	data, err := json.Marshal(body)

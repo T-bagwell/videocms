@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -27,7 +28,13 @@ func (a *App) subtitleProvider() media.SubtitleProvider {
 	if a.subProvider != nil {
 		return a.subProvider
 	}
-	return media.NewOpenSubtitlesProvider(a.cfg.SubtitleOSUser, a.cfg.SubtitleOSPassword, a.cfg.SubtitleOSAPIKey)
+	multi := &media.MultiProvider{}
+	if a.cfg.SubtitleOSAPIKey != "" {
+		multi.Providers = append(multi.Providers,
+			media.NewOpenSubtitlesProvider(a.cfg.SubtitleOSUser, a.cfg.SubtitleOSPassword, a.cfg.SubtitleOSAPIKey))
+	}
+	multi.Providers = append(multi.Providers, media.NewPodnapisiProvider())
+	return multi
 }
 
 // POST /api/videos/{id}/subtitles/search — find subtitle candidates online.
@@ -59,7 +66,32 @@ func (a *App) searchSubtitles(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusBadGateway, "subtitle search failed: "+err.Error())
 		return
 	}
+	if len(items) == 0 {
+		// fuzzy fallback: retry without the year / extra tokens
+		fuzzy := fuzzyTitleQuery(title)
+		if fuzzy != query {
+			if items2, err2 := a.subtitleProvider().Search(r.Context(), fuzzy, strings.TrimSpace(req.Language)); err2 == nil {
+				items = items2
+			}
+		}
+	}
+	providerName := a.subtitleProvider().Name()
+	for i := range items {
+		if items[i].Provider == "" {
+			items[i].Provider = providerName
+		}
+	}
 	writeJSON(w, http.StatusOK, map[string]any{"items": items})
+}
+
+// fuzzyTitleQuery strips 4-digit years and trailing quality tokens so subtitle
+// searches can match slightly different titles.
+func fuzzyTitleQuery(title string) string {
+	re := regexp.MustCompile(`(?i)\b(19\d{2}|20\d{2})\b|1080p|720p|4k|2160p|bluray|web-?dl|webrip|remux`)
+	cleaned := re.ReplaceAllString(title, " ")
+	cleaned = strings.NewReplacer("(", " ", ")", " ", "[", " ", "]", " ").Replace(cleaned)
+	parts := strings.Fields(cleaned)
+	return strings.Join(parts, " ")
 }
 
 // POST /api/videos/{id}/subtitles/download — fetch a candidate, store it under
