@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "hls.js": "^1.7.1",
-    "i18next": "^26.3.6",
+    "i18next": "^26.4.1",
     "jassub": "^2.5.14",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
