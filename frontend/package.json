@@ -13,7 +13,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "hls.js": "^1.7.1",
+    "hls.js": "^1.7.2",
     "i18next": "^26.3.6",
     "jassub": "^2.5.14",
     "react": "^19.2.8",
