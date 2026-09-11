@@ -1,6 +1,6 @@
 module videocms/backend
 
-go 1.26
+go 1.26.0
 
 require (
 	github.com/crewjam/saml v0.5.1
@@ -10,7 +10,7 @@ require (
 	github.com/jackc/pgx/v5 v5.10.0
 	github.com/russellhaering/goxmldsig v1.4.0
 	github.com/rwcarlsen/goexif v0.0.0-20190401172101-9e8deecbddbd
-	golang.org/x/crypto v0.55.0
+	golang.org/x/crypto v0.56.0
 )
 
 require (
